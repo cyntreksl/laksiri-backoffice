@@ -9,6 +9,20 @@ import Button from "primevue/button";
 import Card from "primevue/card";
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
+import Select from "primevue/select";
+import DatePicker from "primevue/datepicker";
+import moment from "moment";
+
+defineProps({
+    users: {
+        type: Array,
+        default: () => [],
+    },
+    customers: {
+        type: Array,
+        default: () => [],
+    }
+})
 
 const baseUrl = ref("/call-center/cashier/paid/list");
 const loading = ref(true);
@@ -19,21 +33,43 @@ const currentPage = ref(1);
 const dt = ref();
 
 const filters = ref({
-    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    customer: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    reception: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    verified_by: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    paid_at: { value: null, matchMode: FilterMatchMode.EQUALS },
 });
 
-const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+const fetchTokens = async (
+    page = 1,
+    search = "",
+    sortField = 'created_at',
+    sortOrder = 0,
+    customer = "",
+    reception = "",
+    verified_by = "",
+    paid_at = ""
+) => {
     loading.value = true;
     try {
-        const response = await axios.get(baseUrl.value, {
-            params: {
-                page,
-                per_page: perPage.value,
-                search,
-                sort_field: sortField,
-                sort_order: sortOrder === 1 ? "asc" : "desc",
-            }
-        });
+        let paidAtParam = '';
+        if (paid_at && moment(paid_at).isValid()) {
+            paidAtParam = moment(paid_at).format("YYYY-MM-DD");
+        }
+        const params = {
+            page,
+            per_page: perPage.value,
+            search,
+            sort_field: sortField,
+            sort_order: sortOrder === 1 ? "asc" : "desc",
+            customer,
+            reception,
+            verified_by,
+        };
+        if (paidAtParam) {
+            params.paid_at = paidAtParam;
+        }
+        const response = await axios.get(baseUrl.value, { params });
         tokens.value = response.data.data;
         totalRecords.value = response.data.meta.total;
         currentPage.value = response.data.meta.current_page;
@@ -48,20 +84,49 @@ const debouncedFetchTokens = debounce((searchValue) => {
     fetchTokens(1, searchValue);
 }, 1000);
 
-watch(() => filters.value.global.value, (newValue) => {
-    if (newValue !== null) {
-        debouncedFetchTokens(newValue);
-    }
-});
+watch(
+    filters,
+    (newFilters, oldFilters) => {
+        fetchTokens(
+            1,
+            filters.value.global.value,
+            'created_at',
+            0,
+            filters.value.customer.value,
+            filters.value.reception.value,
+            filters.value.verified_by.value,
+            filters.value.paid_at.value
+        );
+    },
+    { deep: true }
+);
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchTokens(currentPage.value);
+    fetchTokens(
+        currentPage.value,
+        filters.value.global.value,
+        'created_at',
+        0,
+        filters.value.customer.value,
+        filters.value.reception.value,
+        filters.value.verified_by.value,
+        filters.value.paid_at.value
+    );
 };
 
 const onSort = (event) => {
-    fetchTokens(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+    fetchTokens(
+        currentPage.value,
+        filters.value.global.value,
+        event.sortField,
+        event.sortOrder,
+        filters.value.customer.value,
+        filters.value.reception.value,
+        filters.value.verified_by.value,
+        filters.value.paid_at.value
+    );
 };
 
 onMounted(() => {
@@ -130,9 +195,31 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="customer" header="Customer"></Column>
+                        <Column :showFilterMenu="true" field="customer" filterField="customer" header="Customer">
+                            <template #filter="{ filterModel }">
+                                <Select
+                                    v-model="filterModel.value"
+                                    :options="customers"
+                                    filter
+                                    option-label="name"
+                                    option-value="name"
+                                    placeholder="Select Customer"
+                                />
+                            </template>
+                        </Column>
 
-                        <Column field="reception" header="Reception"></Column>
+                        <Column :showFilterMenu="true" field="reception" filterField="reception" header="Reception">
+                            <template #filter="{ filterModel }">
+                                <Select
+                                    v-model="filterModel.value"
+                                    :options="users"
+                                    filter
+                                    option-label="name"
+                                    option-value="name"
+                                    placeholder="Select Customer"
+                                />
+                            </template>
+                        </Column>
 
                         <Column field="package_count" header="Packages">
                             <template #body="slotProps">
@@ -143,18 +230,42 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="paid_at" header="Paid At"></Column>
+                        <Column :showFilterMenu="true" field="paid_at" filterField="paid_at" header="Paid At">
+                            <template #filter="{ filterModel }">
+                                <DatePicker
+                                    v-model="filterModel.value"
+                                    class="w-full"
+                                    dateFormat="yy-mm-dd"
+                                    placeholder="Select Date"
+                                    showIcon
+                                />
+                            </template>
+                            <template #body="slotProps">
+                                {{ slotProps.data.paid_at ? moment(slotProps.data.paid_at).format('YYYY-MM-DD') : '' }}
+                            </template>
+                        </Column>
 
                         <Column field="paid_amount" header="Paid Amount">
                             <template #body="slotProps">
                                 <div class="flex items-center justify-end">
                                     <i class="ti ti-cash mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                    {{ slotProps.data.paid_amount.toFixed(2) }}
+                                    {{ Number(slotProps.data.paid_amount).toFixed(2) }}
                                 </div>
                             </template>
                         </Column>
 
-                        <Column field="verified_by" header="Verified By"></Column>
+                        <Column :showFilterMenu="true" field="verified_by" filterField="verified_by" header="Verified By">
+                            <template #filter="{ filterModel }">
+                                <Select
+                                    v-model="filterModel.value"
+                                    :options="users"
+                                    filter
+                                    option-label="name"
+                                    option-value="name"
+                                    placeholder="Select Customer"
+                                />
+                            </template>
+                        </Column>
 
                         <Column field="note" header="Note"></Column>
 

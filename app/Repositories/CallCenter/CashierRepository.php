@@ -212,6 +212,34 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             ->cashierQueue()
             ->has('token.cashierPayment');
 
+        // Apply customer filter
+        if (! empty($filters['customer'])) {
+            $query->whereHas('token.customer', function ($q) use ($filters) {
+                $q->where('name', 'like', '%'.$filters['customer'].'%');
+            });
+        }
+
+        // Apply reception filter
+        if (! empty($filters['reception'])) {
+            $query->whereHas('token.reception', function ($q) use ($filters) {
+                $q->where('name', 'like', '%'.$filters['reception'].'%');
+            });
+        }
+
+        // Apply verified_by filter
+        if (! empty($filters['verified_by'])) {
+            $query->whereHas('token.cashierPayment.verifiedBy', function ($q) use ($filters) {
+                $q->where('name', 'like', '%'.$filters['verified_by'].'%');
+            });
+        }
+
+        // Apply paid_at filter
+        if (! empty($filters['paid_at'])) {
+            $query->whereHas('token.cashierPayment', function ($q) use ($filters) {
+                $q->whereDate('created_at', $filters['paid_at']);
+            });
+        }
+
         $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([

@@ -9,6 +9,7 @@ use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use App\Models\Currency;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -66,7 +67,13 @@ class CashierController extends Controller
 
     public function showPaidList()
     {
-        return Inertia::render('CallCenter/Cashier/PaidList');
+        $customers = User::role('customer')->get();
+        $users = User::role('call center')->get();
+
+        return Inertia::render('CallCenter/Cashier/PaidList', [
+            'customers' => $customers,
+            'users' => $users,
+        ]);
     }
 
     public function getPaidList(Request $request)
@@ -75,7 +82,15 @@ class CashierController extends Controller
         $page = $request->input('page', 1);
         $order = $request->input('sort_field', 'id');
         $dir = $request->input('sort_order', 'asc');
+        $search = $request->input('search', null);
 
-        return $this->cashierRepository->dataset($limit, $page, $order, $dir);
+        $filters = [
+            'customer' => $request->input('customer'),
+            'reception' => $request->input('reception'),
+            'verified_by' => $request->input('verified_by'),
+            'paid_at' => $request->input('paid_at'),
+        ];
+
+        return $this->cashierRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 }
