@@ -33,6 +33,7 @@ use App\Actions\HBL\HBLPackage\GetPackagesByReference;
 use App\Actions\HBL\MarkAsRTF;
 use App\Actions\HBL\MarkAsUnRTF;
 use App\Actions\HBL\Payments\CreateHBLPayment;
+use App\Actions\HBL\Payments\UpdateHBLPaymentTransaction;
 use App\Actions\HBL\RestoreHBL;
 use App\Actions\HBL\SwitchHoldStatus;
 use App\Actions\HBL\UpdateHBL;
@@ -150,7 +151,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                     'notes' => $data['payment_notes'] ?? null,
                 ];
 
-                CreateHBLPayment::run($newPaymentData);
+                UpdateHBLPaymentTransaction::run($hbl, $newPaymentData);
             }
 
             $hbl->refresh();

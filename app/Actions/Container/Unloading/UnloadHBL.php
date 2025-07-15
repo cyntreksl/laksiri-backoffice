@@ -26,6 +26,8 @@ class UnloadHBL
 
             UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_CASH_RECEIVED, 'HBL has been removed from loaded shipment');
 
+            $hbl->addStatus('HBL Removed From Shipment');
+
             $hblPackageIds = $container->hbl_packages()
                 ->where('hbl_id', $data['hbl_id'])
                 ->pluck('hbl_package_id');

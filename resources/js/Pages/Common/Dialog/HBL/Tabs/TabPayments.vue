@@ -59,7 +59,9 @@ const formatAmount = (amount, currency = 'LKR') => {
 };
 
 const totalPaid = computed(() => {
-    const sum = payments.value.reduce((sum, p) => sum + parseFloat(p.paid_amount || 0), 0);
+    const sum = payments.value
+        .filter(p => !p.is_cancelled)
+        .reduce((sum, p) => sum + parseFloat(p.paid_amount || 0), 0);
     return Math.round(sum * 100) / 100; // round to 2 decimal places
 });
 const totalDue = computed(() => payments.value.length > 0 ? payments.value[0].due_amount : 0);
