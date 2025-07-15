@@ -147,6 +147,7 @@ const form = useForm({
     discount: Number(props.hbl.discount || 0).toFixed(2),
     paid_amount: Number(props.hbl.paid_amount || 0).toFixed(2),
     grand_total: Number(props.hbl.grand_total || 0).toFixed(2),
+    package_charges: Number(props.hbl.package_charges || 0).toFixed(2),
     packages: props.hbl.packages,
     is_active_package: !!props. hbl. packages?.[0]?.package_rule,
     additional_charge: Number(props.hbl.additional_charge || 0).toFixed(2),

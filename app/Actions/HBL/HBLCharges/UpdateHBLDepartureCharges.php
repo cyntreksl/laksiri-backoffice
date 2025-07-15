@@ -52,7 +52,7 @@ class UpdateHBLDepartureCharges
             'departure_grand_total' => $departureGrandTotal,
         ];
 
-        $departureChargeModel = $HBL->hblDepartureCharge;
+        $departureChargeModel = $HBL->departureCharge;
         if ($departureChargeModel) {
             $departureChargeModel->update($departureCharge);
         } else {

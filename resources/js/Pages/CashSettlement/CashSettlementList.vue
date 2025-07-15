@@ -503,6 +503,7 @@ const exportURL = computed(() => {
                 <template #content>
                     <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null" />
                     <DataTable
+                        class="compact-table-rows"
                         v-model:contextMenuSelection="selectedHBL"
                         v-model:filters="filters"
                         v-model:selection="selectedHBLs"
@@ -719,3 +720,19 @@ const exportURL = computed(() => {
         @update:visible="showConfirmPaymentModal = $event"
     />
 </template>
+
+<style>
+.compact-table-rows .p-datatable-tbody > tr > td,
+.compact-table-rows .p-datatable-thead > tr > th {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+.compact-table-rows .p-datatable-tbody > tr {
+    min-height: 28px !important;
+    height: 32px !important;
+}
+</style>

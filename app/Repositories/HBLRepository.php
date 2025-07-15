@@ -154,6 +154,23 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 UpdateHBLPaymentTransaction::run($hbl, $newPaymentData);
             }
 
+            $paymentData = [
+                'freight_charge' => $data['freight_charge'],
+                'bill_charge' => $data['bill_charge'],
+                'other_charge' => $data['other_charge'],
+                'destination_charge' => $data['destination_charge'],
+                'package_charges' => $data['package_charges'],
+                'discount' => $data['discount'],
+                'additional_charge' => $data['additional_charge'],
+                'grand_total' => $data['grand_total'],
+                'paid_amount' => $data['paid_amount'],
+                'is_departure_charges_paid' => $data['is_departure_charges_paid'],
+                'is_destination_charges_paid' => $data['is_destination_charges_paid'],
+            ];
+
+            UpdateHBLDepartureCharges::run($hbl, $paymentData);
+            UpdateHBLDestinationCharges::run($hbl, $paymentData);
+
             $hbl->refresh();
         });
 
