@@ -64,7 +64,7 @@ class CreateOrUpdateLoadedContainer
                 ]);
 
                 $hbl = HBL::find($hbl_package->hbl_id);
-                $hbl->addStatus('Container Shipped');
+                $hbl->addStatus('HBL Loaded Into Shipment');
             }
 
             UpdateContainerStatus::run($container, ContainerStatus::LOADED->value);

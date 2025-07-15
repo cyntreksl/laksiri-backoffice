@@ -470,6 +470,7 @@ const handleConfirmDriverRemove = (pickupId) => {
                 <template #content>
                     <ContextMenu ref="cm" :model="menuModel" @hide="selectedPickup.length < 1"/>
                     <DataTable
+                        class="compact-table-rows"
                         ref="dt"
                         v-model:contextMenuSelection="selectedPickup"
                         v-model:filters="filters"
@@ -709,3 +710,19 @@ const handleConfirmDriverRemove = (pickupId) => {
         </div>
     </Dialog>
 </template>
+
+<style>
+.compact-table-rows .p-datatable-tbody > tr > td,
+.compact-table-rows .p-datatable-thead > tr > th {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+.compact-table-rows .p-datatable-tbody > tr {
+    min-height: 28px !important;
+    height: 32px !important;
+}
+</style>

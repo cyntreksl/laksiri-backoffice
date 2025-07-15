@@ -40,7 +40,6 @@ class UpdateHBL
             'additional_charge' => $data['additional_charge'],
             'paid_amount' => $data['paid_amount'],
             'grand_total' => $data['grand_total'],
-            'created_by' => auth()->id(),
             'pickup_id' => $data['pickup_id'] ?? null,
             'is_departure_charges_paid' => $data['is_departure_charges_paid'],
             'is_destination_charges_paid' => $data['is_destination_charges_paid'],

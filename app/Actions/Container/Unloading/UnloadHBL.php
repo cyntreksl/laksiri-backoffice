@@ -2,8 +2,11 @@
 
 namespace App\Actions\Container\Unloading;
 
+use App\Actions\HBL\GetHBLById;
 use App\Actions\HBL\HBLPackage\MarkAsUnloaded;
+use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Models\Container;
+use App\Models\HBL;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -18,6 +21,12 @@ class UnloadHBL
     {
         try {
             DB::beginTransaction();
+
+            $hbl = GetHBLById::run($data['hbl_id']);
+
+            UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_CASH_RECEIVED, 'HBL has been removed from loaded shipment');
+
+            $hbl->addStatus('HBL Removed From Shipment');
 
             $hblPackageIds = $container->hbl_packages()
                 ->where('hbl_id', $data['hbl_id'])

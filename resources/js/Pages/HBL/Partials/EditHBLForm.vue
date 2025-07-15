@@ -147,6 +147,7 @@ const form = useForm({
     discount: Number(props.hbl.discount || 0).toFixed(2),
     paid_amount: Number(props.hbl.paid_amount || 0).toFixed(2),
     grand_total: Number(props.hbl.grand_total || 0).toFixed(2),
+    package_charges: Number(props.hbl.package_charges || 0).toFixed(2),
     packages: props.hbl.packages,
     is_active_package: !!props. hbl. packages?.[0]?.package_rule,
     additional_charge: Number(props.hbl.additional_charge || 0).toFixed(2),
@@ -189,6 +190,11 @@ const resetConsigneeWhatsappNumber = () => {
 };
 
 const handleHBLUpdate = () => {
+    // Ensure each package has 'type' property for backend
+    form.packages = form.packages.map(pkg => ({
+        ...pkg,
+        type: pkg.package_type
+    }));
     form.additional_mobile_number = additionalMobileCountryCode.value + additionalMobileNumber.value;
     form.whatsapp_number = whatsappNumberCountryCode.value + whatsappNumber.value;
     form.consignee_additional_mobile_number = consigneeAdditionalMobileCountryCode.value + consigneeAdditionalMobileNumber.value;
@@ -390,22 +396,14 @@ const addPackageData = () => {
     }
 
     if (editMode.value) {
-        packageList.value.splice(editIndex.value, 1, {...packageItem});
-        grandTotalWeight.value = packageList.value.reduce(
-            (accumulator, currentValue) => accumulator + parseFloat(currentValue.totalWeight),
-            0
-        );
-        grandTotalVolume.value = packageList.value.reduce(
-            (accumulator, currentValue) => accumulator + parseFloat(currentValue.volume),
-            0
-        );
-
+        const updatedItem = { ...packageItem, package_type: packageItem.type };
+        packageList.value.splice(editIndex.value, 1, updatedItem);
+        form.packages = [...packageList.value];
         calculatePayment();
     } else {
-        const newItem = {...packageItem};
-        newItem['package_type'] = newItem.type;
+        const newItem = { ...packageItem, package_type: packageItem.type };
         packageList.value.push(newItem);
-        form.packages = packageList.value;
+        form.packages = [...packageList.value];
         calculatePayment();
     }
     closeAddPackageModal();
@@ -475,7 +473,7 @@ watch([() => form.cargo_type], ([newCargoType]) => {
 const selectedType = ref("");
 
 const updateTypeDescription = () => {
-    packageItem.type = (packageItem.type ? " " : "") + selectedType.value;
+    packageItem.type = selectedType.value;
 };
 const hblTotal = ref(0);
 const currency = ref(usePage().props.currentBranch.currency_symbol || "SAR");
@@ -617,7 +615,7 @@ const openEditModal = (index) => {
     editIndex.value = index;
     showAddNewPackageDialog.value = true;
 
-    selectedType.value = packageList.value[index].package_type;
+    selectedType.value = packageList.value[index].package_type; // Ensure dropdown matches current type
     // populate packageItem with existing data for editing
     Object.assign(packageItem, packageList.value[index]);
     packageItem.type = packageList.value[index].package_type;
