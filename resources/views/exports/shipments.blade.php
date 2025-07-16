@@ -152,7 +152,7 @@
                     <strong> NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
                 </th>
                 <th colspan="4" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px; border-bottom: none">
-                    <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 2) }} </strong>
+                    <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 3) }} </strong>
                 </th>
                 <th colspan="4" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px; border-bottom: none">
                     <strong> TOTAL WEIGHT:KG                 {{ number_format($total_gtotal, 2) }} </strong>

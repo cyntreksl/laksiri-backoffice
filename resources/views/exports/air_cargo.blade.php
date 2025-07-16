@@ -138,7 +138,7 @@
                     <strong> TOTAL VOLUME</strong>
                 </th>
                 <th colspan="3" rowspan="2" style="text-align: center;font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    <strong> {{ number_format($total_vtotal, 2) }}</strong>
+                    <strong> {{ number_format($total_vtotal, 3) }}</strong>
                 </th>
                 <th colspan="1" rowspan="2" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     <strong>TOTAL WEIGHT:</strong>
