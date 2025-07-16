@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> SEA Cargo Manifest Free </title>
+    <title> SEA Cargo Manifest </title>
     <style>
         table {
             width: 100%;
@@ -152,7 +152,7 @@
                     <strong> NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
                 </th>
                 <th colspan="4" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px; border-bottom: none">
-                    <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 2) }} </strong>
+                    <strong> TOTAL VOLUME  {{ number_format($total_vtotal, 3) }} </strong>
                 </th>
                 <th colspan="4" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px; border-bottom: none">
                     <strong> TOTAL WEIGHT:KG                 {{ number_format($total_gtotal, 2) }} </strong>
@@ -233,11 +233,18 @@
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center">{{ isset($item[9][3]) ? $item[9][3]['quantity'] : ' ' }}</td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center"></td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center"></td>
-                <td rowspan="{{ $packageCount > 4 ? $packageCount-2 : 2 }}" style="font-size: 11px; text-align: center; border-top: 0; vertical-align: top">
+                <td rowspan="{{ $packageCount > 4 ? $packageCount - 2 : 2 }}"
+                    style="font-size: 11px; text-align: center; border-top: 0; vertical-align: top">
+
+                    <!-- HBL Type Display -->
+                    <div style="margin-bottom: 5px">
+                        {{ $item[11] }} {{-- HBL Type --}}
+                    </div>
+
+                    {{-- Conditional Payment Display --}}
                     @if($item[15] && $item[16])
                         <b>
-                            {{ $branch['branchCode'] }} & {{ $item[13] }}
-                            <br>
+                            {{ $branch['branchCode'] }} & {{ $item[13] }}<br>
                             PAID
                         </b>
                     @elseif($item[15])
@@ -245,7 +252,11 @@
                             PAID
                         </b>
                     @else
-                        <b>NOT PAID <br>PLEASE COLLECT <br>{{ $item[19] }}/-</b>
+                        <b>
+                            NOT PAID <br>
+                            PLEASE COLLECT <br>
+                            {{ $item[19] }}/-
+                        </b>
                     @endif
                 </td>
             </tr>
@@ -295,6 +306,8 @@
                         UBP CARGO - {{ $upbCount }}
                         <br>
                         GIFT CARGO -{{ $giftCount }}
+                        <br>
+                        DOOR TO DOOR CARGO - {{ $d2dCount }}
                     </strong>
                 </td>
             </tr>

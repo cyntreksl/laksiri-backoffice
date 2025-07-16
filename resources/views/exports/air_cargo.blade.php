@@ -138,7 +138,7 @@
                     <strong> TOTAL VOLUME</strong>
                 </th>
                 <th colspan="3" rowspan="2" style="text-align: center;font-family: 'Times New Roman',fantasy; font-size: 11px;">
-                    <strong> {{ number_format($total_vtotal, 2) }}</strong>
+                    <strong> {{ number_format($total_vtotal, 3) }}</strong>
                 </th>
                 <th colspan="1" rowspan="2" style="text-align: center; font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     <strong>TOTAL WEIGHT:</strong>
@@ -220,6 +220,11 @@
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center"></td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center"></td>
                 <td rowspan="{{ $packageCount > 5 ? $packageCount-3 : 2 }}" style="font-size: 11px; text-align: center; border-top: 0; vertical-align: top">
+                    <!-- HBL Type Display -->
+                    <div style="margin-bottom: 5px">
+                        {{ $item[11] }} {{-- HBL Type --}}
+                    </div>
+
                     @if($item[15] && $item[16])
                         <b>
                             {{ $branch['branchCode'] }} & {{ $item[13] }}

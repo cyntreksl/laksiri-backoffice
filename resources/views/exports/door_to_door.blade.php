@@ -65,14 +65,16 @@
 
 @foreach($groupedData as $groupIndex => $data)
     @php
+        $isNoMHBL = $groupIndex === 'no_mhbl';
+    @endphp
+
+    {{-- Now render the chunking and table as before --}}
+    @php
         $serialNumber = 1;
         $itemsPerPageFirst = 4;
         $itemsPerPageRest = 5;
-
         $firstChunk = array_slice($data, 0, $itemsPerPageFirst);
-
         $remainingChunks = array_chunk(array_slice($data, $itemsPerPageFirst), $itemsPerPageRest);
-
         $chunks = array_merge([$firstChunk], $remainingChunks);
         $total_nototal = 0;
         $total_vtotal = 0;
@@ -141,7 +143,9 @@
                     </th>
 
                     <th colspan="4" style="text-align: left;font-family: 'Times New Roman',fantasy; font-size: 11px; border-bottom: none">
-                        <strong> MHBL {{ $mhbl->hbl_number }}</strong>
+                        @if($mhbl)
+                            <strong> MHBL {{ $mhbl->hbl_number }}</strong>
+                        @endif
                     </th>
                     <th colspan="3" style="text-align: left;font-family: 'Times New Roman',fantasy; font-size: 11px;">
                     </th>
@@ -151,7 +155,7 @@
                         <strong> NO OF PKG   {{ number_format($total_nototal, 0) }} </strong>
                     </th>
                     <th colspan="4" style="text-align: left;font-family: 'Times New Roman',fantasy; font-size: 11px; border-bottom: none">
-                        <strong> TOTAL VOLUME {{ number_format($total_vtotal, 2) }}</strong>
+                        <strong> TOTAL VOLUME {{ number_format($total_vtotal, 3) }}</strong>
                     </th>
                     <th colspan="3" style="text-align: left;font-family: 'Times New Roman',fantasy; font-size: 11px;">
                         <strong> TOTAL WEIGHT:KG {{ number_format($total_gtotal, 2) }}</strong>
