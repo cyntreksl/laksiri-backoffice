@@ -11,6 +11,7 @@ use App\Actions\MHBL\GetUnloadedMHBLWithHBLsByRef;
 use App\Actions\Setting\GetSettings;
 use App\Actions\User\GetUserCurrentBranch;
 use App\Enum\ContainerStatus;
+use App\Enum\HBLType;
 use App\Exports\DoorToDoorManifestExport;
 use App\Exports\LoadedContainerManifestExport;
 use App\Exports\LoadedContainerTallySheetExport;
@@ -121,9 +122,11 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             return $a[0] <=> $b[0];
         });
 
-        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === 'gift'));
+        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === HBLType::GIFT->value));
 
-        $upbCount = count(array_filter($data, fn ($item) => $item[11] === 'UPB'));
+        $upbCount = count(array_filter($data, fn ($item) => $item[11] === HBLType::UPB->value));
+
+        $d2dCount = count(array_filter($data, fn ($item) => $item[11] === HBLType::DOOR_TO_DOOR->value));
 
         $cargoType = strtolower(trim($container->cargo_type));
 
@@ -134,6 +137,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             'container' => $container,
             'settings' => $settings,
             'giftCount' => $giftCount,
+            'd2dCount' => $d2dCount,
             'upbCount' => $upbCount,
             'branch' => GetUserCurrentBranch::run(),
         ]);
@@ -168,6 +172,8 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             if (isset($item[20]) && $item[20]) {
                 $mhblKey = $item[20]->id;
                 $groupedData[$mhblKey][] = $item;
+            } else {
+                $groupedData['no_mhbl'][] = $item; // Group HBLs not in MHBL
             }
         }
 

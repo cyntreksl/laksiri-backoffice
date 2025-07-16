@@ -220,6 +220,11 @@
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center"></td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-top: 0; border-bottom: 0; text-align: center"></td>
                 <td rowspan="{{ $packageCount > 5 ? $packageCount-3 : 2 }}" style="font-size: 11px; text-align: center; border-top: 0; vertical-align: top">
+                    <!-- HBL Type Display -->
+                    <div style="margin-bottom: 5px">
+                        {{ $item[11] }} {{-- HBL Type --}}
+                    </div>
+
                     @if($item[15] && $item[16])
                         <b>
                             {{ $branch['branchCode'] }} & {{ $item[13] }}
