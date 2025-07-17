@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Branch\GetDestinationBranches;
+use App\Actions\HBL\GetHBLByIdWithPackages;
 use App\Actions\MHBL\GetMHBLById;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
 use App\Http\Requests\StoreMHBLRequest;
 use App\Http\Requests\UpdateMHBLRequest;
 use App\Interfaces\CountryRepositoryInterface;
+use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\MHBLRepositoryInterface;
 use App\Interfaces\OfficerRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
@@ -28,6 +30,7 @@ class MHBLController extends Controller
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly MHBLRepositoryInterface $mhblRepository,
         private readonly UserRepositoryInterface $userRepository,
+        private readonly HBLRepositoryInterface $HBLRepository,
     ) {}
 
     public function index()
@@ -193,5 +196,20 @@ class MHBLController extends Controller
         $this->authorize('mhbls.download hbl list');
 
         return $this->mhblRepository->hblListDownloadPDF($mhbl);
+    }
+
+    public function downloadMHBLPDF(MHBL $mhbl)
+    {
+        $this->authorize('hbls.download pdf');
+
+        // Get all HBLs for this MHBL
+        $hbls = $mhbl->hbls;
+
+        // Get all HBLs with their packages
+        $hblsWithPackages = $hbls->map(function ($hbl) {
+            return GetHBLByIdWithPackages::run($hbl->id);
+        });
+
+        return $this->mhblRepository->downloadMHBLPDF($mhbl, $hblsWithPackages);
     }
 }

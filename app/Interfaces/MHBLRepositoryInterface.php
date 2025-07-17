@@ -22,4 +22,6 @@ interface MHBLRepositoryInterface
     public function getUnloadedMHBLHBL(string $reference);
 
     public function hblListDownloadPDF(MHBL $MHBL);
+
+    public function downloadMHBLPDF(MHBL $mhbl, $hblsWithPackages);
 }
