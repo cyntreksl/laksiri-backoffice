@@ -7,6 +7,7 @@ use App\Actions\PickUps\CreatePickUp;
 use App\Actions\PickUps\Exception\CreatePickUpException;
 use App\Actions\PickUps\Exception\GetPickupExceptionsByDriver;
 use App\Enum\PickupStatus;
+use App\Events\PickupCreated;
 use App\Http\Resources\PickupExceptionResource;
 use App\Http\Resources\PickupResource;
 use App\Interfaces\Api\PickupRepositoryInterface;
@@ -110,6 +111,8 @@ class PickupRepository implements PickupRepositoryInterface
     {
         try {
             $pickup = CreatePickUp::run($data);
+
+            PickupCreated::dispatch($pickup);
 
             return $this->success('Pickup created successfully!', $pickup);
         } catch (\Exception $e) {
