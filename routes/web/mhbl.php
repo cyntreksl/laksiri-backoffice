@@ -15,3 +15,6 @@ Route::get('mhbls/get-container-loaded-mhbl/list', [MHBLController::class, 'getL
 
 Route::get('mhbls/hbl-list-downloads/{mhbl}', [MHBLController::class, 'hblListDownloadPDF'])
     ->name('mhbls.hbl-list-downloads');
+
+Route::get('mhbls/download/{mhbl}', [MHBLController::class, 'downloadMHBLPDF'])
+    ->name('mhbls.download');

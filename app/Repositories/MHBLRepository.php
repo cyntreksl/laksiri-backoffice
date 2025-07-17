@@ -7,6 +7,7 @@ use App\Actions\HBL\GetHBLByHBLNumber;
 use App\Actions\MHBL\CreateMHBL;
 use App\Actions\MHBL\CreateMHBLsHBL;
 use App\Actions\MHBL\DeleteMHBL;
+use App\Actions\MHBL\DownloadMHBLPDF;
 use App\Actions\MHBL\GetContainerLoadedMHBLs;
 use App\Actions\MHBL\GetUnloadedMHBLWithHBLsByRef;
 use App\Actions\MHBL\GetUnloadMHBLWithHBLs;
@@ -139,5 +140,10 @@ class MHBLRepository implements GridJsInterface, MHBLRepositoryInterface
         $pdf->setPaper('a4', 'portrait');
 
         return $pdf->download($filename);
+    }
+
+    public function downloadMHBLPDF(MHBL $mhbl, $hblsWithPackages)
+    {
+        return DownloadMHBLPDF::run($mhbl, $hblsWithPackages);
     }
 }
