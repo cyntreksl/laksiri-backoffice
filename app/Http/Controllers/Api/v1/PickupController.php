@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Events\PickupCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\v1\StorePickupExceptionRequest;
 use App\Http\Requests\StorePickupRequest;
@@ -40,12 +39,7 @@ class PickupController extends Controller
      */
     public function store(StorePickupRequest $request)
     {
-        $response = $this->pickupRepository->storePickup($request->all());
-        $pickup = $response->getData();
-
-        PickupCreated::dispatch($pickup);
-
-        return $response;
+        return $this->pickupRepository->storePickup($request->all());
     }
 
     /**
