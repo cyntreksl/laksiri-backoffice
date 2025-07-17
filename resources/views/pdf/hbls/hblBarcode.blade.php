@@ -106,7 +106,7 @@
             <tr>
                 <td>WEIGHT:
                     <br>
-                    <label  style="margin-left: -5px; font-size: 15px" >{{$package?->weight}}</label>
+                    <label  style="margin-left: -5px; font-size: 15px" >{{$package?->actual_weight}}</label>
                 </td>
                 <td>VOLUME:<br>
                     <label  style="margin-left: -5px; font-size: 15px" >{{$package?->volume}}</label>

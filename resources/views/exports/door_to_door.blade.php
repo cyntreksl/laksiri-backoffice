@@ -89,7 +89,7 @@
             @php
                 $total_nototal += $package['quantity'];
                 $total_vtotal += $package['volume'];
-                $total_gtotal += $package['weight'];
+                $total_gtotal += $package['actual_weight'];
             @endphp
         @endforeach
     @endforeach
@@ -180,7 +180,7 @@
                 @php
                     $totalQuantity = collect($item[9])->sum('quantity');
                     $totalVolume = collect($item[9])->sum('volume');
-                    $totalWeight = collect($item[9])->sum('weight');
+                    $totalWeight = collect($item[9])->sum('actual_weight');
                     $packageCount = $item[9]->count() ? $item[9]->count() :  0;
 
                     $hblweight = number_format((($total_gtotal / $total_vtotal) * $totalVolume), 2);
