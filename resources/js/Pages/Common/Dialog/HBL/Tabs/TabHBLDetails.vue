@@ -203,7 +203,7 @@ watch(
 
                             <InfoDisplay :value="item.quantity ?? 0" label="Quantity"/>
 
-                            <InfoDisplay :value="item.weight.toFixed(2) ?? 0" label="Weight"/>
+                            <InfoDisplay :value="item.actual_weight.toFixed(2) ?? 0" label="Weight"/>
 
                             <InfoDisplay :value="`${item.volume.toFixed(3) ?? 0} M.CU`" label="Volume"/>
 

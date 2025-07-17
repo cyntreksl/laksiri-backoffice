@@ -215,7 +215,7 @@
                     <td>{{ $package?->package_type }}</td>
                     <td>{{ $package?->length }} X {{ $package?->width }} X {{ $package?->height }}</td>
                     <td>{{ $package?->quantity }}</td>
-                    <td>{{ round($package?->weight, 2) }}</td>
+                    <td>{{ round($package?->actual_weight, 2) }}</td>
                     <td>{{ round($package?->volume, 3) }}</td>
                     <td>{{ $package?->remarks ?? '-' }}</td>
                 </tr>

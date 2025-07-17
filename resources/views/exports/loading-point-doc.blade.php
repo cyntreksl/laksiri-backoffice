@@ -137,7 +137,7 @@
                             {{ $hblPackages->sum('volume') }}
                         </td>
                         <td colspan="1">
-                            {{ $hblPackages->sum('weight') }}
+                            {{ $hblPackages->sum('actual_weight') }}
                         </td>
                         <td colspan="2">
                         </td>
