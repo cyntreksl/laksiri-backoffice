@@ -166,17 +166,6 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
         $container = GetLoadedContainerById::run($container);
 
-        // Prepare logo as base64
-        $settings = GetSettings::run();
-        $logoUrl = $settings['logo_url'] ?? null;
-        $logoPath = $logoUrl ? public_path($logoUrl) : public_path('images/app-logo.png');
-        $logoBase64 = null;
-        if ($logoPath && file_exists($logoPath)) {
-            $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
-            $logoData = file_get_contents($logoPath);
-            $logoBase64 = 'data:image/'.$logoType.';base64,'.base64_encode($logoData);
-        }
-
         // Initialize a new Dompdf instance with custom options
         $options = new Options;
         $options->set('isHtml5ParserEnabled', true);
@@ -189,9 +178,10 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             // Render each HBL as HTML and append to combinedHtml
             $combinedHtml .= view('pdf.hbls.hbl', [
                 'hbl' => $hbl,
-                'settings' => (object) $settings,
-                'logoBase64' => $logoBase64,
+                'settings' => GetSettings::run(),
+                'logoPath' => GetSettings::run()['logo_url'] ?? null
             ])->render();
+            //            $combinedHtml .= '<div style="page-break-after: always;"></div>'; // Add page break after each HBL
         }
 
         // Load the combined HTML into Dompdf
