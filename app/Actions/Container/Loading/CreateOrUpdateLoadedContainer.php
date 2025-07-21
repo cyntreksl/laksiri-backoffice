@@ -6,6 +6,7 @@ use App\Actions\Container\UpdateContainer;
 use App\Actions\Container\UpdateContainerStatus;
 use App\Actions\HBL\HBLPackage\MarkAsLoaded;
 use App\Actions\HBL\HBLPackage\UpdateHBLPackage;
+use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
@@ -64,6 +65,9 @@ class CreateOrUpdateLoadedContainer
                 ]);
 
                 $hbl = HBL::find($hbl_package->hbl_id);
+
+                UpdateHBLSystemStatus::run($hbl, HBL::SYSTEM_STATUS_FULLY_LOADED);
+
                 $hbl->addStatus('HBL Loaded Into Shipment');
             }
 

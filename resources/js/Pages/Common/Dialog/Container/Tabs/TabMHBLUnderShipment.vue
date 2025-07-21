@@ -64,7 +64,7 @@ const hbls = () => {
     filteredHBLSPackagesCount.value = filteredHblPackages.length;
 
     filteredHBLSPackagesWeight.value = filteredHblPackages.reduce((sum, pkg) => {
-        return sum + (pkg.weight || 0);
+        return sum + (pkg.actual_weight || 0);
     }, 0);
 
     filteredHBLSPackagesVolume.value = filteredHblPackages.reduce((sum, pkg) => {
