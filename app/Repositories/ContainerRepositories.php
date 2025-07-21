@@ -179,7 +179,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             $combinedHtml .= view('pdf.hbls.hbl', [
                 'hbl' => $hbl,
                 'settings' => GetSettings::run(),
-                'logoPath' => GetSettings::run()['logo_url'] ?? null
+                'logoPath' => GetSettings::run()['logo_url'] ?? null,
             ])->render();
             //            $combinedHtml .= '<div style="page-break-after: always;"></div>'; // Add page break after each HBL
         }
