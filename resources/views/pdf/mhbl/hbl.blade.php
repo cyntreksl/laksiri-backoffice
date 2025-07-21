@@ -54,7 +54,7 @@
                                 </tr>
                                 <tr>
                                     <td class="hbl-title">Cargo Type:</td>
-                                    <td>{{ $mhbl?->cargo_type }}</td>
+                                    <td>{{ $mhbl?->cargo_type }} - Gift</td>
                                 </tr>
                                 <tr>
                                     <td class="hbl-title">Final Destination:</td>

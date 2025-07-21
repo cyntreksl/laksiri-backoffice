@@ -38,7 +38,7 @@
     {{-- Iterate through each chunk of packages --}}
     @foreach ($packagesChunks as $chunk)
         {{-- Include header on every page --}}
-        @include('pdf.hbls.partials.header')
+        @include('pdf.hbls.partials.header', ['logoBase64' => $logoBase64])
 
         <table class="cargo-detals" style="margin-bottom: -20px;">
             <tbody>
