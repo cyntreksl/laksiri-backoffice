@@ -52,6 +52,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -174,12 +175,23 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         // Create an empty string to store the combined HTML
         $combinedHtml = '';
 
+        $settings = GetSettings::run();
+
+        $logoBase64 = null;
+
+        if ($settings->logo && Storage::disk('s3')->exists($settings->logo)) {
+            $logoContent = Storage::disk('s3')->get($settings->logo);
+            $mime = Storage::disk('s3')->mimeType($settings->logo);
+
+            $logoBase64 = 'data:'.$mime.';base64,'.base64_encode($logoContent);
+        }
+
         foreach ($container->hbls as $hbl) {
             // Render each HBL as HTML and append to combinedHtml
             $combinedHtml .= view('pdf.hbls.hbl', [
                 'hbl' => $hbl,
                 'settings' => GetSettings::run(),
-                'logoPath' => GetSettings::run()['logo_url'] ?? null,
+                'logoPath' => $logoBase64,
             ])->render();
             //            $combinedHtml .= '<div style="page-break-after: always;"></div>'; // Add page break after each HBL
         }
