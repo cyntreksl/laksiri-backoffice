@@ -71,7 +71,7 @@ const hbls = () => {
         return sum + (pkg.volume || 0);
     }, 0);
     //counting mhbls
-    const mhblSet = new Set(filteredHBLS.value.map(hbl => hbl.mhbl));
+    const mhblSet = new Set(filteredHBLS.value.map(hbl => hbl.mhbl.id));
     mhblsCount.value = mhblSet.size;
 }
 
