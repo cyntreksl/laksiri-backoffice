@@ -1,5 +1,11 @@
 @if($settings)
-    @if($logoPath)
+    @if(!empty($logoBase64))
+        <div>
+            <img style="max-width: 140px; max-height: 80px; margin-right: -100px; float: left; margin-top: 10px"
+                 src="{{ $logoBase64 }}"
+                 alt="app_logo">
+        </div>
+    @elseif(!empty($logoPath))
         <div>
             <img style="max-width: 140px; max-height: 80px; margin-right: -100px; float: left; margin-top: 10px"
                  src="{{ $logoPath }}"
