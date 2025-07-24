@@ -363,7 +363,7 @@ const grandTotalVolume = computed(() => {
 
 const grandTotalWeight = computed(() => {
     return form.packages.reduce((acc, pack) => {
-        return acc + (pack.weight || 0);
+        return acc + (pack.actual_weight || 0);
     }, 0);
 });
 
