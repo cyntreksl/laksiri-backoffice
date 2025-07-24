@@ -281,7 +281,7 @@
                     <td colspan="3" style="border-bottom: 0; border-left: 0; border-right: 0; text-align: center;"></td>
                     <td colspan="2" style="border-bottom: 0; border-left: 0; border-left: 0; border-right: 0; text-align: left;"><strong>GRAND TOTAL</strong></td>
                     <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
-                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
+                    <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 3) }}</u></strong></td>
                     <td style="border: none; text-align: center;"><strong><u> {{ number_format($total_gtotal, 2) }}</u></strong></td>
                     <td style="border: none;">&nbsp;</td>
                     <td style="border: none;">&nbsp;</td>

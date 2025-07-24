@@ -34,15 +34,28 @@ class LoadedContainerManifestExport
         $loadedMHBLPackages = [];
         $loadedHBLPackages = [];
 
-        // Group packages by HBL
+        // Get the currently loaded HBL package IDs
+        $currentlyLoadedPackageIds = $this->container->hbl_packages->pluck('id')->toArray();
+
+        // Group packages by HBL, but only include packages that are still loaded in the container
         foreach ($this->container->duplicate_hbl_packages->groupBy('hbl_id') as $hblId => $packages) {
+            // Filter packages to only include those that are still in the container's hbl_packages
+            $stillLoadedPackages = $packages->filter(function ($package) use ($currentlyLoadedPackageIds) {
+                return in_array($package->id, $currentlyLoadedPackageIds);
+            });
+
+            // Skip this HBL if all its packages have been removed from the container
+            if ($stillLoadedPackages->isEmpty()) {
+                continue;
+            }
+
             $hbl = HBL::withoutGlobalScope(BranchScope::class)->with('mhbl')->find($hblId);
             if ($hbl->mhbl) {
-                $loadedMHBLPackages[$hbl->mhbl->id][] = $packages;
+                $loadedMHBLPackages[$hbl->mhbl->id][] = $stillLoadedPackages;
             } else {
                 $loadedHBLPackages[$hblId] = [
                     'hbl' => $hbl,
-                    'packages' => $packages,
+                    'packages' => $stillLoadedPackages,
                 ];
             }
         }
