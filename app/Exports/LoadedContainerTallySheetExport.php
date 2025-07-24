@@ -32,7 +32,16 @@ class LoadedContainerTallySheetExport
         //            return optional($package->hbl->mhbl)->hbl_number ?? $package->hbl->hbl_number;
         //        });
         $data = [];
-        $groupedPackages = $this->container->load('duplicate_hbl_packages.hbl.mhbl')->duplicate_hbl_packages->groupBy(function ($package) {
+
+        // Get the currently loaded HBL package IDs
+        $currentlyLoadedPackageIds = $this->container->hbl_packages->pluck('id')->toArray();
+
+        // Filter duplicate_hbl_packages to only include those that are still in the container's hbl_packages
+        $filteredPackages = $this->container->load('duplicate_hbl_packages.hbl.mhbl')->duplicate_hbl_packages->filter(function ($package) use ($currentlyLoadedPackageIds) {
+            return in_array($package->id, $currentlyLoadedPackageIds);
+        });
+
+        $groupedPackages = $filteredPackages->groupBy(function ($package) {
             return $package->hbl->hbl_number;
         });
         foreach ($groupedPackages as $hblNumber => $hblPackages) {

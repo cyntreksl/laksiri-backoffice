@@ -282,7 +282,7 @@
                 <td style="font-size: 11px; border-left:none;vertical-align: middle; border-top: 0">{{ $item[8] }}</td>
                 <td style="height: 2px !important; font-size: 11px; border: 2px solid;"><b>TOTAL</b></td>
                 <td style="height: 2px !important; text-align: center; font-size: 11px; border: 2px solid; "><b>  <strong> {{ $totalQuantity }}</strong></b></td>
-                <td style="height: 2px !important; text-align: right; font-size: 11px; border: 2px solid; "><b> <strong>{{ number_format($totalVolume,2) }}</strong></b></td>
+                <td style="height: 2px !important; text-align: right; font-size: 11px; border: 2px solid; "><b> <strong>{{ number_format($totalVolume,3) }}</strong></b></td>
                 <td style="height: 2px !important; text-align: right; font-size: 11px; border: 2px solid; "><b>   <strong > {{ $hblweight }}</strong></b></td>
             </tr>
 
@@ -292,7 +292,7 @@
                 <td colspan="3" style="border-bottom: 0; border-left: 0; border-right: 0; text-align: center;"></td>
                 <td colspan="2" style="border-bottom: 0; border-left: 0; border-left: 0; border-right: 0; text-align: left;"><strong>GRAND TOTAL</strong></td>
                 <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_nototal, 0) }}</u></strong></td>
-                <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 2) }}</u></strong></td>
+                <td style="border: none; text-align: center;"><strong><u>{{ number_format($total_vtotal, 3) }}</u></strong></td>
                 <td style="border: none; text-align: center;"><strong><u> {{ number_format($total_gtotal, 2) }}</u></strong></td>
                 <td style="border: none;">&nbsp;</td>
                 <td style="border: none;">&nbsp;</td>
