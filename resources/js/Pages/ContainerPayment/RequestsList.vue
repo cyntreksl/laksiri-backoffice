@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {nextTick, onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import { router, usePage} from "@inertiajs/vue3";
 import Card from "primevue/card";
 import DataTable from "primevue/datatable";
@@ -169,14 +169,6 @@ const displayInfo = (paymentRequest) => {
                             <div class="text-lg font-medium">
                                 Container Payment Requests
                             </div>
-                            <div class="flex items-center gap-3">
-                                <Button
-                                    type="button"
-                                    v-if="usePage().props.user.permissions.includes('payment-container.approve')"
-                                    label="Approve Container Payments" icon="ti ti-cash"
-                                    :disabled="selectedContainerPayments.length === 0"
-                                    @click="approveContainerPayments" />
-                            </div>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between gap-4">
                             <div class="flex flex-col sm:flex-row gap-2">
@@ -207,48 +199,80 @@ const displayInfo = (paymentRequest) => {
                     </template>
                     <template #empty> No Container Payment Request found. </template>
                     <template #loading> Loading Container Payment Request data. Please wait.</template>
-                    <Column v-if="usePage().props.user.permissions.includes('payment-container.approve')" headerStyle="width: 3rem" selectionMode="multiple"></Column>
+<!--                    <Column v-if="usePage().props.user.permissions.includes('payment-container.approve')" headerStyle="width: 3rem" selectionMode="multiple"></Column>-->
                     <Column field="containerReference" header="Container Reference" sortable></Column>
                     <Column field="do_charge" header="DO Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.do_charge.toFixed(2) }}
-                            </div>
+                            </p>
+                            <p v-if="slotProps.data.do_charge_requested_at">{{slotProps.data.do_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.do_charge_requested_by">{{slotProps.data.do_charge_requested_by}}</p>
+                            <Button
+                                v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                :disabled="slotProps.data.do_charge === 0 || slotProps.data.do_charge_finance_approved"
+                                class="my-2"
+                                icon="ti ti-cash"
+                                label="Approve"
+                                outlined
+                                severity="info" size="small"
+                                type="button"
+                                @click="approveContainerPayments" />
                         </template>
                     </Column>
                     <Column field="demurrage_charge" header="Demurrage Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.demurrage_charge.toFixed(2) }}
-                            </div>
+                            </p>
+                            <p v-if="slotProps.data.demurrage_charge_requested_at">{{slotProps.data.demurrage_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.demurrage_charge_requested_by">{{slotProps.data.demurrage_charge_requested_by}}</p>
+                            <Button
+                                v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                :disabled="slotProps.data.demurrage_charge === 0 || slotProps.data.demurrage_charge_finance_approved"
+                                class="my-2"
+                                icon="ti ti-cash"
+                                label="Approve"
+                                outlined
+                                severity="info" size="small"
+                                type="button"
+                                @click="approveContainerPayments" />
                         </template>
                     </Column>
                     <Column field="assessment_charge" header="Assessment Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.assessment_charge.toFixed(2) }}
-                            </div>
+                            </p>
+                            <p v-if="slotProps.data.assessment_charge_requested_at">{{slotProps.data.assessment_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.assessment_charge_requested_by">{{slotProps.data.assessment_charge_requested_by}}</p>
                         </template>
                     </Column>
                     <Column field="slpa_charge" header="SLPA Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.slpa_charge.toFixed(2) }}
-                            </div>
+                            </p>
+                            <p v-if="slotProps.data.slpa_charge_requested_at">{{slotProps.data.slpa_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.slpa_charge_requested_by">{{slotProps.data.slpa_charge_requested_by}}</p>
                         </template>
                     </Column>
                     <Column field="refund_charge" header="Refund Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.refund_charge.toFixed(2) }}
-                            </div>
+                            </p>
+                            <p v-if="slotProps.data.refund_charge_requested_at">{{slotProps.data.refund_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.refund_charge_requested_by">{{slotProps.data.refund_charge_requested_by}}</p>
                         </template>
                     </Column>
                     <Column field="clearance_charge" header="Clearance Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.clearance_charge.toFixed(2) }}
-                            </div>
+                            </p>
+                            <p v-if="slotProps.data.clearance_charge_requested_at">{{slotProps.data.clearance_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.clearance_charge_requested_by">{{slotProps.data.clearance_charge_requested_by}}</p>
                         </template>
                     </Column>
                     <Column field="total" header="Total" header-class="!text-right">
@@ -258,56 +282,9 @@ const displayInfo = (paymentRequest) => {
                             </div>
                         </template>
                     </Column>
-                    <Column field="created_at" header="Created At" sortable>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <DatePicker v-model="filterModel.value" class="w-full" date-format="yy-mm-dd" placeholder="Set Date"/>
-                        </template>
-                    </Column>
-                    <Column header="">
-                       <template #body="slotProps">
-                           <Button aria-label="Info" icon="pi pi-eye" rounded severity="info" size="small" type="button" @click="displayInfo(slotProps.data)" />
-                       </template>
-                    </Column>
                     <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} container payments requests.</template>
                 </DataTable>
             </template>
         </Card>
     </AppLayout>
-
-    <Dialog v-model:visible="visible" :style="{ width: '35rem' }" header="Summery" modal>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm text-gray-500">Request Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_at }}</div>
-            </div>
-
-            <div>
-                <label class="block text-sm text-gray-500">Request Updated Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.updated_at }}</div>
-            </div>
-
-            <div v-if="selectedContainerPayment?.is_finance_approved">
-                <label class="block text-sm text-gray-500">Approved Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_date }}</div>
-            </div>
-
-            <div v-if="selectedContainerPayment?.is_finance_approved">
-                <label class="block text-sm text-gray-500">Approved By</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_by }}</div>
-            </div>
-
-            <div v-if="selectedContainerPayment?.is_refund_collected">
-                <label class="block text-sm text-gray-500">Collected Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.refund_collected_date }}</div>
-            </div>
-
-            <div>
-                <label class="block text-sm text-gray-500">Requested By</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_by }}</div>
-            </div>
-        </div>
-        <div class="flex justify-end gap-2">
-            <Button label="Close" severity="secondary" type="button" @click="visible = false"></Button>
-        </div>
-    </Dialog>
 </template>

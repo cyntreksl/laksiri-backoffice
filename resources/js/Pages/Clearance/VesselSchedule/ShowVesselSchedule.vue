@@ -68,13 +68,34 @@ const loadingPaymentData = ref(false);
 const selectedKey = ref();
 const showCreateShipmentDialog = ref(false);
 
-const form = useForm({
+// Create separate form objects for each charge type
+const doChargeForm = useForm({
     container_id: selectedContainer.value.id ?? '',
-    do_charge: 0,
-    demurrage_charge: 0,
-    assessment_charge: 0,
-    slpa_charge: 0,
-    refund_charge: 0,
+    do_charge: 0
+});
+
+const demurrageChargeForm = useForm({
+    container_id: selectedContainer.value.id ?? '',
+    demurrage_charge: 0
+});
+
+const assessmentChargeForm = useForm({
+    container_id: selectedContainer.value.id ?? '',
+    assessment_charge: 0
+});
+
+const slpaChargeForm = useForm({
+    container_id: selectedContainer.value.id ?? '',
+    slpa_charge: 0
+});
+
+const refundChargeForm = useForm({
+    container_id: selectedContainer.value.id ?? '',
+    refund_charge: 0
+});
+
+const clearanceChargeForm = useForm({
+    container_id: selectedContainer.value.id ?? '',
     clearance_charge: 0
 });
 
@@ -144,22 +165,34 @@ const fetchContainerPayment = async () => {
         }
         containerPaymentData.value = (await response.json());
         isContainerPayment.value = Object.keys(containerPaymentData.value).length > 0;
+
+        // Set container_id for all forms
+        doChargeForm.container_id = selectedContainer.value.id;
+        demurrageChargeForm.container_id = selectedContainer.value.id;
+        assessmentChargeForm.container_id = selectedContainer.value.id;
+        slpaChargeForm.container_id = selectedContainer.value.id;
+        refundChargeForm.container_id = selectedContainer.value.id;
+        clearanceChargeForm.container_id = selectedContainer.value.id;
+
         if (containerPaymentData.value && Object.keys(containerPaymentData.value).length > 0) {
-            form.do_charge = containerPaymentData.value.do_charge;
-            form.demurrage_charge = containerPaymentData.value.demurrage_charge;
-            form.assessment_charge = containerPaymentData.value.assessment_charge;
-            form.slpa_charge = containerPaymentData.value.slpa_charge;
-            form.refund_charge = containerPaymentData.value.refund_charge;
-            form.clearance_charge = containerPaymentData.value.clearance_charge;
+            // Initialize each form with its respective value from the API
+            doChargeForm.do_charge = containerPaymentData.value.do_charge;
+            demurrageChargeForm.demurrage_charge = containerPaymentData.value.demurrage_charge;
+            assessmentChargeForm.assessment_charge = containerPaymentData.value.assessment_charge;
+            slpaChargeForm.slpa_charge = containerPaymentData.value.slpa_charge;
+            refundChargeForm.refund_charge = containerPaymentData.value.refund_charge;
+            clearanceChargeForm.clearance_charge = containerPaymentData.value.clearance_charge;
+
             isFinanceApproved.value = containerPaymentData.value.is_finance_approved;
         } else {
-            form.container_id = selectedContainer.value.id;
-            form.do_charge = 0;
-            form.demurrage_charge = 0;
-            form.assessment_charge = 0;
-            form.slpa_charge = 0;
-            form.refund_charge = 0;
-            form.clearance_charge = 0;
+            // Reset all forms to default values
+            doChargeForm.do_charge = 0;
+            demurrageChargeForm.demurrage_charge = 0;
+            assessmentChargeForm.assessment_charge = 0;
+            slpaChargeForm.slpa_charge = 0;
+            refundChargeForm.refund_charge = 0;
+            clearanceChargeForm.clearance_charge = 0;
+
             isFinanceApproved.value = false;
         }
     } catch (error) {
@@ -169,11 +202,114 @@ const fetchContainerPayment = async () => {
     }
 };
 
-const handleContainerPaymentCreate = async () => {
-    form.post(route("container-payment.store"), {
+// Individual handler functions for each charge type
+const handleDoChargeSubmit = async () => {
+    // Create a complete data object with all charges
+    const completeData = {
+        container_id: selectedContainer.value.id,
+        do_charge: doChargeForm.do_charge,
+    };
+
+    // Use Inertia's post method directly to submit all data
+    router.post(route("container-payment.store"), completeData, {
         onSuccess: (page) => {
             fetchContainerPayment();
-            push.success("Container Payment Created Successfully!");
+            push.success("DO Charge Updated Successfully!");
+        },
+        onError: () => console.log("error"),
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
+const handleDemurrageChargeSubmit = async () => {
+    // Create a complete data object with all charges
+    const completeData = {
+        container_id: selectedContainer.value.id,
+        demurrage_charge: demurrageChargeForm.demurrage_charge,
+    };
+
+    // Use Inertia's post method directly to submit all data
+    router.post(route("container-payment.store"), completeData, {
+        onSuccess: (page) => {
+            fetchContainerPayment();
+            push.success("Demurrage Charge Updated Successfully!");
+        },
+        onError: () => console.log("error"),
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
+const handleAssessmentChargeSubmit = async () => {
+    // Create a complete data object with all charges
+    const completeData = {
+        container_id: selectedContainer.value.id,
+        assessment_charge: assessmentChargeForm.assessment_charge,
+    };
+
+    // Use Inertia's post method directly to submit all data
+    router.post(route("container-payment.store"), completeData, {
+        onSuccess: (page) => {
+            fetchContainerPayment();
+            push.success("Assessment Charge Updated Successfully!");
+        },
+        onError: () => console.log("error"),
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
+const handleSlpaChargeSubmit = async () => {
+    // Create a complete data object with all charges
+    const completeData = {
+        container_id: selectedContainer.value.id,
+        slpa_charge: slpaChargeForm.slpa_charge,
+    };
+
+    // Use Inertia's post method directly to submit all data
+    router.post(route("container-payment.store"), completeData, {
+        onSuccess: (page) => {
+            fetchContainerPayment();
+            push.success("SLPA Charge Updated Successfully!");
+        },
+        onError: () => console.log("error"),
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
+const handleRefundChargeSubmit = async () => {
+    // Create a complete data object with all charges
+    const completeData = {
+        container_id: selectedContainer.value.id,
+        refund_charge: refundChargeForm.refund_charge,
+    };
+
+    // Use Inertia's post method directly to submit all data
+    router.post(route("container-payment.store"), completeData, {
+        onSuccess: (page) => {
+            fetchContainerPayment();
+            push.success("Refund Charge Updated Successfully!");
+        },
+        onError: () => console.log("error"),
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+
+const handleClearanceChargeSubmit = async () => {
+    // Create a complete data object with all charges
+    const completeData = {
+        container_id: selectedContainer.value.id,
+        clearance_charge: clearanceChargeForm.clearance_charge
+    };
+
+    // Use Inertia's post method directly to submit all data
+    router.post(route("container-payment.store"), completeData, {
+        onSuccess: (page) => {
+            fetchContainerPayment();
+            push.success("Clearance Charge Updated Successfully!");
         },
         onError: () => console.log("error"),
         preserveScroll: true,
@@ -673,90 +809,196 @@ const onNodeSelect = (event) => {
                                     </div>
                                 </div>
                                 <template v-else>
-                                    <form @submit.prevent="handleContainerPaymentCreate">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                            <div>
-                                                <IftaLabel>
-                                                    <InputNumber
-                                                        v-model="form.do_charge"
-                                                        :disabled="isPaymentInputDisabled"
-                                                        :maxFractionDigits="2"
-                                                        :minFractionDigits="2" class="w-full"
-                                                        inputId="do-charge" min="0" step="any"
-                                                        variant="filled"
-                                                    />
-                                                    <label for="do-charge">DO Charge</label>
-                                                </IftaLabel>
-                                                <InputError :message="form.errors.do_charge"/>
-                                            </div>
-
-                                            <div>
-                                                <IftaLabel>
-                                                    <InputNumber v-model="form.demurrage_charge"
-                                                                 :disabled="isPaymentInputDisabled"
-                                                                 :maxFractionDigits="2" :minFractionDigits="2"
-                                                                 class="w-full" inputId="demurrage-charge" min="0"
-                                                                 step="any" variant="filled"/>
-                                                    <label for="demurrage-charge">Demurrage Charge</label>
-                                                </IftaLabel>
-                                                <InputError :message="form.errors.demurrage_charge"/>
-                                            </div>
-
-                                            <div>
-                                                <IftaLabel>
-                                                    <InputNumber v-model="form.assessment_charge"
-                                                                 :disabled="isPaymentInputDisabled"
-                                                                 :maxFractionDigits="2" :minFractionDigits="2"
-                                                                 class="w-full" inputId="assessment-charge" min="0"
-                                                                 step="any" variant="filled"/>
-                                                    <label for="assessment-charge">Assessment Charge</label>
-                                                </IftaLabel>
-                                                <InputError :message="form.errors.assessment_charge"/>
-                                            </div>
-
-                                            <div>
-                                                <IftaLabel>
-                                                    <InputNumber v-model="form.slpa_charge" :disabled="isPaymentInputDisabled"
-                                                                 :maxFractionDigits="2" :minFractionDigits="2"
-                                                                 class="w-full"
-                                                                 inputId="slap-charge" min="0" step="any" variant="filled"/>
-                                                    <label for="slap-charge">SLAP Charge</label>
-                                                </IftaLabel>
-                                                <InputError :message="form.errors.slpa_charge"/>
-                                            </div>
-
-                                            <div>
-                                                <IftaLabel>
-                                                    <InputNumber v-model="form.refund_charge" :disabled="isPaymentInputDisabled"
-                                                                 :maxFractionDigits="2" :minFractionDigits="2"
-                                                                 class="w-full"
-                                                                 inputId="refund-charge" min="0" step="any"
-                                                                 variant="filled"/>
-                                                    <label for="refund-charge">Refund</label>
-                                                </IftaLabel>
-                                                <InputError :message="form.errors.refund_charge"/>
-                                            </div>
-
-                                            <div>
-                                                <IftaLabel>
-                                                    <InputNumber v-model="form.clearance_charge"
-                                                                 :disabled="isPaymentInputDisabled"
-                                                                 :maxFractionDigits="2" :minFractionDigits="2"
-                                                                 class="w-full" inputId="clearance-charge" min="0"
-                                                                 step="any" variant="filled"/>
-                                                    <label for="clearance-charge">Clearance Charge</label>
-                                                </IftaLabel>
-                                                <InputError :message="form.errors.clearance_charge"/>
-                                            </div>
-
-                                            <template v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team'">
-                                                <div v-if="!isFinanceApproved"  class="col-span-1 md:col-span-2 text-right">
-                                                    <Button :label="isContainerPayment ? 'Edit Payment' : 'Save Payment'"
-                                                            icon="pi pi-save" size="small" type="submit"/>
+                                    <div class="grid grid-cols-1 gap-5">
+                                        <!-- DO Charge -->
+                                        <form class="border-b pb-4" @submit.prevent="handleDoChargeSubmit">
+                                            <div class="flex flex-col md:flex-row md:items-end gap-4">
+                                                <div class="flex-grow">
+                                                    <IftaLabel>
+                                                        <InputNumber
+                                                            v-model="doChargeForm.do_charge"
+                                                            :disabled="isPaymentInputDisabled"
+                                                            :maxFractionDigits="2"
+                                                            :minFractionDigits="2" class="w-full"
+                                                            inputId="do-charge" min="0" step="any"
+                                                            variant="filled"
+                                                        />
+                                                        <label for="do-charge">DO Charge</label>
+                                                    </IftaLabel>
+                                                    <InputError :message="doChargeForm.errors.do_charge"/>
                                                 </div>
-                                            </template>
-                                        </div>
-                                    </form>
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                    <Button
+                                                        :disabled="doChargeForm.processing"
+                                                        icon="pi pi-save"
+                                                        label="Update DO Charge"
+                                                        size="small"
+                                                        type="submit"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <!-- Demurrage Charge -->
+                                        <form class="border-b pb-4" @submit.prevent="handleDemurrageChargeSubmit">
+                                            <div class="flex flex-col md:flex-row md:items-end gap-4">
+                                                <div class="flex-grow">
+                                                    <IftaLabel>
+                                                        <InputNumber
+                                                            v-model="demurrageChargeForm.demurrage_charge"
+                                                            :disabled="isPaymentInputDisabled"
+                                                            :maxFractionDigits="2"
+                                                            :minFractionDigits="2"
+                                                            class="w-full"
+                                                            inputId="demurrage-charge"
+                                                            min="0"
+                                                            step="any"
+                                                            variant="filled"
+                                                        />
+                                                        <label for="demurrage-charge">Demurrage Charge</label>
+                                                    </IftaLabel>
+                                                    <InputError :message="demurrageChargeForm.errors.demurrage_charge"/>
+                                                </div>
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                    <Button
+                                                        :disabled="demurrageChargeForm.processing"
+                                                        icon="pi pi-save"
+                                                        label="Update Demurrage Charge"
+                                                        size="small"
+                                                        type="submit"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <!-- Assessment Charge -->
+                                        <form class="border-b pb-4" @submit.prevent="handleAssessmentChargeSubmit">
+                                            <div class="flex flex-col md:flex-row md:items-end gap-4">
+                                                <div class="flex-grow">
+                                                    <IftaLabel>
+                                                        <InputNumber
+                                                            v-model="assessmentChargeForm.assessment_charge"
+                                                            :disabled="isPaymentInputDisabled"
+                                                            :maxFractionDigits="2"
+                                                            :minFractionDigits="2"
+                                                            class="w-full"
+                                                            inputId="assessment-charge"
+                                                            min="0"
+                                                            step="any"
+                                                            variant="filled"
+                                                        />
+                                                        <label for="assessment-charge">Assessment Charge</label>
+                                                    </IftaLabel>
+                                                    <InputError :message="assessmentChargeForm.errors.assessment_charge"/>
+                                                </div>
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                    <Button
+                                                        :disabled="assessmentChargeForm.processing"
+                                                        icon="pi pi-save"
+                                                        label="Update Assessment Charge"
+                                                        size="small"
+                                                        type="submit"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <!-- SLPA Charge -->
+                                        <form class="border-b pb-4" @submit.prevent="handleSlpaChargeSubmit">
+                                            <div class="flex flex-col md:flex-row md:items-end gap-4">
+                                                <div class="flex-grow">
+                                                    <IftaLabel>
+                                                        <InputNumber
+                                                            v-model="slpaChargeForm.slpa_charge"
+                                                            :disabled="isPaymentInputDisabled"
+                                                            :maxFractionDigits="2"
+                                                            :minFractionDigits="2"
+                                                            class="w-full"
+                                                            inputId="slap-charge"
+                                                            min="0"
+                                                            step="any"
+                                                            variant="filled"
+                                                        />
+                                                        <label for="slap-charge">SLPA Charge</label>
+                                                    </IftaLabel>
+                                                    <InputError :message="slpaChargeForm.errors.slpa_charge"/>
+                                                </div>
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                    <Button
+                                                        :disabled="slpaChargeForm.processing"
+                                                        icon="pi pi-save"
+                                                        label="Update SLPA Charge"
+                                                        size="small"
+                                                        type="submit"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <!-- Refund Charge -->
+                                        <form class="border-b pb-4" @submit.prevent="handleRefundChargeSubmit">
+                                            <div class="flex flex-col md:flex-row md:items-end gap-4">
+                                                <div class="flex-grow">
+                                                    <IftaLabel>
+                                                        <InputNumber
+                                                            v-model="refundChargeForm.refund_charge"
+                                                            :disabled="isPaymentInputDisabled"
+                                                            :maxFractionDigits="2"
+                                                            :minFractionDigits="2"
+                                                            class="w-full"
+                                                            inputId="refund-charge"
+                                                            min="0"
+                                                            step="any"
+                                                            variant="filled"
+                                                        />
+                                                        <label for="refund-charge">Refund</label>
+                                                    </IftaLabel>
+                                                    <InputError :message="refundChargeForm.errors.refund_charge"/>
+                                                </div>
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                    <Button
+                                                        :disabled="refundChargeForm.processing"
+                                                        icon="pi pi-save"
+                                                        label="Update Refund"
+                                                        size="small"
+                                                        type="submit"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <!-- Clearance Charge -->
+                                        <form class="border-b pb-4" @submit.prevent="handleClearanceChargeSubmit">
+                                            <div class="flex flex-col md:flex-row md:items-end gap-4">
+                                                <div class="flex-grow">
+                                                    <IftaLabel>
+                                                        <InputNumber
+                                                            v-model="clearanceChargeForm.clearance_charge"
+                                                            :disabled="isPaymentInputDisabled"
+                                                            :maxFractionDigits="2"
+                                                            :minFractionDigits="2"
+                                                            class="w-full"
+                                                            inputId="clearance-charge"
+                                                            min="0"
+                                                            step="any"
+                                                            variant="filled"
+                                                        />
+                                                        <label for="clearance-charge">Clearance Charge</label>
+                                                    </IftaLabel>
+                                                    <InputError :message="clearanceChargeForm.errors.clearance_charge"/>
+                                                </div>
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                    <Button
+                                                        :disabled="clearanceChargeForm.processing"
+                                                        icon="pi pi-save"
+                                                        label="Update Clearance Charge"
+                                                        size="small"
+                                                        type="submit"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
 
                                     <RequestsList :container-id="selectedContainer.id"/>
                                 </template>
