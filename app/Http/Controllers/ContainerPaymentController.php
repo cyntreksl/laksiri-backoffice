@@ -7,6 +7,7 @@ use App\Interfaces\ContainerPaymentRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerPayment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ContainerPaymentController extends Controller
@@ -138,5 +139,41 @@ class ContainerPaymentController extends Controller
     public function completePayment(CompletePaymentRequest $request)
     {
         $this->containerPaymentRepository->completePayments($request->all());
+    }
+
+    public function approveSingle(Request $request)
+    {
+        $payment = ContainerPayment::findOrFail($request->container_payment_id);
+
+        $approvedField = $request->charge_type.'_finance_approved';
+        $approvedAtField = $request->charge_type.'_approved_at';
+        $approvedByField = $request->charge_type.'_approved_by';
+
+        if (! isset($payment[$approvedField])) {
+            return response()->json(['error' => 'Invalid charge type'], 400);
+        }
+
+        $payment[$approvedField] = true;
+        $payment[$approvedAtField] = now();
+        $payment[$approvedByField] = Auth::user()->id;
+        $payment->save();
+    }
+
+    public function revokeSingle(Request $request)
+    {
+        $payment = ContainerPayment::findOrFail($request->container_payment_id);
+
+        $approvedField = $request->charge_type.'_finance_approved';
+        $approvedAtField = $request->charge_type.'_approved_at';
+        $approvedByField = $request->charge_type.'_approved_by';
+
+        if (! isset($payment[$approvedField])) {
+            return response()->json(['error' => 'Invalid charge type'], 400);
+        }
+
+        $payment[$approvedField] = false;
+        $payment[$approvedAtField] = null;
+        $payment[$approvedByField] = null;
+        $payment->save();
     }
 }

@@ -60,7 +60,6 @@ const filteredHBLS = ref([]);
 const filteredMHBLS = ref([]);
 const containerPaymentData = ref({});
 const isContainerPayment = ref(false);
-const isFinanceApproved = ref(false);
 const containerId = ref('');
 const showConfirmAddVesselModal = ref(false);
 const loadingContainerData = ref(false);
@@ -71,31 +70,37 @@ const showCreateShipmentDialog = ref(false);
 // Create separate form objects for each charge type
 const doChargeForm = useForm({
     container_id: selectedContainer.value.id ?? '',
+    do_charge_finance_approved: false,
     do_charge: 0
 });
 
 const demurrageChargeForm = useForm({
     container_id: selectedContainer.value.id ?? '',
+    demurrage_charge_finance_approved: false,
     demurrage_charge: 0
 });
 
 const assessmentChargeForm = useForm({
     container_id: selectedContainer.value.id ?? '',
+    assessment_charge_finance_approved: false,
     assessment_charge: 0
 });
 
 const slpaChargeForm = useForm({
     container_id: selectedContainer.value.id ?? '',
+    slpa_charge_finance_approved: false,
     slpa_charge: 0
 });
 
 const refundChargeForm = useForm({
     container_id: selectedContainer.value.id ?? '',
+    refund_charge_finance_approved: false,
     refund_charge: 0
 });
 
 const clearanceChargeForm = useForm({
     container_id: selectedContainer.value.id ?? '',
+    clearance_charge_finance_approved: false,
     clearance_charge: 0
 });
 
@@ -177,13 +182,22 @@ const fetchContainerPayment = async () => {
         if (containerPaymentData.value && Object.keys(containerPaymentData.value).length > 0) {
             // Initialize each form with its respective value from the API
             doChargeForm.do_charge = containerPaymentData.value.do_charge;
-            demurrageChargeForm.demurrage_charge = containerPaymentData.value.demurrage_charge;
-            assessmentChargeForm.assessment_charge = containerPaymentData.value.assessment_charge;
-            slpaChargeForm.slpa_charge = containerPaymentData.value.slpa_charge;
-            refundChargeForm.refund_charge = containerPaymentData.value.refund_charge;
-            clearanceChargeForm.clearance_charge = containerPaymentData.value.clearance_charge;
+            doChargeForm.do_charge_finance_approved = containerPaymentData.value.do_charge_finance_approved;
 
-            isFinanceApproved.value = containerPaymentData.value.is_finance_approved;
+            demurrageChargeForm.demurrage_charge = containerPaymentData.value.demurrage_charge;
+            demurrageChargeForm.demurrage_charge_finance_approved = containerPaymentData.value.demurrage_charge_finance_approved;
+
+            assessmentChargeForm.assessment_charge = containerPaymentData.value.assessment_charge;
+            assessmentChargeForm.assessment_charge_finance_approved = containerPaymentData.value.assessment_charge_finance_approved;
+
+            slpaChargeForm.slpa_charge = containerPaymentData.value.slpa_charge;
+            slpaChargeForm.slpa_charge_finance_approved = containerPaymentData.value.slpa_charge_finance_approved;
+
+            refundChargeForm.refund_charge = containerPaymentData.value.refund_charge;
+            refundChargeForm.refund_charge_finance_approved = containerPaymentData.value.refund_charge_finance_approved;
+
+            clearanceChargeForm.clearance_charge = containerPaymentData.value.clearance_charge;
+            clearanceChargeForm.clearance_charge_finance_approved = containerPaymentData.value.clearance_charge_finance_approved;
         } else {
             // Reset all forms to default values
             doChargeForm.do_charge = 0;
@@ -193,7 +207,12 @@ const fetchContainerPayment = async () => {
             refundChargeForm.refund_charge = 0;
             clearanceChargeForm.clearance_charge = 0;
 
-            isFinanceApproved.value = false;
+            doChargeForm.do_charge_finance_approved = false;
+            demurrageChargeForm.demurrage_charge_finance_approved = false;
+            assessmentChargeForm.assessment_charge_finance_approved = false;
+            slpaChargeForm.slpa_charge_finance_approved = false;
+            refundChargeForm.refund_charge_finance_approved = false;
+            clearanceChargeForm.clearance_charge_finance_approved = false;
         }
     } catch (error) {
         console.error("Error:", error);
@@ -496,11 +515,6 @@ const treeTableData = computed(() => {
     });
 
     return weekGroups;
-});
-
-const isPaymentInputDisabled = computed(() => {
-    return isFinanceApproved.value ||
-        usePage().props.auth.user.roles[0]?.name === 'finance Team';
 });
 
 const onNodeSelect = (event) => {
@@ -817,7 +831,7 @@ const onNodeSelect = (event) => {
                                                     <IftaLabel>
                                                         <InputNumber
                                                             v-model="doChargeForm.do_charge"
-                                                            :disabled="isPaymentInputDisabled"
+                                                            :disabled="$page.props.auth.user.roles[0]?.name === 'finance Team' || doChargeForm.do_charge_finance_approved"
                                                             :maxFractionDigits="2"
                                                             :minFractionDigits="2" class="w-full"
                                                             inputId="do-charge" min="0" step="any"
@@ -827,7 +841,7 @@ const onNodeSelect = (event) => {
                                                     </IftaLabel>
                                                     <InputError :message="doChargeForm.errors.do_charge"/>
                                                 </div>
-                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !doChargeForm.do_charge_finance_approved">
                                                     <Button
                                                         :disabled="doChargeForm.processing"
                                                         icon="pi pi-save"
@@ -846,7 +860,7 @@ const onNodeSelect = (event) => {
                                                     <IftaLabel>
                                                         <InputNumber
                                                             v-model="demurrageChargeForm.demurrage_charge"
-                                                            :disabled="isPaymentInputDisabled"
+                                                            :disabled="$page.props.auth.user.roles[0]?.name === 'finance Team' || demurrageChargeForm.demurrage_charge_finance_approved"
                                                             :maxFractionDigits="2"
                                                             :minFractionDigits="2"
                                                             class="w-full"
@@ -859,7 +873,7 @@ const onNodeSelect = (event) => {
                                                     </IftaLabel>
                                                     <InputError :message="demurrageChargeForm.errors.demurrage_charge"/>
                                                 </div>
-                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !demurrageChargeForm.demurrage_charge_finance_approved">
                                                     <Button
                                                         :disabled="demurrageChargeForm.processing"
                                                         icon="pi pi-save"
@@ -878,7 +892,7 @@ const onNodeSelect = (event) => {
                                                     <IftaLabel>
                                                         <InputNumber
                                                             v-model="assessmentChargeForm.assessment_charge"
-                                                            :disabled="isPaymentInputDisabled"
+                                                            :disabled="$page.props.auth.user.roles[0]?.name === 'finance Team' || assessmentChargeForm.assessment_charge_finance_approved"
                                                             :maxFractionDigits="2"
                                                             :minFractionDigits="2"
                                                             class="w-full"
@@ -891,7 +905,7 @@ const onNodeSelect = (event) => {
                                                     </IftaLabel>
                                                     <InputError :message="assessmentChargeForm.errors.assessment_charge"/>
                                                 </div>
-                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !assessmentChargeForm.assessment_charge_finance_approved">
                                                     <Button
                                                         :disabled="assessmentChargeForm.processing"
                                                         icon="pi pi-save"
@@ -910,7 +924,7 @@ const onNodeSelect = (event) => {
                                                     <IftaLabel>
                                                         <InputNumber
                                                             v-model="slpaChargeForm.slpa_charge"
-                                                            :disabled="isPaymentInputDisabled"
+                                                            :disabled="$page.props.auth.user.roles[0]?.name === 'finance Team' || slpaChargeForm.slpa_charge_finance_approved"
                                                             :maxFractionDigits="2"
                                                             :minFractionDigits="2"
                                                             class="w-full"
@@ -923,7 +937,7 @@ const onNodeSelect = (event) => {
                                                     </IftaLabel>
                                                     <InputError :message="slpaChargeForm.errors.slpa_charge"/>
                                                 </div>
-                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !slpaChargeForm.slpa_charge_finance_approved">
                                                     <Button
                                                         :disabled="slpaChargeForm.processing"
                                                         icon="pi pi-save"
@@ -942,7 +956,7 @@ const onNodeSelect = (event) => {
                                                     <IftaLabel>
                                                         <InputNumber
                                                             v-model="refundChargeForm.refund_charge"
-                                                            :disabled="isPaymentInputDisabled"
+                                                            :disabled="$page.props.auth.user.roles[0]?.name === 'finance Team' || refundChargeForm.refund_charge_finance_approved"
                                                             :maxFractionDigits="2"
                                                             :minFractionDigits="2"
                                                             class="w-full"
@@ -955,7 +969,7 @@ const onNodeSelect = (event) => {
                                                     </IftaLabel>
                                                     <InputError :message="refundChargeForm.errors.refund_charge"/>
                                                 </div>
-                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !refundChargeForm.refund_charge_finance_approved">
                                                     <Button
                                                         :disabled="refundChargeForm.processing"
                                                         icon="pi pi-save"
@@ -974,7 +988,7 @@ const onNodeSelect = (event) => {
                                                     <IftaLabel>
                                                         <InputNumber
                                                             v-model="clearanceChargeForm.clearance_charge"
-                                                            :disabled="isPaymentInputDisabled"
+                                                            :disabled="$page.props.auth.user.roles[0]?.name === 'finance Team' || clearanceChargeForm.clearance_charge_finance_approved"
                                                             :maxFractionDigits="2"
                                                             :minFractionDigits="2"
                                                             class="w-full"
@@ -987,7 +1001,7 @@ const onNodeSelect = (event) => {
                                                     </IftaLabel>
                                                     <InputError :message="clearanceChargeForm.errors.clearance_charge"/>
                                                 </div>
-                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !isFinanceApproved">
+                                                <div v-if="$page.props.auth.user.roles[0]?.name !== 'finance Team' && !clearanceChargeForm.clearance_charge_finance_approved">
                                                     <Button
                                                         :disabled="clearanceChargeForm.processing"
                                                         icon="pi pi-save"

@@ -129,6 +129,45 @@ const revokeContainerPayments = () => {
     });
 }
 
+const revokeSingleApprove = (paymentId, chargeType) => {
+    confirm.require({
+        message: `Are you sure you want to revoke approvals for ${chargeType.replace(
+            "_",
+            " "
+        )}?`,
+        header: `Revoke Approval - ${chargeType.replace("_", " ")}?`,
+        icon: "pi pi-info-circle",
+        rejectLabel: "Cancel",
+        rejectProps: {
+            label: "Cancel",
+            severity: "secondary",
+            outlined: true,
+        },
+        acceptProps: {
+            label: `Revoke`,
+            severity: "success",
+        },
+        accept: async () => {
+            router.post(route("container-payment.revoke-approval-single"), {
+                container_payment_id: paymentId,
+                charge_type: chargeType,
+            }, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success(
+                        `${chargeType.replace("_", " ")} approved successfully!`
+                    );
+                    fetchContainerApprovedPayments(currentPage.value);
+                },
+                onError: () => {
+                    push.error("Something went wrong!");
+                },
+            });
+        },
+        reject: () => {},
+    });
+};
+
 const form = useForm({
     paymentsIds: [],
     payment_received_by: "",
@@ -173,11 +212,6 @@ const clearFilter = () => {
     };
     fetchContainerApprovedPayments(currentPage.value);
 };
-
-const displayInfo = (paymentRequest) => {
-    visible.value = true;
-    selectedContainerPayment.value = paymentRequest;
-}
 </script>
 <template>
     <AppLayout title="Container Approved Payments">
@@ -216,12 +250,12 @@ const displayInfo = (paymentRequest) => {
                                     label="Mark As Paid" icon="ti ti-cash"
                                     :disabled="selectedContainerPayments.length === 0"
                                     @click="showMarkAsPaidModal = true" />
-                                <Button
-                                    type="button"
-                                    v-if="usePage().props.user.permissions.includes('payment-container.approve')"
-                                    label="Revoke Approvals" icon="ti ti-cash"
-                                    :disabled="selectedContainerPayments.length === 0"
-                                    @click="revokeContainerPayments" />
+<!--                                <Button-->
+<!--                                    type="button"-->
+<!--                                    v-if="usePage().props.user.permissions.includes('payment-container.approve')"-->
+<!--                                    label="Revoke Approvals" icon="ti ti-cash"-->
+<!--                                    :disabled="selectedContainerPayments.length === 0"-->
+<!--                                    @click="revokeContainerPayments" />-->
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row justify-between gap-4">
@@ -257,44 +291,248 @@ const displayInfo = (paymentRequest) => {
                     <Column field="containerReference" header="Container Reference" sortable></Column>
                     <Column field="do_charge" header="DO Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.do_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.do_charge_requested_at">Requested: {{slotProps.data.do_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.do_charge_approved_at">Approved: {{slotProps.data.do_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.do_charge_requested_by">Requested: {{slotProps.data.do_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.do_charge_approved_by">Approved: {{slotProps.data.do_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.do_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
                             </div>
+                            <Button
+                                v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                :disabled="
+                                    slotProps.data.do_charge === 0 ||
+                                    slotProps.data.do_charge_finance_approved === 0
+                                "
+                                class="my-2"
+                                icon="ti ti-cash"
+                                label="Revoke"
+                                outlined
+                                severity="warn"
+                                size="small"
+                                type="button"
+                                @click="
+                                    revokeSingleApprove(
+                                        slotProps.data.id,
+                                        'do_charge'
+                                    )
+                                "
+                            />
                         </template>
                     </Column>
                     <Column field="demurrage_charge" header="Demurrage Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.demurrage_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.demurrage_charge_requested_at">Requested: {{slotProps.data.demurrage_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.demurrage_charge_approved_at">Approved: {{slotProps.data.demurrage_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.demurrage_charge_requested_by">Requested: {{slotProps.data.demurrage_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.demurrage_charge_approved_by">Approved: {{slotProps.data.demurrage_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.demurrage_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
                             </div>
+                            <Button
+                                v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                :disabled="
+                                    slotProps.data.demurrage_charge === 0 ||
+                                    slotProps.data.demurrage_charge_finance_approved === 0
+                                "
+                                class="my-2"
+                                icon="ti ti-cash"
+                                label="Revoke"
+                                outlined
+                                severity="warn"
+                                size="small"
+                                type="button"
+                                @click="
+                                    revokeSingleApprove(
+                                        slotProps.data.id,
+                                        'demurrage_charge'
+                                    )
+                                "
+                            />
                         </template>
                     </Column>
                     <Column field="assessment_charge" header="Assessment Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.assessment_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.assessment_charge_requested_at">Requested: {{slotProps.data.assessment_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.assessment_charge_approved_at">Approved: {{slotProps.data.assessment_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.assessment_charge_requested_by">Requested: {{slotProps.data.assessment_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.assessment_charge_approved_by">Approved: {{slotProps.data.assessment_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.assessment_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
                             </div>
+                            <Button
+                                v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                :disabled="
+                                    slotProps.data.assessment_charge === 0 ||
+                                    slotProps.data.assessment_charge_finance_approved === 0
+                                "
+                                class="my-2"
+                                icon="ti ti-cash"
+                                label="Revoke"
+                                outlined
+                                severity="warn"
+                                size="small"
+                                type="button"
+                                @click="
+                                    revokeSingleApprove(
+                                        slotProps.data.id,
+                                        'assessment_charge'
+                                    )
+                                "
+                            />
                         </template>
                     </Column>
                     <Column field="slpa_charge" header="SLPA Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.slpa_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.slpa_charge_requested_at">Requested: {{slotProps.data.slpa_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.slpa_charge_approved_at">Approved: {{slotProps.data.slpa_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.slpa_charge_requested_by">Requested: {{slotProps.data.slpa_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.slpa_charge_approved_by">Approved: {{slotProps.data.slpa_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.slpa_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
                             </div>
+                            <Button
+                                v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                :disabled="
+                                    slotProps.data.slpa_charge === 0 ||
+                                    slotProps.data.slpa_charge_finance_approved === 0
+                                "
+                                class="my-2"
+                                icon="ti ti-cash"
+                                label="Revoke"
+                                outlined
+                                severity="warn"
+                                size="small"
+                                type="button"
+                                @click="
+                                    revokeSingleApprove(
+                                        slotProps.data.id,
+                                        'slpa_charge'
+                                    )
+                                "
+                            />
                         </template>
                     </Column>
                     <Column field="refund_charge" header="Refund Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.refund_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.refund_charge_requested_at">Requested: {{slotProps.data.refund_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.refund_charge_approved_at">Approved: {{slotProps.data.refund_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.refund_charge_requested_by">Requested: {{slotProps.data.refund_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.refund_charge_approved_by">Approved: {{slotProps.data.refund_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.refund_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
                             </div>
+                            <Button
+                                v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                :disabled="
+                                    slotProps.data.refund_charge === 0 ||
+                                    slotProps.data.refund_charge_finance_approved === 0
+                                "
+                                class="my-2"
+                                icon="ti ti-cash"
+                                label="Revoke"
+                                outlined
+                                severity="warn"
+                                size="small"
+                                type="button"
+                                @click="
+                                    revokeSingleApprove(
+                                        slotProps.data.id,
+                                        'refund_charge'
+                                    )
+                                "
+                            />
                         </template>
                     </Column>
                     <Column field="clearance_charge" header="Clearance Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.clearance_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.clearance_charge_requested_at">Requested: {{slotProps.data.clearance_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.clearance_charge_approved_at">Approved: {{slotProps.data.clearance_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.clearance_charge_requested_by">Requested: {{slotProps.data.clearance_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.clearance_charge_approved_by">Approved: {{slotProps.data.clearance_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.clearance_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
                             </div>
+                            <Button
+                                v-if="usePage().props.user.permissions.includes('payment-container.approve')"
+                                :disabled="
+                                    slotProps.data.clearance_charge === 0 ||
+                                    slotProps.data.clearance_charge_finance_approved === 0
+                                "
+                                class="my-2"
+                                icon="ti ti-cash"
+                                label="Revoke"
+                                outlined
+                                severity="warn"
+                                size="small"
+                                type="button"
+                                @click="
+                                    revokeSingleApprove(
+                                        slotProps.data.id,
+                                        'clearance_charge'
+                                    )
+                                "
+                            />
                         </template>
                     </Column>
                     <Column field="total" header="Total" header-class="!text-right">
@@ -302,16 +540,6 @@ const displayInfo = (paymentRequest) => {
                             <div class="text-right">
                                 {{ slotProps.data.total.toFixed(2) }}
                             </div>
-                        </template>
-                    </Column>
-                    <Column field="created_at" header="Created At" sortable>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <DatePicker v-model="filterModel.value" class="w-full" date-format="yy-mm-dd" placeholder="Set Date"/>
-                        </template>
-                    </Column>
-                    <Column header="">
-                        <template #body="slotProps">
-                            <Button aria-label="Info" icon="pi pi-eye" rounded severity="info" size="small" type="button" @click="displayInfo(slotProps.data)" />
                         </template>
                     </Column>
                     <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Container Approved Payments.</template>
@@ -354,41 +582,4 @@ const displayInfo = (paymentRequest) => {
             </template>
         </Dialog>
     </AppLayout>
-
-    <Dialog v-model:visible="visible" :style="{ width: '35rem' }" header="Summery" modal>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm text-gray-500">Request Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_at }}</div>
-            </div>
-
-            <div>
-                <label class="block text-sm text-gray-500">Request Updated Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.updated_at }}</div>
-            </div>
-
-            <div v-if="selectedContainerPayment?.is_finance_approved">
-                <label class="block text-sm text-gray-500">Approved Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_date }}</div>
-            </div>
-
-            <div v-if="selectedContainerPayment?.is_finance_approved">
-                <label class="block text-sm text-gray-500">Approved By</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_by }}</div>
-            </div>
-
-            <div v-if="selectedContainerPayment?.is_refund_collected">
-                <label class="block text-sm text-gray-500">Collected Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.refund_collected_date }}</div>
-            </div>
-
-            <div>
-                <label class="block text-sm text-gray-500">Requested By</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_by }}</div>
-            </div>
-        </div>
-        <div class="flex justify-end gap-2">
-            <Button label="Close" severity="secondary" type="button" @click="visible = false"></Button>
-        </div>
-    </Dialog>
 </template>

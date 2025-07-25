@@ -157,7 +157,7 @@ class ContainerPaymentRepository implements ContainerPaymentRepositoryInterface,
     public function approvedPaymentsDataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         $query = ContainerPayment::query()->where(function ($query) {
-            $query->where('is_finance_approved', '=', '1')->where('is_paid', '=', '0');
+            $query->where('is_paid', '=', '0');
         })->latest();
 
         if (! empty($search)) {

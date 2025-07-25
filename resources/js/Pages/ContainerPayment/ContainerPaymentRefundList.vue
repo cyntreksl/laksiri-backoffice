@@ -215,11 +215,7 @@ const displayInfo = (paymentRequest) => {
                             {{ slotProps.data.refund_charge.toFixed(2) }}
                         </template>
                     </Column>
-                    <Column field="created_at" header="Created At" sortable>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <DatePicker v-model="filterModel.value" class="w-full" date-format="yy-mm-dd" placeholder="Set Date"/>
-                        </template>
-                    </Column>
+                    <Column field="refund_charge_requested_at" header="Requested At" sortable></Column>
                     <Column field="is_finance_approved" header="Finance Approval">
                         <template #body="{ data }">
                             <div class="flex items-center">
@@ -249,22 +245,12 @@ const displayInfo = (paymentRequest) => {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm text-gray-500">Request Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_at }}</div>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.refund_charge_requested_at }}</div>
             </div>
 
-            <div>
-                <label class="block text-sm text-gray-500">Request Updated Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.updated_at }}</div>
-            </div>
-
-            <div v-if="selectedContainerPayment?.is_finance_approved">
-                <label class="block text-sm text-gray-500">Approved Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_date }}</div>
-            </div>
-
-            <div v-if="selectedContainerPayment?.is_finance_approved">
+            <div v-if="selectedContainerPayment?.refund_charge_finance_approved">
                 <label class="block text-sm text-gray-500">Approved By</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_by }}</div>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.refund_charge_approved_by }}</div>
             </div>
 
             <div v-if="selectedContainerPayment?.is_refund_collected">
@@ -274,7 +260,7 @@ const displayInfo = (paymentRequest) => {
 
             <div>
                 <label class="block text-sm text-gray-500">Requested By</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_by }}</div>
+                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.refund_charge_requested_by }}</div>
             </div>
         </div>
         <div class="flex justify-end gap-2">

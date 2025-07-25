@@ -158,62 +158,15 @@ const displayInfo = (paymentRequest) => {
                     <Column field="containerReference" header="Container Reference" sortable></Column>
                     <Column field="do_charge" header="DO Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <div class="text-right">
+                            <p class="font-semibold text-emerald-500">
                                 {{ slotProps.data.do_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="demurrage_charge" header="Demurrage Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.demurrage_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="assessment_charge" header="Assessment Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.assessment_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="slpa_charge" header="SLPA Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.slpa_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="refund_charge" header="Refund Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.refund_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="clearance_charge" header="Clearance Charge" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.clearance_charge.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="total" header="Total" header-class="!text-right">
-                        <template #body="slotProps">
-                            <div class="text-right">
-                                {{ slotProps.data.total.toFixed(2) }}
-                            </div>
-                        </template>
-                    </Column>
-                    <Column field="created_at" header="Created At" sortable>
-                        <template #filter="{ filterModel, filterCallback }">
-                            <DatePicker v-model="filterModel.value" class="w-full" date-format="yy-mm-dd" placeholder="Set Date"/>
-                        </template>
-                    </Column>
-                    <Column field="is_finance_approved" header="Finance Approval" >
-                        <template #body="{ data }">
-                            <div class="flex items-center justify-center">
-                                <div v-if="data.is_finance_approved" class="text-green-500">
+                            </p>
+                            <p v-if="slotProps.data.do_charge_requested_at">Requested: {{slotProps.data.do_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.do_charge_approved_at">Approved: {{slotProps.data.do_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.do_charge_requested_by">Requested: {{slotProps.data.do_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.do_charge_approved_by">Approved: {{slotProps.data.do_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.do_charge_finance_approved" class="text-green-500">
                                     <i class="pi pi-check-circle"></i>
                                     Approved
                                 </div>
@@ -224,11 +177,123 @@ const displayInfo = (paymentRequest) => {
                             </div>
                         </template>
                     </Column>
-                    <Column header="">
+                    <Column field="demurrage_charge" header="Demurrage Charge" header-class="!text-right">
                         <template #body="slotProps">
-                            <Button aria-label="Info" icon="pi pi-eye" rounded severity="info" size="small" type="button" @click="displayInfo(slotProps.data)" />
+                            <p class="font-semibold text-emerald-500">
+                                {{ slotProps.data.demurrage_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.demurrage_charge_requested_at">Requested: {{slotProps.data.demurrage_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.demurrage_charge_approved_at">Approved: {{slotProps.data.demurrage_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.demurrage_charge_requested_by">Requested: {{slotProps.data.demurrage_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.demurrage_charge_approved_by">Approved: {{slotProps.data.demurrage_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.demurrage_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
+                            </div>
                         </template>
                     </Column>
+                    <Column field="assessment_charge" header="Assessment Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <p class="font-semibold text-emerald-500">
+                                {{ slotProps.data.assessment_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.assessment_charge_requested_at">Requested: {{slotProps.data.assessment_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.assessment_charge_approved_at">Approved: {{slotProps.data.assessment_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.assessment_charge_requested_by">Requested: {{slotProps.data.assessment_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.assessment_charge_approved_by">Approved: {{slotProps.data.assessment_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.assessment_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="slpa_charge" header="SLPA Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <p class="font-semibold text-emerald-500">
+                                {{ slotProps.data.slpa_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.slpa_charge_requested_at">Requested: {{slotProps.data.slpa_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.slpa_charge_approved_at">Approved: {{slotProps.data.slpa_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.slpa_charge_requested_by">Requested: {{slotProps.data.slpa_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.slpa_charge_approved_by">Approved: {{slotProps.data.slpa_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.slpa_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="refund_charge" header="Refund Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <p class="font-semibold text-emerald-500">
+                                {{ slotProps.data.refund_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.refund_charge_requested_at">Requested: {{slotProps.data.refund_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.refund_charge_approved_at">Approved: {{slotProps.data.refund_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.refund_charge_requested_by">Requested: {{slotProps.data.refund_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.refund_charge_approved_by">Approved: {{slotProps.data.refund_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.refund_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="clearance_charge" header="Clearance Charge" header-class="!text-right">
+                        <template #body="slotProps">
+                            <p class="font-semibold text-emerald-500">
+                                {{ slotProps.data.clearance_charge.toFixed(2) }}
+                            </p>
+                            <p v-if="slotProps.data.clearance_charge_requested_at">Requested: {{slotProps.data.clearance_charge_requested_at}}</p>
+                            <p v-if="slotProps.data.clearance_charge_approved_at">Approved: {{slotProps.data.clearance_charge_approved_at}}</p>
+                            <p v-if="slotProps.data.clearance_charge_requested_by">Requested: {{slotProps.data.clearance_charge_requested_by}}</p>
+                            <p v-if="slotProps.data.clearance_charge_approved_by">Approved: {{slotProps.data.clearance_charge_approved_by}}</p>
+                            <div class="flex items-center">
+                                <div v-if="slotProps.data.clearance_charge_finance_approved" class="text-green-500">
+                                    <i class="pi pi-check-circle"></i>
+                                    Approved
+                                </div>
+                                <div v-else class="text-red-400">
+                                    <i class="pi pi-times-circle"></i>
+                                    Not Approved
+                                </div>
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="total" header="Total" header-class="!text-right">
+                        <template #body="slotProps">
+                            <div class="text-right">
+                                {{ slotProps.data.total.toFixed(2) }}
+                            </div>
+                        </template>
+                    </Column>
+<!--                    <Column header="">-->
+<!--                        <template #body="slotProps">-->
+<!--                            <Button aria-label="Info" icon="pi pi-eye" rounded severity="info" size="small" type="button" @click="displayInfo(slotProps.data)" />-->
+<!--                        </template>-->
+<!--                    </Column>-->
                     <template #footer> In total there are {{ containerPayments ? totalRecords : 0 }} Completed Container Payments.</template>
                 </DataTable>
             </template>
@@ -237,16 +302,6 @@ const displayInfo = (paymentRequest) => {
 
     <Dialog v-model:visible="visible" :style="{ width: '35rem' }" header="Summery" modal>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm text-gray-500">Request Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_at }}</div>
-            </div>
-
-            <div>
-                <label class="block text-sm text-gray-500">Request Updated Time</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.updated_at }}</div>
-            </div>
-
             <div v-if="selectedContainerPayment?.is_finance_approved">
                 <label class="block text-sm text-gray-500">Approved Time</label>
                 <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.finance_approved_date }}</div>
@@ -260,11 +315,6 @@ const displayInfo = (paymentRequest) => {
             <div v-if="selectedContainerPayment?.is_refund_collected">
                 <label class="block text-sm text-gray-500">Collected Time</label>
                 <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.refund_collected_date }}</div>
-            </div>
-
-            <div>
-                <label class="block text-sm text-gray-500">Requested By</label>
-                <div class="text-gray-800 font-medium">{{ selectedContainerPayment?.created_by }}</div>
             </div>
         </div>
         <div class="flex justify-end gap-2">

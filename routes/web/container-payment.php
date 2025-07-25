@@ -42,3 +42,9 @@ Route::post('container-payment/revoke-approval', [ContainerPaymentController::cl
 
 Route::post('container-payment/complete-payment', [ContainerPaymentController::class, 'completePayment'])
     ->name('container-payment.complete-payment');
+
+Route::post('/container-payment/approve-single', [ContainerPaymentController::class, 'approveSingle'])
+    ->name('container-payment.approve-single');
+
+Route::post('/container-payment/revoke-approval-single', [ContainerPaymentController::class, 'revokeSingle'])
+    ->name('container-payment.revoke-approval-single');
