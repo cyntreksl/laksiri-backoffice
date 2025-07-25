@@ -188,7 +188,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             }
         } catch (\Exception $e) {
             // Log the error but continue without the logo
-            \Log::warning('Unable to access logo file: ' . $e->getMessage());
+            \Log::warning('Unable to access logo file: '.$e->getMessage());
         }
 
         foreach ($container->hbls as $hbl) {
