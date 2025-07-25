@@ -179,11 +179,16 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
         $logoBase64 = null;
 
-        if ($settings->logo && Storage::disk('s3')->exists($settings->logo)) {
-            $logoContent = Storage::disk('s3')->get($settings->logo);
-            $mime = Storage::disk('s3')->mimeType($settings->logo);
+        try {
+            if ($settings->logo && Storage::disk('s3')->exists($settings->logo)) {
+                $logoContent = Storage::disk('s3')->get($settings->logo);
+                $mime = Storage::disk('s3')->mimeType($settings->logo);
 
-            $logoBase64 = 'data:'.$mime.';base64,'.base64_encode($logoContent);
+                $logoBase64 = 'data:'.$mime.';base64,'.base64_encode($logoContent);
+            }
+        } catch (\Exception $e) {
+            // Log the error but continue without the logo
+            \Log::warning('Unable to access logo file: '.$e->getMessage());
         }
 
         foreach ($container->hbls as $hbl) {
