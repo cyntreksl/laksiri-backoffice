@@ -538,7 +538,7 @@ const calculatePayment = async () => {
         } else {
             const data = await response.json();
 
-            // form.freight_charge = data.freight_charge;
+            form.freight_charge = data.freight_charge;
             form.bill_charge = data.bill_charge;
             form.other_charge = data.other_charge;
             form.package_charges = data.package_charges;
@@ -1320,7 +1320,6 @@ const handleCopyFromHBLToConsignee = async () => {
                                 >
                                     <p class="line-clamp-1">Grand Total</p>
                                     <div class="flex items-center">
-                                        <i v-if="packageList.length > 0" class="pi pi-info-circle text-info hover:cursor-pointer mr-2" style="font-size: 1.2rem" @click="isShowedPaymentSummery = !isShowedPaymentSummery"></i>
                                         <p>{{ hblTotal ? hblTotal.toFixed(2) : 0.00 }} {{ currency }}</p>
                                     </div>
                                 </div>

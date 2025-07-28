@@ -53,6 +53,7 @@ class ConvertPickupToHBL
             'destination_charge' => $request->destination_charge,
             'discount' => $request->discount,
             'paid_amount' => $request->paid_amount,
+            'additional_charge' => $request->additional_charge ?? 0,
             'grand_total' => $request->grand_total,
             'pickup_id' => $pickup->id,
             'system_status' => HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
