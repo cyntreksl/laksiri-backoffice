@@ -180,9 +180,15 @@ class GetHBLDestinationTotalSummary
                 return 0.0;
             }
 
-            return $service->dOCharge($hbl)['amount'] ?? 0.0;
+            $doChargeResult = $service->dOCharge($hbl);
+            if (!isset($doChargeResult['amount'])) {
+                // Log::warning('Invalid DO charge result structure');
+                return 0.0;
+            }
+
+            return $doChargeResult['amount'];
         } catch (\Exception $e) {
-            Log::warning('Error getting DO charge: '.$e->getMessage());
+            // Log::warning('Error getting DO charge: '.$e->getMessage());
 
             return 0.0;
         }
