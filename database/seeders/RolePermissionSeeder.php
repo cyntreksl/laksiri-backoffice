@@ -716,6 +716,13 @@ class RolePermissionSeeder extends Seeder
                     'lift_rtf',
                 ],
             ],
+
+            [
+                'group_name' => 'Whatsapp',
+                'permissions' => [
+                    'manage_whatsapp',
+                ],
+            ],
         ];
     }
 
