@@ -7,12 +7,14 @@ import InputSwitch from 'primevue/inputswitch'
 import Badge from 'primevue/badge'
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Menu from 'primevue/menu';
+import AddContact from './Partials/AddContact.vue';
 
 // Reactive data
 const selectedChat = ref(null)
 const newMessage = ref('')
 const activeTab = ref('Media')
 const menu = ref();
+const showAddContact = ref(false);
 
 const items = ref([
     {
@@ -171,7 +173,7 @@ selectedChat.value = chatList.value[0]
             <!-- Header -->
             <div class="p-4 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">Chats</h2>
-                <Button class="p-button-text p-button-sm" icon="pi pi-plus" />
+                <Button class="p-button-text p-button-sm" icon="pi pi-plus" @click="showAddContact = true" />
             </div>
 
             <div class="p-4 border-b border-gray-200">
@@ -384,6 +386,7 @@ selectedChat.value = chatList.value[0]
             </div>
         </div>
     </div>
+        <AddContact v-model:visible="showAddContact" />
     </AppLayout>
 </template>
 

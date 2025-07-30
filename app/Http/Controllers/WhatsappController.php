@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\WhatsappContactRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class WhatsappController extends Controller
 {
+    protected $whatsappContactRepository;
+
+    public function __construct(WhatsappContactRepository $whatsappContactRepository)
+    {
+        $this->whatsappContactRepository = $whatsappContactRepository;
+    }
+
     public function index()
     {
         return Inertia::render('Whatsapp/Messaging');
@@ -44,5 +52,18 @@ class WhatsappController extends Controller
         }
 
         return response()->json(['status' => 'no_message']);
+    }
+
+    public function storeContact(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|unique:whatsapp_contacts,phone',
+            'profile_pic' => 'nullable|url',
+        ]);
+
+        $contact = $this->whatsappContactRepository->create($validated);
+
+        return redirect()->back()->with('success', 'Contact created successfully.');
     }
 }
