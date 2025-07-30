@@ -237,6 +237,15 @@ const closeModal = () => {
                                     label="Download Invoice"
                                     severity="info"
                                 />
+                                <Button
+                                    :href="`/hbls/stream/receipt/${hbl?.id}`"
+                                    as="a"
+                                    icon="pi pi-file-pdf"
+                                    label="Stream Invoice"
+                                    rel="noopener"
+                                    severity="warn"
+                                    target="_blank"
+                                />
                                 <Button icon="pi pi-eye" label="Show HBL Details" @click.prevent="showConfirmViewHBLModal = !showConfirmViewHBLModal"></Button>
                             </div>
                         </div>

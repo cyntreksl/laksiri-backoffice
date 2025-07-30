@@ -181,7 +181,7 @@ class GetHBLDestinationTotalSummary
             }
 
             $doChargeResult = $service->dOCharge($hbl);
-            if (!isset($doChargeResult['amount'])) {
+            if (! isset($doChargeResult['amount'])) {
                 // Log::warning('Invalid DO charge result structure');
                 return 0.0;
             }
