@@ -37,7 +37,15 @@ class BonedAreaRepository implements BonedAreaRepositoryInterface, GridJsInterfa
             ->whereHas('token')
             ->where('is_released', true);
 
-        $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
+        // Handle ordering by token value
+        if ($order === 'token') {
+            $query->join('tokens', 'package_queues.token_id', '=', 'tokens.id')
+                ->orderBy('tokens.token', $direction);
+        } else {
+            $query->orderBy($order, $direction);
+        }
+
+        $records = $query->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([
             'data' => PackageCollection::collection($records),
