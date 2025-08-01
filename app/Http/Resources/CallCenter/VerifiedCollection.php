@@ -22,10 +22,10 @@ class VerifiedCollection extends JsonResource
             'reference' => $this->token->reference,
             'customer' => $this->token->customer->name,
             'reception' => $this->token->reception->name,
-            'is_checked' => $this->verification->is_checked,
-            'verified_by' => $this->verification->verifiedBy->name,
-            'note' => $this->verification->note,
-            'verified_at' => $this->verification->created_at->format('Y-m-d H:i:s'),
+            'is_checked' => optional($this->verification)->is_checked,
+            'verified_by' => optional(optional($this->verification)->verifiedBy)->name,
+            'note' => optional($this->verification)->note,
+            'verified_at' => optional(optional($this->verification)->created_at)->format('Y-m-d H:i:s'),
             'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first())->hbl_number,
         ];
     }
