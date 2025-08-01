@@ -9,25 +9,22 @@ use App\Actions\HBL\UpdateHBLSystemStatus;
 use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
-use Illuminate\Support\Facades\DB;
+use App\Traits\HandlesDeadlocks;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateDraftLoadedContainer
 {
-    use AsAction;
+    use AsAction, HandlesDeadlocks;
 
     /**
      * @throws \Exception
      */
     public function handle(array $data)
     {
-        try {
+        return $this->transactionWithDeadlockRetry(function () use ($data) {
             $container = Container::find($data['container_id']);
 
-            DB::beginTransaction();
-
             foreach ($data['packages'] as $package) {
-
                 $container->hbl_packages()->attach($package['id'], [
                     'status' => 'draft',
                     'loaded_by' => auth()->id(),
@@ -53,17 +50,12 @@ class CreateDraftLoadedContainer
             UpdateContainerStatus::run($container, ContainerStatus::DRAFT->value);
 
             // update container loading start datetime and who loaded by
-            $data = [
+            $updateData = [
                 'loading_started_at' => now(),
                 'loading_started_by' => auth()->id(),
             ];
 
-            UpdateContainer::run($container, $data);
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw new \Exception('Failed to create draft loaded container: '.$e->getMessage());
-        }
+            UpdateContainer::run($container, $updateData);
+        }, 3, 100); // 3 retries with 100ms base delay
     }
 }
