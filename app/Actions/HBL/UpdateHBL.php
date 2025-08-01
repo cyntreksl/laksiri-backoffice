@@ -12,7 +12,8 @@ class UpdateHBL
 
     public function handle(HBL $hbl, array $data): HBL
     {
-        $hbl->update([
+        // Preserve the original branch_id to maintain mobile visibility
+        $updateData = [
             'cargo_type' => $data['cargo_type'],
             'hbl_type' => $data['hbl_type'],
             'hbl_name' => $data['hbl_name'],
@@ -44,7 +45,14 @@ class UpdateHBL
             'is_departure_charges_paid' => $data['is_departure_charges_paid'],
             'is_destination_charges_paid' => $data['is_destination_charges_paid'],
             'is_arrived_to_primary_warehouse' => $data['is_arrived_to_primary_warehouse'] ?? false,
-        ]);
+        ];
+
+        // Only update branch_id if explicitly provided in data to avoid breaking mobile visibility
+        if (isset($data['branch_id'])) {
+            $updateData['branch_id'] = $data['branch_id'];
+        }
+
+        $hbl->update($updateData);
 
         if (! empty($data['paid_amount'])) {
             UpdateHBLPayments::run($data, $hbl);

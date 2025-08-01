@@ -12,7 +12,8 @@ class UpdateHBLApi
 
     public function handle(HBL $hbl, array $data): HBL
     {
-        $hbl->update([
+        // Preserve the original branch_id to maintain consistency across platforms
+        $updateData = [
             'cargo_type' => $data['cargo_type'],
             'consignee_nic' => $data['consignee_nic'],
             'consignee_contact' => $data['consignee_contact'],
@@ -27,7 +28,14 @@ class UpdateHBLApi
             'paid_amount' => $data['paid_amount'],
             'grand_total' => $data['grand_total'],
             'is_completed' => $data['is_completed'] ?? false,
-        ]);
+        ];
+
+        // Only update branch_id if explicitly provided to avoid breaking visibility
+        if (isset($data['branch_id'])) {
+            $updateData['branch_id'] = $data['branch_id'];
+        }
+
+        $hbl->update($updateData);
 
         if (! empty($data['paid_amount'])) {
             UpdateHBLPayments::run($data, $hbl);
