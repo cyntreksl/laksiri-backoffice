@@ -17,12 +17,16 @@ class TokenResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'hbl' => $this->hbl_id ? $this->hbl->withoutGlobalScope(BranchScope::class)->latest()->first() : null,
+            'hbl' => $this->when($this->hbl_id, function() {
+                return optional($this->hbl)->withoutGlobalScope(BranchScope::class)->latest()->first();
+            }),
             'customer' => $this->customer->name,
             'token' => $this->token,
             'reception' => $this->reception->name,
             'package_count' => $this->package_count,
-            'finance_status' => $this->hbl->is_finance_release_approved ? 'Approved' : 'Not Approved',
+            'finance_status' => $this->when($this->hbl, function() {
+                return $this->hbl->is_finance_release_approved ? 'Approved' : 'Not Approved';
+            }, 'Not Approved'),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }
