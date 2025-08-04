@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SendWhatsappMessageRequest;
 use App\Repositories\WhatsappContactRepository;
+use App\Services\WhatsAppService;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -11,14 +15,37 @@ class WhatsappController extends Controller
 {
     protected $whatsappContactRepository;
 
-    public function __construct(WhatsappContactRepository $whatsappContactRepository)
-    {
+    protected $whatsappService;
+
+    public function __construct(
+        WhatsappContactRepository $whatsappContactRepository,
+        WhatsAppService $whatsappService
+    ) {
         $this->whatsappContactRepository = $whatsappContactRepository;
+        $this->whatsappService = $whatsappService;
     }
 
+    // In your WhatsappController
     public function index()
     {
-        return Inertia::render('Whatsapp/Messaging');
+        $contacts = $this->whatsappContactRepository->getAllContacts();
+
+        return Inertia::render('Whatsapp/Messaging', [
+            'contacts' => $contacts,
+        ]);
+    }
+
+    public function storeContact(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|unique:whatsapp_contacts,phone',
+            'profile_pic' => 'nullable|url',
+        ]);
+
+        $contact = $this->whatsappContactRepository->create($validated);
+
+        return redirect()->back()->with('success', 'Contact created successfully.');
     }
 
     public function verifyWebhook(Request $request)
@@ -54,16 +81,80 @@ class WhatsappController extends Controller
         return response()->json(['status' => 'no_message']);
     }
 
-    public function storeContact(Request $request)
+    /**
+     * Send a WhatsApp message
+     */
+    public function sendMessage(SendWhatsappMessageRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|unique:whatsapp_contacts,phone',
-            'profile_pic' => 'nullable|url',
-        ]);
+        try {
+            $phone = $this->formatPhoneNumber($request->recipient);
+            $message = $request->message;
 
-        $contact = $this->whatsappContactRepository->create($validated);
+            // Send message via WhatsApp API
+            $response = $this->whatsappService->sendMessage($phone, $message);
 
-        return redirect()->back()->with('success', 'Contact created successfully.');
+            if ($response['success']) {
+                // Store the sent message in database
+                $messageData = [
+                    'phone' => $phone,
+                    'message' => $message,
+                    'timestamp' => Carbon::now(),
+                    'message_id' => $response['message_id'] ?? null,
+                    'delivery_status' => 'sent',
+                ];
+
+                $storedMessage = $this->whatsappContactRepository->storeSentMessage($messageData);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Message sent successfully',
+                    'data' => [
+                        'message_id' => $response['message_id'],
+                        'stored_message' => $storedMessage,
+                        'timestamp' => $messageData['timestamp']->toISOString(),
+                        'recipient' => $phone,
+                    ],
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response['error'] ?? 'Failed to send message',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            Log::error('WhatsApp send message error: '.$e->getMessage(), [
+                'recipient' => $request->recipient ?? 'unknown',
+                'message_length' => strlen($request->message ?? ''),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while sending the message',
+            ], 500);
+        }
+    }
+
+    /**
+     * Format phone number to international format
+     */
+    private function formatPhoneNumber(string $phone): string
+    {
+        // Remove any non-digit characters except +
+        $phone = preg_replace('/[^0-9+]/', '', $phone);
+
+        // Remove + if present for processing
+        $phone = ltrim($phone, '+');
+
+        // Add country code if not present (assuming Sri Lanka +94)
+        if (str_starts_with($phone, '0')) {
+            // Remove leading 0 and add 94
+            $phone = '94'.substr($phone, 1);
+        } elseif (! str_starts_with($phone, '94')) {
+            // Add 94 if no country code
+            $phone = '94'.$phone;
+        }
+
+        return $phone;
     }
 }
