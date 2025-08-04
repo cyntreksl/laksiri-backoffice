@@ -48,7 +48,7 @@ const chatList = ref([
     {
         id: 1,
         name: 'PrimeTek Team',
-        phone: '+94782498744', // Added phone number
+        phone: '+94711458218', // Added phone number
         avatar: '/placeholder.svg?height=48&width=48',
         lastMessage: "Let's implement PrimeVue...",
         time: '11:15',
@@ -97,21 +97,25 @@ const messages = ref([
         sender: 'OS',
         avatar: '/placeholder.svg?height=32&width=32',
         content: "Awesome! What's the standout feature?",
-        time: '11:15'
+        time: '11:15',
+        outgoing: false
     },
     {
         id: 2,
         sender: 'Jerome Bell',
         avatar: '/placeholder.svg?height=32&width=32',
         content: 'PrimeVue rocks! Simplifies UI dev with versatile components.',
-        time: '11:16'
+        time: '11:16',
+        outgoing: false
+
     },
     {
         id: 3,
         sender: 'Robert Fox',
         avatar: '/placeholder.svg?height=32&width=32',
         content: 'Intriguing! Tell us more about its impact.',
-        time: '11:17'
+        time: '11:17',
+        outgoing: true
     },
     {
         id: 4,
@@ -171,7 +175,8 @@ const sendMessage = async () => {
         avatar: '/placeholder.svg?height=32&width=32',
         content: newMessage.value,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        status: 'sending'
+        status: 'sending',
+        outgoing: true
     }
 
     messages.value.push(message)
@@ -344,42 +349,40 @@ if (chatList.value.length > 0) {
 
                 <!-- Messages Area -->
                 <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                    <div v-for="message in messages" :key="message.id" class="flex items-start space-x-3">
+                    <div v-for="message in messages" :key="message.id"
+                         :class="['flex items-start space-x-3', message.outgoing ? 'flex-row-reverse space-x-reverse' : '']">
                         <Avatar
                             :image="message.avatar"
                             :label="message.sender.charAt(0)"
                             class="w-8 h-8 border"
                             shape="circle"
                         />
-                        <div class="flex items-start gap-2.5">
-                            <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-4 bg-white rounded-lg shadow-sm border border-gray-200border-gray-200 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-                                <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.sender }}</span>
-                                    <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ message.time }}</span>
-                                </div>
-                                <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{ message.content }}</p>
-                                <div class="group relative my-2.5">
-                                    <div class="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
-                                        <button class="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50" data-tooltip-target="download-image">
-                                            <svg aria-hidden="true" class="w-5 h-5 text-white" fill="none" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                                            </svg>
-                                        </button>
-                                        <div id="download-image" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700" role="tooltip">
-                                            Download image
-                                            <div class="tooltip-arrow" data-popper-arrow></div>
-                                        </div>
-                                    </div>
-                                    <img v-if="message.image" :src="message.image" alt="Shared image" class="rounded-lg" />
-                                </div>
-                                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                                {{ message.status === 'sending' ? 'Sending...' : message.status === 'failed' ? 'Failed' : 'Delivered' }}
-                            </span>
+                        <div :class="[ 'flex flex-col w-full max-w-[320px] leading-1.5 p-4 rounded-lg shadow-sm border border-gray-200',  message.outgoing  ? 'bg-blue-100 rounded-es-xl dark:bg-blue-700' : 'bg-white rounded-e-xl rounded-es-xl dark:bg-gray-700']">
+                            <div class="flex items-center space-x-2 rtl:space-x-reverse">
+                                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.sender }}</span>
+                                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ message.time }}</span>
                             </div>
+                            <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{ message.content }}</p>
+                            <div v-if="message.image" class="group relative my-2.5">
+                                <div class="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
+                                    <button class="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50" data-tooltip-target="download-image">
+                                        <svg aria-hidden="true" class="w-5 h-5 text-white" fill="none" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                                        </svg>
+                                    </button>
+                                    <div id="download-image" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700" role="tooltip">
+                                        Download image
+                                        <div class="tooltip-arrow" data-popper-arrow></div>
+                                    </div>
+                                </div>
+                                <img :src="message.image" alt="Shared image" class="rounded-lg" />
+                            </div>
+                            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ message.status === 'sending' ? 'Sending...' : message.status === 'failed' ? 'Failed' : 'Delivered' }}
+                            </span>
                         </div>
-
                     </div>
                 </div>
+
 
                 <!-- Message Input -->
                 <div class="bg-white border-t border-gray-200 p-4">
