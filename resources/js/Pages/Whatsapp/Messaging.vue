@@ -16,6 +16,8 @@ const newMessage = ref('')
 const activeTab = ref('Media')
 const menu = ref();
 const showAddContact = ref(false);
+const loadingMessages = ref(false);
+const expandedMessages = ref(new Set());
 
 const items = ref([
     {
@@ -91,57 +93,38 @@ const chatList = ref([
     }
 ])
 
-const messages = ref([
-    {
-        id: 1,
-        sender: 'OS',
-        avatar: '/placeholder.svg?height=32&width=32',
-        content: "Awesome! What's the standout feature?",
-        time: '11:15',
-        outgoing: false
-    },
-    {
-        id: 2,
-        sender: 'Jerome Bell',
-        avatar: '/placeholder.svg?height=32&width=32',
-        content: 'PrimeVue rocks! Simplifies UI dev with versatile components.',
-        time: '11:16',
-        outgoing: false
+const messages = ref([])
 
-    },
-    {
-        id: 3,
-        sender: 'Robert Fox',
-        avatar: '/placeholder.svg?height=32&width=32',
-        content: 'Intriguing! Tell us more about its impact.',
-        time: '11:17',
-        outgoing: true
-    },
-    {
-        id: 4,
-        sender: 'Esther Howard',
-        avatar: '/placeholder.svg?height=32&width=32',
-        content: "It's design-neutral and compatible with Tailwind. Features accessible, high-grade components!",
-        time: '11:18',
-        image: '/placeholder.svg?height=300&width=500'
-    },
-    {
-        id: 4,
-        sender: 'Esther Howard',
-        avatar: '/placeholder.svg?height=32&width=32',
-        content: "It's design-neutral and compatible with Tailwind. Features accessible, high-grade components!",
-        time: '11:18',
-        image: '/placeholder.svg?height=300&width=500'
-    },
-    {
-        id: 4,
-        sender: 'Esther Howard',
-        avatar: '/placeholder.svg?height=32&width=32',
-        content: "It's design-neutral and compatible with Tailwind. Features accessible, high-grade components!",
-        time: '11:18',
-        image: '/placeholder.svg?height=300&width=500'
+const fetchMessages = async (phone) => {
+    if (!phone) return;
+
+    loadingMessages.value = true;
+
+    try {
+        const response = await fetch(`/whatsapp/messages/${encodeURIComponent(phone)}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': usePage().props.csrf,
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            messages.value = result.data.messages || [];
+            console.log('Messages loaded successfully:', result.data.messages.length);
+        } else {
+            console.error('Failed to fetch messages:', result.message);
+            messages.value = [];
+        }
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        messages.value = [];
+    } finally {
+        loadingMessages.value = false;
     }
-])
+}
 
 const recipientPhone = ref('')
 const members = ref([
@@ -153,10 +136,13 @@ const members = ref([
 ])
 
 // Methods
-const selectChat = (chat) => {
+const selectChat = async (chat) => {
     selectedChat.value = chat
-    // Set the recipient phone number when a chat is selected
     recipientPhone.value = chat.phone || ''
+    expandedMessages.value.clear()
+
+    // Fetch messages for the selected chat
+    await fetchMessages(chat.phone)
 }
 
 const sendMessage = async () => {
@@ -176,7 +162,9 @@ const sendMessage = async () => {
         content: newMessage.value,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         status: 'sending',
-        outgoing: true
+        outgoing: true,
+        timestamp: new Date().toISOString(),
+        messageId: null
     }
 
     messages.value.push(message)
@@ -262,6 +250,67 @@ const handleContactSaved = (contact) => {
 if (chatList.value.length > 0) {
     selectChat(chatList.value[0])
 }
+
+const toggleMessageExpansion = (messageId) => {
+    if (expandedMessages.value.has(messageId)) {
+        expandedMessages.value.delete(messageId)
+    } else {
+        expandedMessages.value.add(messageId)
+    }
+}
+
+const isMessageExpanded = (messageId) => {
+    return expandedMessages.value.has(messageId)
+}
+
+const getStatusIcon = (status) => {
+    switch (status) {
+        case 'sending':
+            return 'pi pi-clock'
+        case 'sent':
+            return 'pi pi-check'
+        case 'delivered':
+            return 'pi pi-check-circle'
+        case 'read':
+            return 'pi pi-eye'
+        case 'failed':
+            return 'pi pi-times-circle'
+        default:
+            return 'pi pi-question-circle'
+    }
+}
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case 'sending':
+            return 'text-yellow-500'
+        case 'sent':
+            return 'text-gray-500'
+        case 'delivered':
+            return 'text-blue-500'
+        case 'read':
+            return 'text-green-500'
+        case 'failed':
+            return 'text-red-500'
+        default:
+            return 'text-gray-400'
+    }
+}
+
+const formatFullTimestamp = (timestamp) => {
+    if (!timestamp) return 'Unknown'
+    const date = new Date(timestamp)
+    return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    })
+}
+
+
 </script>
 
 <template>
@@ -285,9 +334,9 @@ if (chatList.value.length > 0) {
                         v-for="chat in chatList"
                         :key="chat.id"
                         :class="[
-            'p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors',
-            { 'bg-blue-50 border-l-4 border-l-green-500': selectedChat?.id === chat.id }
-          ]"
+                            'p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors',
+                            { 'bg-blue-50 border-l-4 border-l-green-500': selectedChat?.id === chat.id }
+                        ]"
                         @click="selectChat(chat)"
                     >
                         <div class="flex items-start space-x-3">
@@ -348,41 +397,103 @@ if (chatList.value.length > 0) {
                 </div>
 
                 <!-- Messages Area -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                    <div v-for="message in messages" :key="message.id"
-                         :class="['flex items-start space-x-3', message.outgoing ? 'flex-row-reverse space-x-reverse' : '']">
-                        <Avatar
-                            :image="message.avatar"
-                            :label="message.sender.charAt(0)"
-                            class="w-8 h-8 border"
-                            shape="circle"
-                        />
-                        <div :class="[ 'flex flex-col w-full max-w-[320px] leading-1.5 p-4 rounded-lg shadow-sm border border-gray-200',  message.outgoing  ? 'bg-blue-100 rounded-es-xl dark:bg-blue-700' : 'bg-white rounded-e-xl rounded-es-xl dark:bg-gray-700']">
-                            <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.sender }}</span>
-                                <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ message.time }}</span>
-                            </div>
-                            <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{ message.content }}</p>
-                            <div v-if="message.image" class="group relative my-2.5">
-                                <div class="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
-                                    <button class="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50" data-tooltip-target="download-image">
-                                        <svg aria-hidden="true" class="w-5 h-5 text-white" fill="none" viewBox="0 0 16 18" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                                        </svg>
-                                    </button>
-                                    <div id="download-image" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700" role="tooltip">
-                                        Download image
-                                        <div class="tooltip-arrow" data-popper-arrow></div>
+                <div class="flex-1 overflow-y-auto p-4 bg-gray-50">
+                    <div v-if="loadingMessages" class="flex justify-center items-center py-8">
+                        <div class="text-gray-500">Loading messages...</div>
+                    </div>
+                    <div v-else-if="messages.length === 0" class="flex justify-center items-center py-8">
+                        <div class="text-gray-500">No messages yet. Start a conversation!</div>
+                    </div>
+                    <div v-else class="space-y-6">
+                        <div
+                            v-for="message in messages"
+                            :key="message.id"
+                            :class="[
+                                'flex',
+                                message.outgoing ? 'justify-end' : 'justify-start'
+                            ]"
+                        >
+                            <div
+                                :class="[
+                                    'max-w-xs lg:max-w-md px-4 py-3 rounded-lg cursor-pointer transition-all duration-300 shadow-sm',
+                                    message.outgoing
+                                        ? 'bg-green-500 text-white hover:bg-green-600'
+                                        : 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
+                                ]"
+                                @click="toggleMessageExpansion(message.id)"
+                            >
+                                <div class="flex items-start space-x-2">
+                                    <Avatar
+                                        v-if="!message.outgoing"
+                                        :image="message.avatar"
+                                        :label="message.sender.charAt(0)"
+                                        class="w-6 h-6"
+                                        shape="circle"
+                                    />
+                                    <div class="flex-1">
+                                        <p class="text-sm leading-relaxed">{{ message.content }}</p>
+                                        <div class="flex items-center justify-between mt-2">
+                                            <span class="text-xs opacity-70">{{ message.time }}</span>
+                                            <div class="flex items-center space-x-1">
+                                                <span v-if="message.outgoing && message.status"
+                                                      :class="['text-xs opacity-70', getStatusColor(message.status)]">
+                                                    <i :class="getStatusIcon(message.status)"></i>
+                                                </span>
+                                                <i class="pi pi-chevron-down text-xs opacity-50 transition-transform duration-300"
+                                                   :class="{ 'rotate-180': isMessageExpanded(message.id) }"></i>
+                                            </div>
+                                        </div>
+
+                                        <!-- Expandable Meta Information -->
+                                        <transition name="fade">
+                                            <div
+                                                v-if="isMessageExpanded(message.id)"
+                                                class="mt-2 pt-2 border-t border-opacity-20 rounded-lg p-3 text-xs"
+                                                :class="[
+      message.outgoing ? 'bg-green-100 border-green-200' : 'bg-gray-100 border-gray-300',
+      'text-gray-700'
+    ]"
+                                            >
+                                                <div class="flex flex-col gap-1">
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="font-semibold">Status:</span>
+                                                        <i :class="[getStatusIcon(message.status), getStatusColor(message.status)]"></i>
+                                                        <span class="capitalize">{{ message.status || 'Unknown' }}</span>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="font-semibold">Timestamp:</span>
+                                                        <span>{{ formatFullTimestamp(message.timestamp) }}</span>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="font-semibold">Type:</span>
+                                                        <span>{{ message.outgoing ? 'Outgoing' : 'Incoming' }}</span>
+                                                    </div>
+
+                                                    <div
+                                                        v-if="!message.outgoing"
+                                                        class="flex items-center gap-1"
+                                                    >
+                                                        <span class="font-semibold">From:</span>
+                                                        <span>{{ message.sender }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </transition>
+
                                     </div>
                                 </div>
-                                <img :src="message.image" alt="Shared image" class="rounded-lg" />
+                                <img
+                                    v-if="message.image"
+                                    :src="message.image"
+                                    alt="Shared image"
+                                    class="mt-3 rounded-lg max-w-full h-auto shadow-sm"
+                                />
                             </div>
-                            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">{{ message.status === 'sending' ? 'Sending...' : message.status === 'failed' ? 'Failed' : 'Delivered' }}
-                            </span>
                         </div>
                     </div>
                 </div>
-
 
                 <!-- Message Input -->
                 <div class="bg-white border-t border-gray-200 p-4">
@@ -460,11 +571,11 @@ if (chatList.value.length > 0) {
                             v-for="tab in ['Media', 'Link', 'Docs']"
                             :key="tab"
                             :class="[
-              'px-3 py-1 text-sm font-medium rounded-lg transition-colors',
-              activeTab === tab
-                ? 'bg-blue-100 text-blue-700'
-                : 'text-gray-600 hover:text-gray-900'
-            ]"
+                                'px-3 py-1 text-sm font-medium rounded-lg transition-colors',
+                                activeTab === tab
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            ]"
                             @click="activeTab = tab"
                         >
                             {{ tab }}
@@ -510,5 +621,13 @@ if (chatList.value.length > 0) {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+.fade-leave-active {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
 }
 </style>

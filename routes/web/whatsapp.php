@@ -13,6 +13,9 @@ Route::name('whatsapp.')->prefix('whatsapp')->group(function () {
     // Send message endpoint
     Route::post('/send', [WhatsappController::class, 'sendMessage'])
         ->name('send');
+
+    Route::get('/messages/{phone}', [WhatsappController::class, 'getMessages'])
+        ->name('whatsapp.messages.get');
 });
 
 // Webhook endpoints (these should be accessible without authentication)
