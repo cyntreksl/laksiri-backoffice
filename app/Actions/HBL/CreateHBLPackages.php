@@ -63,13 +63,13 @@ class CreateHBLPackages
                     // Default logic (web or other APIs)
 
                     if ($hbl->cargo_type === CargoType::AIR_CARGO->value) {
-                        $package->weight = number_format($packageData['chargeableWeight'] ?? 0, 3);
+                        $package->weight = (float) ($packageData['chargeableWeight'] ?? 0);
                     } else {
-                        $package->weight = number_format($packageData['totalWeight'] ?? $packageData['weight'] ?? 0, 3);
+                        $package->weight = (float) ($packageData['totalWeight'] ?? $packageData['weight'] ?? 0);
                     }
 
-                    $package->actual_weight = $packageData['totalWeight'] ?? $packageData['weight'] ?? 0;
-                    $package->volumetric_weight = number_format($packageData['volumetricWeight'] ?? 0, 3);
+                    $package->actual_weight = (float) ($packageData['totalWeight'] ?? $packageData['weight'] ?? 0);
+                    $package->volumetric_weight = (float) ($packageData['volumetricWeight'] ?? 0);
                 }
 
                 $package->save();

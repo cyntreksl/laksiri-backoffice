@@ -17,13 +17,13 @@ class PackageCollection extends JsonResource
     {
         return [
             'id' => $this->id,
-            'package_count' => $this->token->package_count,
-            'reference' => $this->token->reference,
+            'package_count' => optional($this->token)->package_count,
+            'reference' => optional($this->token)->reference,
             'released_at' => $this->released_at,
             'released_packages' => $this->released_packages,
             'note' => $this->note,
-            'released_by' => $this->releasedBy->name,
-            'token' => $this->token->token,
+            'released_by' => optional($this->releasedBy)->name ?? 'Unknown',
+            'token' => optional($this->token)->token,
             'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first())->hbl_number,
         ];
     }
