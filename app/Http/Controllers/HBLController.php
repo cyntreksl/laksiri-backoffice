@@ -369,6 +369,11 @@ class HBLController extends Controller
         return $this->HBLRepository->downloadCashierInvoice($hbl);
     }
 
+    public function streamCashierReceipt($hbl)
+    {
+        return $this->HBLRepository->streamCashierInvoice($hbl);
+    }
+
     public function showDoorToDoorList()
     {
         $this->authorize('hbls.show door to door list');

@@ -560,6 +560,15 @@ watch(() => props.visible, (newVal) => {
                         severity="info"
                     />
                     <Button
+                        :href="`/hbls/stream/receipt/${hbl?.id}`"
+                        as="a"
+                        icon="pi pi-file-pdf"
+                        label="Stream Invoice"
+                        rel="noopener"
+                        severity="warn"
+                        target="_blank"
+                    />
+                    <Button
                         label="Issue Token"
                         icon="pi pi-tag"
                         :loading="isProcessing"
