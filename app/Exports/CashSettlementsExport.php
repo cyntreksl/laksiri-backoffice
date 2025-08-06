@@ -56,7 +56,7 @@ class CashSettlementsExport implements FromQuery, ShouldAutoSize, WithHeadings, 
 
         $query->cashSettlement()->whereHas('packages');
         $query->with(['pickup', 'packages'])
-            ->withSum('packages', 'weight')
+            ->withSum('packages', 'actual_weight')
             ->withSum('packages', 'volume');
 
         FilterFactory::apply($query, $this->filters);
@@ -72,7 +72,7 @@ class CashSettlementsExport implements FromQuery, ShouldAutoSize, WithHeadings, 
             'Name' => $row->hbl_name,
             'Address' => $row->address,
             'Pickup Date' => $row->created_at->format('Y-m-d'),
-            'Weight' => $row['packages_sum_weight'],
+            'Weight' => $row['packages_sum_actual_weight'],
             'Volume' => $row['packages_sum_volume'],
             'No of Packages' => count($row->packages),
             'Destination Charges' => number_format($row->destinationCharge->destination_1_total_with_tax / $row->destinationCharge->base_currency_rate_in_lkr ?? 0, 2),
