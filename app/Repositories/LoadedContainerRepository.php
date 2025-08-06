@@ -23,10 +23,15 @@ use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\Scopes\BranchScope;
 use App\Services\ContainerWeightService;
+use App\Traits\HandlesDeadlocks;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
+    use HandlesDeadlocks;
+
     protected $notificationMailRepository;
 
     public function __construct(NotificationMailRepository $notificationMailRepository)
@@ -39,19 +44,30 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
      */
     public function store(array $data)
     {
-        try {
-            if (isset($data['is_draft'])) {
-                return CreateDraftLoadedContainer::run($data);
-            } else {
-                $container = CreateOrUpdateLoadedContainer::run($data);
-                $hblNumbers = array_unique(array_column($data['packages'], 'hbl_id'));
-                $this->notificationMailRepository->sendShipmentDepartureNotification($hblNumbers);
+        return $this->executeWithDeadlockRetry(function () use ($data) {
+            try {
+                if (isset($data['is_draft'])) {
+                    return CreateDraftLoadedContainer::run($data);
+                } else {
+                    $container = CreateOrUpdateLoadedContainer::run($data);
+                    $hblNumbers = array_unique(array_column($data['packages'], 'hbl_id'));
+                    $this->notificationMailRepository->sendShipmentDepartureNotification($hblNumbers);
 
-                ContainerWeightService::recalculate($container);
+                    ContainerWeightService::recalculate($container);
+                }
+            } catch (QueryException $e) {
+                // Let the deadlock handler manage QueryExceptions
+                throw $e;
+            } catch (\Exception $e) {
+                // Log non-database exceptions for debugging
+                Log::error('Failed to create loaded container', [
+                    'error' => $e->getMessage(),
+                    'data' => $data,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                throw new \Exception('Failed to create loaded container: '.$e->getMessage());
             }
-        } catch (\Exception $e) {
-            throw new \Exception('Failed to create loaded container: '.$e->getMessage());
-        }
+        }, 3, 150); // 3 retries with 150ms base delay
     }
 
     public function deleteDraft(array $data)
@@ -207,22 +223,32 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     public function loadMHBL(array $data)
     {
-        try {
-            $mhbl = GetUnloadedMHBLWithHBLsByRef::run($data['mhbl']);
-            $packages = $mhbl->hbls->flatMap(function ($hbl) {
-                return $hbl->packages->map(function ($package) {
-                    return $package->toArray();
-                });
-            })->values()->all();
-            $loadingData = [
-                'container_id' => $data['container_id'],
-                'packages' => $packages,
-            ];
+        return $this->executeWithDeadlockRetry(function () use ($data) {
+            try {
+                $mhbl = GetUnloadedMHBLWithHBLsByRef::run($data['mhbl']);
+                $packages = $mhbl->hbls->flatMap(function ($hbl) {
+                    return $hbl->packages->map(function ($package) {
+                        return $package->toArray();
+                    });
+                })->values()->all();
+                $loadingData = [
+                    'container_id' => $data['container_id'],
+                    'packages' => $packages,
+                ];
 
-            return $this->store($loadingData);
-        } catch (\Exception $e) {
-            throw new \Exception('Failed to add MHBL to loaded container: '.$e->getMessage());
-        }
+                return $this->store($loadingData);
+            } catch (QueryException $e) {
+                // Let the deadlock handler manage QueryExceptions
+                throw $e;
+            } catch (\Exception $e) {
+                Log::error('Failed to add MHBL to loaded container', [
+                    'error' => $e->getMessage(),
+                    'data' => $data,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                throw new \Exception('Failed to add MHBL to loaded container: '.$e->getMessage());
+            }
+        }, 3, 150);
     }
 
     public function tallySheetDownloadPDF($container)

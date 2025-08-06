@@ -25,6 +25,7 @@ use App\Http\Resources\PickupResource;
 use App\Interfaces\Api\HBLRepositoryInterface;
 use App\Models\Branch;
 use App\Models\HBL;
+use App\Models\Scopes\BranchScope;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -159,7 +160,8 @@ class HBLRepository implements HBLRepositoryInterface
 
     public function getCompletedHBL($data)
     {
-        $hbls = HBL::where('system_status', '<', 2.2)
+        $hbls = HBL::withoutGlobalScope(BranchScope::class)
+            ->where('system_status', '<', 2.2)
             ->where('created_by', auth()->id())
             ->with(['pickup', 'packages']) // preload needed relations
             ->orderBy('created_at', 'desc')
@@ -212,7 +214,16 @@ class HBLRepository implements HBLRepositoryInterface
 
     public function completedHBLView(HBL $hbl)
     {
-        $hbl->load(['packages', 'pickup', 'pickup.driver', 'pickup.driver.driverLocation', 'pickup.driver.driverLocation.branch']);
+        // Load relationships without global scope to ensure data is accessible
+        $hbl->load([
+            'packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class);
+            },
+            'pickup',
+            'pickup.driver',
+            'pickup.driver.driverLocation',
+            'pickup.driver.driverLocation.branch',
+        ]);
         $response = null;
 
         if ($hbl->pickup) {
