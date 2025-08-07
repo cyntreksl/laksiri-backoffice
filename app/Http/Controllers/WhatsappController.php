@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SendWhatsappMessageRequest;
+use App\Models\WhatsappContact;
 use App\Repositories\WhatsappContactRepository;
 use App\Services\WhatsAppService;
 use Carbon\Carbon;
@@ -200,4 +201,49 @@ class WhatsappController extends Controller
 
         return $phone;
     }
+
+
+    public function updateContact(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'phone' => 'required|string|unique:whatsapp_contacts,phone,' . $id,
+                'profile_pic' => 'nullable|url',
+            ]);
+
+            $contact = WhatsappContact::findOrFail($id);
+            $contact->update($validated);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error updating WhatsApp contact: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update contact'
+            ], 500);
+        }
+    }
+
+
+    public function destroyContact($id)
+    {
+        try {
+            $contact = WhatsappContact::findOrFail($id);
+            $contact->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Contact deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting WhatsApp contact: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete contact'
+            ], 500);
+        }
+    }
+
 }

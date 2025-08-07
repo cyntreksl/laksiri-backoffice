@@ -10,6 +10,14 @@ Route::name('whatsapp.')->prefix('whatsapp')->group(function () {
     Route::post('/contacts', [WhatsappController::class, 'storeContact'])
         ->name('contacts.store');
 
+    // Add this to your whatsapp routes section
+    Route::put('/contacts/{id}', [WhatsappController::class, 'updateContact'])
+        ->name('contacts.update');
+
+    // Add this to your whatsapp routes section
+    Route::delete('/contacts/{id}', [WhatsappController::class, 'destroyContact'])
+        ->name('contacts.destroy');
+
     // Send message endpoint
     Route::post('/send', [WhatsappController::class, 'sendMessage'])
         ->name('send');

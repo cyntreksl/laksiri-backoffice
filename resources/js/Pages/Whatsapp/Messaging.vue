@@ -1,5 +1,6 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import Avatar from 'primevue/avatar'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -8,7 +9,16 @@ import Badge from 'primevue/badge'
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Menu from 'primevue/menu';
 import AddContact from './Partials/AddContact.vue';
-import {usePage} from "@inertiajs/vue3";
+import { router } from '@inertiajs/vue3';
+import { useConfirm } from "primevue/useconfirm";
+import { push } from 'notivue';
+import EditContact from './Partials/EditContact.vue';
+
+// Get props from Inertia
+const page = usePage()
+const props = computed(() => page.props)
+const confirm = useConfirm();
+
 
 // Reactive data
 const selectedChat = ref(null)
@@ -18,25 +28,35 @@ const menu = ref();
 const showAddContact = ref(false);
 const loadingMessages = ref(false);
 const expandedMessages = ref(new Set());
+const contactMenu = ref();
+const selectedContact = ref(null);
+const showEditContact = ref(false);
 
 const items = ref([
     {
         label: 'Options',
         items: [
             {
-                label: 'Group Info',
-                icon: 'pi pi-info-circle'
+                label: 'Edit Contact',
+                icon: 'pi pi-pencil',
+                command: () => {
+                    handleEditContact();
+                }
             },
             {
-                label: 'Leave Group',
-                icon: 'pi pi-sign-out'
+                label: 'Delete Contact',
+                icon: 'pi pi-trash',
+                command: () => {
+                    handleDeleteContact();
+                }
             }
         ]
     }
 ]);
 
-const toggle = (event) => {
-    menu.value.toggle(event);
+const toggle = (event, chat) => {
+    selectedContact.value = chat;
+    contactMenu.value.toggle(event);
 };
 
 const settings = reactive({
@@ -45,55 +65,29 @@ const settings = reactive({
     saveDownloads: false
 })
 
-// Mock data - Added phone numbers
-const chatList = ref([
-    {
-        id: 1,
-        name: 'PrimeTek Team',
-        phone: '+94711458218', // Added phone number
-        avatar: '/placeholder.svg?height=48&width=48',
-        lastMessage: "Let's implement PrimeVue...",
-        time: '11:15',
-        unreadCount: 0,
-        online: true,
-        members: 'Cody Fisher, Esther Howard, Jerome Bell, Kristin Watson...'
-    },
-    {
-        id: 2,
-        name: 'Jerome Bell',
-        phone: '+1234567891', // Added phone number
-        avatar: '/placeholder.svg?height=48&width=48',
-        lastMessage: "PrimeVue's...",
-        time: '11:15',
-        unreadCount: 1,
-        online: true,
-        members: 'Jerome Bell'
-    },
-    {
-        id: 3,
-        name: 'Robert Fox',
-        phone: '+1234567892', // Added phone number
-        avatar: '/placeholder.svg?height=48&width=48',
-        lastMessage: 'Interesting! PrimeVue sounds...',
-        time: '11:15',
-        unreadCount: 0,
-        online: false,
-        members: 'Robert Fox'
-    },
-    {
-        id: 4,
-        name: 'Esther Howard',
-        phone: '+1234567893', // Added phone number
-        avatar: '/placeholder.svg?height=48&width=48',
-        lastMessage: 'Quick one, team! Anyone...',
-        time: '11:15',
-        unreadCount: 1,
-        online: true,
-        members: 'Esther Howard'
-    }
+// Use real contacts from backend instead of mock data
+const chatList = ref(props.value.contacts || [])
+const messages = ref([])
+const recipientPhone = ref('')
+
+// Members for the right sidebar (can also be made dynamic if needed)
+const members = ref([
+    { id: 1, name: 'Robin Jonas', avatar: '/placeholder.svg?height=32&width=32' },
+    { id: 2, name: 'Cameron Williamson', avatar: '/placeholder.svg?height=32&width=32' },
+    { id: 3, name: 'Eleanor Pena', avatar: '/placeholder.svg?height=32&width=32' },
+    { id: 4, name: 'Arlene McCoy', avatar: '/placeholder.svg?height=32&width=32' },
+    { id: 5, name: 'Dianne Russell', avatar: '/placeholder.svg?height=32&width=32' }
 ])
 
-const messages = ref([])
+// Methods
+const selectChat = async (chat) => {
+    selectedChat.value = chat
+    recipientPhone.value = chat.phone || ''
+    expandedMessages.value.clear()
+
+    // Fetch messages for the selected chat
+    await fetchMessages(chat.phone)
+}
 
 const fetchMessages = async (phone) => {
     if (!phone) return;
@@ -124,25 +118,6 @@ const fetchMessages = async (phone) => {
     } finally {
         loadingMessages.value = false;
     }
-}
-
-const recipientPhone = ref('')
-const members = ref([
-    { id: 1, name: 'Robin Jonas', avatar: '/placeholder.svg?height=32&width=32' },
-    { id: 2, name: 'Cameron Williamson', avatar: '/placeholder.svg?height=32&width=32' },
-    { id: 3, name: 'Eleanor Pena', avatar: '/placeholder.svg?height=32&width=32' },
-    { id: 4, name: 'Arlene McCoy', avatar: '/placeholder.svg?height=32&width=32' },
-    { id: 5, name: 'Dianne Russell', avatar: '/placeholder.svg?height=32&width=32' }
-])
-
-// Methods
-const selectChat = async (chat) => {
-    selectedChat.value = chat
-    recipientPhone.value = chat.phone || ''
-    expandedMessages.value.clear()
-
-    // Fetch messages for the selected chat
-    await fetchMessages(chat.phone)
 }
 
 const sendMessage = async () => {
@@ -177,7 +152,6 @@ const sendMessage = async () => {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                // Add CSRF token if needed (Laravel)
                 "X-CSRF-TOKEN": usePage().props.csrf,
             },
             body: JSON.stringify({
@@ -187,8 +161,6 @@ const sendMessage = async () => {
         })
 
         const result = await response.json()
-
-        console.log(result)
 
         if (result.success) {
             // Update message with server data
@@ -201,10 +173,6 @@ const sendMessage = async () => {
                 recipient: result.data.recipient,
                 storedMessage: result.data.stored_message
             })
-
-            // Optional: Show success notification
-            // showNotification('Message sent successfully', 'success')
-
         } else {
             throw new Error(result.message || 'Failed to send message')
         }
@@ -217,9 +185,6 @@ const sendMessage = async () => {
 
         // Show error message to user
         alert(`Failed to send message: ${error.message}`)
-
-        // Optional: Remove failed message from UI or add retry option
-        // messages.value = messages.value.filter(msg => msg.id !== message.id)
     }
 }
 
@@ -247,9 +212,11 @@ const handleContactSaved = (contact) => {
 }
 
 // Select first chat by default
-if (chatList.value.length > 0) {
-    selectChat(chatList.value[0])
-}
+onMounted(() => {
+    if (chatList.value.length > 0) {
+        selectChat(chatList.value[0])
+    }
+})
 
 const toggleMessageExpansion = (messageId) => {
     if (expandedMessages.value.has(messageId)) {
@@ -310,7 +277,107 @@ const formatFullTimestamp = (timestamp) => {
     })
 }
 
+const getInitials = (name) => {
+    if (!name) return '?'
+    return name.charAt(0).toUpperCase()
+}
 
+// Contact Edit and Delete Functions
+const handleEditContact = () => {
+    if (!selectedContact.value) return;
+
+    // Show the edit dialog with the selected contact data
+    showEditContact.value = true;
+}
+
+const handleContactUpdated = (updatedContact) => {
+    // Find and update the contact in the chatList
+    const index = chatList.value.findIndex(chat => chat.id === updatedContact.id);
+    if (index !== -1) {
+        chatList.value[index] = {
+            ...chatList.value[index],
+            name: updatedContact.name,
+            phone: updatedContact.phone,
+            avatar: updatedContact.profile_pic || chatList.value[index].avatar
+        };
+    }
+
+    // If the updated contact is currently selected, update the selected chat too
+    if (selectedChat.value && selectedChat.value.id === updatedContact.id) {
+        selectedChat.value = {
+            ...selectedChat.value,
+            name: updatedContact.name,
+            phone: updatedContact.phone,
+            avatar: updatedContact.profile_pic || selectedChat.value.avatar
+        };
+    }
+
+    push.success('Contact updated successfully');
+}
+
+
+const handleDeleteContact = () => {
+    if (!selectedContact.value) return;
+
+    confirm.require({
+        message: `Are you sure you want to delete ${selectedContact.value.name}?`,
+        header: 'Delete Confirmation',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            deleteContact(selectedContact.value.id);
+        },
+        reject: () => {
+            // Do nothing
+        }
+    });
+}
+
+const deleteContact = async (contactId) => {
+    try {
+        const response = await fetch(`/whatsapp/contacts/${contactId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': usePage().props.csrf,
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Remove contact from chatList
+            const index = chatList.value.findIndex(chat => chat.id === contactId);
+            if (index !== -1) {
+                chatList.value.splice(index, 1);
+            }
+
+            // If deleted contact was selected, clear selection
+            if (selectedChat.value && selectedChat.value.id === contactId) {
+                selectedChat.value = null;
+                messages.value = [];
+                recipientPhone.value = '';
+            }
+
+            push.success('Contact deleted successfully');
+        } else {
+            throw new Error(result.message || 'Failed to delete contact');
+        }
+    } catch (error) {
+        console.error('Failed to delete contact:', error);
+        push.error(`Failed to delete contact: ${error.message}`);
+    }
+}
 </script>
 
 <template>
@@ -343,7 +410,7 @@ const formatFullTimestamp = (timestamp) => {
                             <div class="relative">
                                 <Avatar
                                     :image="chat.avatar"
-                                    :label="chat.name.charAt(0)"
+                                    :label="getInitials(chat.name)"
                                     class="w-12 h-12 border"
                                     shape="circle"
                                 />
@@ -354,7 +421,7 @@ const formatFullTimestamp = (timestamp) => {
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <p class="text-sm font-medium text-gray-900 truncate">{{ chat.name }}</p>
+                                    <p class="text-sm font-medium text-gray-900 truncate">{{ chat.name || 'Unknown Contact' }}</p>
                                     <span class="text-xs text-gray-500">{{ chat.time }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
@@ -366,6 +433,11 @@ const formatFullTimestamp = (timestamp) => {
                                     />
                                 </div>
                             </div>
+                            <Button
+                                icon="pi pi-ellipsis-v"
+                                class="p-button-text p-button-sm"
+                                @click.stop="toggle($event, chat)"
+                            />
                         </div>
                     </div>
                 </div>
@@ -378,7 +450,7 @@ const formatFullTimestamp = (timestamp) => {
                     <div class="flex items-center space-x-3">
                         <Avatar
                             :image="selectedChat?.avatar"
-                            :label="selectedChat?.name?.charAt(0)"
+                            :label="getInitials(selectedChat?.name)"
                             class="w-10 h-10 border"
                             shape="circle"
                         />
@@ -391,8 +463,6 @@ const formatFullTimestamp = (timestamp) => {
                     <div class="flex items-center space-x-2">
                         <Button class="p-button-text" icon="pi pi-phone" />
                         <Button class="p-button-text" icon="pi pi-search" />
-                        <Button aria-controls="overlay_menu" aria-haspopup="true" class="p-button-text" icon="pi pi-ellipsis-h" @click="toggle" />
-                        <Menu id="overlay_menu" ref="menu" :model="items" :popup="true" />
                     </div>
                 </div>
 
@@ -426,7 +496,7 @@ const formatFullTimestamp = (timestamp) => {
                                     <Avatar
                                         v-if="!message.outgoing"
                                         :image="message.avatar"
-                                        :label="message.sender.charAt(0)"
+                                        :label="getInitials(message.sender)"
                                         class="w-6 h-6"
                                         shape="circle"
                                     />
@@ -450,9 +520,9 @@ const formatFullTimestamp = (timestamp) => {
                                                 v-if="isMessageExpanded(message.id)"
                                                 class="mt-2 pt-2 border-t border-opacity-20 rounded-lg p-3 text-xs"
                                                 :class="[
-      message.outgoing ? 'bg-green-100 border-green-200' : 'bg-gray-100 border-gray-300',
-      'text-gray-700'
-    ]"
+                                                    message.outgoing ? 'bg-green-100 border-green-200' : 'bg-gray-100 border-gray-300',
+                                                    'text-gray-700'
+                                                ]"
                                             >
                                                 <div class="flex flex-col gap-1">
                                                     <div class="flex items-center gap-1">
@@ -476,12 +546,11 @@ const formatFullTimestamp = (timestamp) => {
                                                         class="flex items-center gap-1"
                                                     >
                                                         <span class="font-semibold">From:</span>
-                                                        <span>{{ message.sender }}</span>
+                                                        <span>{{ message.sender || 'Unknown' }}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </transition>
-
                                     </div>
                                 </div>
                                 <img
@@ -553,11 +622,11 @@ const formatFullTimestamp = (timestamp) => {
                             <div class="flex items-center space-x-3">
                                 <Avatar
                                     :image="member.avatar"
-                                    :label="member.name.charAt(0)"
+                                    :label="getInitials(member.name)"
                                     class="w-8 h-8"
                                     shape="circle"
                                 />
-                                <span class="text-sm font-medium text-gray-900">{{ member.name }}</span>
+                                <span class="text-sm font-medium text-gray-900">{{ member.name || 'Unknown Member' }}</span>
                             </div>
                             <Button class="p-button-text p-button-sm" icon="pi pi-chevron-right" />
                         </div>
@@ -600,6 +669,16 @@ const formatFullTimestamp = (timestamp) => {
                 </div>
             </div>
         </div>
+
+        <!-- Contact Options Menu -->
+        <Menu ref="contactMenu" :model="items" :popup="true" />
+
+        <EditContact
+            v-model:visible="showEditContact"
+            :contact="selectedContact"
+            @contact-updated="handleContactUpdated"
+        />
+
         <AddContact v-model:visible="showAddContact" @contact-saved="handleContactSaved" />
     </AppLayout>
 </template>
