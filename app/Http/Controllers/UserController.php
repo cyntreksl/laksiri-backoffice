@@ -39,7 +39,7 @@ class UserController extends Controller
 
         return Inertia::render('User/UserList', [
             'roles' => $this->roleRepository->getRoles(),
-            'branches' => $this->branchRepository->getUserBranches(),
+            'branches' => $this->branchRepository->getBranches(),
             'userRole' => Auth()->user()->getRoleNames()[0],
             'currentBranch' => GetUserCurrentBranchID::run(),
             'isSuperAdmin' => Auth::user()->name === 'Super Administrator' && Auth::user()->hasRole('admin'),
@@ -93,7 +93,7 @@ class UserController extends Controller
         return Inertia::render('User/EditUser', [
             'userRecord' => $user->load('roles', 'branches'),
             'roles' => $this->roleRepository->getRoles(),
-            'branches' => $this->branchRepository->getUserBranches(),
+            'branches' => $this->branchRepository->getBranches(),
         ]);
     }
 
