@@ -123,7 +123,7 @@ class WhatsAppService
                 'messaging_product' => 'whatsapp',
                 'to' => $to,
                 'type' => 'text',
-                "recipient_type"=> "individual",
+                'recipient_type' => 'individual',
                 'text' => [
                     'body' => $message,
                 ],

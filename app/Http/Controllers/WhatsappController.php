@@ -170,7 +170,7 @@ class WhatsappController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            Log::error('WhatsApp get messages error: ' . $e->getMessage());
+            Log::error('WhatsApp get messages error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -202,13 +202,12 @@ class WhatsappController extends Controller
         return $phone;
     }
 
-
     public function updateContact(Request $request, $id)
     {
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'phone' => 'required|string|unique:whatsapp_contacts,phone,' . $id,
+                'phone' => 'required|string|unique:whatsapp_contacts,phone,'.$id,
                 'profile_pic' => 'nullable|url',
             ]);
 
@@ -216,15 +215,14 @@ class WhatsappController extends Controller
             $contact->update($validated);
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error updating WhatsApp contact: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error updating WhatsApp contact: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update contact'
+                'message' => 'Failed to update contact',
             ], 500);
         }
     }
-
 
     public function destroyContact($id)
     {
@@ -234,16 +232,15 @@ class WhatsappController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Contact deleted successfully'
+                'message' => 'Contact deleted successfully',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting WhatsApp contact: ' . $e->getMessage());
+            Log::error('Error deleting WhatsApp contact: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete contact'
+                'message' => 'Failed to delete contact',
             ], 500);
         }
     }
-
 }

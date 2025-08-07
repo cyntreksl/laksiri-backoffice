@@ -29,7 +29,7 @@ class WhatsappContactRepository implements WhatsappContactRepositoryInterface
                     'time' => now()->format('H:i'),
                     'unreadCount' => 0,
                     'online' => false,
-                    'members' => $contact->name
+                    'members' => $contact->name,
                 ];
             })
             ->toArray();
