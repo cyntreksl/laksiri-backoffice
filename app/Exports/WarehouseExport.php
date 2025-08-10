@@ -50,7 +50,7 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
         $query->warehouse();
 
         $query->with(['packages'])
-            ->withSum('packages', 'weight')
+            ->withSum('packages', 'actual_weight')
             ->withSum('packages', 'volume');
 
         FilterFactory::apply($query, $this->filters);
@@ -66,7 +66,7 @@ class WarehouseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
             'Shipper Name' => $row->hbl_name,
             'Cargo Type' => $row->cargo_type,
             'HBL Type' => $row->hbl_type,
-            'Weight' => $row['packages_sum_weight'],
+            'Weight' => $row['packages_sum_actual_weight'],
             'Volume' => $row['packages_sum_volume'],
             'No of Packages' => count($row->packages),
         ];
