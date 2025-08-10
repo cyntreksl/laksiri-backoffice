@@ -188,7 +188,7 @@ jobs:
         github.ref == 'refs/heads/main' && 'production' ||
         github.ref == 'refs/heads/stage' && 'stage' ||
         'stage'
-    } }
+    }}
     steps:
       - name: Download application artifact
         uses: actions/download-artifact@v3
