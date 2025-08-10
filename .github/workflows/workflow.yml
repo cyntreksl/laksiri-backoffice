@@ -15,206 +15,179 @@ on:
         required: true
         default: 'stage'
 
-jobs:
-  setup-services:
-    runs-on: ubuntu-latest
-    outputs:
-      mysql-port: 3306
-      redis-port: 6379
-    steps:
-      - name: Start MySQL service
-        uses: mysql-actions/setup-mysql@v1
-        with:
-          mysql-version: '8.0'
-          mysql-root-password: let_me_in
-          mysql-database: testing
-          mysql-user: homestead
-          mysql-password: secret
+install-dependencies:
+  runs-on: ubuntu-latest
+  services:
+    mysql:
+      image: mysql:8.0
+      env:
+        MYSQL_ROOT_PASSWORD: let_me_in
+        MYSQL_DATABASE: testing
+        MYSQL_USER: homestead
+        MYSQL_PASSWORD: secret
+      options: >-
+        --health-cmd="mysqladmin ping --silent"
+        --health-interval=10s
+        --health-timeout=5s
+        --health-retries=3
+    redis:
+      image: redis:6.2
+      options: >-
+        --health-cmd="redis-cli ping"
+        --health-interval=10s
+        --health-timeout=5s
+        --health-retries=3
+  steps:
+    - uses: actions/checkout@v3
 
-      - name: Start Redis service
-        uses: docker://redis:6.2
-        id: redis
-        # Redis runs as a service below in job definitions
+    - name: Set up PHP 8.3
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.3
+        extensions: zip, gd, pcntl, pdo_mysql, exif, bcmath
+        ini-values: post_max_size=256M, upload_max_filesize=256M
+        coverage: none
 
-  install-dependencies:
-    runs-on: ubuntu-latest
-    needs: setup-services
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: let_me_in
-          MYSQL_DATABASE: testing
-          MYSQL_USER: homestead
-          MYSQL_PASSWORD: secret
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-      redis:
-        image: redis:6.2
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y unzip libzip-dev libpng-dev zip git mariadb-client
 
-    steps:
-      - uses: actions/checkout@v3
+    - name: Install Composer
+      run: |
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-      - name: Set up PHP 8.3
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          extensions: zip, gd, pcntl, pdo_mysql, exif, bcmath
-          ini-values: post_max_size=256M, upload_max_filesize=256M
-          coverage: none
+    - name: Copy .env if not exists
+      run: |
+        if [ ! -f .env ]; then cp .env.example .env; fi
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip libzip-dev libpng-dev zip git mariadb-client
+    - name: Install PHP dependencies
+      run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Install Composer
-        run: |
-          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - name: Generate app key
+      run: php artisan key:generate
 
-      - name: Copy .env if not exists
-        run: |
-          if [ ! -f .env ]; then cp .env.example .env; fi
+    - name: Cache vendor directory
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
-      - name: Install PHP dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+build-frontend:
+  runs-on: ubuntu-latest
+  needs: install-dependencies
+  steps:
+    - uses: actions/checkout@v3
 
-      - name: Generate app key
-        run: php artisan key:generate
+    - name: Use Node.js 20
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20.17.0
+        cache: 'npm'
 
-      - name: Cache vendor directory
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+    - name: Install frontend dependencies
+      run: npm ci
 
-  build-frontend:
-    runs-on: ubuntu-latest
-    needs: install-dependencies
-    steps:
-      - uses: actions/checkout@v3
+    - name: Build frontend assets
+      run: npm run build
 
-      - name: Use Node.js 20
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20.17.0
-          cache: 'npm'
+    - name: Upload frontend build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-build
+        path: |
+          public/build/assets/*
+          public/build/*
 
-      - name: Install frontend dependencies
-        run: npm ci
+run-tests:
+  runs-on: ubuntu-latest
+  needs: install-dependencies
+  services:
+    mysql:
+      image: mysql:8.0
+      env:
+        MYSQL_ROOT_PASSWORD: let_me_in
+        MYSQL_DATABASE: testing
+        MYSQL_USER: homestead
+        MYSQL_PASSWORD: secret
+      options: >-
+        --health-cmd="mysqladmin ping --silent"
+        --health-interval=10s
+        --health-timeout=5s
+        --health-retries=3
+    redis:
+      image: redis:6.2
+      options: >-
+        --health-cmd="redis-cli ping"
+        --health-interval=10s
+        --health-timeout=5s
+        --health-retries=3
+  steps:
+    - uses: actions/checkout@v3
 
-      - name: Build frontend assets
-        run: npm run build
+    - name: Set up PHP 8.3
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.3
+        extensions: pdo_mysql
 
-      - name: Upload frontend build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-build
-          path: |
-            public/build/assets/*
-            public/build/*
+    - name: Install composer dependencies
+      run: composer install --no-interaction
 
-  run-tests:
-    runs-on: ubuntu-latest
-    needs: install-dependencies
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: let_me_in
-          MYSQL_DATABASE: testing
-          MYSQL_USER: homestead
-          MYSQL_PASSWORD: secret
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-      redis:
-        image: redis:6.2
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+    - name: Run Pint code style check
+      run: vendor/bin/pint --test
 
-    steps:
-      - uses: actions/checkout@v3
+package-application:
+  runs-on: ubuntu-latest
+  needs: [build-frontend, run-tests]
+  steps:
+    - uses: actions/checkout@v3
 
-      - name: Set up PHP 8.3
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          extensions: pdo_mysql
+    - name: Create application.zip
+      run: zip -r application.zip . -x "*.git*" "node_modules/*"
 
-      - name: Install composer dependencies
-        run: composer install --no-interaction
+    - name: Upload packaged application artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: application-zip
+        path: application.zip
 
-      - name: Run Pint code style check
-        run: vendor/bin/pint --test
+deploy:
+  runs-on: ubuntu-latest
+  needs: package-application
+  environment:
+    name: ${{
+      github.event_name == 'workflow_dispatch' && github.event.inputs.environment ||
+      github.ref == 'refs/heads/main' && 'production' ||
+      github.ref == 'refs/heads/stage' && 'stage' ||
+      'stage'
+  }}
+  steps:
+    - name: Download application artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: application-zip
+        path: .
 
-  package-application:
-    runs-on: ubuntu-latest
-    needs: [build-frontend, run-tests]
-    steps:
-      - uses: actions/checkout@v3
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Create application.zip
-        run: zip -r application.zip . -x "*.git*" "node_modules/*"
+    - name: Add remote host to known_hosts
+      run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-      - name: Upload packaged application artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: application-zip
-          path: application.zip
+    - name: Copy application.zip to server
+      run: scp application.zip ${{ secrets.EC2_USER }}@${{ secrets.HOST }}:/tmp/app.zip
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: package-application
-    environment:
-      name: ${{
-        github.ref == 'refs/heads/main' && 'production' ||
-        github.ref == 'refs/heads/stage' && 'stage' ||
-        'stage'
-    }}
-    steps:
-      - name: Download application artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: application-zip
-          path: .
-
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-
-      - name: Add remote host to known_hosts
-        run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-
-      - name: Copy application.zip to server
-        run: scp application.zip ${{ secrets.EC2_USER }}@${{ secrets.HOST }}:/tmp/app.zip
-
-      - name: Deploy on server
-        run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.HOST }} bash -s << 'EOF'
-          unzip -o /tmp/app.zip -d /var/www/laksiri-backoffice
-          cd /var/www/laksiri-backoffice
-          php artisan migrate --force
-          php artisan db:seed --force
-          php artisan config:clear
-          php artisan cache:clear
-          php artisan sidecar:deploy --activate
-          EOF
+    - name: Deploy on server
+      run: |
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.HOST }} bash -s << 'EOF'
+        unzip -o /tmp/app.zip -d /var/www/laksiri-backoffice
+        cd /var/www/laksiri-backoffice
+        php artisan migrate --force
+        php artisan db:seed --force
+        php artisan config:clear
+        php artisan cache:clear
+        php artisan sidecar:deploy --activate
+        EOF
