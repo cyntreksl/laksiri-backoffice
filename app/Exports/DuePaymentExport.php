@@ -51,7 +51,7 @@ class DuePaymentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
 
         $query->duePayment();
         $query->with(['pickup', 'packages'])
-            ->withSum('packages', 'weight')
+            ->withSum('packages', 'actual_weight')
             ->withSum('packages', 'volume');
 
         FilterFactory::apply($query, $this->filters);
@@ -66,7 +66,7 @@ class DuePaymentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
             'HBL Number' => $row->hbl_number,
             'Name' => $row->hbl_name,
             'Pickup Date' => $row->pickup ? $row->pickup['pickup_date'] : null,
-            'Weight' => $row['packages_sum_weight'],
+            'Weight' => $row['packages_sum_actual_weight'],
             'Volume' => $row['packages_sum_volume'],
             'No of Packages' => count($row->packages),
             'Amount' => $row->grand_total,
