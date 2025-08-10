@@ -80,6 +80,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Restore vendor directory
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+
       - name: Use Node.js 20
         uses: actions/setup-node@v3
         with:
