@@ -552,7 +552,7 @@ const deleteContact = async (contactId) => {
                                         </transition>
                                     </div>
                                 </div>
-                                <img
+                                <imgF
                                     v-if="message.image"
                                     :src="message.image"
                                     alt="Shared image"
@@ -566,8 +566,8 @@ const deleteContact = async (contactId) => {
                 <!-- Message Input -->
                 <div class="bg-white border-t border-gray-200 p-4">
                     <div class="flex items-center space-x-3">
-                        <Button class="p-button-text" icon="pi pi-face-smile" />
-                        <Button class="p-button-text" icon="pi pi-paperclip" />
+<!--                        <Button class="p-button-text" icon="pi pi-face-smile" />-->
+<!--                        <Button class="p-button-text" icon="pi pi-paperclip" />-->
                         <InputText
                             v-model="newMessage"
                             class="flex-1"
