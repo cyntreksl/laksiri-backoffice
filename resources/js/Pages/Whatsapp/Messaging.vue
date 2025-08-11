@@ -589,83 +589,57 @@ const deleteContact = async (contactId) => {
             <!-- Right Sidebar - Members & Settings -->
             <div class="w-80 bg-white border-l border-gray-200 flex flex-col">
                 <!-- Settings -->
-                <div class="p-4 border-b border-gray-200">
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-700">Notification</span>
-                            <InputSwitch v-model="settings.notifications" />
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-700">Sound</span>
-                            <InputSwitch v-model="settings.sound" />
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-700">Save to downloads</span>
-                            <InputSwitch v-model="settings.saveDownloads" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Members -->
-                <div class="p-4 border-b border-gray-200">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-medium text-gray-900">Members</h4>
-                        <span class="text-sm text-blue-600 cursor-pointer">See All</span>
-                    </div>
-                    <div class="space-y-3">
-                        <div
-                            v-for="member in members"
-                            :key="member.id"
-                            class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
-                        >
-                            <div class="flex items-center space-x-3">
-                                <Avatar
-                                    :image="member.avatar"
-                                    :label="getInitials(member.name)"
-                                    class="w-8 h-8"
-                                    shape="circle"
-                                />
-                                <span class="text-sm font-medium text-gray-900">{{ member.name || 'Unknown Member' }}</span>
-                            </div>
-                            <Button class="p-button-text p-button-sm" icon="pi pi-chevron-right" />
-                        </div>
-                    </div>
-                </div>
+<!--                <div class="p-4 border-b border-gray-200">-->
+<!--                    <div class="space-y-3">-->
+<!--                        <div class="flex items-center justify-between">-->
+<!--                            <span class="text-sm font-medium text-gray-700">Notification</span>-->
+<!--                            <InputSwitch v-model="settings.notifications" />-->
+<!--                        </div>-->
+<!--                        <div class="flex items-center justify-between">-->
+<!--                            <span class="text-sm font-medium text-gray-700">Sound</span>-->
+<!--                            <InputSwitch v-model="settings.sound" />-->
+<!--                        </div>-->
+<!--                        <div class="flex items-center justify-between">-->
+<!--                            <span class="text-sm font-medium text-gray-700">Save to downloads</span>-->
+<!--                            <InputSwitch v-model="settings.saveDownloads" />-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
 
                 <!-- Media & Docs -->
-                <div class="p-4">
-                    <div class="flex space-x-4 mb-4">
-                        <button
-                            v-for="tab in ['Media', 'Link', 'Docs']"
-                            :key="tab"
-                            :class="[
-                                'px-3 py-1 text-sm font-medium rounded-lg transition-colors',
-                                activeTab === tab
-                                    ? 'bg-blue-100 text-blue-700'
-                                    : 'text-gray-600 hover:text-gray-900'
-                            ]"
-                            @click="activeTab = tab"
-                        >
-                            {{ tab }}
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div
-                            v-for="i in 6"
-                            :key="i"
-                            class="aspect-square bg-gray-200 rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                        >
-                            <img
-                                alt="Media thumbnail"
-                                class="w-full h-full object-cover rounded-lg"
-                                src="/placeholder.svg?height=80&width=80"
-                            />
-                        </div>
-                    </div>
-                    <button class="w-full mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium">
-                        Show more →
-                    </button>
-                </div>
+<!--                <div class="p-4">-->
+<!--                    <div class="flex space-x-4 mb-4">-->
+<!--                        <button-->
+<!--                            v-for="tab in ['Media', 'Link', 'Docs']"-->
+<!--                            :key="tab"-->
+<!--                            :class="[-->
+<!--                                'px-3 py-1 text-sm font-medium rounded-lg transition-colors',-->
+<!--                                activeTab === tab-->
+<!--                                    ? 'bg-blue-100 text-blue-700'-->
+<!--                                    : 'text-gray-600 hover:text-gray-900'-->
+<!--                            ]"-->
+<!--                            @click="activeTab = tab"-->
+<!--                        >-->
+<!--                            {{ tab }}-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                    <div class="grid grid-cols-3 gap-2">-->
+<!--                        <div-->
+<!--                            v-for="i in 6"-->
+<!--                            :key="i"-->
+<!--                            class="aspect-square bg-gray-200 rounded-lg cursor-pointer hover:opacity-80 transition-opacity"-->
+<!--                        >-->
+<!--                            <img-->
+<!--                                alt="Media thumbnail"-->
+<!--                                class="w-full h-full object-cover rounded-lg"-->
+<!--                                src="/placeholder.svg?height=80&width=80"-->
+<!--                            />-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <button class="w-full mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium">-->
+<!--                        Show more →-->
+<!--                    </button>-->
+<!--                </div>-->
             </div>
         </div>
 
