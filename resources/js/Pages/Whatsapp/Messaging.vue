@@ -552,7 +552,7 @@ const deleteContact = async (contactId) => {
                                         </transition>
                                     </div>
                                 </div>
-                                <imgF
+                                <img
                                     v-if="message.image"
                                     :src="message.image"
                                     alt="Shared image"
