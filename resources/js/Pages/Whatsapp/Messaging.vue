@@ -392,7 +392,7 @@ const deleteContact = async (contactId) => {
                 </div>
 
                 <div class="p-4 border-b border-gray-200">
-                    <InputText class="w-full" placeholder="Search" type="text" />
+<!--                    <InputText class="w-full" placeholder="Search" type="text" />-->
                 </div>
 
                 <!-- Chat List -->
@@ -460,8 +460,8 @@ const deleteContact = async (contactId) => {
                         </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <Button class="p-button-text" icon="pi pi-phone" />
-                        <Button class="p-button-text" icon="pi pi-search" />
+<!--                        <Button class="p-button-text" icon="pi pi-phone" />-->
+<!--                        <Button class="p-button-text" icon="pi pi-search" />-->
                     </div>
                 </div>
 
