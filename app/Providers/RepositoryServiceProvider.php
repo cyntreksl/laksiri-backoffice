@@ -48,6 +48,7 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\VesselScheduleRepositoryInterface;
 use App\Interfaces\WarehouseRepositoryInterface;
 use App\Interfaces\WarehousezoneRepositoryInterface;
+use App\Interfaces\WhatsappContactRepositoryInterface;
 use App\Interfaces\ZoneRepositoryInterface;
 use App\Repositories\AirLineRepository;
 use App\Repositories\AnyFileUploadRepository;
@@ -95,6 +96,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\VesselScheduleRepository;
 use App\Repositories\WareahouseZoneRepository;
 use App\Repositories\WarehouseRepository;
+use App\Repositories\WhatsappContactRepository;
 use App\Repositories\ZoneRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -152,7 +154,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MHBLRepositoryInterface::class, MHBLRepository::class);
         $this->app->bind(DeliveryRepositoryInterface::class, DeliveryRepository::class);
         $this->app->bind(ReceptionRepositoryInterface::class, ReceptionRepository::class);
-
+        $this->app->bind(WhatsappContactRepositoryInterface::class, WhatsappContactRepository::class);
         // finance repositories
         $this->app->bind(\App\Interfaces\Finance\HBLRepositoryInterface::class, \App\Repositories\Finance\HBLRepository::class);
     }
