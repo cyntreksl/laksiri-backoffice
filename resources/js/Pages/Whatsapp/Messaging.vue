@@ -587,7 +587,7 @@ const deleteContact = async (contactId) => {
             </div>
 
             <!-- Right Sidebar - Members & Settings -->
-            <div class="w-80 bg-white border-l border-gray-200 flex flex-col">
+<!--            <div class="w-80 bg-white border-l border-gray-200 flex flex-col">-->
                 <!-- Settings -->
 <!--                <div class="p-4 border-b border-gray-200">-->
 <!--                    <div class="space-y-3">-->
@@ -604,7 +604,7 @@ const deleteContact = async (contactId) => {
 <!--                            <InputSwitch v-model="settings.saveDownloads" />-->
 <!--                        </div>-->
 <!--                    </div>-->
-<!--                </div>-->
+                </div>
 
                 <!-- Media & Docs -->
 <!--                <div class="p-4">-->
@@ -640,8 +640,8 @@ const deleteContact = async (contactId) => {
 <!--                        Show more →-->
 <!--                    </button>-->
 <!--                </div>-->
-            </div>
-        </div>
+<!--            </div>-->
+<!--        </div>-->
 
         <!-- Contact Options Menu -->
         <Menu ref="contactMenu" :model="items" :popup="true" />
