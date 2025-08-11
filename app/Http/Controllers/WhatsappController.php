@@ -230,9 +230,15 @@ class WhatsappController extends Controller
             $contact = WhatsappContact::findOrFail($id);
             $contact->delete();
 
+            // Get updated contacts list after deletion
+            $updatedContacts = $this->whatsappContactRepository->getAllContacts();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Contact deleted successfully',
+                'data' => [
+                    'contacts' => $updatedContacts
+                ]
             ]);
         } catch (\Exception $e) {
             Log::error('Error deleting WhatsApp contact: '.$e->getMessage());
@@ -243,4 +249,5 @@ class WhatsappController extends Controller
             ], 500);
         }
     }
+
 }
