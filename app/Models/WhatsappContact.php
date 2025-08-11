@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WhatsappContact extends Model
 {
-    use HasFactory , SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -22,51 +23,73 @@ class WhatsappContact extends Model
         'last_interaction' => 'datetime',
     ];
 
-    /**
-     * Create or update contact when receiving a message
-     */
-    public static function createOrUpdateFromMessage($phone, $name = null, $profilePic = null)
+    public function messages(): HasMany
     {
-        return self::updateOrCreate(
-            ['phone' => $phone],
-            [
-                'name' => $name ?? self::where('phone', $phone)->value('name'),
-                'profile_pic' => $profilePic ?? self::where('phone', $phone)->value('profile_pic'),
-                'last_interaction' => now(),
-            ]
-        );
+        return $this->hasMany(WhatsappMessage::class, 'whatsapp_contact_id');
     }
 
-    /**
-     * Get formatted phone number
-     */
-    public function getFormattedPhoneAttribute()
+    public function latestMessage(): HasOne
+    {
+        return $this->hasOne(WhatsappMessage::class, 'whatsapp_contact_id')
+            ->latest('created_at');
+    }
+
+    public function unreadMessages(): HasMany
+    {
+        return $this->messages()
+            ->where('message_type', 'received')
+            ->where('is_read', false);
+    }
+
+    public function getUnreadCountAttribute(): int
+    {
+        return $this->unreadMessages()->count();
+    }
+
+    public function getFormattedPhoneAttribute(): string
     {
         // Format phone number for display
-        return preg_replace('/(\d{3})(\d{3})(\d{4})/', '($1) $2-$3', $this->phone);
+        $phone = $this->phone;
+        if (str_starts_with($phone, '+94')) {
+            return '+94 '.substr($phone, 3, 2).' '.substr($phone, 5);
+        }
+
+        return $phone;
     }
 
-    /**
-     * Get time since last interaction
-     */
-    public function getLastInteractionHumanAttribute()
+    public function getInitialsAttribute(): string
     {
-        return $this->last_interaction ? $this->last_interaction->diffForHumans() : 'Never';
+        if (! $this->name) {
+            return substr($this->phone, -2);
+        }
+
+        $words = explode(' ', $this->name);
+        $initials = '';
+        foreach ($words as $word) {
+            $initials .= strtoupper(substr($word, 0, 1));
+        }
+
+        return substr($initials, 0, 2);
     }
 
-    /**
-     * Scope for recent contacts
-     */
-    public function scopeRecent($query, $days = 30)
+    public function getDisplayNameAttribute(): string
     {
-        return $query->where('last_interaction', '>=', Carbon::now()->subDays($days));
+        return $this->name ?: 'Contact '.substr($this->phone, -4);
     }
 
-    /**
-     * Scope for ordering by last interaction
-     */
-    public function scopeOrderByLastInteraction($query, $direction = 'desc')
+    public function scopeWithUnreadCount($query)
     {
-        return $query->orderBy('last_interaction', $direction);
+        return $query->withCount(['unreadMessages']);
+    }
+
+    public function scopeRecentlyActive($query)
+    {
+        return $query->whereNotNull('last_interaction')
+            ->orderBy('last_interaction', 'desc');
+    }
+
+    public function scopeWithLatestMessage($query)
+    {
+        return $query->with(['latestMessage']);
     }
 }
