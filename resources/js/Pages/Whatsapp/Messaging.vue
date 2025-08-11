@@ -456,7 +456,6 @@ const deleteContact = async (contactId) => {
                         />
                         <div>
                             <h3 class="font-semibold text-gray-900">{{ selectedChat?.name || 'Select a chat' }}</h3>
-                            <p class="text-sm text-gray-500">{{ selectedChat?.members || '' }}</p>
                             <p v-if="selectedChat?.phone" class="text-xs text-gray-400">{{ selectedChat.phone }}</p>
                         </div>
                     </div>
