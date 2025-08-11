@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SendWhatsappMessageRequest;
+use App\Models\WhatsappContact;
 use App\Repositories\WhatsappContactRepository;
 use App\Services\WhatsAppService;
 use Carbon\Carbon;
@@ -136,6 +137,49 @@ class WhatsappController extends Controller
     }
 
     /**
+     * Get messages for a specific phone number
+     */
+    public function getMessages($phone)
+    {
+        try {
+            $formattedPhone = $this->formatPhoneNumber($phone);
+
+            // Get messages for the specific phone number
+            $messages = $this->whatsappContactRepository->getMessagesByPhone($formattedPhone);
+
+            // Format messages for frontend
+            $formattedMessages = $messages->map(function ($message) {
+                return [
+                    'id' => $message->id,
+                    'sender' => $message->is_outgoing ? 'You' : $message->sender_name ?? 'Contact',
+                    'avatar' => '/placeholder.svg?height=32&width=32',
+                    'content' => $message->message,
+                    'time' => Carbon::parse($message->timestamp)->format('H:i'),
+                    'outgoing' => $message->is_outgoing,
+                    'status' => $message->delivery_status ?? 'delivered',
+                    'messageId' => $message->message_id,
+                    'timestamp' => $message->timestamp,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'messages' => $formattedMessages,
+                    'phone' => $formattedPhone,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('WhatsApp get messages error: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while fetching messages',
+            ], 500);
+        }
+    }
+
+    /**
      * Format phone number to international format
      */
     private function formatPhoneNumber(string $phone): string
@@ -156,5 +200,47 @@ class WhatsappController extends Controller
         }
 
         return $phone;
+    }
+
+    public function updateContact(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'phone' => 'required|string|unique:whatsapp_contacts,phone,'.$id,
+                'profile_pic' => 'nullable|url',
+            ]);
+
+            $contact = WhatsappContact::findOrFail($id);
+            $contact->update($validated);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error updating WhatsApp contact: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update contact',
+            ], 500);
+        }
+    }
+
+    public function destroyContact($id)
+    {
+        try {
+            $contact = WhatsappContact::findOrFail($id);
+            $contact->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Contact deleted successfully',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting WhatsApp contact: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete contact',
+            ], 500);
+        }
     }
 }

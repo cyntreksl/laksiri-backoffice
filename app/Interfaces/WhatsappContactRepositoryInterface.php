@@ -23,6 +23,8 @@ interface WhatsappContactRepositoryInterface
 
     public function getContactWithMessages(string $phone);
 
+    public function getMessagesByPhone(string $phone, int $limit = 50);
+
     public function markMessagesAsRead(string $phone): void;
 
     public function getUnreadMessageCount(string $phone): int;
