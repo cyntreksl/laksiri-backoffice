@@ -107,6 +107,21 @@ const fetchMessages = async (phone) => {
 
         if (result.success) {
             messages.value = result.data.messages || [];
+
+            // Update lastMessage in chat list with the latest message
+            if (selectedChat.value && messages.value.length > 0) {
+                // Find the most recent message
+                const latestMessage = messages.value.reduce((latest, current) => {
+                    return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
+                });
+
+                const chatIndex = chatList.value.findIndex(chat => chat.id === selectedChat.value.id);
+                if (chatIndex !== -1) {
+                    chatList.value[chatIndex].lastMessage = latestMessage.content;
+                    chatList.value[chatIndex].time = latestMessage.time;
+                }
+            }
+
             console.log('Messages loaded successfully:', result.data.messages.length);
         } else {
             console.error('Failed to fetch messages:', result.message);
@@ -129,12 +144,14 @@ const sendMessage = async () => {
         return
     }
 
+    const messageContent = newMessage.value;
+
     // Add message to UI immediately for better UX
     const message = {
         id: messages.value.length + 1,
         sender: 'You',
         avatar: '/placeholder.svg?height=32&width=32',
-        content: newMessage.value,
+        content: messageContent,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         status: 'sending',
         outgoing: true,
@@ -143,7 +160,6 @@ const sendMessage = async () => {
     }
 
     messages.value.push(message)
-    const messageContent = newMessage.value
     newMessage.value = ''
 
     try {
@@ -167,6 +183,15 @@ const sendMessage = async () => {
             message.status = 'sent'
             message.messageId = result.data.message_id
             message.timestamp = result.data.timestamp
+
+            // Update lastMessage in chat list
+            if (selectedChat.value) {
+                const chatIndex = chatList.value.findIndex(chat => chat.id === selectedChat.value.id);
+                if (chatIndex !== -1) {
+                    chatList.value[chatIndex].lastMessage = messageContent;
+                    chatList.value[chatIndex].time = message.time;
+                }
+            }
 
             console.log('Message sent successfully:', {
                 messageId: result.data.message_id,
@@ -379,6 +404,7 @@ const deleteContact = async (contactId) => {
     }
 }
 </script>
+
 
 <template>
     <AppLayout title="Whatsapp">
