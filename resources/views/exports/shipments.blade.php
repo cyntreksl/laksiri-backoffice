@@ -72,20 +72,32 @@
     $remainingChunks = array_chunk(array_slice($data, $itemsPerPageFirst), $itemsPerPageRest);
 
     $chunks = array_merge([$firstChunk], $remainingChunks);
+
     $total_nototal = 0;
     $total_vtotal = 0;
     $total_gtotal = 0;
-@endphp
 
-@foreach($data as $item)
-    @foreach ($item[9] as $package)
-        @php
+    // If a container shipment weight is provided and > 0, use it directly
+    if (!empty($container?->shipment_weight) && $container->shipment_weight > 0) {
+        $total_gtotal = $container->shipment_weight;
+    } else {
+        $total_gtotal = 0;
+        foreach ($data as $item) {
+            foreach ($item[9] as $package) {
+                $total_gtotal += $package['actual_weight'];
+            }
+        }
+    }
+
+    // Still calculate quantity and volume totals normally
+    foreach ($data as $item) {
+        foreach ($item[9] as $package) {
             $total_nototal += $package['quantity'];
             $total_vtotal += $package['volume'];
-            $total_gtotal += $package['actual_weight'];
-        @endphp
-    @endforeach
-@endforeach
+        }
+    }
+@endphp
+
 @foreach ($chunks as $chunkIndex => $chunk)
     <table>
         @if ($chunkIndex === 0)

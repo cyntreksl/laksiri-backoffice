@@ -80,19 +80,29 @@
         $total_vtotal = 0;
         $total_gtotal = 0;
         $mhbl = [];
+
+        // If a container shipment weight is provided and > 0, use it directly
+        if (!empty($container?->shipment_weight) && $container->shipment_weight > 0) {
+            $total_gtotal = $container->shipment_weight;
+        } else {
+            $total_gtotal = 0;
+            foreach ($data as $item) {
+                foreach ($item[9] as $package) {
+                    $total_gtotal += $package['actual_weight'];
+                }
+            }
+        }
+
+    // Still calculate quantity and volume totals normally
+    foreach ($data as $item) {
+        $mhbl = $item[20];
+
+        foreach ($item[9] as $package) {
+            $total_nototal += $package['quantity'];
+            $total_vtotal += $package['volume'];
+        }
+    }
     @endphp
-    @foreach($data as $item)
-        @php
-            $mhbl = $item[20];
-        @endphp
-        @foreach ($item[9] as $package)
-            @php
-                $total_nototal += $package['quantity'];
-                $total_vtotal += $package['volume'];
-                $total_gtotal += $package['actual_weight'];
-            @endphp
-        @endforeach
-    @endforeach
 
     @foreach ($chunks as $chunkIndex => $chunk)
         <table class="hbl-content">
