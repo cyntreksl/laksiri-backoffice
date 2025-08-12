@@ -408,7 +408,7 @@ const deleteContact = async (contactId) => {
 
 <template>
     <AppLayout title="Whatsapp">
-        <div class="flex h-screen bg-gray-50 border">
+        <div class="flex h-[calc(100vh-120px)] bg-gray-50 border">
             <!-- Left Sidebar - Chat List -->
             <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
                 <!-- Header -->
@@ -417,12 +417,8 @@ const deleteContact = async (contactId) => {
                     <Button class="p-button-text p-button-sm" icon="pi pi-plus" @click="showAddContact = true" />
                 </div>
 
-                <div class="p-4 border-b border-gray-200">
-<!--                    <InputText class="w-full" placeholder="Search" type="text" />-->
-                </div>
-
                 <!-- Chat List -->
-                <div class="flex-1 overflow-y-auto">
+                <div class="flex-1 overflow-hidden">
                     <div
                         v-for="chat in chatList"
                         :key="chat.id"
@@ -472,34 +468,30 @@ const deleteContact = async (contactId) => {
             <!-- Main Chat Area -->
             <div class="flex-1 flex flex-col">
                 <!-- Chat Header -->
-                <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+                <div class="bg-white border-b border-gray-200 p-3 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <Avatar
                             :image="selectedChat?.avatar"
                             :label="getInitials(selectedChat?.name)"
-                            class="w-10 h-10 border"
+                            class="w-8 h-8 border"
                             shape="circle"
                         />
                         <div>
-                            <h3 class="font-semibold text-gray-900">{{ selectedChat?.name || 'Select a chat' }}</h3>
+                            <h3 class="font-semibold text-gray-900 text-sm">{{ selectedChat?.name || 'Select a chat' }}</h3>
                             <p v-if="selectedChat?.phone" class="text-xs text-gray-400">{{ selectedChat.phone }}</p>
                         </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-<!--                        <Button class="p-button-text" icon="pi pi-phone" />-->
-<!--                        <Button class="p-button-text" icon="pi pi-search" />-->
                     </div>
                 </div>
 
                 <!-- Messages Area -->
-                <div class="flex-1 overflow-y-auto p-4 bg-gray-50">
-                    <div v-if="loadingMessages" class="flex justify-center items-center py-8">
+                <div class="flex-1 overflow-hidden p-3 bg-gray-50">
+                    <div v-if="loadingMessages" class="flex justify-center items-center h-full">
                         <div class="text-gray-500">Loading messages...</div>
                     </div>
-                    <div v-else-if="messages.length === 0" class="flex justify-center items-center py-8">
+                    <div v-else-if="messages.length === 0" class="flex justify-center items-center h-full">
                         <div class="text-gray-500">No messages yet. Start a conversation!</div>
                     </div>
-                    <div v-else class="space-y-6">
+                    <div v-else class="space-y-3 h-full overflow-hidden">
                         <div
                             v-for="message in messages"
                             :key="message.id"
@@ -510,7 +502,7 @@ const deleteContact = async (contactId) => {
                         >
                             <div
                                 :class="[
-                                    'max-w-xs lg:max-w-md px-4 py-3 rounded-lg cursor-pointer transition-all duration-300 shadow-sm',
+                                    'max-w-xs px-3 py-2 rounded-lg cursor-pointer transition-all duration-300 shadow-sm',
                                     message.outgoing
                                         ? 'bg-green-500 text-white hover:bg-green-600'
                                         : 'bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
@@ -522,12 +514,12 @@ const deleteContact = async (contactId) => {
                                         v-if="!message.outgoing"
                                         :image="message.avatar"
                                         :label="getInitials(message.sender)"
-                                        class="w-6 h-6"
+                                        class="w-5 h-5"
                                         shape="circle"
                                     />
                                     <div class="flex-1">
                                         <p class="text-sm leading-relaxed">{{ message.content }}</p>
-                                        <div class="flex items-center justify-between mt-2">
+                                        <div class="flex items-center justify-between mt-1">
                                             <span class="text-xs opacity-70">{{ message.time }}</span>
                                             <div class="flex items-center space-x-1">
                                                 <span v-if="message.outgoing && message.status"
@@ -543,7 +535,7 @@ const deleteContact = async (contactId) => {
                                         <transition name="fade">
                                             <div
                                                 v-if="isMessageExpanded(message.id)"
-                                                class="mt-2 pt-2 border-t border-opacity-20 rounded-lg p-3 text-xs"
+                                                class="mt-2 pt-2 border-t border-opacity-20 rounded-lg p-2 text-xs"
                                                 :class="[
                                                     message.outgoing ? 'bg-green-100 border-green-200' : 'bg-gray-100 border-gray-300',
                                                     'text-gray-700'
@@ -582,7 +574,7 @@ const deleteContact = async (contactId) => {
                                     v-if="message.image"
                                     :src="message.image"
                                     alt="Shared image"
-                                    class="mt-3 rounded-lg max-w-full h-auto shadow-sm"
+                                    class="mt-2 rounded-lg max-w-full h-auto shadow-sm"
                                 />
                             </div>
                         </div>
@@ -590,10 +582,8 @@ const deleteContact = async (contactId) => {
                 </div>
 
                 <!-- Message Input -->
-                <div class="bg-white border-t border-gray-200 p-4">
+                <div class="bg-white border-t border-gray-200 p-3">
                     <div class="flex items-center space-x-3">
-<!--                        <Button class="p-button-text" icon="pi pi-face-smile" />-->
-<!--                        <Button class="p-button-text" icon="pi pi-paperclip" />-->
                         <InputText
                             v-model="newMessage"
                             class="flex-1"
@@ -603,6 +593,7 @@ const deleteContact = async (contactId) => {
                         <Button
                             :disabled="!newMessage.trim() || !recipientPhone"
                             icon="pi pi-send"
+                            size="small"
                             @click="sendMessage"
                         />
                     </div>

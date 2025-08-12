@@ -16,23 +16,19 @@ class WhatsappContactRepository implements WhatsappContactRepositoryInterface
 
     public function getAllContacts()
     {
-        return \DB::table('whatsapp_contacts')
-            ->select('id', 'name', 'phone', 'profile_pic as avatar')
-            ->get()
-            ->map(function ($contact) {
-                return [
-                    'id' => $contact->id,
-                    'name' => $contact->name,
-                    'phone' => $contact->phone,
-                    'avatar' => $contact->avatar ?? '/placeholder.svg?height=48&width=48',
-                    'lastMessage' => 'No messages yet',
-                    'time' => now()->format('H:i'),
-                    'unreadCount' => 0,
-                    'online' => false,
-                    'members' => $contact->name,
-                ];
-            })
-            ->toArray();
+        return WhatsappContact::all()->map(function ($contact) {
+            return [
+                'id' => $contact->id,
+                'name' => $contact->name,
+                'phone' => $contact->phone,
+                'avatar' => $contact->profile_pic ?? '/placeholder.svg?height=48&width=48',
+                'lastMessage' => 'No messages yet',
+                'time' => now()->format('H:i'),
+                'unreadCount' => 0,
+                'online' => false,
+                'members' => $contact->name,
+            ];
+        })->toArray();
     }
 
     public function findByPhone(string $phone): ?WhatsappContact

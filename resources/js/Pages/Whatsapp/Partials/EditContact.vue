@@ -41,7 +41,6 @@ watch(() => props.contact, (newContact) => {
 const updateContact = () => {
     form.put(route('whatsapp.contacts.update', form.id), {
         onSuccess: () => {
-            push.success('Contact updated successfully!');
             emit('contact-updated', form);
             emit('update:visible', false);
             form.reset();
@@ -89,17 +88,6 @@ const closeDialog = () => {
                     placeholder="Phone number"
                 />
                 <InputError :message="form.errors.phone" />
-            </div>
-
-            <div>
-                <label for="profile_pic" class="block text-sm font-medium text-gray-700 mb-1">Profile Picture URL</label>
-                <InputText
-                    id="profile_pic"
-                    v-model="form.profile_pic"
-                    class="w-full"
-                    placeholder="Profile picture URL"
-                />
-                <InputError :message="form.errors.profile_pic" />
             </div>
         </div>
 
