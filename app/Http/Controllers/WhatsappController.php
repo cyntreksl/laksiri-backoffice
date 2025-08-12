@@ -237,8 +237,8 @@ class WhatsappController extends Controller
                 'success' => true,
                 'message' => 'Contact deleted successfully',
                 'data' => [
-                    'contacts' => $updatedContacts
-                ]
+                    'contacts' => $updatedContacts,
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Error deleting WhatsApp contact: '.$e->getMessage());
@@ -249,5 +249,4 @@ class WhatsappController extends Controller
             ], 500);
         }
     }
-
 }
