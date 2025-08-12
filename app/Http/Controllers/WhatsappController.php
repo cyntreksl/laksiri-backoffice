@@ -40,11 +40,16 @@ class WhatsappController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|unique:whatsapp_contacts,phone',
+            'phone' => 'required|string|unique:whatsapp_contacts,phone,NULL,id,deleted_at,NULL',
             'profile_pic' => 'nullable|url',
         ]);
 
         $contact = $this->whatsappContactRepository->create($validated);
+
+        // Check if it was a restoration
+        if ($contact->wasChanged('deleted_at') && $contact->deleted_at === null) {
+            return redirect()->back()->with('success', 'Previously deleted contact restored successfully.');
+        }
 
         return redirect()->back()->with('success', 'Contact created successfully.');
     }

@@ -11,6 +11,21 @@ class WhatsappContactRepository implements WhatsappContactRepositoryInterface
 {
     public function create(array $data): WhatsappContact
     {
+        // Check if a contact with this phone exists but is soft deleted
+        $existingContact = WhatsappContact::withTrashed()->where('phone', $data['phone'])->first();
+
+        if ($existingContact && $existingContact->trashed()) {
+            // Restore the deleted contact and update its information
+            $existingContact->restore();
+            $existingContact->update([
+                'name' => $data['name'],
+                'profile_pic' => $data['profile_pic'] ?? null,
+            ]);
+
+            return $existingContact;
+        }
+
+        // Create new contact
         return WhatsappContact::create($data);
     }
 
