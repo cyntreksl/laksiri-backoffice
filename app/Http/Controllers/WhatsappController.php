@@ -149,10 +149,15 @@ class WhatsappController extends Controller
         try {
             $formattedPhone = $this->formatPhoneNumber($phone);
 
-            // Get messages for the specific phone number
+            $latest = request()->query('latest', false);
+
             $messages = $this->whatsappContactRepository->getMessagesByPhone($formattedPhone);
 
-            // Format messages for frontend
+            if ($latest && $messages->isNotEmpty()) {
+                $messages = $messages->take(1);
+
+            }
+
             $formattedMessages = $messages->map(function ($message) {
                 return [
                     'id' => $message->id,

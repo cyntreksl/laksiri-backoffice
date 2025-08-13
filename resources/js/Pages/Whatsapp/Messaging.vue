@@ -89,13 +89,18 @@ const selectChat = async (chat) => {
     await fetchMessages(chat.phone)
 }
 
-const fetchMessages = async (phone) => {
+const fetchMessages = async (phone, fetchLatestOnly = false) => {
     if (!phone) return;
 
     loadingMessages.value = true;
 
     try {
-        const response = await fetch(`/whatsapp/messages/${encodeURIComponent(phone)}`, {
+        let url = `/whatsapp/messages/${encodeURIComponent(phone)}`;
+        if (fetchLatestOnly) {
+            url += '?latest=true'; // Assuming your backend supports this query parameter
+        }
+
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -106,19 +111,21 @@ const fetchMessages = async (phone) => {
         const result = await response.json();
 
         if (result.success) {
-            messages.value = result.data.messages || [];
+            let newMessages = result.data.messages || [];
+
+            if (fetchLatestOnly && newMessages.length > 0) {
+                newMessages = [newMessages[newMessages.length - 1]];
+            }
+
+            messages.value = newMessages;
 
             // Update lastMessage in chat list with the latest message
-            if (selectedChat.value && messages.value.length > 0) {
-                // Find the most recent message
-                const latestMessage = messages.value.reduce((latest, current) => {
-                    return new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest;
-                });
-
-                const chatIndex = chatList.value.findIndex(chat => chat.id === selectedChat.value.id);
-                if (chatIndex !== -1) {
-                    chatList.value[chatIndex].lastMessage = latestMessage.content;
-                    chatList.value[chatIndex].time = latestMessage.time;
+            if (newMessages.length > 0) {
+                const latestMessage = newMessages[0];
+                const chat = chatList.value.find(chat => chat.phone === phone);
+                if (chat) {
+                    chat.lastMessage = latestMessage.content;
+                    chat.time = latestMessage.time;
                 }
             }
 
@@ -205,18 +212,14 @@ const sendMessage = async () => {
     } catch (error) {
         console.error('Failed to send message:', error)
 
-        // Update message status on error
         message.status = 'failed'
 
-        // Show error message to user
         alert(`Failed to send message: ${error.message}`)
     }
 }
 
-// Handle contact saved from AddContact component
 const handleContactSaved = (contact) => {
     if (contact) {
-        // Add the new contact to the chat list
         const newChat = {
             id: chatList.value.length + 1,
             name: contact.name,
@@ -231,17 +234,20 @@ const handleContactSaved = (contact) => {
 
         chatList.value.unshift(newChat)
 
-        // Optionally select the new contact
         selectChat(newChat)
     }
 }
 
-// Select first chat by default
-onMounted(() => {
+onMounted(async () => {
     if (chatList.value.length > 0) {
-        selectChat(chatList.value[0])
+        console.log('Fetching latest messages for all chats on initial load');
+        for (const chat of chatList.value) {
+            await fetchMessages(chat.phone, true);
+        }
+        selectChat(chatList.value[0]);
     }
-})
+});
+
 
 const toggleMessageExpansion = (messageId) => {
     if (expandedMessages.value.has(messageId)) {
