@@ -1,7 +1,11 @@
 <script setup>
 import {Link, router, usePage} from '@inertiajs/vue3';
 import logo from "../../../images/logo_main.png";
-import {reactive, ref} from "vue";
+import {reactive, ref, onMounted} from "vue";
+import Menu from 'primevue/menu';
+import Button from 'primevue/button';
+import Tooltip from 'primevue/tooltip';
+import Panel from 'primevue/panel';
 
 const props = defineProps({
     isSidebarExpanded: {
@@ -1004,8 +1008,241 @@ const setMenu = (menu) => {
     activeMenu.value = menu;
 };
 
+// PrimeVue menu model
+const menuModel = ref([
+    {
+        label: 'Dashboard',
+        icon: 'pi pi-home',
+        command: () => {
+            router.visit(route('dashboard'));
+        }
+    },
+    {
+        label: 'Pickup',
+        icon: 'pi pi-truck',
+        visible: () => page.props.user.permissions.includes('pickups.create') ||
+                   page.props.user.permissions.includes('pickups.index') ||
+                   page.props.user.permissions.includes('pickups.show pickup exceptions') ||
+                   page.props.user.permissions.includes('pickups.show pickup order') ||
+                   page.props.user.permissions.includes('pickups.pending pickups'),
+        command: () => {
+            setMenu('pickups');
+            openSideBar();
+        }
+    },
+    {
+        label: 'HBL',
+        icon: 'pi pi-window',
+        visible: () => page.props.user.permissions.includes('delivers.show deliver order') ||
+                   page.props.user.permissions.includes('hbls.show draft hbls') ||
+                   page.props.user.permissions.includes('hbls.show cancelled hbls') ||
+                   page.props.user.permissions.includes('mhbls.index') ||
+                   page.props.user.permissions.includes('hbls.index') ||
+                   page.props.user.permissions.includes('hbls.create'),
+        command: () => {
+            setMenu('hbls');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Back Office',
+        icon: 'pi pi-building',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('cash')),
+        command: () => {
+            setMenu('back-office');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Arrivals',
+        icon: 'pi pi-inbox',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('arrival')) &&
+                   page.props.currentBranch.type === 'Destination',
+        command: () => {
+            setMenu('arrival');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Reception',
+        icon: 'pi pi-stamp',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception')),
+        command: () => {
+            setMenu('reception');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Document Verifications',
+        icon: 'pi pi-certificate',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document')),
+        command: () => {
+            setMenu('verifications');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Cashier',
+        icon: 'pi pi-wallet',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show cashier')),
+        command: () => {
+            setMenu('cashier');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Package Queue',
+        icon: 'pi pi-package',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package')),
+        command: () => {
+            setMenu('package');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Examination',
+        icon: 'pi pi-check-circle',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination')),
+        command: () => {
+            setMenu('examination');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Queue Screens',
+        icon: 'pi pi-desktop',
+        visible: () => page.props.user.permissions.some(permission => permission.endsWith('screen')),
+        command: () => {
+            setMenu('screens');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Loading',
+        icon: 'pi pi-truck-loading',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('container')) ||
+                   page.props.user.permissions.some(permission => permission.startsWith('shipment')),
+        command: () => {
+            setMenu('loading');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Third Party Shipments',
+        icon: 'pi pi-trailer',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('third_party_shipments')) &&
+                   page.props.currentBranch.type === 'Destination',
+        command: () => {
+            setMenu('third-party-shipments');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Courier',
+        icon: 'pi pi-truck',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('courier')) ||
+                   page.props.user.permissions.some(permission => permission.startsWith('third-party-agents')) ||
+                   page.props.user.permissions.some(permission => permission.startsWith('courier-agents')),
+        command: () => {
+            setMenu('courier');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Vessel Schedules',
+        icon: 'pi pi-calendar',
+        visible: () => page.props.user.permissions.includes('vessel.schedule.index'),
+        command: () => {
+            router.visit(route('clearance.vessel-schedule.index'));
+        }
+    },
+    {
+        label: 'Container Payments',
+        icon: 'pi pi-credit-card',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('payment-container')),
+        command: () => {
+            setMenu('container-payment');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Gate Controller',
+        icon: 'pi pi-shield',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('mark-')),
+        command: () => {
+            setMenu('gate-controller');
+            openSideBar();
+        }
+    },
+    {
+        label: 'User Management',
+        icon: 'pi pi-users',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('users')) ||
+                   page.props.user.permissions.includes('roles.list'),
+        command: () => {
+            setMenu('users');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Branches',
+        icon: 'pi pi-code-branch',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('branches')) ||
+                   page.props.user.permissions.includes('branches.list'),
+        command: () => {
+            router.visit(route('branches.index'));
+        }
+    },
+    {
+        label: 'Call Center',
+        icon: 'pi pi-headset',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('call-center.')),
+        command: () => {
+            setMenu('call-center');
+            openSideBar();
+        }
+    },
+    {
+        label: 'Tokens',
+        icon: 'pi pi-tag',
+        visible: () => page.props.user.permissions.includes('manage_tokens'),
+        command: () => {
+            router.visit(route('call-center.tokens.index'));
+        }
+    },
+    {
+        label: 'Whatsapp',
+        icon: 'pi pi-whatsapp',
+        visible: () => page.props.user.permissions.includes('manage_whatsapp'),
+        command: () => {
+            router.visit(route('whatsapp.index'));
+        }
+    },
+    {
+        label: 'File Manager',
+        icon: 'pi pi-folder',
+        command: () => {
+            router.visit(route('file-manager.index'));
+        }
+    },
+    {
+        label: 'Settings',
+        icon: 'pi pi-cog',
+        visible: () => !page.props.user.roles.includes('viewer') &&
+                   page.props.auth.user.roles[0].name !== 'customer',
+        command: () => {
+            setMenu('setting');
+            openSideBar();
+        }
+    }
+]);
+
 setMenu(mainRoute);
 setSidebarState();
+
+onMounted(() => {
+    // Add any additional initialization if needed
+});
 </script>
 
 <template>
@@ -1027,354 +1264,44 @@ setSidebarState();
           </a>
         </div>
 
-        <!-- Main Sections Links -->
-        <div
-          class="is-scrollbar-hidden flex grow flex-col space-y-4 overflow-y-auto pt-6"
-        >
-          <!-- Dashboard -->
-          <Link
-            :class="[
-              activeMenu === 'dashboard' ? 'bg-primary/10 text-primary' : '',
-            ]"
-            :href="route('dashboard')"
-            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-            x-tooltip.placement.right="'Dashboard'"
+        <!-- Main Sections Links using PrimeVue Menu -->
+        <div class="is-scrollbar-hidden flex grow flex-col pt-6 w-full px-3">
+          <Menu
+            :model="menuModel"
+            :pt="{
+              root: 'w-full',
+              menu: 'flex flex-col space-y-1',
+              menuitem: 'w-full',
+              content: ({ context }) => [
+                'rounded-lg transition-all duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25',
+                {
+                  'bg-primary/10 text-primary dark:text-primary': context.focused
+                }
+              ],
+              action: 'flex items-center w-full p-3',
+              icon: 'mr-3 text-lg',
+              label: 'font-medium text-sm'
+            }"
+            class="w-full border-0"
           >
-            <i class="ti ti-home text-2xl"></i>
-          </Link>
-
-          <template v-if="page.props.auth.user.roles[0].name !== 'customer'">
-            <!-- Pickup -->
-            <a
-              v-if="page.props.user.permissions.includes('pickups.create') || page.props.user.permissions.includes('pickups.index') || page.props.user.permissions.includes('pickups.show pickup exceptions') || page.props.user.permissions.includes('pickups.show pickup order') || page.props.user.permissions.includes('pickups.pending pickups')"
-              :class="[
-                activeMenu === 'pickups' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Pickup'"
-              @click="setMenu( 'pickups'); openSideBar();"
-            >
-              <i class="ti ti-truck text-2xl"></i>
-            </a>
-
-            <!-- HBL -->
-            <a
-              v-if="page.props.user.permissions.includes('delivers.show deliver order') || page.props.user.permissions.includes('hbls.show draft hbls') || page.props.user.permissions.includes('hbls.show cancelled hbls') || page.props.user.permissions.includes('mhbls.index') || page.props.user.permissions.includes('hbls.index') || page.props.user.permissions.includes('hbls.create')"
-              :class="[
-                activeMenu === 'hbls' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'HBL'"
-              @click="setMenu( 'hbls'); openSideBar();"
-            >
-              <i class="ti ti-app-window text-2xl"></i>
-            </a>
-
-            <!-- Back Office -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('cash'))"
-              :class="[
-                activeMenu === 'back-office'
-                  ? 'bg-primary/10 text-primary'
-                  : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Back Office'"
-              @click="setMenu( 'back-office'); openSideBar();"
-            >
-              <i class="ti ti-building text-2xl"></i>
-            </a>
-
-            <!-- Destination Branch Arrivals -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('arrival')) && page.props.currentBranch.type === 'Destination'"
-              :class="[
-                activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Arrivals'"
-              @click="setMenu( 'arrival'); openSideBar();"
-            >
-              <i class="ti ti-inbox text-2xl"></i>
-            </a>
-
-            <!-- Reception Verifications -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception'))"
-              :class="[
-                activeMenu === 'reception' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Reception'"
-              @click="setMenu( 'reception'); openSideBar();"
-            >
-              <i class="ti ti-rubber-stamp text-2xl"></i>
-            </a>
-
-            <!-- Document Verifications -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document'))"
-              :class="[
-                activeMenu === 'verifications' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Document Verifications'"
-              @click="setMenu( 'verifications'); openSideBar();"
-            >
-              <i class="ti ti-certificate text-2xl"></i>
-            </a>
-
-            <!-- Cashier -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show cashier'))"
-              :class="[
-                activeMenu === 'cashier' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Cashier'"
-              @click="setMenu( 'cashier'); openSideBar();"
-            >
-              <i class="ti ti-wallet text-2xl"></i>
-            </a>
-
-            <!-- Boned Area Screens -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package'))"
-              :class="[
-                activeMenu === 'package' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Package Queue'"
-              @click="setMenu( 'package'); openSideBar();"
-            >
-              <i class="ti ti-package text-2xl"></i>
-            </a>
-
-            <!-- Examination  -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination'))"
-              :class="[
-                activeMenu === 'examination' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Examination'"
-              @click="setMenu( 'examination'); openSideBar();"
-            >
-              <i class="ti ti-checkup-list text-2xl"></i>
-            </a>
-
-            <!-- Queue Screen -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.endsWith('screen'))"
-              :class="[
-                activeMenu === 'screens' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Queue Screens'"
-              @click="setMenu( 'screens'); openSideBar();"
-            >
-              <i class="ti ti-screen-share text-2xl"></i>
-            </a>
-
-            <!-- Loading -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('container')) || page.props.user.permissions.some(permission => permission.startsWith('shipment'))"
-              :class="[
-                activeMenu === 'loading' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Loading'"
-              @click="setMenu( 'loading'); openSideBar();"
-            >
-              <i class="ti ti-truck-loading text-2xl"></i>
-            </a>
-
-            <!-- Third Part Shipments -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('third_party_shipments')) && page.props.currentBranch.type === 'Destination'"
-              :class="[
-                activeMenu === 'third-party-shipments' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Third Party Shipments'"
-              @click="setMenu( 'third-party-shipments'); openSideBar();"
-            >
-              <i class="ti ti-tir text-2xl"></i>
-            </a>
-
-            <!-- Departure Branch Arrivals -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('arrival')) && page.props.currentBranch.type === 'Departure'"
-              :class="[
-                activeMenu === 'arrival' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Arrivals'"
-              @click="setMenu( 'arrival'); openSideBar();"
-            >
-              <i class="ti ti-inbox text-2xl"></i>
-            </a>
-
-            <!-- Courier Management -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('courier')) || page.props.user.permissions.some(permission => permission.startsWith('third-party-agents')) || page.props.user.permissions.some(permission => permission.startsWith('courier-agents'))"
-              :class="[
-                activeMenu === 'courier' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Courier'"
-              @click="setMenu( 'courier'); openSideBar();"
-            >
-              <i class="ti ti-truck-delivery text-2xl"></i>
-            </a>
-
-            <!-- Vessel Schedules -->
-            <Link
-              v-if="page.props.user.permissions.includes('vessel.schedule.index')"
-              :class="[
-                activeMenu === 'clearance' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              :href="route('clearance.vessel-schedule.index')"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Vessel Schedules'"
-            >
-              <i class="ti ti-calendar-stats text-2xl"></i>
-            </Link>
-
-            <!-- Container Payments -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('payment-container'))"
-              :class="[
-                activeMenu === 'container-payment' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Container Payments'"
-              @click="setMenu( 'container-payment'); openSideBar();"
-            >
-              <i class="ti ti-container text-2xl"></i>
-            </a>
-
-            <!-- Gate Controller  -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('mark-'))"
-              :class="[
-                activeMenu === 'gate-controller' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Gate Controller'"
-              @click="setMenu( 'gate-controller'); openSideBar();"
-            >
-              <i class="ti ti-spy text-2xl"></i>
-            </a>
-
-            <!-- User Management -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('users')) || page.props.user.permissions.includes('roles.list')"
-              :class="[
-                activeMenu === 'users' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'User Management'"
-              @click="setMenu( 'users'); openSideBar();"
-            >
-              <i class="ti ti-users text-2xl"></i>
-            </a>
-
-            <!-- Branches -->
-            <Link
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('branches')) || page.props.user.permissions.includes('branches.list')"
-              :class="[
-                activeMenu === 'branches' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              :href="route('branches.index')"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Branches'"
-            >
-              <i class="ti ti-git-branch text-2xl"></i>
-            </Link>
-
-            <!-- Call Center -->
-            <a
-              v-if="page.props.user.permissions.some(permission => permission.startsWith('call-center.'))"
-              :class="[
-                activeMenu === 'call-center' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Call Center'"
-              @click="setMenu( 'call-center'); openSideBar();"
-            >
-              <i class="ti ti-headset text-2xl"></i>
-            </a>
-
-            <!-- Tokens -->
-            <Link
-              v-if="page.props.user.permissions.includes('manage_tokens')"
-              :class="[
-                current === 'call-center.tokens.index' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              :href="route('call-center.tokens.index')"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Tokens'"
-            >
-              <i class="ti ti-tag text-2xl"></i>
-            </Link>
-
-            <!-- Whatsapp -->
-            <Link
-              v-if="page.props.user.permissions.includes('manage_whatsapp')"
-              :class="[
-                activeMenu === 'whatsapp' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              :href="route('whatsapp.index')"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Whatsapp'"
-            >
-              <i class="ti ti-brand-whatsapp text-2xl"></i>
-            </Link>
-          </template>
+            <template #item="{ item, props }">
+              <a
+                v-if="item.visible ? item.visible() : true"
+                v-tooltip.right="item.label"
+                class="focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-lg"
+                v-bind="props.action"
+                @click="item.command"
+              >
+                <span :class="item.icon"></span>
+                <span class="ml-2">{{ item.label }}</span>
+              </a>
+            </template>
+          </Menu>
         </div>
 
         <!-- Bottom Links -->
         <div class="flex flex-col items-center space-y-3 py-3">
-          <Link
-            :class="[
-              activeMenu === 'driver' ? 'bg-primary/10 text-primary' : '',
-            ]"
-            :href="route('file-manager.index')"
-            class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-            x-tooltip.placement.right="'File Manager'"
-          >
-            <i class="ti ti-brand-onedrive text-2xl"></i>
-          </Link>
-          <!-- Settings -->
-          <template v-if="page.props.auth.user.roles[0].name !== 'customer'">
-            <a
-              v-if="! page.props.user.roles.includes('viewer')"
-              :class="[
-                activeMenu === 'setting' ? 'bg-primary/10 text-primary' : '',
-              ]"
-              class="flex size-11 items-center justify-center rounded-lg outline-none transition-colors duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-              x-tooltip.placement.right="'Setting'"
-              @click="setMenu( 'setting'); openSideBar();"
-            >
-              <svg
-                class="size-7"
-                fill="none"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M2 12.947v-1.771c0-1.047.85-1.913 1.899-1.913 1.81 0 2.549-1.288 1.64-2.868a1.919 1.919 0 0 1 .699-2.607l1.729-.996c.79-.474 1.81-.192 2.279.603l.11.192c.9 1.58 2.379 1.58 3.288 0l.11-.192c.47-.795 1.49-1.077 2.279-.603l1.73.996a1.92 1.92 0 0 1 .699 2.607c-.91 1.58-.17 2.868 1.639 2.868 1.04 0 1.899.856 1.899 1.912v1.772c0 1.047-.85 1.912-1.9 1.912-1.808 0-2.548 1.288-1.638 2.869.52.915.21 2.083-.7 2.606l-1.729.997c-.79.473-1.81.191-2.279-.604l-.11-.191c-.9-1.58-2.379-1.58-3.288 0l-.11.19c-.47.796-1.49 1.078-2.279.605l-1.73-.997a1.919 1.919 0 0 1-.699-2.606c.91-1.58.17-2.869-1.639-2.869A1.911 1.911 0 0 1 2 12.947Z"
-                  fill="currentColor"
-                  fill-opacity="0.3"
-                ></path>
-                <path
-                  d="M11.995 15.332c1.794 0 3.248-1.464 3.248-3.27 0-1.807-1.454-3.272-3.248-3.272-1.794 0-3.248 1.465-3.248 3.271 0 1.807 1.454 3.271 3.248 3.271Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </a>
-          </template>
+          <!-- Additional bottom items can be added here if needed -->
         </div>
       </div>
     </div>
@@ -1382,102 +1309,87 @@ setSidebarState();
     <!-- Sidebar Panel -->
     <div class="sidebar-panel">
       <div
-        class="flex h-full grow flex-col bg-white pl-[var(--main-sidebar-width)] dark:bg-navy-750"
+        class="flex h-full grow flex-col bg-white pl-[var(--main-sidebar-width)] dark:bg-navy-750 shadow-lg"
       >
         <!-- Sidebar Panel Header -->
-        <div class="flex h-18 w-full items-center justify-between pl-4 pr-1">
+        <div class="flex h-18 w-full items-center justify-between pl-4 pr-1 border-b border-slate-200 dark:border-navy-600">
           <p
-            class="text-base tracking-wider text-slate-800 dark:text-navy-100"
+            class="text-lg font-semibold tracking-wide text-slate-800 dark:text-navy-100"
           >
             {{ activeTitle }}
           </p>
-          <button
-            class="btn size-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden"
+          <Button
+            aria-label="Close sidebar"
+            class="p-button-text p-button-sm p-button-rounded"
+            icon="pi pi-times"
             @click="closeSideBar"
-          >
-            <svg
-              class="size-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M15 19l-7-7 7-7"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-              ></path>
-            </svg>
-          </button>
+          />
         </div>
 
-        <!-- Sidebar Panel Body -->
-        <div
-          class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6 simplebar-scrollable-y"
-          data-simplebar="init"
-        >
-          <div class="simplebar-wrapper" style="margin: 0px 0px -24px">
-            <div class="simplebar-height-auto-observer-wrapper">
-              <div class="simplebar-height-auto-observer"></div>
+        <!-- Sidebar Panel Body using PrimeVue Panel -->
+        <div class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6 simplebar-scrollable-y">
+          <div class="p-4">
+            <div class="flex flex-col space-y-1">
+              <Link
+                v-for="item in childMenuList"
+                :key="item.title"
+                :class="[
+                  'p-3 rounded-lg transition-all duration-200 flex items-center',
+                  'focus:outline-none focus:ring-2 focus:ring-primary/30',
+                  isActive(item)
+                    ? 'bg-primary/10 text-primary font-medium shadow-sm'
+                    : 'text-slate-700 hover:bg-slate-100 dark:text-navy-200 dark:hover:bg-navy-600'
+                ]"
+                :href="route(item.route, item.params || {})"
+              >
+                <span class="ml-2 text-sm">{{ item.title }}</span>
+              </Link>
             </div>
-            <div class="simplebar-mask">
-              <div class="simplebar-offset" style="right: 0px; bottom: 0px">
-                <div
-                  aria-label="scrollable content"
-                  class="simplebar-content-wrapper"
-                  role="region"
-                  style="height: 100%; overflow: hidden scroll"
-                  tabindex="0"
-                >
-                  <div
-                    class="simplebar-content"
-                    style="padding: 1px 1px 24px"
-                  >
-                    <ul class="flex flex-1 flex-col px-4 font-inter">
-                      <li v-for="item in childMenuList" :key="item.title">
-                        <Link
-                          :class="isActive(item) ? 'afont-medium text-primary dark:text-accent-light' : 'text-slate-600 hover:text-slate-900 rounded-lg hover:bg-neutral-300 dark:text-navy-200 dark:hover:text-navy-50 dark:hover:bg-neutral-500'"
-                          :href="route(item.route, item.params || {})"
-                          class="flex py-2 text-xs+ tracking-wide outline-none transition-colors duration-300 ease-in-out font-medium text-primary dark:text-accent-light"
-                        >
-                          <span class="ml-2"> {{ item.title }}</span>
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div
-              class="simplebar-placeholder"
-              style="width: 240px; height: 686px"
-            ></div>
-          </div>
-          <div
-            class="simplebar-track simplebar-horizontal"
-            style="visibility: hidden"
-          >
-            <div
-              class="simplebar-scrollbar"
-              style="width: 0px; display: none"
-            ></div>
-          </div>
-          <div
-            class="simplebar-track simplebar-vertical"
-            style="visibility: visible"
-          >
-            <div
-              class="simplebar-scrollbar"
-              style="
-                height: 126px;
-                display: block;
-                transform: translate3d(0px, 0px, 0px);
-              "
-            ></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Additional custom styles for better UI/UX */
+.sidebar {
+  --main-sidebar-width: 5rem;
+}
+
+.main-sidebar {
+  width: var(--main-sidebar-width);
+  transition: all 0.3s ease;
+}
+
+.sidebar-panel {
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Focus styles for accessibility */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Hover effects for better interactivity */
+a:hover {
+  transform: translateX(2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .main-sidebar {
+    position: fixed;
+    z-index: 1000;
+  }
+
+  .sidebar-panel {
+    position: fixed;
+    z-index: 999;
+  }
+}
+</style>
