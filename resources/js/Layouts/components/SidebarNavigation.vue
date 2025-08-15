@@ -1267,6 +1267,7 @@ onMounted(() => {
         <!-- Main Sections Links using PrimeVue Menu -->
         <div class="is-scrollbar-hidden flex grow flex-col pt-6 w-full px-3">
           <Menu
+              style="min-width: 0; border: 0"
             :model="menuModel"
             :pt="{
               root: 'w-full',
@@ -1293,7 +1294,6 @@ onMounted(() => {
                 @click="item.command"
               >
                 <span :class="item.icon"></span>
-                <span class="ml-2">{{ item.label }}</span>
               </a>
             </template>
           </Menu>
