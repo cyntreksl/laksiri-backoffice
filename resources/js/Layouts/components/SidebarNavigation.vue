@@ -1014,7 +1014,7 @@ const setMenu = (menu) => {
 const menuModel = ref([
     {
         label: 'Dashboard',
-        icon: 'pi pi-home',
+        icon: 'ti ti-home text-2xl',
         command: () => {
             closeSideBar();
             router.visit(route('dashboard'));
@@ -1022,7 +1022,7 @@ const menuModel = ref([
     },
     {
         label: 'Pickup',
-        icon: 'pi pi-truck',
+        icon: 'ti ti-truck text-2xl',
         visible: () => page.props.user.permissions.includes('pickups.create') ||
                    page.props.user.permissions.includes('pickups.index') ||
                    page.props.user.permissions.includes('pickups.show pickup exceptions') ||
@@ -1034,7 +1034,7 @@ const menuModel = ref([
     },
     {
         label: 'HBL',
-        icon: 'pi pi-window',
+        icon: 'ti ti-app-window text-2xl',
         visible: () => page.props.user.permissions.includes('delivers.show deliver order') ||
                    page.props.user.permissions.includes('hbls.show draft hbls') ||
                    page.props.user.permissions.includes('hbls.show cancelled hbls') ||
@@ -1047,7 +1047,7 @@ const menuModel = ref([
     },
     {
         label: 'Back Office',
-        icon: 'pi pi-building',
+        icon: 'ti ti-building text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('cash')),
         command: () => {
             setMenu('back-office');
@@ -1055,7 +1055,7 @@ const menuModel = ref([
     },
     {
         label: 'Arrivals',
-        icon: 'pi pi-inbox',
+        icon: 'ti ti-inbox text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('arrival')) &&
                    page.props.currentBranch.type === 'Destination',
         command: () => {
@@ -1064,7 +1064,7 @@ const menuModel = ref([
     },
     {
         label: 'Reception',
-        icon: 'pi pi-stamp',
+        icon: 'ti ti-rubber-stamp text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception')),
         command: () => {
             setMenu('reception');
@@ -1072,7 +1072,7 @@ const menuModel = ref([
     },
     {
         label: 'Document Verifications',
-        icon: 'pi pi-certificate',
+        icon: 'ti ti-certificate text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document')),
         command: () => {
             setMenu('verifications');
@@ -1080,7 +1080,7 @@ const menuModel = ref([
     },
     {
         label: 'Cashier',
-        icon: 'pi pi-wallet',
+        icon: 'ti ti-wallet text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show cashier')),
         command: () => {
             setMenu('cashier');
@@ -1088,7 +1088,7 @@ const menuModel = ref([
     },
     {
         label: 'Package Queue',
-        icon: 'pi pi-package',
+        icon: 'ti ti-package text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package')),
         command: () => {
             setMenu('package');
@@ -1096,7 +1096,7 @@ const menuModel = ref([
     },
     {
         label: 'Examination',
-        icon: 'pi pi-check-circle',
+        icon: 'ti ti-checkup-list text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination')),
         command: () => {
             setMenu('examination');
@@ -1104,7 +1104,7 @@ const menuModel = ref([
     },
     {
         label: 'Queue Screens',
-        icon: 'pi pi-desktop',
+        icon: 'ti ti-screen-share text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.endsWith('screen')),
         command: () => {
             setMenu('screens');
@@ -1112,7 +1112,7 @@ const menuModel = ref([
     },
     {
         label: 'Loading',
-        icon: 'pi pi-truck-loading',
+        icon: 'ti ti-truck-loading text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('container')) ||
                    page.props.user.permissions.some(permission => permission.startsWith('shipment')),
         command: () => {
@@ -1121,7 +1121,7 @@ const menuModel = ref([
     },
     {
         label: 'Third Party Shipments',
-        icon: 'pi pi-trailer',
+        icon: 'ti ti-tir text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('third_party_shipments')) &&
                    page.props.currentBranch.type === 'Destination',
         command: () => {
@@ -1130,7 +1130,7 @@ const menuModel = ref([
     },
     {
         label: 'Courier',
-        icon: 'pi pi-truck',
+        icon: 'ti ti-truck-delivery text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('courier')) ||
                    page.props.user.permissions.some(permission => permission.startsWith('third-party-agents')) ||
                    page.props.user.permissions.some(permission => permission.startsWith('courier-agents')),
@@ -1140,7 +1140,7 @@ const menuModel = ref([
     },
     {
         label: 'Vessel Schedules',
-        icon: 'pi pi-calendar',
+        icon: 'ti ti-calendar-stats text-2xl',
         visible: () => page.props.user.permissions.includes('vessel.schedule.index'),
         command: () => {
             closeSideBar();
@@ -1149,7 +1149,7 @@ const menuModel = ref([
     },
     {
         label: 'Container Payments',
-        icon: 'pi pi-credit-card',
+        icon: 'ti ti-container text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('payment-container')),
         command: () => {
             setMenu('container-payment');
@@ -1157,7 +1157,7 @@ const menuModel = ref([
     },
     {
         label: 'Gate Controller',
-        icon: 'pi pi-shield',
+        icon: 'ti ti-spy text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('mark-')),
         command: () => {
             setMenu('gate-controller');
@@ -1165,7 +1165,7 @@ const menuModel = ref([
     },
     {
         label: 'User Management',
-        icon: 'pi pi-users',
+        icon: 'ti ti-users text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('users')) ||
                    page.props.user.permissions.includes('roles.list'),
         command: () => {
@@ -1174,7 +1174,7 @@ const menuModel = ref([
     },
     {
         label: 'Branches',
-        icon: 'pi pi-code-branch',
+        icon: 'ti ti-git-branch text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('branches')) ||
                    page.props.user.permissions.includes('branches.list'),
         command: () => {
@@ -1184,7 +1184,7 @@ const menuModel = ref([
     },
     {
         label: 'Call Center',
-        icon: 'pi pi-headset',
+        icon: 'ti ti-headset text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('call-center.')),
         command: () => {
             setMenu('call-center');
@@ -1192,7 +1192,7 @@ const menuModel = ref([
     },
     {
         label: 'Tokens',
-        icon: 'pi pi-tag',
+        icon: 'ti ti-tag text-2xl',
         visible: () => page.props.user.permissions.includes('manage_tokens'),
         command: () => {
             closeSideBar();
@@ -1201,7 +1201,7 @@ const menuModel = ref([
     },
     {
         label: 'Whatsapp',
-        icon: 'pi pi-whatsapp',
+        icon: 'ti ti-brand-whatsapp text-2xl',
         visible: () => page.props.user.permissions.includes('manage_whatsapp'),
         command: () => {
             closeSideBar();
@@ -1210,7 +1210,7 @@ const menuModel = ref([
     },
     {
         label: 'File Manager',
-        icon: 'pi pi-folder',
+        icon: 'ti ti-brand-onedrive text-2xl',
         command: () => {
             closeSideBar();
             router.visit(route('file-manager.index'));
@@ -1218,7 +1218,7 @@ const menuModel = ref([
     },
     {
         label: 'Settings',
-        icon: 'pi pi-cog',
+        icon: 'ti ti-settings text-2xl',
         visible: () => !page.props.user.roles.includes('viewer') &&
                    page.props.auth.user.roles[0].name !== 'customer',
         command: () => {
@@ -1386,11 +1386,6 @@ setSidebarState();
 .main-sidebar {
   width: var(--main-sidebar-width);
   transition: all 0.3s ease;
-}
-
-.main-sidebar .pi {
-    font-size: 1.2rem !important;
-    line-height: 1 !important;
 }
 
 .sidebar-panel {
