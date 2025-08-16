@@ -1311,7 +1311,7 @@ setSidebarState();
               <a
                 v-if="item.visible ? item.visible() : true"
                 v-tooltip.right="item.label"
-                class="focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-lg"
+                class="focus:outline-none rounded-full"
                 v-bind="props.action"
                 @click="item.command"
               >
@@ -1378,6 +1378,11 @@ setSidebarState();
 .main-sidebar {
   width: var(--main-sidebar-width);
   transition: all 0.3s ease;
+}
+
+.main-sidebar .pi {
+    font-size: 1.2rem !important;
+    line-height: 1 !important;
 }
 
 .sidebar-panel {
