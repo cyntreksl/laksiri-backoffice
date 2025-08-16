@@ -1002,7 +1002,7 @@ const setMenu = (menu) => {
     }
     activeMenu.value = menu;
 
-    // Only open sidebar if there are child menu items
+    // Only open the sidebar if there are child menu items
     if (childMenuList.length > 0) {
         openSideBar();
     } else {
