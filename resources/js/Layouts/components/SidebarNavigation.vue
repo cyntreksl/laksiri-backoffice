@@ -1002,6 +1002,13 @@ const setMenu = (menu) => {
             break;
     }
     activeMenu.value = menu;
+    
+    // Only open sidebar if there are child menu items
+    if (childMenuList.length > 0) {
+        openSideBar();
+    } else {
+        closeSideBar();
+    }
 };
 
 // PrimeVue menu model
@@ -1023,7 +1030,6 @@ const menuModel = ref([
                    page.props.user.permissions.includes('pickups.pending pickups'),
         command: () => {
             setMenu('pickups');
-            openSideBar();
         }
     },
     {
@@ -1037,7 +1043,6 @@ const menuModel = ref([
                    page.props.user.permissions.includes('hbls.create'),
         command: () => {
             setMenu('hbls');
-            openSideBar();
         }
     },
     {
@@ -1046,7 +1051,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('cash')),
         command: () => {
             setMenu('back-office');
-            openSideBar();
         }
     },
     {
@@ -1056,7 +1060,6 @@ const menuModel = ref([
                    page.props.currentBranch.type === 'Destination',
         command: () => {
             setMenu('arrival');
-            openSideBar();
         }
     },
     {
@@ -1065,7 +1068,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception')),
         command: () => {
             setMenu('reception');
-            openSideBar();
         }
     },
     {
@@ -1074,7 +1076,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document')),
         command: () => {
             setMenu('verifications');
-            openSideBar();
         }
     },
     {
@@ -1083,7 +1084,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show cashier')),
         command: () => {
             setMenu('cashier');
-            openSideBar();
         }
     },
     {
@@ -1092,7 +1092,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package')),
         command: () => {
             setMenu('package');
-            openSideBar();
         }
     },
     {
@@ -1101,7 +1100,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination')),
         command: () => {
             setMenu('examination');
-            openSideBar();
         }
     },
     {
@@ -1110,7 +1108,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.endsWith('screen')),
         command: () => {
             setMenu('screens');
-            openSideBar();
         }
     },
     {
@@ -1120,7 +1117,6 @@ const menuModel = ref([
                    page.props.user.permissions.some(permission => permission.startsWith('shipment')),
         command: () => {
             setMenu('loading');
-            openSideBar();
         }
     },
     {
@@ -1130,7 +1126,6 @@ const menuModel = ref([
                    page.props.currentBranch.type === 'Destination',
         command: () => {
             setMenu('third-party-shipments');
-            openSideBar();
         }
     },
     {
@@ -1141,7 +1136,6 @@ const menuModel = ref([
                    page.props.user.permissions.some(permission => permission.startsWith('courier-agents')),
         command: () => {
             setMenu('courier');
-            openSideBar();
         }
     },
     {
@@ -1158,7 +1152,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('payment-container')),
         command: () => {
             setMenu('container-payment');
-            openSideBar();
         }
     },
     {
@@ -1167,7 +1160,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('mark-')),
         command: () => {
             setMenu('gate-controller');
-            openSideBar();
         }
     },
     {
@@ -1177,7 +1169,6 @@ const menuModel = ref([
                    page.props.user.permissions.includes('roles.list'),
         command: () => {
             setMenu('users');
-            openSideBar();
         }
     },
     {
@@ -1195,7 +1186,6 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('call-center.')),
         command: () => {
             setMenu('call-center');
-            openSideBar();
         }
     },
     {
@@ -1228,7 +1218,6 @@ const menuModel = ref([
                    page.props.auth.user.roles[0].name !== 'customer',
         command: () => {
             setMenu('setting');
-            openSideBar();
         }
     }
 ]);
