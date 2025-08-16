@@ -1,11 +1,9 @@
 <script setup>
 import {Link, router, usePage} from '@inertiajs/vue3';
 import logo from "../../../images/logo_main.png";
-import {reactive, ref, onMounted} from "vue";
+import {reactive, ref, computed} from "vue";
 import Menu from 'primevue/menu';
 import Button from 'primevue/button';
-import Tooltip from 'primevue/tooltip';
-import Panel from 'primevue/panel';
 
 const props = defineProps({
     isSidebarExpanded: {
@@ -13,8 +11,6 @@ const props = defineProps({
         default: false,
     },
 });
-
-defineEmits(['menu-select', 'close-panel']);
 
 const page = usePage();
 
@@ -1237,12 +1233,17 @@ const menuModel = ref([
     }
 ]);
 
+// Split into top and bottom menus for layout
+const bottomLabels = ['Whatsapp', 'File Manager', 'Settings'];
+const topMenuModel = computed(() =>
+    menuModel.value.filter((item) => !bottomLabels.includes(item.label))
+);
+const bottomMenuModel = computed(() =>
+    menuModel.value.filter((item) => bottomLabels.includes(item.label))
+);
+
 setMenu(mainRoute);
 setSidebarState();
-
-onMounted(() => {
-    // Add any additional initialization if needed
-});
 </script>
 
 <template>
@@ -1265,13 +1266,12 @@ onMounted(() => {
         </div>
 
         <!-- Main Sections Links using PrimeVue Menu -->
-        <div class="is-scrollbar-hidden flex grow flex-col pt-6 w-full px-3">
+        <div class="is-scrollbar-hidden flex grow flex-col pt-6">
           <Menu
-              style="min-width: 0; border: 0"
-            :model="menuModel"
+            :model="topMenuModel"
             :pt="{
               root: 'w-full',
-              menu: 'flex flex-col space-y-1',
+              menu: 'flex flex-col space-y-3',
               menuitem: 'w-full',
               content: ({ context }) => [
                 'rounded-lg transition-all duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25',
@@ -1279,10 +1279,11 @@ onMounted(() => {
                   'bg-primary/10 text-primary dark:text-primary': context.focused
                 }
               ],
-              action: 'flex items-center w-full p-3',
-              icon: 'mr-3 text-lg',
-              label: 'font-medium text-sm'
+              action: 'flex items-center justify-center w-full',
+              icon: '!w-8',
+              label: 'hidden'
             }"
+            style="min-width: 0; border: 0"
             class="w-full border-0"
           >
             <template #item="{ item, props }">
@@ -1300,8 +1301,38 @@ onMounted(() => {
         </div>
 
         <!-- Bottom Links -->
-        <div class="flex flex-col items-center space-y-3 py-3">
-          <!-- Additional bottom items can be added here if needed -->
+        <div class="flex flex-col items-center space-y-3 py-3 w-full px-3">
+          <Menu
+            :model="bottomMenuModel"
+            :pt="{
+              root: 'w-full',
+              menu: 'flex flex-col space-y-3',
+              menuitem: 'w-full',
+              content: ({ context }) => [
+                'rounded-lg transition-all duration-200 hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25',
+                {
+                  'bg-primary/10 text-primary dark:text-primary': context.focused
+                }
+              ],
+              action: 'flex items-center justify-center w-full p-4',
+              icon: 'text-2xl',
+              label: 'hidden'
+            }"
+            class="w-full border-0"
+            style="min-width: 0; border: 0"
+          >
+            <template #item="{ item, props }">
+              <a
+                v-if="item.visible ? item.visible() : true"
+                v-tooltip.right="item.label"
+                class="focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-lg"
+                v-bind="props.action"
+                @click="item.command"
+              >
+                <span :class="item.icon"></span>
+              </a>
+            </template>
+          </Menu>
         </div>
       </div>
     </div>
@@ -1392,4 +1423,6 @@ a:hover {
     z-index: 999;
   }
 }
+
+/* Spacing and icon sizes for the main menu are applied via PrimeVue pt classes on the Menu components */
 </style>
