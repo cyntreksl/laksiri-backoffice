@@ -14,7 +14,7 @@ const childMenuList = reactive([]);
 const activeTitle = ref("");
 
 const isSidebarExpanded = ref(
-    localStorage.getItem("sidebar-expanded") === "false"
+    localStorage.getItem("sidebar-expanded") === "true"
 );
 
 const setSidebarState = () => {
@@ -42,14 +42,16 @@ const isActive = (item) => {
 }
 
 const openSideBar = () => {
-    localStorage.setItem("sidebar-expanded", true);
+    localStorage.setItem("sidebar-expanded", "true");
     document.body.classList.add("is-sidebar-open");
     isSidebarExpanded.value = true;
 };
 
 const closeSideBar = () => {
-    localStorage.setItem("sidebar-expanded", false);
+    localStorage.setItem("sidebar-expanded", "false");
     document.body.classList.remove("is-sidebar-open");
+    isSidebarExpanded.value = false;
+    childMenuList.splice(0, childMenuList.length);
 };
 
 const changeSidePanelTitle = (title) => {
@@ -1014,6 +1016,7 @@ const menuModel = ref([
         label: 'Dashboard',
         icon: 'pi pi-home',
         command: () => {
+            closeSideBar();
             router.visit(route('dashboard'));
         }
     },
@@ -1140,6 +1143,7 @@ const menuModel = ref([
         icon: 'pi pi-calendar',
         visible: () => page.props.user.permissions.includes('vessel.schedule.index'),
         command: () => {
+            closeSideBar();
             router.visit(route('clearance.vessel-schedule.index'));
         }
     },
@@ -1174,6 +1178,7 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('branches')) ||
                    page.props.user.permissions.includes('branches.list'),
         command: () => {
+            closeSideBar();
             router.visit(route('branches.index'));
         }
     },
@@ -1190,6 +1195,7 @@ const menuModel = ref([
         icon: 'pi pi-tag',
         visible: () => page.props.user.permissions.includes('manage_tokens'),
         command: () => {
+            closeSideBar();
             router.visit(route('call-center.tokens.index'));
         }
     },
@@ -1198,6 +1204,7 @@ const menuModel = ref([
         icon: 'pi pi-whatsapp',
         visible: () => page.props.user.permissions.includes('manage_whatsapp'),
         command: () => {
+            closeSideBar();
             router.visit(route('whatsapp.index'));
         }
     },
@@ -1205,6 +1212,7 @@ const menuModel = ref([
         label: 'File Manager',
         icon: 'pi pi-folder',
         command: () => {
+            closeSideBar();
             router.visit(route('file-manager.index'));
         }
     },
