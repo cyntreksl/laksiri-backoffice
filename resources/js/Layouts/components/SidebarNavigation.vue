@@ -5,13 +5,6 @@ import {reactive, ref, computed} from "vue";
 import Menu from 'primevue/menu';
 import Button from 'primevue/button';
 
-const props = defineProps({
-    isSidebarExpanded: {
-        type: Boolean,
-        default: false,
-    },
-});
-
 const page = usePage();
 
 const current = route().current();
@@ -20,8 +13,12 @@ const activeMenu = ref(mainRoute);
 const childMenuList = reactive([]);
 const activeTitle = ref("");
 
+const isSidebarExpanded = ref(
+    localStorage.getItem("sidebar-expanded") === "false"
+);
+
 const setSidebarState = () => {
-    if (props.isSidebarExpanded) {
+    if (isSidebarExpanded.value) {
         document.body.classList.add("is-sidebar-open");
     } else {
         document.body.classList.remove("is-sidebar-open");
@@ -47,7 +44,7 @@ const isActive = (item) => {
 const openSideBar = () => {
     localStorage.setItem("sidebar-expanded", true);
     document.body.classList.add("is-sidebar-open");
-    props.isSidebarExpanded = true;
+    isSidebarExpanded.value = true;
 };
 
 const closeSideBar = () => {
@@ -1002,7 +999,7 @@ const setMenu = (menu) => {
             break;
     }
     activeMenu.value = menu;
-    
+
     // Only open sidebar if there are child menu items
     if (childMenuList.length > 0) {
         openSideBar();
@@ -1273,13 +1270,13 @@ setSidebarState();
               label: 'hidden'
             }"
             style="min-width: 0; border: 0"
-            class="w-full border-0"
+            class="w-full"
           >
             <template #item="{ item, props }">
               <a
                 v-if="item.visible ? item.visible() : true"
                 v-tooltip.right="item.label"
-                class="focus:outline-none focus:ring-2 focus:ring-primary/30 rounded-lg"
+                class="focus:outline-none !rounded-full"
                 v-bind="props.action"
                 @click="item.command"
               >
@@ -1329,10 +1326,10 @@ setSidebarState();
     <!-- Sidebar Panel -->
     <div class="sidebar-panel">
       <div
-        class="flex h-full grow flex-col bg-white pl-[var(--main-sidebar-width)] dark:bg-navy-750 shadow-lg"
+        class="flex h-full grow flex-col bg-white pl-[var(--main-sidebar-width)] dark:bg-navy-750"
       >
         <!-- Sidebar Panel Header -->
-        <div class="flex h-18 w-full items-center justify-between pl-4 pr-1 border-b border-slate-200 dark:border-navy-600">
+        <div class="flex h-16 w-full items-center justify-between pl-4 pr-1">
           <p
             class="text-lg font-semibold tracking-wide text-slate-800 dark:text-navy-100"
           >

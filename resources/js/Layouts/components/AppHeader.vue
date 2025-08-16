@@ -8,15 +8,6 @@ import Popover from 'primevue/popover';
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
 
-const props = defineProps({
-    isSidebarExpanded: {
-        type: Boolean,
-        default: false,
-    }
-})
-
-const emit = defineEmits(["update:isSidebarExpanded"]);
-
 const page = usePage();
 const monochromeModeSelector = useMonochromeSelector();
 const darkModeSelector = useDarkModeSelector();
@@ -37,21 +28,6 @@ const toggleMonochromeMode = () => {
 
 const toggleDarkMode = () => {
     darkModeSelector.toggleDarkMode();
-};
-
-const toggleSideBar = () => {
-    const newValue = !props.isSidebarExpanded;
-    emit("update:isSidebarExpanded", newValue);
-    localStorage.setItem("sidebar-expanded", newValue);
-    setSidebarState(newValue);
-};
-
-const setSidebarState = (expanded) => {
-    if (expanded) {
-        document.body.classList.add("is-sidebar-open");
-    } else {
-        document.body.classList.remove("is-sidebar-open");
-    }
 };
 
 const toggle = (event) => {
@@ -98,10 +74,7 @@ const setBranch = (branch) => {
             <!-- Header Items -->
             <div class="flex w-full items-center justify-between">
                 <!-- Left: Sidebar Toggle Button -->
-                <div>
-                    <Button v-if="!isSidebarExpanded" icon="pi pi-bars" rounded severity="contrast" variant="text" @click="toggleSideBar" />
-                    <Button v-else icon="pi pi-chevron-left" rounded severity="contrast" variant="text" @click="toggleSideBar" />
-                </div>
+                <div></div>
 
                 <!-- Right: Header buttons -->
                 <div class="-mr-1.5 flex items-center space-x-2">
