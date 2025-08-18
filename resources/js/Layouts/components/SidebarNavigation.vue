@@ -1028,7 +1028,7 @@ const menuModel = ref([
                    page.props.user.permissions.includes('pickups.show pickup exceptions') ||
                    page.props.user.permissions.includes('pickups.show pickup order') ||
                    page.props.user.permissions.includes('pickups.pending pickups') &&
-            page.props.currentBranch.type === 'Departure',
+            page.props.auth.user.primary_branch.type === 'Departure',
         command: () => {
             setMenu('pickups');
         }
@@ -1042,7 +1042,7 @@ const menuModel = ref([
                    page.props.user.permissions.includes('mhbls.index') ||
                    page.props.user.permissions.includes('hbls.index') ||
                    page.props.user.permissions.includes('hbls.create') &&
-            page.props.currentBranch.type === 'Departure',
+            page.props.auth.user.primary_branch.type === 'Departure',
         command: () => {
             setMenu('hbls');
         }
@@ -1051,7 +1051,7 @@ const menuModel = ref([
         label: 'Back Office',
         icon: 'ti ti-building text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('cash')) &&
-            page.props.currentBranch.type === 'Departure',
+            page.props.auth.user.primary_branch.type === 'Departure',
         command: () => {
             setMenu('back-office');
         }
@@ -1060,7 +1060,7 @@ const menuModel = ref([
         label: 'Arrivals',
         icon: 'ti ti-inbox text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('arrival')) &&
-                   page.props.currentBranch.type === 'Destination',
+                   page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('arrival');
         }
@@ -1068,7 +1068,7 @@ const menuModel = ref([
     {
         label: 'Reception',
         icon: 'ti ti-rubber-stamp text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception')) && page.props.currentBranch.type === 'Destination',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception')) && page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('reception');
         }
@@ -1076,7 +1076,7 @@ const menuModel = ref([
     {
         label: 'Document Verifications',
         icon: 'ti ti-certificate text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document')) && page.props.currentBranch.type === 'Destination',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document')) && page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('verifications');
         }
@@ -1084,7 +1084,7 @@ const menuModel = ref([
     {
         label: 'Cashier',
         icon: 'ti ti-wallet text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show cashier')) && page.props.currentBranch.type === 'Destination',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show cashier')) && page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('cashier');
         }
@@ -1092,7 +1092,7 @@ const menuModel = ref([
     {
         label: 'Package Queue',
         icon: 'ti ti-package text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package')) && page.props.currentBranch.type === 'Destination',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package')) && page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('package');
         }
@@ -1100,7 +1100,7 @@ const menuModel = ref([
     {
         label: 'Examination',
         icon: 'ti ti-checkup-list text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination')) && page.props.currentBranch.type === 'Destination',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination')) && page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('examination');
         }
@@ -1108,7 +1108,7 @@ const menuModel = ref([
     {
         label: 'Queue Screens',
         icon: 'ti ti-screen-share text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.endsWith('screen')) && page.props.currentBranch.type === 'Destination',
+        visible: () => page.props.user.permissions.some(permission => permission.endsWith('screen')) && page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('screens');
         }
@@ -1118,7 +1118,7 @@ const menuModel = ref([
         icon: 'ti ti-truck-loading text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('container')) ||
                    page.props.user.permissions.some(permission => permission.startsWith('shipment')) &&
-            page.props.currentBranch.type === 'Departure',
+            page.props.auth.user.primary_branch.type === 'Departure',
         command: () => {
             setMenu('loading');
         }
@@ -1127,7 +1127,7 @@ const menuModel = ref([
         label: 'Third Party Shipments',
         icon: 'ti ti-tir text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('third_party_shipments')) &&
-                   page.props.currentBranch.type === 'Destination',
+                   page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('third-party-shipments');
         }
@@ -1138,7 +1138,7 @@ const menuModel = ref([
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('courier')) ||
                    page.props.user.permissions.some(permission => permission.startsWith('third-party-agents')) ||
                    page.props.user.permissions.some(permission => permission.startsWith('courier-agents')) &&
-            page.props.currentBranch.type === 'Destination',
+            page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('courier');
         }
@@ -1147,7 +1147,7 @@ const menuModel = ref([
         label: 'Vessel Schedules',
         icon: 'ti ti-calendar-stats text-2xl',
         visible: () => page.props.user.permissions.includes('vessel.schedule.index')  &&
-            page.props.currentBranch.type === 'Destination',
+            page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             closeSideBar();
             router.visit(route('clearance.vessel-schedule.index'));
@@ -1157,7 +1157,7 @@ const menuModel = ref([
         label: 'Container Payments',
         icon: 'ti ti-container text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('payment-container'))  &&
-            page.props.currentBranch.type === 'Destination',
+            page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('container-payment');
         }
@@ -1166,7 +1166,7 @@ const menuModel = ref([
         label: 'Gate Controller',
         icon: 'ti ti-spy text-2xl',
         visible: () => page.props.user.permissions.some(permission => permission.startsWith('mark-'))  &&
-            page.props.currentBranch.type === 'Destination',
+            page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('gate-controller');
         }
@@ -1193,7 +1193,7 @@ const menuModel = ref([
     {
         label: 'Call Center',
         icon: 'ti ti-headset text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('call-center.')) && page.props.currentBranch.type === 'Destination',
+        visible: () => page.props.user.permissions.some(permission => permission.startsWith('call-center.')) && page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             setMenu('call-center');
         }
@@ -1201,7 +1201,7 @@ const menuModel = ref([
     {
         label: 'Tokens',
         icon: 'ti ti-tag text-2xl',
-        visible: () => page.props.user.permissions.includes('manage_tokens') && page.props.currentBranch.type === 'Destination',
+        visible: () => page.props.user.permissions.includes('manage_tokens') && page.props.auth.user.primary_branch.type === 'Destination',
         command: () => {
             closeSideBar();
             router.visit(route('call-center.tokens.index'));
