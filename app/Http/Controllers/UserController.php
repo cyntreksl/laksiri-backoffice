@@ -37,8 +37,14 @@ class UserController extends Controller
     {
         $this->authorize('users.list');
 
+        $roles = $this->roleRepository->getRoles();
+        if (! Auth::user()->hasRole('super-admin')) {
+            // Hide the Super Admin role from non–super-admins
+            $roles = $roles->filter(fn ($role) => $role->name !== 'super-admin')->values();
+        }
+
         return Inertia::render('User/UserList', [
-            'roles' => $this->roleRepository->getRoles(),
+            'roles' => $roles,
             'branches' => $this->branchRepository->getBranches(),
             'userRole' => Auth()->user()->getRoleNames()[0],
             'currentBranch' => GetUserCurrentBranchID::run(),
@@ -90,9 +96,15 @@ class UserController extends Controller
     {
         $this->authorize('users.edit');
 
+        $roles = $this->roleRepository->getRoles();
+        if (! Auth::user()->hasRole('super-admin')) {
+            // Hide the Super Admin role from non–super-admins
+            $roles = $roles->filter(fn ($role) => $role->name !== 'super-admin')->values();
+        }
+
         return Inertia::render('User/EditUser', [
             'userRecord' => $user->load('roles', 'branches'),
-            'roles' => $this->roleRepository->getRoles(),
+            'roles' => $roles,
             'branches' => $this->branchRepository->getBranches(),
         ]);
     }
