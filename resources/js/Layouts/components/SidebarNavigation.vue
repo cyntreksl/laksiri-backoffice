@@ -1268,7 +1268,7 @@ setSidebarState();
         </div>
 
         <!-- Main Sections Links using PrimeVue Menu -->
-        <div class="is-scrollbar-hidden flex grow flex-col pt-6">
+        <div class="is-scrollbar-hidden space-y-4 overflow-y-auto flex grow flex-col pt-6">
           <Menu
             :model="topMenuModel"
             :pt="{
