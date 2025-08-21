@@ -3,6 +3,7 @@ import {Head} from "@inertiajs/vue3";
 import SidebarNavigation from "@/Layouts/components/SidebarNavigation.vue";
 import {Notification, Notivue} from "notivue";
 import AppHeader from "@/Layouts/components/AppHeader.vue";
+import ConfirmDialog from 'primevue/confirmdialog';
 
 const props = defineProps({
     title: "",
