@@ -1,0 +1,96 @@
+name: Deploy Application
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - stage
+          - production
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'main'
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Add remote host to known_hosts
+        run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment package
+        run: |
+          # Exclude unnecessary files from deployment
+          zip -r deployment.zip . \
+            -x "*.git*" \
+            -x "node_modules/*" \
+            -x ".github/*" \
+            -x "tests/*" \
+            -x "docs/*" \
+            -x "*.md" \
+            -x "composer.lock" \
+            -x "package-lock.json" \
+            -x ".env.example"
+
+      - name: Copy deployment package to server
+        run: scp deployment.zip ${{ secrets.EC2_USER }}@${{ secrets.HOST }}:/tmp/deployment.zip
+
+      - name: Deploy on server
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.HOST }} bash -s << 'EOF'
+          # Backup current deployment
+          if [ -d "/var/www/laksiri-backoffice" ]; then
+            cp -r /var/www/laksiri-backoffice /var/www/laksiri-backoffice.backup.$(date +%Y%m%d_%H%M%S)
+          fi
+          
+          # Deploy new version
+          unzip -o /tmp/deployment.zip -d /var/www/laksiri-backoffice
+          cd /var/www/laksiri-backoffice
+          
+          # Run deployment commands
+          php artisan migrate --force
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan view:clear
+          php artisan route:clear
+          
+          # Deploy Sidecar if available
+          if command -v php &> /dev/null && php artisan list | grep -q "sidecar:deploy"; then
+            php artisan sidecar:deploy --activate
+          fi
+          
+          # Set proper permissions
+          sudo chown -R www-data:www-data /var/www/laksiri-backoffice
+          sudo chmod -R 755 /var/www/laksiri-backoffice
+          sudo chmod -R 775 /var/www/laksiri-backoffice/storage
+          sudo chmod -R 775 /var/www/laksiri-backoffice/bootstrap/cache
+          
+          # Clean up
+          rm /tmp/deployment.zip
+          
+          echo "Deployment completed successfully!"
+          EOF
+
+      - name: Deployment Status
+        run: |
+          echo "✅ Application deployed to ${{ github.event.inputs.environment }}"
+          echo "🌐 Branch: ${{ github.event.inputs.branch }}"
+          echo "🕐 Deployment completed at $(date)"
