@@ -88,12 +88,6 @@ jobs:
             public/build/assets/*
             public/build/*
 
-      - name: Upload vendor directory
-        uses: actions/upload-artifact@v4
-        with:
-          name: vendor-directory
-          path: vendor/
-
   package-application:
     runs-on: ubuntu-latest
     needs: setup-and-build
@@ -105,12 +99,6 @@ jobs:
         with:
           name: frontend-build
           path: public/build/
-
-      - name: Download vendor directory
-        uses: actions/download-artifact@v4
-        with:
-          name: vendor-directory
-          path: .
 
       - name: Create application.zip
         run: zip -r application.zip . -x "*.git*" "node_modules/*"
