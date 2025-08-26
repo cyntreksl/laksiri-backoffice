@@ -7,6 +7,28 @@ import Button from 'primevue/button';
 
 const page = usePage();
 
+// Normalize roles and detect Super Admin
+const roleNames = computed(() => {
+    const roles = (page.props.auth?.user?.roles ?? page.props.user?.roles ?? []);
+    return roles
+        .map(r => (typeof r === 'string' ? r : r?.name))
+        .filter(Boolean)
+        .map(n => String(n).toLowerCase());
+});
+const isRole = (name) => roleNames.value.includes(String(name).toLowerCase());
+const notRole = (name) => !isRole(name);
+const isSuperAdmin = computed(() => isRole('super-admin'));
+
+// Helpers to centralize permission/branch checks
+const can = (perm) => isSuperAdmin.value || page.props.user.permissions.includes(perm);
+const canSomeStartWith = (prefix) =>
+    isSuperAdmin.value || page.props.user.permissions.some((permission) => permission.startsWith(prefix));
+const canSomeEndsWith = (suffix) =>
+    isSuperAdmin.value || page.props.user.permissions.some((permission) => permission.endsWith(suffix));
+const isDep = () => isSuperAdmin.value || page.props.auth.user.primary_branch.type === 'Departure';
+const isDest = () => isSuperAdmin.value || page.props.auth.user.primary_branch.type === 'Destination';
+const currentBranchIs = (type) => isSuperAdmin.value || page.props.currentBranch.type === type;
+
 const current = route().current();
 const mainRoute = current.split(".")[0];
 const activeMenu = ref(mainRoute);
@@ -63,11 +85,11 @@ const setMenu = (menu) => {
         case "pickups":
             let pickupMenu = [];
 
-            if (usePage().props.user.permissions.includes("pickups.create")) {
+            if (can("pickups.create")) {
                 pickupMenu.splice(2, 0, { title: "Create Job", route: "pickups.create" });
             }
 
-            if (usePage().props.user.permissions.includes("pickups.pending pickups")) {
+            if (can("pickups.pending pickups")) {
                 pickupMenu.splice(
                     2,
                     0,
@@ -78,7 +100,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("pickups.show pickup order")) {
+            if (can("pickups.show pickup order")) {
                 pickupMenu.splice(
                     2,
                     0,
@@ -89,7 +111,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("pickups.show pickup exceptions")) {
+            if (can("pickups.show pickup exceptions")) {
                 pickupMenu.splice(
                     2,
                     0,
@@ -100,7 +122,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("pickups.index")) {
+            if (can("pickups.index")) {
                 pickupMenu.splice(
                     2,
                     0,
@@ -111,7 +133,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("pickups.trash_pickups")) {
+            if (can("pickups.trash_pickups")) {
                 pickupMenu.splice(
                     2,
                     0,
@@ -129,7 +151,7 @@ const setMenu = (menu) => {
         case "hbls":
             let hblMenu = [];
 
-            if (usePage().props.user.permissions.includes("hbls.create")) {
+            if (can("hbls.create")) {
                 hblMenu.splice(
                     2,
                     0,
@@ -140,7 +162,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name !== 'call center') {
+            if (can("hbls.index") && notRole('call center')) {
                 hblMenu.splice(
                     2,
                     0,
@@ -149,7 +171,7 @@ const setMenu = (menu) => {
                         route: "hbls.index",
                     }
                 );
-            }else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'call center') {
+            } else if (can("hbls.index") && isRole('call center')) {
                 hblMenu.splice(
                     2,
                     0,
@@ -158,8 +180,7 @@ const setMenu = (menu) => {
                         route: "call-center.hbls.index",
                     }
                 );
-            } else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'finance team')
-            {
+            } else if (can("hbls.index") && isRole('finance team')) {
                 hblMenu.splice(
                     2,
                     0,
@@ -168,9 +189,7 @@ const setMenu = (menu) => {
                         route: "finance.hbls.index",
                     }
                 );
-            }
-            else if (usePage().props.user.permissions.includes("hbls.index") && usePage().props.auth.user.roles[0].name === 'clearance team')
-            {
+            } else if (can("hbls.index") && isRole('clearance team')) {
                 hblMenu.splice(
                     2,
                     0,
@@ -181,7 +200,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("hbls.hbl finance approval list") && usePage().props.currentBranch.type === 'Destination') {
+            if (can("hbls.hbl finance approval list") && currentBranchIs('Destination')) {
                 hblMenu.splice(
                     2,
                     0,
@@ -192,7 +211,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("hbls.finance approved hbl list") && usePage().props.currentBranch.type === 'Destination') {
+            if (can("hbls.finance approved hbl list") && currentBranchIs('Destination')) {
                 hblMenu.splice(
                     2,
                     0,
@@ -203,7 +222,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("mhbls.index")) {
+            if (can("mhbls.index")) {
                 hblMenu.splice(
                     2,
                     0,
@@ -214,7 +233,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("hbls.show door to door list")) {
+            if (can("hbls.show door to door list")) {
                 hblMenu.splice(
                     2,
                     0,
@@ -225,7 +244,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("delivers.assign release to driver") && usePage().props.currentBranch.type === 'Destination') {
+            if (can("delivers.assign release to driver") && currentBranchIs('Destination')) {
                 hblMenu.splice(
                     2,
                     0,
@@ -236,7 +255,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("hbls.show cancelled hbls")) {
+            if (can("hbls.show cancelled hbls")) {
                 hblMenu.splice(
                     2,
                     0,
@@ -246,7 +265,7 @@ const setMenu = (menu) => {
                     }
                 );
             }
-            if (usePage().props.user.permissions.includes("hbls.show draft hbls")) {
+            if (can("hbls.show draft hbls")) {
                 hblMenu.splice(
                     2,
                     0,
@@ -257,7 +276,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("delivers.show deliver order") && usePage().props.currentBranch.type === 'Destination') {
+            if (can("delivers.show deliver order") && currentBranchIs('Destination')) {
                 hblMenu.splice(
                     2,
                     0,
@@ -273,7 +292,7 @@ const setMenu = (menu) => {
         case "back-office":
             let backOfficeMenu = [];
 
-            if (usePage().props.user.permissions.includes("cash.index")) {
+            if (can("cash.index")) {
                 backOfficeMenu.splice(
                     2,
                     0,
@@ -284,7 +303,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("warehouse.index")) {
+            if (can("warehouse.index")) {
                 backOfficeMenu.splice(
                     2,
                     0,
@@ -295,7 +314,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("cash.index")) {
+            if (can("cash.index")) {
                 backOfficeMenu.splice(
                     2,
                     0,
@@ -314,7 +333,7 @@ const setMenu = (menu) => {
             break;
         case "container-payment":
             let containerPaymentMenu = [];
-            if (usePage().props.user.permissions.includes("payment-container.index")) {
+            if (can("payment-container.index")) {
                 containerPaymentMenu.splice(
                     2,
                     0,
@@ -325,7 +344,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("payment-container.approved list")) {
+            if (can("payment-container.approved list")) {
                 containerPaymentMenu.splice(
                     2,
                     0,
@@ -336,7 +355,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("payment-container.completed payment requests")) {
+            if (can("payment-container.completed payment requests")) {
                 containerPaymentMenu.splice(
                     2,
                     0,
@@ -347,7 +366,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("payment-container.refund list")) {
+            if (can("payment-container.refund list")) {
                 containerPaymentMenu.splice(
                     2,
                     0,
@@ -368,7 +387,7 @@ const setMenu = (menu) => {
         case "gate-controller":
             let gateControllerMenu = [];
 
-            if (usePage().props.user.permissions.includes("mark-shipment-arrived-to-warehouse")) {
+            if (can("mark-shipment-arrived-to-warehouse")) {
                 gateControllerMenu.splice(
                     2,
                     0,
@@ -379,7 +398,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("mark-shipment-depart-from-warehouse")) {
+            if (can("mark-shipment-depart-from-warehouse")) {
                 gateControllerMenu.splice(
                     2,
                     0,
@@ -390,7 +409,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("mark-gate-pass")) {
+            if (can("mark-gate-pass")) {
                 gateControllerMenu.splice(
                     2,
                     0,
@@ -411,7 +430,7 @@ const setMenu = (menu) => {
         case "reception":
             let receptionMenu = [];
 
-            if (usePage().props.user.permissions.includes("customer-queue.issue token")) {
+            if (can("customer-queue.issue token")) {
                 receptionMenu.splice(
                     2,
                     0,
@@ -422,7 +441,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show reception calling queue")) {
+            if (can("customer-queue.show reception calling queue")) {
                 receptionMenu.splice(
                     2,
                     0,
@@ -433,7 +452,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show reception verified list")) {
+            if (can("customer-queue.show reception verified list")) {
                 receptionMenu.splice(
                     2,
                     0,
@@ -453,7 +472,7 @@ const setMenu = (menu) => {
         case "verifications":
             let verificationMenu = [];
 
-            if (usePage().props.user.permissions.includes("customer-queue.show document verification queue")) {
+            if (can("customer-queue.show document verification queue")) {
                 verificationMenu.splice(
                     2,
                     0,
@@ -464,7 +483,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show document verified list")) {
+            if (can("customer-queue.show document verified list")) {
                 verificationMenu.splice(
                     2,
                     0,
@@ -484,7 +503,7 @@ const setMenu = (menu) => {
         case "cashier":
             let cashierMenu = [];
 
-            if (usePage().props.user.permissions.includes("customer-queue.show cashier calling queue")) {
+            if (can("customer-queue.show cashier calling queue")) {
                 cashierMenu.splice(
                     2,
                     0,
@@ -495,7 +514,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show cashier paid list")) {
+            if (can("customer-queue.show cashier paid list")) {
                 cashierMenu.splice(
                     2,
                     0,
@@ -515,7 +534,7 @@ const setMenu = (menu) => {
         case "package":
             let packageMenu = [];
 
-            if (usePage().props.user.permissions.includes("customer-queue.show package calling screen")) {
+            if (can("customer-queue.show package calling screen")) {
                 packageMenu.splice(
                     2,
                     0,
@@ -526,7 +545,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show package calling queue")) {
+            if (can("customer-queue.show package calling queue")) {
                 packageMenu.splice(
                     2,
                     0,
@@ -537,7 +556,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show package released list")) {
+            if (can("customer-queue.show package released list")) {
                 packageMenu.splice(
                     2,
                     0,
@@ -557,7 +576,7 @@ const setMenu = (menu) => {
         case "examination":
             let examinationMenu = [];
 
-            if (usePage().props.user.permissions.includes("customer-queue.show document verification queue")) {
+            if (can("customer-queue.show document verification queue")) {
                 examinationMenu.splice(
                     2,
                     0,
@@ -568,7 +587,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show document verified list")) {
+            if (can("customer-queue.show document verified list")) {
                 examinationMenu.splice(
                     2,
                     0,
@@ -588,7 +607,7 @@ const setMenu = (menu) => {
         case "screens":
             let screenMenu = [];
 
-            if (usePage().props.user.permissions.includes("customer-queue.show document verification calling screen")) {
+            if (can("customer-queue.show document verification calling screen")) {
                 screenMenu.splice(
                     2,
                     0,
@@ -599,7 +618,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show cashier calling screen")) {
+            if (can("customer-queue.show cashier calling screen")) {
                 screenMenu.splice(
                     2,
                     0,
@@ -610,7 +629,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("customer-queue.show examination calling screen")) {
+            if (can("customer-queue.show examination calling screen")) {
                 screenMenu.splice(
                     2,
                     0,
@@ -629,7 +648,7 @@ const setMenu = (menu) => {
             break;
         case "loading":
             let loadingMenu = [];
-            if (usePage().props.user.permissions.includes("all.shipments.index")) {
+            if (can("all.shipments.index")) {
                 loadingMenu.splice(
                     2,
                     0,
@@ -639,7 +658,7 @@ const setMenu = (menu) => {
                     }
                 );
             }
-            if (usePage().props.user.permissions.includes("container.index")) {
+            if (can("container.index")) {
                 loadingMenu.splice(
                     2,
                     0,
@@ -649,7 +668,7 @@ const setMenu = (menu) => {
                     }
                 );
             }
-            if (usePage().props.user.permissions.includes("shipment.index")) {
+            if (can("shipment.index")) {
                 loadingMenu.splice(
                     2,
                     0,
@@ -668,7 +687,7 @@ const setMenu = (menu) => {
             break;
         case "third-party-shipments":
             let thirdPartyShipmentMenu = [];
-            if (usePage().props.user.permissions.includes("third_party_shipments.create")) {
+            if (can("third_party_shipments.create")) {
                 thirdPartyShipmentMenu.splice(
                     2,
                     0,
@@ -688,7 +707,7 @@ const setMenu = (menu) => {
         case "arrival":
             let arrivalMenu = [];
 
-            if (usePage().props.user.permissions.includes("arrivals.index") && usePage().props.currentBranch.type === 'Destination') {
+            if (can("arrivals.index") && currentBranchIs('Destination')) {
                 arrivalMenu.splice(
                     2,
                     0,
@@ -699,7 +718,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("bonded.index") && usePage().props.currentBranch.type === 'Destination') {
+            if (can("bonded.index") && currentBranchIs('Destination')) {
                 arrivalMenu.splice(
                     2,
                     0,
@@ -710,7 +729,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("issues.index")) {
+            if (can("issues.index")) {
                 arrivalMenu.splice(
                     2,
                     0,
@@ -731,7 +750,7 @@ const setMenu = (menu) => {
         case "users":
             let userMenu = [];
 
-            if (usePage().props.user.permissions.includes("users.list")) {
+            if (can("users.list")) {
                 userMenu.splice(
                     2,
                     0,
@@ -741,7 +760,7 @@ const setMenu = (menu) => {
                     }
                 );
             }
-            if (usePage().props.user.permissions.includes("users.list")) {
+            if (can("users.list")) {
                 userMenu.splice(
                     2,
                     0,
@@ -751,7 +770,7 @@ const setMenu = (menu) => {
                     }
                 );
             }
-            if (usePage().props.user.permissions.includes("users.list")) {
+            if (can("users.list")) {
                 userMenu.splice(
                     2,
                     0,
@@ -762,7 +781,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("roles.list")) {
+            if (can("roles.list")) {
                 userMenu.splice(
                     2,
                     0,
@@ -781,7 +800,7 @@ const setMenu = (menu) => {
             break;
         case "courier":
             let courierMenu = [];
-            if (usePage().props.user.permissions.includes("third-party-agents.index") && usePage().props.currentBranch.type === 'Destination'){
+            if (can("third-party-agents.index") && currentBranchIs('Destination')){
 
                 courierMenu.splice(
                     2,
@@ -792,7 +811,7 @@ const setMenu = (menu) => {
                     }
                 );
             }
-            if (usePage().props.user.permissions.includes("courier.create")){
+            if (can("courier.create")){
 
                 courierMenu.splice(
                     2,
@@ -803,7 +822,7 @@ const setMenu = (menu) => {
                     }
                 );
             }
-            if (usePage().props.user.permissions.includes("courier.index")){
+            if (can("courier.index")){
                 courierMenu.splice(
                     2,
                     0,
@@ -813,7 +832,7 @@ const setMenu = (menu) => {
                     }
                 );
             }
-            if (usePage().props.user.permissions.includes("courier-agents.index")){
+            if (can("courier-agents.index")){
                 courierMenu.splice(
                     2,
                     0,
@@ -933,7 +952,7 @@ const setMenu = (menu) => {
             ];
 
             settingsPermissionMenuMap.forEach(({ permission, title, route }) => {
-                if (usePage().props.user.permissions.includes(permission)) {
+                if (can(permission)) {
                     settingMenu.push({ title, route });
                 }
             });
@@ -945,7 +964,7 @@ const setMenu = (menu) => {
         case "call-center":
             let callCenterMenu = [];
 
-            if (usePage().props.user.permissions.includes("call-center.hbl-list")) {
+            if (can("call-center.hbl-list")) {
                 callCenterMenu.splice(
                     2,
                     0,
@@ -956,7 +975,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("call-center.all-calls")) {
+            if (can("call-center.all-calls")) {
                 callCenterMenu.splice(
                     2,
                     0,
@@ -967,7 +986,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("call-center.followups")) {
+            if (can("call-center.followups")) {
                 callCenterMenu.splice(
                     2,
                     0,
@@ -978,7 +997,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (usePage().props.user.permissions.includes("call-center.appointments")) {
+            if (can("call-center.appointments")) {
                 callCenterMenu.splice(
                     2,
                     0,
@@ -1023,12 +1042,13 @@ const menuModel = ref([
     {
         label: 'Pickup',
         icon: 'ti ti-truck text-2xl',
-        visible: () => page.props.user.permissions.includes('pickups.create') ||
-                   page.props.user.permissions.includes('pickups.index') ||
-                   page.props.user.permissions.includes('pickups.show pickup exceptions') ||
-                   page.props.user.permissions.includes('pickups.show pickup order') ||
-                   page.props.user.permissions.includes('pickups.pending pickups') &&
-            page.props.auth.user.primary_branch.type === 'Departure',
+        visible: () => (
+            can('pickups.create') ||
+            can('pickups.index') ||
+            can('pickups.show pickup exceptions') ||
+            can('pickups.show pickup order') ||
+            can('pickups.pending pickups')
+        ) && isDep(),
         command: () => {
             setMenu('pickups');
         }
@@ -1036,13 +1056,14 @@ const menuModel = ref([
     {
         label: 'HBL',
         icon: 'ti ti-app-window text-2xl',
-        visible: () => page.props.user.permissions.includes('delivers.show deliver order') ||
-                   page.props.user.permissions.includes('hbls.show draft hbls') ||
-                   page.props.user.permissions.includes('hbls.show cancelled hbls') ||
-                   page.props.user.permissions.includes('mhbls.index') ||
-                   page.props.user.permissions.includes('hbls.index') ||
-                   page.props.user.permissions.includes('hbls.create') &&
-            page.props.auth.user.primary_branch.type === 'Departure',
+        visible: () => (
+            can('delivers.show deliver order') ||
+            can('hbls.show draft hbls') ||
+            can('hbls.show cancelled hbls') ||
+            can('mhbls.index') ||
+            can('hbls.index') ||
+            can('hbls.create')
+        ) && isDep(),
         command: () => {
             setMenu('hbls');
         }
@@ -1050,8 +1071,7 @@ const menuModel = ref([
     {
         label: 'Back Office',
         icon: 'ti ti-building text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('cash')) &&
-            page.props.auth.user.primary_branch.type === 'Departure',
+        visible: () => canSomeStartWith('cash') && isDep(),
         command: () => {
             setMenu('back-office');
         }
@@ -1059,8 +1079,7 @@ const menuModel = ref([
     {
         label: 'Arrivals',
         icon: 'ti ti-inbox text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('arrival')) &&
-                   page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('arrival') && isDest(),
         command: () => {
             setMenu('arrival');
         }
@@ -1068,7 +1087,7 @@ const menuModel = ref([
     {
         label: 'Reception',
         icon: 'ti ti-rubber-stamp text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show reception')) && page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('customer-queue.show reception') && isDest(),
         command: () => {
             setMenu('reception');
         }
@@ -1076,7 +1095,7 @@ const menuModel = ref([
     {
         label: 'Document Verifications',
         icon: 'ti ti-certificate text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show document')) && page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('customer-queue.show document') && isDest(),
         command: () => {
             setMenu('verifications');
         }
@@ -1084,7 +1103,7 @@ const menuModel = ref([
     {
         label: 'Cashier',
         icon: 'ti ti-wallet text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show cashier')) && page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('customer-queue.show cashier') && isDest(),
         command: () => {
             setMenu('cashier');
         }
@@ -1092,7 +1111,7 @@ const menuModel = ref([
     {
         label: 'Package Queue',
         icon: 'ti ti-package text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show package')) && page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('customer-queue.show package') && isDest(),
         command: () => {
             setMenu('package');
         }
@@ -1100,7 +1119,7 @@ const menuModel = ref([
     {
         label: 'Examination',
         icon: 'ti ti-checkup-list text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('customer-queue.show examination')) && page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('customer-queue.show examination') && isDest(),
         command: () => {
             setMenu('examination');
         }
@@ -1108,7 +1127,7 @@ const menuModel = ref([
     {
         label: 'Queue Screens',
         icon: 'ti ti-screen-share text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.endsWith('screen')) && page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeEndsWith('screen') && isDest(),
         command: () => {
             setMenu('screens');
         }
@@ -1116,9 +1135,10 @@ const menuModel = ref([
     {
         label: 'Loading',
         icon: 'ti ti-truck-loading text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('container')) ||
-                   page.props.user.permissions.some(permission => permission.startsWith('shipment')) &&
-            page.props.auth.user.primary_branch.type === 'Departure',
+        visible: () => (
+            canSomeStartWith('container') ||
+            canSomeStartWith('shipment')
+        ) && isDep(),
         command: () => {
             setMenu('loading');
         }
@@ -1126,8 +1146,7 @@ const menuModel = ref([
     {
         label: 'Third Party Shipments',
         icon: 'ti ti-tir text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('third_party_shipments')) &&
-                   page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('third_party_shipments') && isDest(),
         command: () => {
             setMenu('third-party-shipments');
         }
@@ -1135,10 +1154,11 @@ const menuModel = ref([
     {
         label: 'Courier',
         icon: 'ti ti-truck-delivery text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('courier')) ||
-                   page.props.user.permissions.some(permission => permission.startsWith('third-party-agents')) ||
-                   page.props.user.permissions.some(permission => permission.startsWith('courier-agents')) &&
-            page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => (
+            canSomeStartWith('courier') ||
+            canSomeStartWith('third-party-agents') ||
+            canSomeStartWith('courier-agents')
+        ) && isDest(),
         command: () => {
             setMenu('courier');
         }
@@ -1146,8 +1166,7 @@ const menuModel = ref([
     {
         label: 'Vessel Schedules',
         icon: 'ti ti-calendar-stats text-2xl',
-        visible: () => page.props.user.permissions.includes('vessel.schedule.index')  &&
-            page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => can('vessel.schedule.index') && isDest(),
         command: () => {
             closeSideBar();
             router.visit(route('clearance.vessel-schedule.index'));
@@ -1156,8 +1175,7 @@ const menuModel = ref([
     {
         label: 'Container Payments',
         icon: 'ti ti-container text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('payment-container'))  &&
-            page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('payment-container') && isDest(),
         command: () => {
             setMenu('container-payment');
         }
@@ -1165,8 +1183,7 @@ const menuModel = ref([
     {
         label: 'Gate Controller',
         icon: 'ti ti-spy text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('mark-'))  &&
-            page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('mark-') && isDest(),
         command: () => {
             setMenu('gate-controller');
         }
@@ -1174,8 +1191,7 @@ const menuModel = ref([
     {
         label: 'User Management',
         icon: 'ti ti-users text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('users')) ||
-                   page.props.user.permissions.includes('roles.list'),
+        visible: () => canSomeStartWith('users') || can('roles.list'),
         command: () => {
             setMenu('users');
         }
@@ -1183,8 +1199,7 @@ const menuModel = ref([
     {
         label: 'Branches',
         icon: 'ti ti-git-branch text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('branches')) ||
-                   page.props.user.permissions.includes('branches.list'),
+        visible: () => canSomeStartWith('branches') || can('branches.list'),
         command: () => {
             closeSideBar();
             router.visit(route('branches.index'));
@@ -1193,7 +1208,7 @@ const menuModel = ref([
     {
         label: 'Call Center',
         icon: 'ti ti-headset text-2xl',
-        visible: () => page.props.user.permissions.some(permission => permission.startsWith('call-center.')) && page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => canSomeStartWith('call-center.') && isDest(),
         command: () => {
             setMenu('call-center');
         }
@@ -1201,7 +1216,7 @@ const menuModel = ref([
     {
         label: 'Tokens',
         icon: 'ti ti-tag text-2xl',
-        visible: () => page.props.user.permissions.includes('manage_tokens') && page.props.auth.user.primary_branch.type === 'Destination',
+        visible: () => can('manage_tokens') && isDest(),
         command: () => {
             closeSideBar();
             router.visit(route('call-center.tokens.index'));
@@ -1210,7 +1225,7 @@ const menuModel = ref([
     {
         label: 'Whatsapp',
         icon: 'ti ti-brand-whatsapp text-2xl',
-        visible: () => page.props.user.permissions.includes('manage_whatsapp'),
+        visible: () => can('manage_whatsapp'),
         command: () => {
             closeSideBar();
             router.visit(route('whatsapp.index'));
@@ -1227,8 +1242,7 @@ const menuModel = ref([
     {
         label: 'Settings',
         icon: 'ti ti-settings text-2xl',
-        visible: () => !page.props.user.roles.includes('viewer') &&
-                   page.props.auth.user.roles[0].name !== 'customer',
+        visible: () => isSuperAdmin.value || (notRole('viewer') && notRole('customer')),
         command: () => {
             setMenu('setting');
         }

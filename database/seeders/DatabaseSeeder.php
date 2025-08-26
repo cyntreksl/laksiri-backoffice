@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             //            NoteTypeSeeder::class,
             //            BranchSeeder::class,
             RolePermissionSeeder::class,
-            //            UserSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }
