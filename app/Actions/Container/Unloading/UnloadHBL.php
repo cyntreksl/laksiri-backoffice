@@ -34,6 +34,8 @@ class UnloadHBL
 
             $container->hbl_packages()->detach($hblPackageIds);
 
+            $container->duplicate_hbl_packages()->detach($hblPackageIds);
+
             foreach ($hblPackageIds as $hblPackageId) {
                 MarkAsUnloaded::run($hblPackageId);
             }
