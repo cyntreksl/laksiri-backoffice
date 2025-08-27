@@ -25,6 +25,7 @@ const emit = defineEmits(["update:visible"]);
 const hblRef = ref('');
 const hblData = ref(null);
 const errorMessage = ref('');
+const loadingPackageId = ref(null);
 
 const getHBLWithPackages = async () => {
     errorMessage.value = '';
@@ -62,6 +63,8 @@ const handleLoad = (packages) => {
         packages = [packages];
     }
 
+    loadingPackageId.value = packages[0].id;
+
     router.post(route("loading.loaded-containers.store"), {
             container_id: props.container.id,
             packages,
@@ -72,6 +75,9 @@ const handleLoad = (packages) => {
             },
             onError: () => {
                 console.error('Something went to wrong!');
+            },
+            onFinish: () => {
+                loadingPackageId.value = null;
             },
             preserveScroll: true,
             preserveState: true,
@@ -122,7 +128,9 @@ const handleLoad = (packages) => {
                             </p>
                         </div>
                         <div class="px-2.5">
-                            <Button v-tooltip="'Click to Load'" icon="ti ti-corner-up-right-double text-2xl" rounded severity="success" variant="text" @click.prevent="handleLoad(hblPackage)"/>
+                            <Button v-tooltip="'Click to Load'" :disabled="loadingPackageId === hblPackage.id" icon="ti ti-corner-up-right-double text-2xl" rounded severity="success" variant="text" @click.prevent="handleLoad(hblPackage)">
+                                <i v-if="loadingPackageId === hblPackage.id" class="pi pi-spin pi-spinner text-xl"></i>
+                            </Button>
                         </div>
                     </div>
                 </template>
