@@ -27,4 +27,11 @@ class PackageQueue extends Model
     {
         return $this->belongsTo(User::class, 'auth_id');
     }
+
+    public function releaseLogs()
+    {
+        return $this->hasMany(PackageReleaseLog::class);
+    }
+
+
 }
