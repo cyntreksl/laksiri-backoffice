@@ -24,7 +24,9 @@ class PackageQueueResource extends JsonResource
             'customer' => $this->token->customer->name,
             'created_at' => $this->token()->exists ?? $this->token->created_at->format('Y-m-d H:i:s'),
             'hbl' => $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first(),
-            'hbl_packages' => $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()->packages,
+            'hbl_packages' => optional(
+                $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()
+            )->packages,
         ];
     }
 }
