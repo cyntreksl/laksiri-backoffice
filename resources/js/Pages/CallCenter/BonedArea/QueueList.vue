@@ -74,7 +74,7 @@ const loadPackageDetails = async () => {
 };
 
 const handleReturnPackage = () => {
-    returnForm.post(route('/call-center/package-logs/{packageQueueId}'), {
+    returnForm.post(route('call-center.package.return'), {
         onSuccess: () => {
             push.success('Package returned successfully!');
             returnDialogVisible.value = false;
