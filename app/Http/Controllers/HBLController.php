@@ -635,11 +635,11 @@ class HBLController extends Controller
         $hbl->remarks()->save($remark);
     }
 
-    public function storePackageRemark(StoreRemarksRequest $request, HBLPackage $HBLPackage)
+    public function storePackageRemark(StoreRemarksRequest $request, HBLPackage $hbl_package)
     {
         $remark = new Remark;
         $remark->body = $request->body;
         $remark->user_id = Auth::id();
-        $HBLPackage->remarks()->save($remark);
+        $hbl_package->remarks()->save($remark);
     }
 }

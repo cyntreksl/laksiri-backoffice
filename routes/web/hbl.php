@@ -124,5 +124,5 @@ Route::post('hbls/payments/{payment}/cancel', [HBLController::class, 'cancelPaym
 Route::post('/hbls/{hbl}/remarks', [HblController::class, 'storeRemark'])
     ->name('hbls.remarks.store');
 
-Route::post('/hbl-packages/{hblPackage}/remarks', [HblController::class, 'storePackageRemark'])
+Route::post('/hbl-packages/{hbl_package}/remarks', [HblController::class, 'storePackageRemark'])
     ->name('hbl_packages.remarks.store');

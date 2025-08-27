@@ -13,8 +13,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Remark extends Model
 {
     use HasFactory;
-    use SoftDeletes;
     use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = ['user_id', 'body'];
 

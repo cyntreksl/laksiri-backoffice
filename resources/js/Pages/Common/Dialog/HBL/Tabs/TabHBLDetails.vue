@@ -2,14 +2,17 @@
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import SimpleOverviewWidget from "@/Components/Widgets/SimpleOverviewWidget.vue";
 import PostSkeleton from "@/Components/PostSkeleton.vue";
-import {watch} from "vue";
+import {ref, watch} from "vue";
 import Card from 'primevue/card';
 import Avatar from 'primevue/avatar';
 import InfoDisplayChip from "@/Pages/Common/Components/InfoDisplayChip.vue";
 import Button from "primevue/button";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 import {useConfirm} from "primevue/useconfirm";
+import Dialog from "primevue/dialog";
+import Input from "primevue/inputtext";
+import axios from "axios";
 
 const props = defineProps({
     hbl: {
@@ -26,9 +29,14 @@ const props = defineProps({
     },
 });
 
-console.log(props.hbl?.packages)
-
+const isRemarkVisible = ref(false);
+const selectedPackage = ref(null);
 const confirm = useConfirm();
+const remarks = ref([]);
+const newRemark = ref('');
+const loading = ref(false);
+const fetching = ref(false);
+const page = usePage();
 
 const handleRTFHBLPackage = (packageId) => {
     confirm.require({
@@ -101,6 +109,72 @@ watch(
     },
     { immediate: true }
 );
+
+const openRemarksDialog = (pkg) => {
+    selectedPackage.value = pkg;
+    isRemarkVisible.value = true;
+    fetchRemarks();
+};
+
+const fetchRemarks = async () => {
+    if (!selectedPackage.value) return;
+    fetching.value = true;
+
+    try {
+        const { data } = await axios.get(`/remarks/package/${selectedPackage.value.id}`);
+        remarks.value = data.data || data;
+    } catch (error) {
+        console.error('Error fetching remarks:', error);
+        push.error('Failed to load remarks');
+    } finally {
+        fetching.value = false;
+    }
+};
+
+const addRemark = async () => {
+    if (!newRemark.value.trim() || !selectedPackage.value) return;
+    loading.value = true;
+
+    try {
+        // Send the remark to the server - FIXED: Added proper package ID
+        await axios.post(`/hbl-packages/${selectedPackage.value.id}/remarks`, {
+            body: newRemark.value
+        });
+
+        // Clear input
+        newRemark.value = '';
+
+        // Refetch remarks from database
+        await fetchRemarks();
+
+        push.success('Remark added successfully');
+
+    } catch (error) {
+        console.error('Error adding remark:', error);
+        push.error('Failed to add remark');
+    } finally {
+        loading.value = false;
+    }
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+
+    try {
+        const date = new Date(dateString.includes(' ') ? dateString.replace(' ', 'T') : dateString);
+        return date.toLocaleString();
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return dateString;
+    }
+};
+
+const closeRemarksDialog = () => {
+    isRemarkVisible.value = false;
+    selectedPackage.value = null;
+    remarks.value = [];
+    newRemark.value = '';
+};
 </script>
 
 <template>
@@ -180,17 +254,23 @@ watch(
                             <span>This Package is on RTF</span>
                         </div>
 
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
-                                <i v-if="item?.latest_rtf_record?.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
-                                <i class="ti ti-package text-xl"></i>
-                                <p class="text-xl uppercase font-normal">
-                                    {{ item.package_type ?? '-' }}
-                                </p>
-                                <i
-                                    v-tooltip="item.is_loaded ? 'Loaded to Shipment' : 'Not Loaded to Shipment'"
-                                    :class="item.is_loaded ? 'ti ti-circle-check-filled text-xl text-success' : 'ti ti-circle-x-filled text-xl text-error'"
-                                ></i>
+                                <div class="flex items-center space-x-2">
+                                    <i v-if="item?.latest_rtf_record?.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <i class="ti ti-package text-xl"></i>
+                                    <p class="text-xl uppercase font-normal">
+                                        {{ item.package_type ?? '-' }}
+                                    </p>
+                                    <i
+                                        v-tooltip="item.is_loaded ? 'Loaded to Shipment' : 'Not Loaded to Shipment'"
+                                        :class="item.is_loaded ? 'ti ti-circle-check-filled text-xl text-success' : 'ti ti-circle-x-filled text-xl text-error'"
+                                    ></i>
+                                </div>
+                            </div>
+                            <div>
+                                <i v-tooltip="'Remarks'" class="pi pi-comments text-xl hover:cursor-pointer hover:text-success"
+                                   @click.prevent="openRemarksDialog(item)"></i>
                             </div>
                         </div>
 
@@ -240,7 +320,6 @@ watch(
                 </template>
                 <template #content>
                     <div class="flex items-start gap-4">
-                        <!-- Fixed width avatar -->
                         <Avatar
                             :label="hbl?.hbl_name?.charAt(0)"
                             class="!bg-emerald-200 flex-shrink-0"
@@ -248,7 +327,6 @@ watch(
                             style="width: 64px; height: 64px"
                         />
 
-                        <!-- Flexible content area -->
                         <div class="flex flex-col min-w-0 flex-grow">
                             <p class="font-medium text-gray-900 truncate">{{ hbl?.hbl_name }}</p>
                             <p class="text-gray-500 text-sm truncate">{{ hbl?.contact_number }}</p>
@@ -283,7 +361,6 @@ watch(
                 </template>
                 <template #content>
                     <div class="flex items-start gap-4">
-                        <!-- Fixed width avatar -->
                         <Avatar
                             :label="hbl?.consignee_name.charAt(0)"
                             class="!bg-emerald-200 flex-shrink-0"
@@ -291,7 +368,6 @@ watch(
                             style="width: 64px; height: 64px"
                         />
 
-                        <!-- Flexible content area -->
                         <div class="flex flex-col min-w-0 flex-grow">
                             <p class="font-medium text-gray-900 truncate">{{ hbl?.consignee_name }}</p>
                             <p class="text-gray-500 text-sm truncate">{{ hbl?.consignee_contact }}</p>
@@ -370,7 +446,6 @@ watch(
                     </div>
                 </template>
             </Card>
-            <!-- End Deletion Details Card -->
         </div>
 
         <div class="col-span-12 lg:col-span-8 md:col-span-6 sm:col-span-12 space-y-4">
@@ -407,4 +482,96 @@ watch(
             </Card>
         </div>
     </div>
+
+    <Dialog v-model:visible="isRemarkVisible" :style="{ width: '50rem' }" header="Package Remarks" modal @hide="closeRemarksDialog">
+        <div v-if="selectedPackage" class="mb-4 p-3 bg-blue-50 rounded-lg">
+            <p class="font-semibold">{{ selectedPackage.package_type }}</p>
+        </div>
+
+        <div class="flex flex-col h-[400px] border rounded-lg p-4 bg-gray-50">
+            <!-- Loading overlay for fetching -->
+            <div
+                v-if="fetching"
+                class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 rounded-lg"
+            >
+                <div class="flex flex-col items-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-success"></div>
+                    <p class="mt-2 text-gray-600">Loading remarks...</p>
+                </div>
+            </div>
+
+            <!-- Chat messages -->
+            <div class="flex-1 overflow-y-auto space-y-4 px-4 relative">
+                <!-- Empty state -->
+                <div
+                    v-if="!fetching && remarks.length === 0"
+                    class="flex items-center justify-center h-full text-gray-400"
+                >
+                    <div class="text-center">
+                        <i class="pi pi-comments text-4xl mb-2"></i>
+                        <p>No remarks yet</p>
+                        <p class="text-sm">Be the first to add a remark</p>
+                    </div>
+                </div>
+
+                <!-- Remarks list -->
+                <div
+                    v-for="(item, index) in remarks"
+                    :key="item.id || index"
+                    :class="item?.user?.id === page.props.auth.user.id ? 'justify-end' : 'justify-start'"
+                    class="flex"
+                >
+                    <div
+                        :class="item?.user?.id === page.props.auth.user.id ? 'bg-success text-white' : 'bg-white text-gray-700'"
+                        class="max-w-xs rounded-lg p-3 shadow-md"
+                    >
+                        <p class="text-sm font-semibold">{{ item?.user?.name }}</p>
+                        <p class="break-words">{{ item.body }}</p>
+                        <small class="block text-xs mt-1 opacity-70">
+                            {{ formatDate(item.created_at) }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input box -->
+            <div class="flex items-center gap-2 mt-4 relative">
+                <Input
+                    v-model="newRemark"
+                    :disabled="loading || fetching"
+                    class="flex-1 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-success/90 disabled:opacity-50"
+                    placeholder="Type a remark..."
+                    @keyup.enter="addRemark"
+                />
+
+                <!-- Loading indicator for sending -->
+                <div
+                    v-if="loading"
+                    class="absolute right-12"
+                >
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-success"></div>
+                </div>
+
+                <Button
+                    :disabled="loading || fetching || !newRemark.trim()"
+                    class="bg-success text-white px-4 py-2 rounded-lg hover:bg-success/80 disabled:opacity-50 flex items-center gap-2"
+                    @click="addRemark"
+                >
+                    <i class="pi pi-send text-sm"></i>
+                    <span>{{ loading ? 'Sending...' : 'Send' }}</span>
+                </Button>
+            </div>
+        </div>
+    </Dialog>
 </template>
+
+<style scoped>
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
