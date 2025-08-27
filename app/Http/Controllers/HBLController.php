@@ -14,6 +14,7 @@ use App\Enum\HBLPaymentStatus;
 use App\Enum\HBLType;
 use App\Http\Requests\StoreCallFlagRequest;
 use App\Http\Requests\StoreHBLRequest;
+use App\Http\Requests\StoreRemarksRequest;
 use App\Http\Requests\UpdateHBLRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
@@ -25,9 +26,11 @@ use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use App\Models\HBLPackage;
+use App\Models\Remark;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -622,5 +625,21 @@ class HBLController extends Controller
                 'trace' => config('app.debug') ? $e->getTrace() : null,
             ], 500);
         }
+    }
+
+    public function storeRemark(StoreRemarksRequest $request, Hbl $hbl)
+    {
+        $remark = new Remark;
+        $remark->body = $request->body;
+        $remark->user_id = Auth::id();
+        $hbl->remarks()->save($remark);
+    }
+
+    public function storePackageRemark(StoreRemarksRequest $request, HBLPackage $HBLPackage)
+    {
+        $remark = new Remark;
+        $remark->body = $request->body;
+        $remark->user_id = Auth::id();
+        $HBLPackage->remarks()->save($remark);
     }
 }

@@ -108,4 +108,9 @@ class HBLPackage extends Model
     {
         return $this->morphOne(RtfRecord::class, 'rtfable')->latestOfMany();
     }
+
+    public function remarks(): MorphMany
+    {
+        return $this->morphMany(Remark::class, 'remarkable');
+    }
 }

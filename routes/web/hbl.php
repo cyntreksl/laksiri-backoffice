@@ -120,3 +120,9 @@ Route::get('hbl-charge/{id}', [HBLController::class, 'hblChargeDetails'])
 Route::get('hbls/{hbl}/payments', [HBLController::class, 'getHBLPayments']);
 
 Route::post('hbls/payments/{payment}/cancel', [HBLController::class, 'cancelPayment']);
+
+Route::post('/hbls/{hbl}/remarks', [HblController::class, 'storeRemark'])
+    ->name('hbls.remarks.store');
+
+Route::post('/hbl-packages/{hblPackage}/remarks', [HblController::class, 'storePackageRemark'])
+    ->name('hbl_packages.remarks.store');

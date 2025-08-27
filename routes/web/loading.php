@@ -104,6 +104,9 @@ Route::name('loading.')->group(function () {
 
     Route::get('all-shipments-list', [ContainerController::class, 'allShipmentsList']);
 
+    Route::post('/containers/{container}/remarks', [ContainerController::class, 'storeRemark'])
+        ->name('containers.remarks.store');
+
     // Manual Loadings
     Route::get('manual-loadings', function () {
         return Inertia::render('Loading/ManualLoading');

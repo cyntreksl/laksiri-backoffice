@@ -14,6 +14,7 @@ import TabShipment from "@/Pages/Common/Dialog/HBL/Tabs/TabShipment.vue";
 import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
 import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
 import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
+import TabRemarks from "@/Pages/Common/Dialog/HBL/Tabs/TabRemarks.vue";
 
 const props = defineProps({
     show: {
@@ -169,6 +170,12 @@ onMounted(() => {
                         <span>Documents</span>
                     </a>
                 </Tab>
+                <Tab value="6">
+                    <a class="flex items-center gap-2 text-inherit">
+                        <i class="pi pi-comments" />
+                        <span>Remarks</span>
+                    </a>
+                </Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -188,6 +195,9 @@ onMounted(() => {
                 </TabPanel>
                 <TabPanel value="5">
                     <TabDocuments v-if="hbl" :hbl-id="hbl.id"/>
+                </TabPanel>
+                <TabPanel value="6">
+                    <TabRemarks v-if="hbl" :hbl-id="hbl.id"/>
                 </TabPanel>
             </TabPanels>
         </Tabs>
