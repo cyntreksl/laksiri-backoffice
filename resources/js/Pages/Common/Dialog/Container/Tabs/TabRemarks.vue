@@ -1,17 +1,16 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
-import axios from "axios";
-import { usePage } from '@inertiajs/vue3';
+import {onMounted, ref, watch} from "vue";
+import {usePage} from "@inertiajs/vue3";
 import Button from 'primevue/button';
 import Input from 'primevue/inputtext';
+import axios from "axios";
 
 const props = defineProps({
-    hblId: {
+    containerId: {
         type: Number,
         required: true,
-    },
+    }
 });
-
 const remarks = ref([]);
 const newRemark = ref('');
 const loading = ref(false);
@@ -19,11 +18,11 @@ const fetching = ref(false);
 const page = usePage();
 
 const fetchRemarks = async () => {
-    if (!props.hblId) return;
+    if (!props.containerId) return;
     fetching.value = true;
 
     try {
-        const { data } = await axios.get(`/remarks/hbl/${props.hblId}`);
+        const { data } = await axios.get(`/remarks/container/${props.containerId}`);
         remarks.value = data.data || data;
     } catch (error) {
         console.error('Error fetching remarks:', error);
@@ -32,7 +31,7 @@ const fetchRemarks = async () => {
     }
 };
 
-watch(() => props.hblId, () => {
+watch(() => props.containerId, () => {
     fetchRemarks();
 });
 
@@ -42,7 +41,7 @@ const addRemark = async () => {
 
     try {
         // Send the remark to the server
-        await axios.post(`/hbls/${props.hblId}/remarks`, {
+        await axios.post(`/containers/${props.containerId}/remarks`, {
             body: newRemark.value
         });
 
@@ -145,8 +144,8 @@ onMounted(() => {
 
             <Button
                 :disabled="loading || fetching || !newRemark.trim()"
-                @click="addRemark"
                 class="bg-success text-white px-4 py-2 rounded-lg hover:bg-success/80 disabled:opacity-50 flex items-center gap-2"
+                @click="addRemark"
             >
                 <i class="pi pi-send text-sm"></i>
                 <span>{{ loading ? 'Sending...' : 'Send' }}</span>
@@ -165,3 +164,4 @@ onMounted(() => {
     to { transform: rotate(360deg); }
 }
 </style>
+
