@@ -74,7 +74,7 @@ const loadPackageDetails = async () => {
 };
 
 const handleReturnPackage = () => {
-    returnForm.post(route('call-center.package.return'), {
+    returnForm.post(route('/call-center/package-logs/{packageQueueId}'), {
         onSuccess: () => {
             push.success('Package returned successfully!');
             returnDialogVisible.value = false;
@@ -88,6 +88,21 @@ const handleReturnPackage = () => {
         preserveState: true,
         preserveScroll: true,
     });
+};
+
+const logDialogVisible = ref(false);
+const selectedTokenLogs = ref([]);
+
+const showLogDialog = (token) => {
+    // Fetch logs for this token - you'll need to implement this API endpoint
+    axios.get(`/call-center/package-logs/${token.id}`)
+        .then(response => {
+            selectedTokenLogs.value = response.data;
+            logDialogVisible.value = true;
+        })
+        .catch(error => {
+            push.error('Error fetching logs');
+        });
 };
 </script>
 
@@ -144,15 +159,27 @@ const handleReturnPackage = () => {
                         </template>
                     </Column>
                     <Column field="created_at" header="Created At"></Column>
-                    <Column field="" style="width: 10%">
+                    <Column field="" header="Actions" style="width: 15%">
                         <template #body="{ data }">
-                            <Button
-                                class="mr-2"
-                                icon="ti ti-arrow-right"
-                                rounded
-                                size="small"
-                                @click.prevent="handlePackageRelease(data)"
-                            />
+                            <div class="flex items-center">
+                                <Button
+                                    class="mr-2"
+                                    icon="ti ti-arrow-right"
+                                    rounded
+                                    size="small"
+                                    @click.prevent="handlePackageRelease(data)"
+                                />
+                                <!-- Add log icon button -->
+                                <Button
+                                    class="mr-2"
+                                    icon="ti ti-history"
+                                    rounded
+                                    size="small"
+                                    severity="secondary"
+                                    @click.prevent="showLogDialog(data)"
+                                    v-tooltip="'View Release Logs'"
+                                />
+                            </div>
                         </template>
                     </Column>
                     <template #footer> In total there are {{ slotProps.items.length }} tokens.</template>
@@ -265,5 +292,55 @@ const handleReturnPackage = () => {
                 @click="handleReturnPackage"
             ></Button>
         </div>
+    </Dialog>
+
+    <!-- Add Log Dialog -->
+    <Dialog
+        :style="{ width: '50rem' }"
+        :visible="logDialogVisible"
+        header="Package Release Logs"
+        modal
+        @update:visible="logDialogVisible = $event"
+    >
+        <DataTable
+            :value="selectedTokenLogs"
+            class="p-datatable-sm"
+            responsive-layout="scroll"
+        >
+            <Column field="created_at" header="Date">
+                <template #body="slotProps">
+                    {{ new Date(slotProps.data.created_at).toLocaleString() }}
+                </template>
+            </Column>
+            <Column field="type" header="Type">
+                <template #body="slotProps">
+                    <Tag :severity="slotProps.data.type === 'return' ? 'warning' : 'success'">
+                        {{ slotProps.data.type }}
+                    </Tag>
+                </template>
+            </Column>
+            <Column field="packages" header="Packages">
+                <template #body="slotProps">
+                    <div v-for="(pkg, index) in slotProps.data.packages" :key="index">
+                        <div v-if="typeof pkg === 'object'">
+                            {{ pkg.reference }} - {{ pkg.package_count }} packages
+                        </div>
+                        <div v-else>
+                            {{ pkg }}
+                        </div>
+                    </div>
+                </template>
+            </Column>
+            <Column field="remarks" header="Remarks"></Column>
+            <Column field="createdBy.name" header="Created By"></Column>
+        </DataTable>
+
+        <template #footer>
+            <Button
+                label="Close"
+                severity="secondary"
+                @click="logDialogVisible = false"
+            />
+        </template>
     </Dialog>
 </template>

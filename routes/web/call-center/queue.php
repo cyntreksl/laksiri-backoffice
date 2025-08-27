@@ -27,3 +27,6 @@ Route::get('/get-package-details-by-token/{token}', [QueueController::class, 'ge
 
 Route::post('/return-package', [QueueController::class, 'returnPackage'])
     ->name('package.return');
+
+Route::get('/package-logs/{packageQueueId}', [QueueController::class, 'getPackageLogs'])
+    ->name('package.logs');

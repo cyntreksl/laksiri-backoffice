@@ -88,15 +88,28 @@ class QueueController extends Controller
         })->first();
 
         if (!$packageQueue) {
-            return response()->json(['error' => 'Package not found'], 404);
+            return; // Simply stop execution if not found
         }
 
+        // Store the released packages before clearing them
+        $releasedPackages = $packageQueue->released_packages ?? [];
+
+        // Ensure we have valid package data
+        if (empty($releasedPackages)) {
+            $releasedPackages = [
+                [
+                    'reference' => $packageQueue->reference,
+                    'package_count' => $packageQueue->package_count,
+                    'returned_at' => now()->toDateTimeString(),
+                ]
+            ];
+        }
 
         // Create a release log entry for the return
         PackageReleaseLog::create([
             'package_queue_id' => $packageQueue->id,
             'type' => 'return',
-            'packages' => $packageQueue->hbl_packages ?? [],
+            'packages' => $releasedPackages,
             'remarks' => $request->remarks,
             'created_by' => auth()->id(),
         ]);
@@ -109,7 +122,14 @@ class QueueController extends Controller
             'note' => $request->remarks,
             'auth_id' => auth()->id(),
         ]);
+    }
+    public function getPackageLogs($packageQueueId)
+    {
+        $logs = PackageReleaseLog::where('package_queue_id', $packageQueueId)
+            ->with('createdBy')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        return response()->json(['message' => 'Package returned successfully']);
+        return response()->json($logs);
     }
 }
