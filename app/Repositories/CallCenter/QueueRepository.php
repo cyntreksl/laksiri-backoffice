@@ -92,7 +92,7 @@ class QueueRepository implements QueueRepositoryInterface
             $query->where('token', $token);
         })->with(['token.customer', 'releasedBy'])->first();
 
-        if (!$packageQueue) {
+        if (! $packageQueue) {
             return response()->json(['error' => 'Package not found'], 404);
         }
 
@@ -112,7 +112,7 @@ class QueueRepository implements QueueRepositoryInterface
             $query->where('token', $data['token_number']);
         })->first();
 
-        if (!$packageQueue) {
+        if (! $packageQueue) {
             return; // Simply stop execution if not found
         }
 
@@ -126,7 +126,7 @@ class QueueRepository implements QueueRepositoryInterface
                     'reference' => $packageQueue->reference,
                     'package_count' => $packageQueue->package_count,
                     'returned_at' => now()->toDateTimeString(),
-                ]
+                ],
             ];
         }
 

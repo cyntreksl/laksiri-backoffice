@@ -31,5 +31,4 @@ interface QueueRepositoryInterface
     public function returnPackage(array $data): void;
 
     public function getPackageLogs(int $packageQueueId): JsonResponse;
-
 }

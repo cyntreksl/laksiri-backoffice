@@ -32,6 +32,4 @@ class PackageQueue extends Model
     {
         return $this->hasMany(PackageReleaseLog::class);
     }
-
-
 }

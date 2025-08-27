@@ -22,7 +22,7 @@ class ReturnPackageRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'token_number' => 'required|string|exists:package_queues,token_id',
+            'token_number' => 'required|string|exists:package_queues,token_id',
             'remarks' => 'nullable|string',
         ];
     }

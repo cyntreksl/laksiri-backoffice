@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ReturnPackageRequest;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
-
 
 class QueueController extends Controller
 {
@@ -65,7 +63,6 @@ class QueueController extends Controller
         $this->queueRepository->returnPackage($request->validated());
 
     }
-
 
     public function getPackageLogs($packageQueueId)
     {

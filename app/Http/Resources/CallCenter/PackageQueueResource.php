@@ -35,9 +35,9 @@ class PackageQueueResource extends JsonResource
                     'packages' => $log->packages,
                     'remarks' => $log->remarks,
                     'timestamp' => $log->created_at->format('Y-m-d H:i:s'),
-                    'created_by' => $log->createdBy->name
+                    'created_by' => $log->createdBy->name,
                 ];
-            })
+            }),
         ];
     }
 }

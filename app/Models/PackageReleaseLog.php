@@ -15,11 +15,11 @@ class PackageReleaseLog extends Model
         'type',
         'packages',
         'remarks',
-        'created_by'
+        'created_by',
     ];
 
     protected $casts = [
-        'packages' => 'array'
+        'packages' => 'array',
     ];
 
     public function packageQueue(): BelongsTo
