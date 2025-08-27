@@ -26,4 +26,10 @@ interface QueueRepositoryInterface
 
     // public function getPackageQueueCounts(): JsonResponse;
 
+    public function getPackageDetailsByToken(string $token): JsonResponse;
+
+    public function returnPackage(array $data): void;
+
+    public function getPackageLogs(int $packageQueueId): JsonResponse;
+
 }
