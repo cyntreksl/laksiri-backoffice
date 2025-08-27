@@ -16,7 +16,7 @@ class RemarksResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'remark' => $this->remark,
+            'body' => $this->body,
             'user' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,

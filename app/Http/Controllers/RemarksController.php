@@ -17,8 +17,6 @@ class RemarksController extends Controller
             'package' => HblPackage::class,
         };
 
-        dd($id);
-
         $model = $modelClass::findOrFail($id);
 
         return RemarksResource::collection($model->remarks()->with('user:id,name')->get());
