@@ -1377,20 +1377,20 @@ setSidebarState();
         <div class="h-[calc(100%-4.5rem)] overflow-x-hidden pb-6 simplebar-scrollable-y">
           <div class="p-4">
             <div class="flex flex-col space-y-1">
-              <Link
+              <div
                 v-for="item in childMenuList"
                 :key="item.title"
                 :class="[
                   'p-3 rounded-lg transition-all duration-200 flex items-center',
-                  'focus:outline-none focus:ring-2 focus:ring-primary/30',
+                  'focus:outline-none focus:ring-2 focus:ring-primary/30 hover:cursor-pointer',
                   isActive(item)
                     ? 'bg-primary/10 text-primary font-medium shadow-sm'
                     : 'text-slate-700 hover:bg-slate-100 dark:text-navy-200 dark:hover:bg-navy-600'
                 ]"
-                :href="route(item.route, item.params || {})"
+                @click="router.visit(route(item.route, item.params || {}), { onSuccess: () => closeSideBar() })"
               >
                 <span class="ml-2 text-sm">{{ item.title }}</span>
-              </Link>
+              </div>
             </div>
           </div>
         </div>
