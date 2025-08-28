@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\RemarksResource;
 use App\Models\Container;
 use App\Models\HBL;
-use App\Models\HblPackage;
+use App\Models\HBLPackage;
 
 class RemarksController extends Controller
 {
@@ -14,7 +14,7 @@ class RemarksController extends Controller
         $modelClass = match ($type) {
             'hbl' => HBL::class,
             'container' => Container::class,
-            'package' => HblPackage::class,
+            'package' => HBLPackage::class,
         };
 
         $model = $modelClass::findOrFail($id);
