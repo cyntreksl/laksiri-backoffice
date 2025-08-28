@@ -80,6 +80,18 @@
                     <span class="w-40 font-semibold">Agent:</span>
                     <span class="text-neutral-500">{{ $data['hbl']['branch']['name'] }}</span>
                 </div>
+                <div class="flex">
+                    <span class="w-32 font-semibold">Total Packages:</span>
+                    <span class="text-neutral-500">{{ count($data['hbl']['packages']) }}</span>
+                </div>
+                <div class="flex">
+                    <span class="w-32 font-semibold">Collected Today:</span>
+                    <span class="text-neutral-500">{{ $data['collected_packages'] ?? 0 }}</span>
+                </div>
+                <div class="flex">
+                    <span class="w-32 font-semibold">Remaining:</span>
+                    <span class="text-neutral-500">{{ $data['remaining_packages'] ?? (count($data['hbl']['packages']) - ($data['collected_packages'] ?? 0)) }}</span>
+                </div>
             </div>
 
             <div class="space-y-2">
@@ -91,10 +103,8 @@
                     <span class="w-32 font-semibold">Vessel:</span>
                     <span class="text-neutral-500">{{ $data['vessel']['vessel_name'] ?? '' }}</span>
                 </div>
-                <div class="flex">
-                    <span class="w-32 font-semibold">No. of Packages:</span>
-                    <span class="text-neutral-500">{{ count($data['hbl']['packages']) }}</span>
-                </div>
+
+
                 <div class="flex">
                     <span class="w-32 font-semibold">Bond Storage No:</span>
                     @if($data['bond_storage_numbers'])
