@@ -56,6 +56,7 @@ class DownloadCashierInvoicePDF
                 'do_charge' => $sl_Invoice['do_charge'],
                 'stamp_charge' => $sl_Invoice['stamp_charge'],
             ],
+            'bond_storage_numbers' => $hbl->packages->pluck('bond_storage_number')->filter()->values()->all(),
             'total_in_word' => $total_in_word,
             'by' => GetUserById::run($sl_Invoice['created_by'])->name,
             'taxes' => GetTaxesByWarehouse::run($hbl->warehouse_id)
