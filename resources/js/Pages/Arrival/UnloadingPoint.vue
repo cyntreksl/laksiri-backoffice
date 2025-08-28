@@ -8,6 +8,10 @@ import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
 import CreateUnloadingIssueModal from "@/Pages/Arrival/Partials/CreateUnloadingIssueModal.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Button from "primevue/button";
+import { push } from 'notivue';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import axios from 'axios';
 
 const props = defineProps({
     container: {
@@ -234,6 +238,78 @@ const confirmShowMHBLCreateIssueModal = (packageID) => {
 const reviewContainer = () => {
     showReviewModal.value = true
 }
+const isRemarkVisible = ref(false);
+const selectedPackage = ref(null);
+const remarks = ref([]);
+const newRemark = ref('');
+const loading = ref(false);
+const fetching = ref(false);
+
+const openRemarksDialog = (pkg) => {
+    selectedPackage.value = pkg;
+    isRemarkVisible.value = true;
+    fetchRemarks();
+};
+
+const closeRemarksDialog = () => {
+    isRemarkVisible.value = false;
+    selectedPackage.value = null;
+    remarks.value = [];
+    newRemark.value = '';
+};
+
+const fetchRemarks = async () => {
+    if (!selectedPackage.value) return;
+    fetching.value = true;
+
+    try {
+        const { data } = await axios.get(`/remarks/package/${selectedPackage.value.id}`);
+        remarks.value = data.data || data;
+    } catch (error) {
+        console.error('Error fetching remarks:', error);
+        push.error('Failed to load remarks');
+    } finally {
+        fetching.value = false;
+    }
+};
+
+const addRemark = async () => {
+    if (!newRemark.value.trim() || !selectedPackage.value) return;
+    loading.value = true;
+
+    try {
+        // Send the remark to the server
+        await axios.post(`/hbl-packages/${selectedPackage.value.id}/remarks`, {
+            body: newRemark.value
+        });
+
+        // Clear input
+        newRemark.value = '';
+
+        // Refetch remarks from database
+        await fetchRemarks();
+
+        push.success('Remark added successfully');
+    } catch (error) {
+        console.error('Error adding remark:', error);
+        push.error('Failed to add remark');
+    } finally {
+        loading.value = false;
+    }
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+
+    try {
+        const date = new Date(dateString.includes(' ') ? dateString.replace(' ', 'T') : dateString);
+        return date.toLocaleString();
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return dateString;
+    }
+};
+
 </script>
 
 <template>
@@ -461,7 +537,7 @@ const reviewContainer = () => {
                                                                 {{ element.package_type }}
                                                             </p>
                                                         </div>
-                                                        <div class="px-2.5">
+                                                        <div class="px-2.5 flex items-center space-x-2">
                                                             <svg
                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
                                                                 fill="none" height="24" stroke="currentColor"
@@ -666,6 +742,9 @@ const reviewContainer = () => {
                                                                 {{ element.package_type }}
                                                             </p>
                                                         </div>
+                                                        <div class="px-2.5 flex items-center space-x-2">
+                                                            <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -827,12 +906,12 @@ const reviewContainer = () => {
                                                     {{ element.package_type }}
                                                 </p>
                                             </div>
-                                            <div class="flex items-center space-x-8 px-2.5">
+                                            <div class="flex items-center space-x-2 px-2.5">
                                                 <Button :disabled="element.unloading_issue.length > 0"
                                                         icon="pi pi-exclamation-triangle" label="Create Unloading Issue"
                                                         severity="warn" size="small"
                                                         @click.prevent="confirmShowCreateIssueModal(index)"/>
-
+                                                <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
                                                 <Button v-tooltip.left="'Click to Re-Load'" aria-label="Filter"
                                                         icon="ti ti-corner-up-left-double text-2xl" rounded
                                                         severity="danger" text
@@ -992,12 +1071,13 @@ const reviewContainer = () => {
                                                                 {{ element.package_type }}
                                                             </p>
                                                         </div>
-                                                        <div class="flex items-center space-x-8 px-2.5">
+                                                        <div class="flex items-center space-x-2 px-2.5">
                                                             <Button :disabled="element.unloading_issue.length > 0"
                                                                     icon="pi pi-exclamation-triangle"
                                                                     label="Create Unloading Issue"
                                                                     severity="warn" size="small"
                                                                     @click.prevent="confirmShowMHBLCreateIssueModal(element.id)"/>
+                                                            <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1040,9 +1120,104 @@ const reviewContainer = () => {
         <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :visible="showUnloadingIssueModal"
                                    @close="showUnloadingIssueModal = false"
                                    @update:visible="showUnloadingIssueModal = $event"/>
+
+        <Dialog
+            v-model:visible="isRemarkVisible"
+            :style="{ width: '50rem' }"
+            header="Package Remarks"
+            modal
+            @hide="closeRemarksDialog"
+        >
+            <div v-if="selectedPackage" class="mb-4 p-3 bg-blue-50 rounded-lg">
+                <p class="font-semibold">{{ selectedPackage.package_type }}</p>
+                <p class="text-sm text-gray-600">{{ selectedPackage.hbl?.hbl_number }}</p>
+            </div>
+
+            <div class="flex flex-col h-[400px] border rounded-lg p-4 bg-gray-50">
+                <!-- Loading overlay for fetching -->
+                <div
+                    v-if="fetching"
+                    class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 rounded-lg"
+                >
+                    <div class="flex flex-col items-center">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-success"></div>
+                        <p class="mt-2 text-gray-600">Loading remarks...</p>
+                    </div>
+                </div>
+
+                <!-- Chat messages -->
+                <div class="flex-1 overflow-y-auto space-y-4 px-4 relative">
+                    <!-- Empty state -->
+                    <div
+                        v-if="!fetching && remarks.length === 0"
+                        class="flex items-center justify-center h-full text-gray-400"
+                    >
+                        <div class="text-center">
+                            <i class="pi pi-comments text-4xl mb-2"></i>
+                            <p>No remarks yet</p>
+                            <p class="text-sm">Be the first to add a remark</p>
+                        </div>
+                    </div>
+
+                    <!-- Remarks list -->
+                    <div
+                        v-for="(item, index) in remarks"
+                        :key="item.id || index"
+                        :class="item?.user?.id === $page.props.auth.user.id ? 'justify-end' : 'justify-start'"
+                        class="flex"
+                    >
+                        <div
+                            :class="item?.user?.id === $page.props.auth.user.id ? 'bg-success text-white' : 'bg-white text-gray-700'"
+                            class="max-w-xs rounded-lg p-3 shadow-md"
+                        >
+                            <p class="text-sm font-semibold">{{ item?.user?.name }}</p>
+                            <p class="break-words">{{ item.body }}</p>
+                            <small class="block text-xs mt-1 opacity-70">
+                                {{ formatDate(item.created_at) }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input box -->
+                <div class="flex items-center gap-2 mt-4 relative">
+                    <InputText
+                        v-model="newRemark"
+                        :disabled="loading || fetching"
+                        class="flex-1 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-success/90 disabled:opacity-50"
+                        placeholder="Type a remark..."
+                        @keyup.enter="addRemark"
+                    />
+
+                    <!-- Loading indicator for sending -->
+                    <div
+                        v-if="loading"
+                        class="absolute right-12"
+                    >
+                        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-success"></div>
+                    </div>
+
+                    <Button
+                        :disabled="loading || fetching || !newRemark.trim()"
+                        class="bg-success text-white px-4 py-2 rounded-lg hover:bg-success/80 disabled:opacity-50 flex items-center gap-2"
+                        @click="addRemark"
+                    >
+                        <i class="pi pi-send text-sm"></i>
+                        <span>{{ loading ? 'Sending...' : 'Send' }}</span>
+                    </Button>
+                </div>
+            </div>
+        </Dialog>
     </AppLayout>
 </template>
 
 <style scoped>
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
 
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
 </style>
