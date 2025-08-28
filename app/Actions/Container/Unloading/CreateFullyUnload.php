@@ -29,6 +29,12 @@ class CreateFullyUnload
             $container = Container::withoutGlobalScope(BranchScope::class)
                 ->find($data['container_id']);
 
+            // Group packages by HBL ID
+            $hblGroups = collect($data['packages'])->groupBy('hbl.id');
+
+            // Assign bond storage numbers
+            AssignBondStorageNumber::run($hblGroups);
+
             foreach ($data['packages'] as $package) {
                 $container->hbl_packages()->detach($package['id']);
 

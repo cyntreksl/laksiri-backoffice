@@ -263,7 +263,7 @@ const reviewContainer = () => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
-                    <Button v-if=" filteredPackages.length === 0  && filteredMHBLPackages.length === 0" :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0 "
+                    <Button :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0 "
                             icon="pi pi-arrow-right" icon-pos="right" label="Proceed to Review"
                             size="small" @click.prevent="reviewContainer"/>
                 </div>
