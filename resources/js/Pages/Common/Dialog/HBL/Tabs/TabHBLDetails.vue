@@ -290,6 +290,8 @@ const closeRemarksDialog = () => {
                             <div class="col-span-2">
                                 <InfoDisplay :value="item.remarks ?? '-'" label="Remarks"/>
                             </div>
+
+                            <InfoDisplay v-if="item.bond_storage_number" :value="item?.bond_storage_number" label="Bond Storage Number"/>
                         </div>
 
                         <div class="mt-3">

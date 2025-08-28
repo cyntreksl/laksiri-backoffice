@@ -52,6 +52,7 @@ class HBLPackage extends Model
         'airport_of_arrival',
         'is_hold',
         'is_rtf',
+        'bond_storage_number',
     ];
 
     /**
