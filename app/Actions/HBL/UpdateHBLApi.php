@@ -26,6 +26,7 @@ class UpdateHBLApi
             'other_charge' => $data['other_charge'],
             'discount' => $data['discount'],
             'paid_amount' => $data['paid_amount'],
+            'additional_charge' => $data['additional_charge'] ?? null,
             'grand_total' => $data['grand_total'],
             'is_completed' => $data['is_completed'] ?? false,
         ];

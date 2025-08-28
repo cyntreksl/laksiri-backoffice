@@ -14,23 +14,33 @@ class RolePermissionSeeder extends Seeder
         // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create roles
-        //        Role::updateOrCreate(['name' => 'super-admin']);
-        //        Role::updateOrCreate(['name' => 'admin']);
-        //        Role::updateOrCreate(['name' => 'empty']);
-        //        Role::updateOrCreate(['name' => 'viewer']);
-        //        Role::updateOrCreate(['name' => 'driver']);
-        //        Role::updateOrCreate(['name' => 'customer']);
-        //        Role::updateOrCreate(['name' => 'call center']);
-        //        Role::updateOrCreate(['name' => 'boned area']);
-        //        Role::updateOrCreate(['name' => 'finance Team']);
-        //        Role::updateOrCreate(['name' => 'front office staff']);
-        //        Role::updateOrCreate(['name' => 'clearance team']);
-        //        Role::updateOrCreate(['name' => 'gate-security']);
-        //
-        //        $this->command->info('Default Roles added.');
-        //
-        //        $this->assignPermissions();
+        // Create roles with hierarchy (lower number = higher privilege)
+        $rolesWithHierarchy = [
+            'super-admin' => 0.00,  // optional top role if used
+            'admin' => 1.00,
+
+            'empty' => 10.00,
+            'viewer' => 20.00,
+            'driver' => 30.00,
+            'customer' => 40.00,
+            'call center' => 50.00,
+            'boned area' => 60.00,
+            'finance Team' => 70.00, // keep exact name used in app
+            'front office staff' => 80.00,
+            'clearance team' => 90.00,
+            'gate-security' => 100.00,
+        ];
+
+        foreach ($rolesWithHierarchy as $name => $hierarchy) {
+            Role::updateOrCreate(
+                ['name' => $name, 'guard_name' => 'web'],
+                ['hierarchy' => $hierarchy]
+            );
+        }
+
+        $this->command->info('Default Roles added with hierarchy.');
+
+        // $this->assignPermissions();
 
         $this->createPermissionIfNotExsists();
 
@@ -714,6 +724,13 @@ class RolePermissionSeeder extends Seeder
                 'permissions' => [
                     'set_rtf',
                     'lift_rtf',
+                ],
+            ],
+
+            [
+                'group_name' => 'Whatsapp',
+                'permissions' => [
+                    'manage_whatsapp',
                 ],
             ],
         ];
