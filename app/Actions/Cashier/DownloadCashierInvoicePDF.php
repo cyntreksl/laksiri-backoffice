@@ -35,9 +35,24 @@ class DownloadCashierInvoicePDF
                 !empty($package['unloaded_at']);
         })->count();
 
+        $collectedDate = $sl_Invoice['date'];
+        $packageWithDate = collect($hbl->packages)->first(function ($package) {
+            return !empty($package['unload_date']) ||
+                !empty($package['arrived_at']) ||
+                !empty($package['unloaded_at']);
+        });
+
+        if ($packageWithDate) {
+            $collectedDate = $packageWithDate['unload_date'] ??
+                $packageWithDate['arrived_at'] ??
+                $packageWithDate['unloaded_at'] ??
+                $sl_Invoice['date'];
+        }
+
         $data = [
             'clearing_time' => $sl_Invoice['clearing_time'],
             'date' => $sl_Invoice['date'],
+            'collected_date' => $collectedDate,
             'vessel' => $container,
             'hbl' => $hbl,
             'grand_volume' => $sl_Invoice['grand_volume'],
