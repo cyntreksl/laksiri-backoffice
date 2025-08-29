@@ -1063,7 +1063,7 @@ const menuModel = ref([
             can('mhbls.index') ||
             can('hbls.index') ||
             can('hbls.create')
-        ) && isDep(),
+        ),
         command: () => {
             setMenu('hbls');
         }
