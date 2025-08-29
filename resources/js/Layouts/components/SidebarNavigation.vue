@@ -961,7 +961,7 @@ const setMenu = (menu) => {
 
             changeSidePanelTitle("Settings");
             break;
-        case "call-center":
+        case "callcenter":
             let callCenterMenu = [];
 
             if (can("call-center.hbl-list")) {
@@ -1210,7 +1210,7 @@ const menuModel = ref([
         icon: 'ti ti-headset text-2xl',
         visible: () => canSomeStartWith('call-center.') && isDest(),
         command: () => {
-            setMenu('call-center');
+            setMenu('callcenter');
         }
     },
     {
@@ -1361,7 +1361,7 @@ setSidebarState();
         <!-- Sidebar Panel Header -->
         <div class="flex h-16 w-full items-center justify-between pl-4 pr-1">
           <p
-            class="text-lg font-semibold tracking-wide text-slate-800 dark:text-navy-100"
+            class="font-semibold tracking-wide text-slate-800 dark:text-navy-100"
           >
             {{ activeTitle }}
           </p>
