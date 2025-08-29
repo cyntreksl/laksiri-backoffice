@@ -97,8 +97,10 @@
                 </div>
                 <div class="flex">
                     <span class="w-32 font-semibold">Bond Storage No:</span>
-                    @if($data['bond_storage_numbers'])
+                    @if(!empty($data['bond_storage_numbers']))
                         <span class="text-neutral-500">{{ implode(', ', $data['bond_storage_numbers']) }}</span>
+                    @else
+                        <span class="text-neutral-500">N/A</span>
                     @endif
                 </div>
                 <div class="flex">
