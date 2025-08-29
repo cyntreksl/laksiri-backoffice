@@ -390,9 +390,12 @@ class HBLController extends Controller
         $order = $request->input('sort_field', 'id');
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
+        $containerStatus = $request->input('containerStatus', null);
 
         $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'createdBy', 'deliveryType', 'warehouse', 'isHold', 'paymentStatus', 'isDelayed', 'drivers', 'officers']);
-
+        if ($containerStatus) {
+            $filters['containerStatus'] = $containerStatus;
+        }
         return $this->HBLRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 

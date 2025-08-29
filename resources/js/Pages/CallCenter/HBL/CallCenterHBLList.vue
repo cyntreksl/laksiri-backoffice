@@ -81,6 +81,7 @@ const showConfirmViewCallFlagModal = ref(false);
 const showIssueTokenDialog = ref(false);
 const showCallFlagListDialog = ref(false);
 const hblName = ref("");
+const containerStatuses = ref(['IN TRANSIT', 'REACHED DESTINATION', 'UNLOADED', 'LOADED']);
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -90,6 +91,7 @@ const filters = ref({
     is_hold: {value: null, matchMode: FilterMatchMode.EQUALS},
     user: {value: null, matchMode: FilterMatchMode.EQUALS},
     payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+    container_status: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
@@ -129,6 +131,7 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOr
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 createdBy: filters.value.user.value || "",
                 paymentStatus: filters.value.payments.value || [],
+                containerStatus: filters.value.container_status.value || "",
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
             }
@@ -182,6 +185,10 @@ watch(() => fromDate.value, (newValue) => {
 });
 
 watch(() => toDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.container_status.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
 
@@ -263,6 +270,7 @@ const clearFilter = () => {
         is_hold: {value: null, matchMode: FilterMatchMode.EQUALS},
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
         payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+        container_status: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
@@ -436,6 +444,12 @@ const exportCSV = () => {
                         <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full"
                                 input-id="user" option-label="name" option-value="id"/>
                         <label for="user">Created By</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.container_status.value" :options="containerStatuses" :showClear="true"
+                                class="w-full" input-id="container-status"/>
+                        <label for="container-status">Container Status</label>
                     </FloatLabel>
                 </div>
             </Panel>
