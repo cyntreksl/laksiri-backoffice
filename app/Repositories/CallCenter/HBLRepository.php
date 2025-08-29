@@ -66,7 +66,6 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         ]);
     }
 
-
     public function createAndIssueToken(HBL $hbl)
     {
         // create token

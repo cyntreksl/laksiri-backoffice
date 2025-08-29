@@ -396,6 +396,7 @@ class HBLController extends Controller
         if ($containerStatus) {
             $filters['containerStatus'] = $containerStatus;
         }
+
         return $this->HBLRepository->dataset($limit, $page, $order, $dir, $search, $filters);
     }
 
