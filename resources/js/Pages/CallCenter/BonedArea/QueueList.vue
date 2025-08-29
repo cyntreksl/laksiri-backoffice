@@ -172,7 +172,7 @@ const showLogDialog = (token) => {
                                 <!-- Add log icon button -->
                                 <Button
                                     class="mr-2"
-                                    icon="ti ti-history"
+                                    icon="ti ti-eye"
                                     rounded
                                     size="small"
                                     severity="secondary"
