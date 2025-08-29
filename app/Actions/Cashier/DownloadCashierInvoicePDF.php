@@ -30,16 +30,16 @@ class DownloadCashierInvoicePDF
         $total_in_word = strtoupper($formatter->format($sl_Invoice['total']));
 
         $collectedPackages = collect($hbl->packages)->filter(function ($package) {
-            return !empty($package['unload_date']) ||
-                !empty($package['arrived_at']) ||
-                !empty($package['unloaded_at']);
+            return ! empty($package['unload_date']) ||
+                ! empty($package['arrived_at']) ||
+                ! empty($package['unloaded_at']);
         })->count();
 
         $collectedDate = $sl_Invoice['date'];
         $packageWithDate = collect($hbl->packages)->first(function ($package) {
-            return !empty($package['unload_date']) ||
-                !empty($package['arrived_at']) ||
-                !empty($package['unloaded_at']);
+            return ! empty($package['unload_date']) ||
+                ! empty($package['arrived_at']) ||
+                ! empty($package['unloaded_at']);
         });
 
         if ($packageWithDate) {
