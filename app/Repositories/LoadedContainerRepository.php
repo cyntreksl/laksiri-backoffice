@@ -267,4 +267,14 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
         return $pdf->download($filename);
     }
+
+    public function downloadManifestExcel($container)
+    {
+        $filename = 'Loaded_Container_Manifest_' . $container->reference . '_' . date('Y_m_d_H_i_s') . '.xlsx';
+
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\LoadedContainerManifestExcelExport($container),
+            $filename
+        );
+    }
 }

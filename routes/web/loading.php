@@ -61,6 +61,9 @@ Route::name('loading.')->group(function () {
     Route::get('/loaded-containers/{container}/manifest/export', [LoadedContainerController::class, 'exportManifest'])
         ->name('loaded-containers.manifest.export');
 
+    Route::get('/loaded-containers/{container}/manifest/excel/export', [LoadedContainerController::class, 'exportManifestExcel'])
+        ->name('loaded-containers.manifest.excel.export');
+
     Route::get('/loaded-containers/{container}/doorToDoor/export', [LoadedContainerController::class, 'doorToDoorManifest'])
         ->name('loaded-containers.doorToDoor.export');
 

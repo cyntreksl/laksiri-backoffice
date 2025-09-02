@@ -118,4 +118,14 @@ class LoadedContainerController extends Controller
 
         return $this->loadedContainerRepository->tallySheetDownloadPDF($container);
     }
+
+    public function exportManifestExcel($container)
+    {
+        $this->authorize('shipment.download manifest');
+
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+
+        return $this->loadedContainerRepository->downloadManifestExcel($container);
+    }
+
 }
