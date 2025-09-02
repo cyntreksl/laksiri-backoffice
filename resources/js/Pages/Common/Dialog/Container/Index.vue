@@ -11,6 +11,7 @@ import TabHandlingProcedure from "@/Pages/Common/Dialog/Container/Tabs/TabHandli
 import TabMHBLUnderShipment from "@/Pages/Common/Dialog/Container/Tabs/TabMHBLUnderShipment.vue";
 import TabShipmentDetails from "@/Pages/Common/Dialog/Container/Tabs/TabShipmentDetails.vue";
 import TabDocuments from "@/Pages/Common/Dialog/Container/Tabs/TabDocuments.vue";
+import TabRemarks from "@/Pages/Common/Dialog/Container/Tabs/TabRemarks.vue";
 
 const props = defineProps({
     show: {
@@ -84,6 +85,12 @@ const emit = defineEmits(['close']);
                         <span>Handling Procedure</span>
                     </a>
                 </Tab>
+                <Tab value="5">
+                    <a class="flex items-center gap-2 text-inherit">
+                        <i class="pi pi-comments text-xl" />
+                        <span>Remarks</span>
+                    </a>
+                </Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -100,6 +107,9 @@ const emit = defineEmits(['close']);
                 </TabPanel>
                 <TabPanel value="4">
                     <TabHandlingProcedure :container="container"/>
+                </TabPanel>
+                <TabPanel value="5">
+                    <TabRemarks :container-id="container?.id"/>
                 </TabPanel>
             </TabPanels>
         </Tabs>

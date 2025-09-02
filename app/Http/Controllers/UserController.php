@@ -37,8 +37,23 @@ class UserController extends Controller
     {
         $this->authorize('users.list');
 
+        $roles = $this->roleRepository->getRoles();
+
+        $actor = Auth::user();
+        if (! $actor->hasRole('super-admin')) {
+            // Role visibility:
+            // - super-admin: see all
+            // - admin: hide only super-admin
+            // - others: hide admin and super-admin
+            if ($actor->hasRole('admin')) {
+                $roles = $roles->filter(fn ($role) => $role->name !== 'super-admin')->values();
+            } else {
+                $roles = $roles->filter(fn ($role) => ! in_array($role->name, ['admin', 'super-admin'], true))->values();
+            }
+        }
+
         return Inertia::render('User/UserList', [
-            'roles' => $this->roleRepository->getRoles(),
+            'roles' => $roles,
             'branches' => $this->branchRepository->getBranches(),
             'userRole' => Auth()->user()->getRoleNames()[0],
             'currentBranch' => GetUserCurrentBranchID::run(),
@@ -80,6 +95,19 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+        $actor = auth()->user();
+        $targetRoleName = strtolower((string) $request->input('role'));
+
+        // Only super-admin can create super-admin users
+        if ($targetRoleName === 'super-admin' && ! $actor?->hasRole('super-admin')) {
+            abort(403, 'You are not authorized to create this user.');
+        }
+
+        // Only admin or super-admin can create admin users
+        if ($targetRoleName === 'admin' && ! $actor?->hasAnyRole(['super-admin', 'admin'])) {
+            abort(403, 'You are not authorized to create this user.');
+        }
+
         $this->userRepository->storeUser($request->all());
     }
 
@@ -90,9 +118,24 @@ class UserController extends Controller
     {
         $this->authorize('users.edit');
 
+        $roles = $this->roleRepository->getRoles();
+
+        $actor = Auth::user();
+        if (! $actor->hasRole('super-admin')) {
+            // Role visibility:
+            // - super-admin: see all
+            // - admin: hide only super-admin
+            // - others: hide admin and super-admin
+            if ($actor->hasRole('admin')) {
+                $roles = $roles->filter(fn ($role) => $role->name !== 'super-admin')->values();
+            } else {
+                $roles = $roles->filter(fn ($role) => ! in_array($role->name, ['admin', 'super-admin'], true))->values();
+            }
+        }
+
         return Inertia::render('User/EditUser', [
             'userRecord' => $user->load('roles', 'branches'),
-            'roles' => $this->roleRepository->getRoles(),
+            'roles' => $roles,
             'branches' => $this->branchRepository->getBranches(),
         ]);
     }
@@ -102,9 +145,14 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        if ($user->hasRole('admin') || $user->hasRole('super-admin')) {
-            // Prevent non-super-admins from editing admin/super-admin users
-            if (auth()->user() && ! auth()->user()->hasRole('super-admin')) {
+        if ($user->hasRole('super-admin')) {
+            // Only super-admin can modify super-admin users
+            if (! auth()->user() || ! auth()->user()->hasRole('super-admin')) {
+                abort(403, 'You are not authorized to modify this user.');
+            }
+        } elseif ($user->hasRole('admin')) {
+            // Only admin or super-admin can modify admin users
+            if (! auth()->user() || ! auth()->user()->hasAnyRole(['super-admin', 'admin'])) {
                 abort(403, 'You are not authorized to modify this user.');
             }
         }
@@ -117,9 +165,14 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        if ($user->hasRole('admin') || $user->hasRole('super-admin')) {
-            // Prevent non-super-admins from deleting admin/super-admin users
-            if (auth()->user() && ! auth()->user()->hasRole('super-admin')) {
+        if ($user->hasRole('super-admin')) {
+            // Only super-admin can delete super-admin users
+            if (! auth()->user() || ! auth()->user()->hasRole('super-admin')) {
+                abort(403, 'You are not authorized to delete this user.');
+            }
+        } elseif ($user->hasRole('admin')) {
+            // Only admin or super-admin can delete admin users
+            if (! auth()->user() || ! auth()->user()->hasAnyRole(['super-admin', 'admin'])) {
                 abort(403, 'You are not authorized to delete this user.');
             }
         }

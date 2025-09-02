@@ -12,6 +12,7 @@ use App\Enum\ContainerType;
 use App\Enum\HBLType;
 use App\Enum\WarehouseType;
 use App\Http\Requests\StoreContainerRequest;
+use App\Http\Requests\StoreRemarksRequest;
 use App\Http\Requests\StoreUnloadingIssue;
 use App\Http\Requests\UpdateContainerRequest;
 use App\Interfaces\AirLineRepositoryInterface;
@@ -21,6 +22,7 @@ use App\Interfaces\MHBLRepositoryInterface;
 use App\Models\Container;
 use App\Models\ContainerDocument;
 use App\Models\HBL;
+use App\Models\Remark;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -347,5 +349,13 @@ class ContainerController extends Controller
     public function unsetRTF(Container $container)
     {
         return $this->containerRepository->undoRTF($container);
+    }
+
+    public function storeRemark(StoreRemarksRequest $request, Container $container)
+    {
+        $remark = new Remark;
+        $remark->body = $request->body;
+        $remark->user_id = Auth::id();
+        $container->remarks()->save($remark);
     }
 }

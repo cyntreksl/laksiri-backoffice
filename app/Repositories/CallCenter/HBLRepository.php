@@ -32,7 +32,8 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ->withCount('callFlags')
             ->with(['callFlags' => function ($query) {
                 $query->orderBy('date', 'desc');
-            }]);
+            }])
+            ->with('containers');
 
         if (! empty($search)) {
             $query->whereAny([

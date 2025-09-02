@@ -315,4 +315,9 @@ class HBL extends Model
     {
         return $this->hasMany(Payment::class, 'hbl_id');
     }
+
+    public function remarks(): MorphMany
+    {
+        return $this->morphMany(Remark::class, 'remarkable');
+    }
 }

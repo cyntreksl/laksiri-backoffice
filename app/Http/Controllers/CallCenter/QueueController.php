@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\CallCenter;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ReturnPackageRequest;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use Inertia\Inertia;
 
@@ -50,5 +51,21 @@ class QueueController extends Controller
     public function getPackageQueue()
     {
         return $this->queueRepository->getPackageQueue();
+    }
+
+    public function getPackageDetailsByToken($token): \Illuminate\Http\JsonResponse
+    {
+        return $this->queueRepository->getPackageDetailsByToken($token);
+    }
+
+    public function returnPackage(ReturnPackageRequest $request)
+    {
+        $this->queueRepository->returnPackage($request->validated());
+
+    }
+
+    public function getPackageLogs($packageQueueId)
+    {
+        return $this->queueRepository->getPackageLogs($packageQueueId);
     }
 }

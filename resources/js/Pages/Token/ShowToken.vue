@@ -10,6 +10,12 @@ import Avatar from "primevue/avatar";
 import Button from "primevue/button";
 import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
+import Dialog from "primevue/dialog";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import Tag from "primevue/tag";
+import {push} from "notivue";
+import axios from 'axios';
 
 const props = defineProps({
     verificationDocuments: {
@@ -41,6 +47,11 @@ const paymentRecord = ref([]);
 const isLoading = ref(false);
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const showConfirmViewHBLModal = ref(false);
+
+// Package Release Logs variables
+const logDialogVisible = ref(false);
+const selectedTokenLogs = ref([]);
+const isLoadingLogs = ref(false);
 
 const tokenTimeline = computed(() => {
     // Create a mapping between queue types and timeline steps
@@ -203,6 +214,23 @@ const getHBLPayments = async () => {
     }
 };
 
+const showLogDialog = () => {
+    isLoadingLogs.value = true;
+    logDialogVisible.value = true;
+
+    // Fetch logs for this token using the token ID
+    axios.get(`/call-center/package-logs/${props.token.id}`)
+        .then(response => {
+            selectedTokenLogs.value = response.data;
+        })
+        .catch(error => {
+            push.error('Error fetching logs');
+        })
+        .finally(() => {
+            isLoadingLogs.value = false;
+        });
+};
+
 getHBLPayments();
 
 const closeModal = () => {
@@ -247,6 +275,13 @@ const closeModal = () => {
                                     target="_blank"
                                 />
                                 <Button icon="pi pi-eye" label="Show HBL Details" @click.prevent="showConfirmViewHBLModal = !showConfirmViewHBLModal"></Button>
+                                <!-- Add Package Logs Button -->
+                                <Button
+                                    icon="pi pi-history"
+                                    label="View Release Logs"
+                                    severity="secondary"
+                                    @click="showLogDialog"
+                                />
                             </div>
                         </div>
                     </template>
@@ -508,4 +543,127 @@ const closeModal = () => {
         @close="closeModal"
         @update:show="showConfirmViewHBLModal = $event"
     />
+
+    <!-- Package Release Logs Dialog -->
+    <Dialog
+        :style="{ width: '60rem' }"
+        :visible="logDialogVisible"
+        header="Package Release Logs"
+        modal
+        @update:visible="logDialogVisible = $event"
+    >
+        <div v-if="isLoadingLogs" class="flex justify-center items-center py-8">
+            <div class="flex items-center gap-3">
+                <i class="pi pi-spin pi-spinner text-blue-500 text-xl"></i>
+                <span class="text-gray-600">Loading logs...</span>
+            </div>
+        </div>
+
+        <div v-else-if="selectedTokenLogs.length === 0" class="text-center py-12">
+            <div class="flex flex-col items-center gap-4">
+                <div class="p-4 bg-gray-100 rounded-full">
+                    <i class="pi pi-history text-gray-400 text-3xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">No Logs Found</h3>
+                    <p class="text-sm text-gray-500">No package release logs available for this token.</p>
+                </div>
+            </div>
+        </div>
+
+        <DataTable
+            v-else
+            :value="selectedTokenLogs"
+            class="p-datatable-sm"
+            responsive-layout="scroll"
+            stripedRows
+        >
+            <Column field="created_at" header="Date" style="width: 20%">
+                <template #body="slotProps">
+                    <div class="space-y-1">
+                        <div class="text-sm font-medium text-gray-900">
+                            {{ moment(slotProps.data.created_at).format('MMM DD, YYYY') }}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            {{ moment(slotProps.data.created_at).format('h:mm A') }}
+                        </div>
+                    </div>
+                </template>
+            </Column>
+
+            <Column field="type" header="Type" style="width: 15%">
+                <template #body="slotProps">
+                    <Tag
+                        :severity="slotProps.data.type === 'return' ? 'warning' : 'success'"
+                        class="font-medium"
+                    >
+                        <i :class="slotProps.data.type === 'return' ? 'pi pi-undo' : 'pi pi-check'" class="mr-1"></i>
+                        {{ slotProps.data.type === 'return' ? 'Return' : 'Release' }}
+                    </Tag>
+                </template>
+            </Column>
+
+            <Column field="packages" header="Packages" style="width: 35%">
+                <template #body="slotProps">
+                    <div class="space-y-1">
+                        <div v-for="(pkg, index) in slotProps.data.packages" :key="index" class="text-sm">
+                            <div v-if="typeof pkg === 'object'" class="flex items-center gap-2">
+                                <i class="pi pi-package text-blue-500 text-xs"></i>
+                                <span class="font-medium text-gray-900">{{ pkg.reference }}</span>
+                                <span class="text-gray-600">-</span>
+                                <span class="text-gray-700">{{ pkg.package_count }} packages</span>
+                            </div>
+                            <div v-else class="flex items-center gap-2">
+                                <i class="pi pi-package text-blue-500 text-xs"></i>
+                                <span class="text-gray-700">{{ pkg }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </Column>
+
+            <Column field="remarks" header="Remarks" style="width: 20%">
+                <template #body="slotProps">
+                    <div v-if="slotProps.data.remarks" class="text-sm text-gray-700">
+                        {{ slotProps.data.remarks }}
+                    </div>
+                    <div v-else class="text-xs text-gray-400 italic">
+                        No remarks
+                    </div>
+                </template>
+            </Column>
+
+            <Column field="createdBy.name" header="Created By" style="width: 15%">
+                <template #body="slotProps">
+                    <div v-if="slotProps.data.createdBy" class="flex items-center gap-2">
+                        <Avatar
+                            :label="slotProps.data.createdBy.name?.charAt(0)?.toUpperCase()"
+                            class="bg-blue-100 text-blue-600"
+                            size="small"
+                        />
+                        <div class="text-sm">
+                            <div class="font-medium text-gray-900">{{ slotProps.data.createdBy.name }}</div>
+                        </div>
+                    </div>
+                    <div v-else class="text-xs text-gray-400 italic">
+                        Unknown
+                    </div>
+                </template>
+            </Column>
+        </DataTable>
+
+        <template #footer>
+            <div class="flex justify-between items-center">
+                <div class="text-sm text-gray-600">
+                    Total logs: {{ selectedTokenLogs.length }}
+                </div>
+                <Button
+                    label="Close"
+                    severity="secondary"
+                    icon="pi pi-times"
+                    @click="logDialogVisible = false"
+                />
+            </div>
+        </template>
+    </Dialog>
 </template>

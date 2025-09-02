@@ -52,6 +52,7 @@ class HBLPackage extends Model
         'airport_of_arrival',
         'is_hold',
         'is_rtf',
+        'bond_storage_number',
     ];
 
     /**
@@ -107,5 +108,10 @@ class HBLPackage extends Model
     public function latestRtfRecord(): MorphOne
     {
         return $this->morphOne(RtfRecord::class, 'rtfable')->latestOfMany();
+    }
+
+    public function remarks(): MorphMany
+    {
+        return $this->morphMany(Remark::class, 'remarkable');
     }
 }

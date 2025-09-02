@@ -1,3 +1,4 @@
+<!-- QueueList.vue -->
 <script setup>
 import {router} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
@@ -11,6 +12,12 @@ import Button from "primevue/button";
 import SelectButton from "primevue/selectbutton";
 import Tag from "primevue/tag";
 import PackageReleaseDialog from "@/Pages/CallCenter/BonedArea/PackageReleaseDialog.vue";
+import Dialog from "primevue/dialog";
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import {push} from "notivue";
+import axios from 'axios';
+import {useForm} from "@inertiajs/vue3";
 
 const props = defineProps({
     packageQueue: {
@@ -40,6 +47,63 @@ const closePackageReleaseModal = () => {
     selectedToken.value = [];
     showPackageReleaseDialog.value = false;
 }
+
+const returnDialogVisible = ref(false);
+const returnForm = useForm({
+    token_number: '',
+    package_details: null,
+    remarks: ''
+});
+
+const showReturnDialog = () => {
+    returnDialogVisible.value = true;
+};
+
+const loadPackageDetails = async () => {
+    if (!returnForm.token_number) return;
+
+    try {
+        const response = await axios.get(`/call-center/get-package-details-by-token/${returnForm.token_number}`);
+        returnForm.package_details = response.data;
+    } catch (error) {
+        if (error.response.status === 404) {
+            push.error('Package not found!');
+        }
+        returnForm.package_details = null;
+    }
+};
+
+const handleReturnPackage = () => {
+    returnForm.post(route('call-center.package.return'), {
+        onSuccess: () => {
+            push.success('Package returned successfully!');
+            returnDialogVisible.value = false;
+            returnForm.reset();
+            // Refresh the package queue data
+            router.reload({ only: ['packageQueue'] });
+        },
+        onError: (errors) => {
+            push.error('Error returning package: ' + Object.values(errors).join(', '));
+        },
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+const logDialogVisible = ref(false);
+const selectedTokenLogs = ref([]);
+
+const showLogDialog = (token) => {
+    // Fetch logs for this token - you'll need to implement this API endpoint
+    axios.get(`/call-center/package-logs/${token.id}`)
+        .then(response => {
+            selectedTokenLogs.value = response.data;
+            logDialogVisible.value = true;
+        })
+        .catch(error => {
+            push.error('Error fetching logs');
+        });
+};
 </script>
 
 <template>
@@ -54,11 +118,14 @@ const closePackageReleaseModal = () => {
                     <div class="text-lg font-medium">
                         Package Calling Queue
                     </div>
-                    <SelectButton v-model="layout" :allowEmpty="false" :options="options">
-                        <template #option="{ option }">
-                            <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-table']"/>
-                        </template>
-                    </SelectButton>
+                    <div class="flex items-center gap-2">
+                        <Button label="Return Package" severity="warning" type="button" @click="showReturnDialog"></Button>
+                        <SelectButton v-model="layout" :allowEmpty="false" :options="options">
+                            <template #option="{ option }">
+                                <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-table']"/>
+                            </template>
+                        </SelectButton>
+                    </div>
                 </div>
             </template>
 
@@ -92,15 +159,27 @@ const closePackageReleaseModal = () => {
                         </template>
                     </Column>
                     <Column field="created_at" header="Created At"></Column>
-                    <Column field="" style="width: 10%">
+                    <Column field="" header="Actions" style="width: 15%">
                         <template #body="{ data }">
-                            <Button
-                                class="mr-2"
-                                icon="ti ti-arrow-right"
-                                rounded
-                                size="small"
-                                @click.prevent="handlePackageRelease(data)"
-                            />
+                            <div class="flex items-center">
+                                <Button
+                                    class="mr-2"
+                                    icon="ti ti-arrow-right"
+                                    rounded
+                                    size="small"
+                                    @click.prevent="handlePackageRelease(data)"
+                                />
+                                <!-- Add log icon button -->
+                                <Button
+                                    class="mr-2"
+                                    icon="ti ti-eye"
+                                    rounded
+                                    size="small"
+                                    severity="secondary"
+                                    @click.prevent="showLogDialog(data)"
+                                    v-tooltip="'View Release Logs'"
+                                />
+                            </div>
                         </template>
                     </Column>
                     <template #footer> In total there are {{ slotProps.items.length }} tokens.</template>
@@ -152,4 +231,116 @@ const closePackageReleaseModal = () => {
     <PackageReleaseDialog :package-queue="selectedToken" :visible="showPackageReleaseDialog"
                           @close="closePackageReleaseModal"
                           @update:visible="showPackageReleaseDialog = $event"/>
+
+    <Dialog :style="{ width: '40rem' }" :visible="returnDialogVisible" header="Return Package" modal @update:visible="returnDialogVisible = $event">
+        <div class="space-y-4">
+            <div class="field">
+                <label for="token_number" class="block mb-2">Token Number</label>
+                <InputText
+                    id="token_number"
+                    v-model="returnForm.token_number"
+                    class="w-full"
+                    @blur="loadPackageDetails"
+                    @keyup.enter="loadPackageDetails"
+                />
+                <div v-if="returnForm.errors.token_number" class="text-red-500 text-sm mt-1">
+                    {{ returnForm.errors.token_number }}
+                </div>
+            </div>
+
+            <div v-if="returnForm.package_details" class="border rounded p-4">
+                <h3 class="font-bold mb-2">Package Details</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><strong>Reference:</strong> {{ returnForm.package_details.reference }}</div>
+                    <div><strong>Customer:</strong> {{ returnForm.package_details.customer }}</div>
+                    <div><strong>Package Count:</strong> {{ returnForm.package_details.package_count }}</div>
+                    <div><strong>Released At:</strong> {{ returnForm.package_details.released_at }}</div>
+                </div>
+
+                <div class="mt-3" v-if="returnForm.package_details.released_packages">
+                    <h4 class="font-bold mb-1">Released Packages:</h4>
+                    <ul class="list-disc pl-5">
+                        <li v-for="(pkg, key) in returnForm.package_details.released_packages" :key="key">
+                            {{ key }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="return_remarks" class="block mb-2">Remarks</label>
+                <Textarea
+                    id="return_remarks"
+                    v-model="returnForm.remarks"
+                    class="w-full"
+                    rows="3"
+                    placeholder="Enter return remarks..."
+                />
+                <div v-if="returnForm.errors.remarks" class="text-red-500 text-sm mt-1">
+                    {{ returnForm.errors.remarks }}
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-4">
+            <Button label="Cancel" severity="secondary" type="button" @click="returnDialogVisible = false"></Button>
+            <Button
+                :disabled="!returnForm.package_details || returnForm.processing"
+                :class="{ 'opacity-75': returnForm.processing }"
+                label="Process Return"
+                type="button"
+                @click="handleReturnPackage"
+            ></Button>
+        </div>
+    </Dialog>
+
+    <!-- Add Log Dialog -->
+    <Dialog
+        :style="{ width: '50rem' }"
+        :visible="logDialogVisible"
+        header="Package Release Logs"
+        modal
+        @update:visible="logDialogVisible = $event"
+    >
+        <DataTable
+            :value="selectedTokenLogs"
+            class="p-datatable-sm"
+            responsive-layout="scroll"
+        >
+            <Column field="created_at" header="Date">
+                <template #body="slotProps">
+                    {{ new Date(slotProps.data.created_at).toLocaleString() }}
+                </template>
+            </Column>
+            <Column field="type" header="Type">
+                <template #body="slotProps">
+                    <Tag :severity="slotProps.data.type === 'return' ? 'warning' : 'success'">
+                        {{ slotProps.data.type }}
+                    </Tag>
+                </template>
+            </Column>
+            <Column field="packages" header="Packages">
+                <template #body="slotProps">
+                    <div v-for="(pkg, index) in slotProps.data.packages" :key="index">
+                        <div v-if="typeof pkg === 'object'">
+                            {{ pkg.reference }} - {{ pkg.package_count }} packages
+                        </div>
+                        <div v-else>
+                            {{ pkg }}
+                        </div>
+                    </div>
+                </template>
+            </Column>
+            <Column field="remarks" header="Remarks"></Column>
+            <Column field="createdBy.name" header="Created By"></Column>
+        </DataTable>
+
+        <template #footer>
+            <Button
+                label="Close"
+                severity="secondary"
+                @click="logDialogVisible = false"
+            />
+        </template>
+    </Dialog>
 </template>

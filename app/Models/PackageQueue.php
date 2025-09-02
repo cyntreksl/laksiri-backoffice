@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PackageQueue extends Model
 {
@@ -26,5 +27,10 @@ class PackageQueue extends Model
     public function releasedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'auth_id');
+    }
+
+    public function releaseLogs(): HasMany
+    {
+        return $this->hasMany(PackageReleaseLog::class);
     }
 }

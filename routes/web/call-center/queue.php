@@ -21,3 +21,12 @@ Route::get('/get-cashier-queue', [QueueController::class, 'getCashierQueue']);
 Route::get('/get-examination-queue', [QueueController::class, 'getExaminationQueue']);
 
 Route::get('/get-package-queue', [QueueController::class, 'getPackageQueue']);
+
+Route::get('/get-package-details-by-token/{token}', [QueueController::class, 'getPackageDetailsByToken'])
+    ->name('package.details.by.token');
+
+Route::post('/return-package', [QueueController::class, 'returnPackage'])
+    ->name('package.return');
+
+Route::get('/package-logs/{packageQueueId}', [QueueController::class, 'getPackageLogs'])
+    ->name('package.logs');

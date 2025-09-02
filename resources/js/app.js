@@ -23,7 +23,6 @@ import dayjs from "dayjs";
 import Swiper from "swiper/bundle";
 import Sortable from "sortablejs";
 import ApexCharts from "apexcharts";
-import * as Gridjs from "gridjs";
 import store from "./store";
 import "@caneara/iodine"; // @see https://github.com/caneara/iodine
 import Quill from "quill/dist/quill.min"; // @see https://quilljs.com/
@@ -43,7 +42,6 @@ window.SimpleBar = SimpleBar;
 window.Swiper = Swiper;
 window.Sortable = Sortable;
 window.ApexCharts = ApexCharts;
-window.Gridjs = Gridjs;
 window.flatpickr = flatpickr;
 window.Quill = Quill;
 window.Tom = Tom;

@@ -18,7 +18,10 @@ class TokenResource extends JsonResource
         return [
             'id' => $this->id,
             'hbl' => $this->when($this->hbl_id, function () {
-                return optional($this->hbl)->withoutGlobalScope(BranchScope::class)->latest()->first();
+                return $this->hbl()
+                    ->withoutGlobalScope(BranchScope::class)
+                    ->latest()
+                    ->first();
             }),
             'customer' => $this->customer->name,
             'token' => $this->token,

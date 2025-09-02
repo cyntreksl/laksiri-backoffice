@@ -29,6 +29,12 @@ class DownloadCashierInvoicePDF
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
         $total_in_word = strtoupper($formatter->format($sl_Invoice['total']));
 
+        $collectedPackages = collect($hbl->packages)->filter(function ($package) {
+            return ! empty($package['unload_date']) ||
+                ! empty($package['arrived_at']) ||
+                ! empty($package['unloaded_at']);
+        })->count();
+
         $data = [
             'clearing_time' => $sl_Invoice['clearing_time'],
             'date' => $sl_Invoice['date'],
@@ -56,6 +62,7 @@ class DownloadCashierInvoicePDF
                 'do_charge' => $sl_Invoice['do_charge'],
                 'stamp_charge' => $sl_Invoice['stamp_charge'],
             ],
+            'bond_storage_numbers' => $hbl->packages->pluck('bond_storage_number')->filter()->values()->all(),
             'total_in_word' => $total_in_word,
             'by' => GetUserById::run($sl_Invoice['created_by'])->name,
             'taxes' => GetTaxesByWarehouse::run($hbl->warehouse_id)
@@ -67,6 +74,8 @@ class DownloadCashierInvoicePDF
                 })
                 ->values()
                 ->all(),
+            'collected_packages' => $collectedPackages,
+            'remaining_packages' => count($hbl->packages) - $collectedPackages,
         ];
 
         $template = view('pdf.cashier.invoice', [
