@@ -27,6 +27,9 @@ class LoadedContainerManifestExcelExport implements FromCollection, WithHeadings
     private Container $container;
     private $settings;
     private $branch;
+    // MODIFICATION START: Define a constant for the number of package type columns
+    private const PACKAGE_TYPE_COLUMNS = 8;
+    // MODIFICATION END
 
     public function __construct(Container $container)
     {
@@ -44,64 +47,56 @@ class LoadedContainerManifestExcelExport implements FromCollection, WithHeadings
         foreach ($data as $row) {
             $packages = $row[9]; // packages collection
             
+            // MODIFICATION START: Change logic to split package types into columns
             if ($packages && $packages->count() > 0) {
-                // Group packages by type for better display
-                $packageTypes = [];
                 $totalCbm = 0;
                 $totalQuantity = 0;
                 
+                // Get unique package types
+                $packageTypes = [];
+
                 foreach ($packages as $package) {
-                    $type = $package->package_type ?? 'N/A';
-                    if (!isset($packageTypes[$type])) {
-                        $packageTypes[$type] = 0;
-                    }
-                    $packageTypes[$type] += $package->quantity ?? 0;
                     $totalCbm += $package->cbm ?? 0;
                     $totalQuantity += $package->quantity ?? 0;
+                    $type = $package->package_type ?? 'N/A';
+                    if (!in_array($type, $packageTypes)) {
+                        $packageTypes[] = $type;
+                    }
                 }
                 
-                // Create package type string
-                $packageTypeString = '';
-                foreach ($packageTypes as $type => $qty) {
-                    $packageTypeString .= $qty . ' ' . $type . ' ';
-                }
-                
+                // Pad the array with empty strings to fill all dedicated columns
+                $paddedPackageTypes = array_slice(
+                    array_pad($packageTypes, self::PACKAGE_TYPE_COLUMNS, ''), 
+                    0, 
+                    self::PACKAGE_TYPE_COLUMNS
+                );
+
                 $collection->push([
                     $serialNumber++,
                     $row[0], // HBL Number
                     $row[1], // Customer Name
                     number_format($totalCbm, 3), // CBM
                     $totalQuantity, // Total packages
-                    trim($packageTypeString), // Package types
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
+                    ...$paddedPackageTypes, // Spread the package types into their own columns
                     $row[13] ?? '', // Destination/Warehouse
                     $row[18] ?? '', // Remarks
                 ]);
             } else {
+                // Also create empty cells for package types for rows with no packages
+                $emptyPackageTypes = array_fill(0, self::PACKAGE_TYPE_COLUMNS, '');
+
                 $collection->push([
                     $serialNumber++,
                     $row[0], // HBL Number
                     $row[1], // Customer Name
                     '0.000', // CBM
                     '0', // Total packages
-                    '', // Package types
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
-                    '', // Empty column for spacing
+                    ...$emptyPackageTypes,
                     $row[13] ?? '', // Destination/Warehouse
                     $row[18] ?? '', // Remarks
                 ]);
             }
+            // MODIFICATION END
         }
         
         return $collection;
@@ -115,8 +110,10 @@ class LoadedContainerManifestExcelExport implements FromCollection, WithHeadings
             'NAME OF CUSTOMER',
             'CBM',
             'TOT',
+            // This is the main heading that will be merged
             'TYPE OF PACKAGE',
-            '', // Empty columns for package type breakdown
+            // These are placeholders for the merge
+            '',
             '',
             '',
             '',
@@ -146,7 +143,8 @@ class LoadedContainerManifestExcelExport implements FromCollection, WithHeadings
         $sheet->getColumnDimension('C')->setWidth(25); // NAME OF CUSTOMER
         $sheet->getColumnDimension('D')->setWidth(8);  // CBM
         $sheet->getColumnDimension('E')->setWidth(6);  // TOT
-        $sheet->getColumnDimension('F')->setWidth(15); // TYPE OF PACKAGE
+        // Set width for all package type columns
+        $sheet->getColumnDimension('F')->setWidth(8);
         $sheet->getColumnDimension('G')->setWidth(8);
         $sheet->getColumnDimension('H')->setWidth(8);
         $sheet->getColumnDimension('I')->setWidth(8);
@@ -215,27 +213,39 @@ class LoadedContainerManifestExcelExport implements FromCollection, WithHeadings
                     ],
                 ]);
 
-                // Add container info
-                $containerInfo = sprintf(
-                    'CONTR NO: %s     DATE LOADED: %s     SHIPMENT NO: %s',
-                    $this->container->container_number ?? 'N/A',
-                    $this->container->created_at ? $this->container->created_at->format('d.m.Y') : date('d.m.Y'),
-                    $this->container->reference ?? 'N/A'
-                );
-                $sheet->setCellValue('A3', $containerInfo);
-                $sheet->mergeCells('A3:O3');
-                $sheet->getStyle('A3')->applyFromArray([
-                    'font' => [
-                        'size' => 10,
-                    ],
-                    'alignment' => [
-                        'horizontal' => Alignment::HORIZONTAL_CENTER,
-                        'vertical' => Alignment::VERTICAL_CENTER,
-                    ],
-                ]);
+                // MODIFICATION START: Restructure container info header for better spacing
+                // Remove the old merged cell A3:O3
+                $sheet->getRowDimension(3)->setRowHeight(20);
+                $sheet->getStyle('A3:O3')->getFont()->setBold(true);
+
+                // Part 1: Container Number (Left Aligned)
+                $sheet->setCellValue('A3', 'CONTR NO : ' . ($this->container->container_number ?? 'N/A'));
+                $sheet->mergeCells('A3:E3');
+                $sheet->getStyle('A3:E3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+                // Part 2: Date Loaded (Center Aligned)
+                $dateLoaded = $this->container->created_at ? $this->container->created_at->format('d.m.Y') : date('d.m.Y');
+                $sheet->setCellValue('F3', 'DATE LOADED : ' . $dateLoaded);
+                $sheet->mergeCells('F3:J3');
+                $sheet->getStyle('F3:J3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Part 3: Shipment Number (Right Aligned)
+                $sheet->setCellValue('K3', 'SHIPMENT NO: ' . ($this->container->reference ?? 'N/A'));
+                $sheet->mergeCells('K3:O3');
+                $sheet->getStyle('K3:O3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                // MODIFICATION END
+
+                // MODIFICATION START: Merge the 'TYPE OF PACKAGE' header cell
+                $sheet->mergeCells('F4:M4');
+                // MODIFICATION END
 
                 // Get the last row with data
                 $lastRow = $sheet->getHighestRow();
+
+                // If no data, lastRow might be the header row
+                if ($lastRow < 5) {
+                    $lastRow = 4;
+                }
                 
                 // Apply borders to all data cells
                 $dataRange = 'A4:O' . $lastRow;
@@ -247,6 +257,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, WithHeadings
                     ],
                     'alignment' => [
                         'vertical' => Alignment::VERTICAL_CENTER,
+                        'wrapText' => true,
                     ],
                 ]);
 
@@ -254,11 +265,14 @@ class LoadedContainerManifestExcelExport implements FromCollection, WithHeadings
                 $sheet->getStyle('A4:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // SN
                 $sheet->getStyle('D4:D' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // CBM
                 $sheet->getStyle('E4:E' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // TOT
+                // MODIFICATION START: Center align all package type columns
+                $sheet->getStyle('F4:M' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Package Types
+                // MODIFICATION END
                 $sheet->getStyle('N4:N' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // DESTINATION
 
                 // Set row height for better appearance
                 for ($i = 4; $i <= $lastRow; $i++) {
-                    $sheet->getRowDimension($i)->setRowHeight(20);
+                    $sheet->getRowDimension($i)->setRowHeight(25);
                 }
             },
         ];
@@ -266,6 +280,8 @@ class LoadedContainerManifestExcelExport implements FromCollection, WithHeadings
 
     private function prepareData(): array
     {
+        // ... This private function does not need changes ...
+        // [ The existing code for prepareData() remains the same ]
         $data = [];
         $loadedMHBLPackages = [];
         $loadedHBLPackages = [];
