@@ -14,6 +14,7 @@ use App\Enum\ContainerStatus;
 use App\Enum\HBLType;
 use App\Exports\DoorToDoorManifestExport;
 use App\Exports\LoadedContainerManifestExport;
+use App\Exports\LoadedContainerManifestExcelExport;
 use App\Exports\LoadedContainerTallySheetExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
@@ -266,5 +267,33 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
+    }
+
+    public function downloadManifestExcel($container)
+    {
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+        $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.xlsx';
+
+        $export = new LoadedContainerManifestExcelExport($container);
+
+        // Apply same data processing logic as PDF export
+        $data = array_filter($export->prepareData(), function ($item) {
+            return isset($item[0]) && $item[0] !== '';
+        });
+
+        usort($data, function ($a, $b) {
+            return $a[0] <=> $b[0];
+        });
+
+        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === HBLType::GIFT->value));
+        $upbCount = count(array_filter($data, fn ($item) => $item[11] === HBLType::UPB->value));
+        $d2dCount = count(array_filter($data, fn ($item) => $item[11] === HBLType::DOOR_TO_DOOR->value));
+
+        $cargoType = strtolower(trim($container->cargo_type));
+
+        // Set processed data and metadata
+        $export->setProcessedData($data, $giftCount, $upbCount, $d2dCount, $cargoType);
+
+        return $export->download($filename);
     }
 }
