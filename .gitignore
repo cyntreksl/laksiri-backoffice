@@ -27,3 +27,4 @@ public/uploads
 package-lock.json
 
 .cursor/
+/WARP.md
