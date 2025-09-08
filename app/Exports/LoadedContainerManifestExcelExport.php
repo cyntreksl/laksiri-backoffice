@@ -99,77 +99,118 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         }
 
         // --- Main Header (Replicates HTML Header) ---
-        // Row 1
+        // Row 1 - First header row with border
+        $worksheet->getStyle('A1:K1')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        // Fill the background color of the first row with light gray
+        $worksheet->getStyle('A1:K1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
+
         $worksheet->mergeCells('A1:B1');
-        $worksheet->setCellValue('A1', 'OBL ' . ($this->container?->bl_number ?? ''));
-        $worksheet->mergeCells('C1:G1');
-        $worksheet->setCellValue('C1', 'UNIVERSAL FREIGHT SERVICES');
-        $worksheet->getStyle('C1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $worksheet->mergeCells('H1:K1');
-        $worksheet->setCellValue('H1', 'SHIPMENT NO ' . ($this->container?->reference ?? ''));
-        $worksheet->getStyle('H1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        $worksheet->getStyle('A1:K1')->getFont()->setBold(true);
+        $worksheet->setCellValue('A1', 'OBL');
+        $worksheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Row 2
+        $worksheet->setCellValue('C1', $this->container?->bl_number ?? 'ONEYDOHF00020500');
+        $worksheet->getStyle('C1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        $worksheet->mergeCells('D1:J1');
+        $worksheet->setCellValue('D1', 'UNIVERSAL FREIGHT SERVICES');
+        $worksheet->getStyle('H1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $worksheet->setCellValue('K1', 'SHIPMENT  NO' . ($this->container?->reference ?? '2745'));
+        $worksheet->getStyle('K1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+        $worksheet->getStyle('A1:K1')->getFont()->setBold(true)->setSize(11);        // Row 2 - Manifest title with gray background
         $worksheet->mergeCells('A2:K2');
-        $worksheet->setCellValue('A2', 'SEA CARGO MANIFEST');
-        $worksheet->getStyle('A2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D8D8D8');
+        $worksheet->setCellValue('A2', 'CARGO MANIFEST');
+        $worksheet->getStyle('A2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('DDDDDD');
         $worksheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $worksheet->getStyle('A2')->getFont()->setBold(true)->setItalic(true)->setSize(14);
+        $worksheet->getStyle('A2')->getFont()->setBold(true)->setSize(14);
+        $worksheet->getStyle('A2:K2')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // Row 3
-        $worksheet->setCellValue('A3', 'VESSEL:');
+        // Row 3 - Vessel info row
+        $worksheet->getStyle('A3:K3')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $worksheet->getStyle('A3:K3')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
+
+        $worksheet->setCellValue('A3', 'VESSEL  :');
         $worksheet->mergeCells('B3:C3');
-        $worksheet->setCellValue('B3', $this->container?->vessel_name ?? '');
+        $worksheet->setCellValue('B3', $this->container?->vessel_name ?? 'YM COSMOS');
+
         $worksheet->mergeCells('D3:G3');
-        $worksheet->setCellValue('D3', 'DATE LOADED: ' . \Carbon\Carbon::parse($this->container?->loading_started_at)->format('Y-m-d'));
+        $worksheet->setCellValue('D3', 'DATE LOADED : ' . ($this->container?->loading_started_at ? \Carbon\Carbon::parse($this->container?->loading_started_at)->format('d.m.Y') : '09.01.2025'));
+
         $worksheet->setCellValue('H3', 'VOYAGE:');
-        $worksheet->setCellValue('I3', $this->container?->voyage_number ?? '');
+        $worksheet->setCellValue('I3', $this->container?->voyage_number ?? '181E');
+
         $worksheet->setCellValue('J3', 'ETA:');
-        $worksheet->setCellValue('K3', $this->container?->estimated_time_of_arrival ?? '');
-        $worksheet->getStyle('A3:K3')->getFont()->setBold(true)->setSize(11);
+        $worksheet->setCellValue('K3', $this->container?->estimated_time_of_arrival ? \Carbon\Carbon::parse($this->container?->estimated_time_of_arrival)->format('d.m.Y') : '03.02.2025');
 
-        // Row 4
-        $shipperInfo = "SHIPPER          : " . ($this->settings?->invoice_header_title ?? '') . ", " . ($this->settings?->invoice_header_address ?? '') . ". TEL: " . ($this->settings?->invoice_header_telephone ?? '');
-        $consigneeInfo = "CONSIGNEE   : LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA";
-        $notifyInfo = "NOTIFY             : LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY'S MAWATHA, COLOMBO - 03, SRI LANKA. TEL: +94 11-47722800";
-        $worksheet->mergeCells('A4:K4');
-        $worksheet->setCellValue('A4', $shipperInfo . "\n" . $consigneeInfo . "\n" . $notifyInfo);
-        $worksheet->getStyle('A4')->getAlignment()->setWrapText(true);
-        $worksheet->getRowDimension(4)->setRowHeight(60); // <-- Increased row height
+        $worksheet->getStyle('A3:K3')->getFont()->setBold(true);
 
-        // Row 5
-        $worksheet->mergeCells('A5:C5');
-        $worksheet->setCellValue('A5', 'CONTR NO      ' . ($this->container?->container_number ?? ''));
-        $worksheet->mergeCells('D5:G5');
-        $worksheet->setCellValue('D5', 'SEAL NO:      ' . ($this->container?->seal_number ?? ''));
-        $worksheet->getStyle('D5:G5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $worksheet->mergeCells('H5:K5');
-        $worksheet->setCellValue('H5', 'CONTAINER TYPE: ' . ($this->container?->container_type ?? ''));
-        $worksheet->getStyle('H5:K5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $worksheet->getStyle('A5:K5')->getFont()->setBold(true)->setSize(11);
+        $worksheet->getStyle('A3:K3')->getFont()->setBold(true);
 
-        // Row 6
-        $worksheet->mergeCells('A6:C6');
-        $worksheet->setCellValue('A6', 'NO OF PKG   ' . number_format($total_nototal, 0));
-        $worksheet->mergeCells('D6:G6');
-        $worksheet->setCellValue('D6', 'TOTAL VOLUME   ' . number_format($total_vtotal, 3));
-        $worksheet->getStyle('D6:G6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $worksheet->mergeCells('H6:K6');
-        $worksheet->setCellValue('H6', 'TOTAL WEIGHT:KG         ' . number_format($total_gtotal, 2));
-        $worksheet->getStyle('H6:K6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $worksheet->getStyle('A6:K6')->getFont()->setBold(true)->setSize(11);
+        // Row 4-6 - Shipper, consignee, notify info - Individual rows
+        // Row 4 - Shipper
+        $worksheet->getStyle('A4:K4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $worksheet->getStyle('A4:K4')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
+        $worksheet->setCellValue('A4', 'SHIPPER');
+        $worksheet->mergeCells('B4:K4');
+        $worksheet->setCellValue('B4', ': UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX: +974 4620812');
+        $worksheet->getStyle('A4:K4')->getFont()->setBold(true);
+
+        // Row 5 - Consignee
+        $worksheet->getStyle('A5:K5')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $worksheet->getStyle('A5:K5')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
+        $worksheet->setCellValue('A5', 'CONSIGNEE');
+        $worksheet->mergeCells('B5:K5');
+        $worksheet->setCellValue('B5', ': LAKSIRI SEVA (PVT) LTD. NO: 66, NEW NUGE ROAD, PELIYAGODA, SRI LANKA');
+        $worksheet->getStyle('A5:K5')->getFont()->setBold(true);
+
+        // Row 6 - Notify
+        $worksheet->getStyle('A6:K6')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $worksheet->getStyle('A6:K6')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
+        $worksheet->setCellValue('A6', 'NOTIFY');
+        $worksheet->mergeCells('B6:K6');
+        $worksheet->setCellValue('B6', ': LAKSIRI SEVA (PVT) LTD. NO: 31, ST.ANTHONY\'S MAWATHA, COLOMBO - 03, SRI LANKA.  TEL : +94 11-2574180 / 11-47722800');
+        $worksheet->getStyle('A6:K6')->getFont()->setBold(true);
+
+        // Row 7 - Container number
+        $worksheet->getStyle('A7:K7')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $worksheet->getStyle('A7:K7')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
+        $worksheet->setCellValue('A7', 'CONTR NO :');
+        $worksheet->mergeCells('B7:C7');
+        $worksheet->setCellValue('B7', $this->container?->container_number ?? 'TCLU1650570');
+        $worksheet->mergeCells('D7:G7');
+        $worksheet->setCellValue('D7', 'SEAL NO:');
+        $worksheet->mergeCells('H7:I7');
+        $worksheet->setCellValue('H7', $this->container?->seal_number ?? 'QA01390A');
+        $worksheet->mergeCells('J7:K7');
+        $worksheet->setCellValue('J7', 'CONTAINER TYPE : 01 X 40\' H/C');
+        $worksheet->getStyle('A7:K7')->getFont()->setBold(true);
+
+        // Row 8 - Package count
+        $worksheet->getStyle('A8:K8')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $worksheet->getStyle('A8:K8')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
+        $worksheet->setCellValue('A8', 'NO OF PKG:');
+        $worksheet->mergeCells('B8:D8');
+        $worksheet->setCellValue('B8', number_format($total_nototal, 0));
+        $worksheet->mergeCells('E8:G8');
+        $worksheet->setCellValue('E8', 'TOTAL  VOLUME  : ' . number_format($total_vtotal, 3));
+        $worksheet->mergeCells('H8:K8');
+        $worksheet->setCellValue('H8', 'TOTAL WEIGHT: KG        ' . number_format($total_gtotal, 3));
+        $worksheet->getStyle('H8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $worksheet->getStyle('A8:K8')->getFont()->setBold(true);
 
         // --- HBL Table Header ---
-        $hblHeaders = ['SR NO', 'HBL NO', 'NAME OF SHIPPER', 'NAME OF CONSIGNEES', 'TYPE OF PKGS', 'NO.OF PKGS', 'VOLUME CBM', 'GWHT', 'DESCRIPTION OF CARGO', 'DELIVERY', 'REMARKS'];
-        $worksheet->fromArray($hblHeaders, null, 'A7');
-        $worksheet->getStyle('A7:K7')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D8D8D8');
-        $worksheet->getStyle('A7:K7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
-        $worksheet->getStyle('A7:K7')->getFont()->setSize(10);
+        // Create a clean header row with column titles
+        $hblHeaders = ['SR NO', 'HBL NO', 'NAME OF SHIPPER', 'NAME OF CONSIGNEES', 'TYPE OF PKGS', 'NO.OF PKGS', 'VOLUME CBM', 'GWHT', 'DESCRIPTION', 'DELIVERY', 'REMARKS'];
+        $worksheet->fromArray($hblHeaders, null, 'A9');
+        $worksheet->getStyle('A9:K9')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+        $worksheet->getStyle('A9:K9')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
+        $worksheet->getStyle('A9:K9')->getFont()->setBold(true);
 
         // --- HBL Data Rows Loop ---
-        $currentRow = 8;
-        $serialNumber = 1;
+        $currentRow = 10; // Start immediately after the header row
+        $serialNumber = 1; // Start from 1 since we don't have any sample rows anymore
 
         foreach ($data as $item) {
             $startRow = $currentRow;
@@ -188,14 +229,17 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             $worksheet->mergeCells("A{$startRow}:A" . ($startRow + $totalBlockRows - 1)); // SR NO
             $worksheet->setCellValue("A{$startRow}", $serialNumber++);
 
+            // Set the first column style
+            $worksheet->getStyle("A{$startRow}")->getFont()->setBold(true);
+
             $worksheet->mergeCells("I{$startRow}:I" . ($startRow + $totalBlockRows - 1)); // DESCRIPTION
-            $worksheet->setCellValue("I{$startRow}", "PERSONAL\nEFFECT");
+            $worksheet->setCellValue("I{$startRow}", "PERSONAL\nEFFECTS");
 
             $worksheet->mergeCells("J{$startRow}:J" . ($startRow + $totalBlockRows - 1)); // DELIVERY
-            $worksheet->setCellValue("J{$startRow}", $item[13] ?? '');
+            $worksheet->setCellValue("J{$startRow}", $item[13] ?? 'CMB');
 
             $worksheet->mergeCells("K{$startRow}:K" . ($startRow + $totalBlockRows - 1)); // REMARKS
-            $worksheet->setCellValue("K{$startRow}", "GIFT CARGO\nPAID");
+            $worksheet->setCellValue("K{$startRow}", "GIFT CARGO\nDOH & CMB\nPAID");
 
             $worksheet->mergeCells("D{$startRow}:D" . ($startRow + $totalBlockRows - 1)); // NAME OF CONSIGNEES
             $worksheet->setCellValue("D{$startRow}", ($item[5] ?? '') . "\n" . ($item[6] ?? '') . "\n" . ($item[8] ?? ''));
@@ -252,12 +296,14 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
             // Set Vertical Alignments for the block
             $worksheet->getStyle("A{$startRow}:K{$totalRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
-            $worksheet->getStyle("A{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $worksheet->getStyle("A{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $worksheet->getStyle("B{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $worksheet->getStyle("C{$startRow}:C{$totalRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_LEFT)->setWrapText(true);
             $worksheet->getStyle("D{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
-            $worksheet->getStyle("F{$startRow}:H{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $worksheet->getStyle("E{$startRow}:H{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $worksheet->getStyle("I{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $worksheet->getStyle("J{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $worksheet->getStyle("K{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             // Remove all borders for first 4 rows in columns E, F, G, H (TYPE OF PKGS, NO.OF PKGS, VOLUME CBM, GWHT)
             $firstFourRowsEnd = $startRow + 3; // First 4 rows (0-based, so +3)
@@ -300,7 +346,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->getStyle("A1:K{$lastDataRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
         // Remove borders from green colored cells (TYPE OF PKGS column) - must be after global border styling
-        $currentRowForBorderRemoval = 8;
+        $currentRowForBorderRemoval = 10;
         $serialNumberForBorderRemoval = 1;
         foreach ($data as $item) {
             $startRowForBorderRemoval = $currentRowForBorderRemoval;
@@ -347,17 +393,20 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         }
 
         // ### NEW: Set Column Widths ###
-        $worksheet->getColumnDimension('A')->setWidth(6);   // SR NO
-        $worksheet->getColumnDimension('B')->setWidth(15);  // HBL NO
-        $worksheet->getColumnDimension('C')->setWidth(35);  // NAME OF SHIPPER
-        $worksheet->getColumnDimension('D')->setWidth(35);  // NAME OF CONSIGNEES
-        $worksheet->getColumnDimension('E')->setWidth(12);  // TYPE OF PKGS
+        $worksheet->getColumnDimension('A')->setWidth(8);   // SR NO
+        $worksheet->getColumnDimension('B')->setWidth(12);  // HBL NO
+        $worksheet->getColumnDimension('C')->setWidth(22);  // NAME OF SHIPPER
+        $worksheet->getColumnDimension('D')->setWidth(25);  // NAME OF CONSIGNEES
+        $worksheet->getColumnDimension('E')->setWidth(8);   // CHR
         $worksheet->getColumnDimension('F')->setWidth(10);  // NO.OF PKGS
-        $worksheet->getColumnDimension('G')->setWidth(12);  // VOLUME CBM
-        $worksheet->getColumnDimension('H')->setWidth(12);  // GWHT
+        $worksheet->getColumnDimension('G')->setWidth(10);  // VOLUME CBM
+        $worksheet->getColumnDimension('H')->setWidth(10);  // GWHT
         $worksheet->getColumnDimension('I')->setWidth(15);  // DESCRIPTION
         $worksheet->getColumnDimension('J')->setWidth(10);  // DELIVERY
-        $worksheet->getColumnDimension('K')->setWidth(25);  // REMARKS
+        $worksheet->getColumnDimension('K')->setWidth(15);  // REMARKS
+
+        // Add overall border to the entire table
+        $worksheet->getStyle("A1:K{$lastDataRow}")->getBorders()->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
     }
 
     public function collection()
