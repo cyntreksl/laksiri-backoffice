@@ -226,67 +226,63 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             $totalVolume = $packages->sum('volume');
             $hblweight = ($total_vtotal > 0) ? (($total_gtotal / $total_vtotal) * $totalVolume) : 0;
 
-            // Determine block height
+            // Determine block height - minimum 4 rows for shipper data + 1 for total
             $dataRowCount = max(4, $packageCount);
-            $totalBlockRows = $dataRowCount + 1;
+            $totalBlockRows = $dataRowCount + 1; // +1 for the total row
 
-            // Merges for the entire block
-            $worksheet->mergeCells("A{$startRow}:A" . ($startRow + $totalBlockRows - 1)); // SR NO
+            // SR NO - Merge for entire block including total row
+            $worksheet->mergeCells("A{$startRow}:A" . ($startRow + $totalBlockRows - 1));
             $worksheet->setCellValue("A{$startRow}", $serialNumber++);
-
-            // Set the first column style
             $worksheet->getStyle("A{$startRow}")->getFont()->setBold(true);
+            $worksheet->getStyle("A{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-            $worksheet->mergeCells("I{$startRow}:I" . ($startRow + $totalBlockRows - 1)); // DESCRIPTION
-            $worksheet->setCellValue("I{$startRow}", "PERSONAL\nEFFECTS");
-
-            $worksheet->mergeCells("J{$startRow}:J" . ($startRow + $totalBlockRows - 1)); // DELIVERY
-            $worksheet->setCellValue("J{$startRow}", $item[13] ?? 'CMB');
-            $worksheet->getStyle("J{$startRow}")->getFont()->setBold(true); // Make DELIVERY column bold
-
-            $worksheet->mergeCells("K{$startRow}:K" . ($startRow + $totalBlockRows - 1)); // REMARKS
-            $worksheet->setCellValue("K{$startRow}", "GIFT CARGO\nDOH & CMB\nPAID");
-            $worksheet->getStyle("K{$startRow}")->getFont()->setBold(true); // Make REMARKS column bold
-
-            $worksheet->mergeCells("D{$startRow}:D" . ($startRow + $totalBlockRows - 1)); // NAME OF CONSIGNEES
-            $worksheet->setCellValue("D{$startRow}", ($item[5] ?? '') . "\n" . ($item[6] ?? '') . "\n" . ($item[8] ?? ''));
-
-            // Merge for data rows only
-            $worksheet->mergeCells("B{$startRow}:B" . ($startRow + $dataRowCount - 1)); // HBL NO
+            // HBL NO - Merge for data rows only (excluding total row)
+            $worksheet->mergeCells("B{$startRow}:B" . ($startRow + $dataRowCount - 1));
             $worksheet->setCellValue("B{$startRow}", $item[0] ?? '');
+            $worksheet->getStyle("B{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-            // Fill row by row
-            // Row 1
-            $worksheet->setCellValue("C{$startRow}", $item[1] ?? '');
-            $worksheet->setCellValue("E{$startRow}", $packages[0]['package_type'] ?? '');
-            $worksheet->setCellValue("F{$startRow}", $packages[0]['quantity'] ?? '');
+            // NAME OF SHIPPER - Fill row by row with shipper information
+            $worksheet->setCellValue("C{$startRow}", $item[1] ?? ''); // Shipper name
+            $worksheet->setCellValue("C" . ($startRow + 1), $item[2] ?? ''); // Shipper address
+            $worksheet->setCellValue("C" . ($startRow + 2), $item[14] ?? ''); // Additional shipper info
+            $worksheet->setCellValue("C" . ($startRow + 3), $item[4] ?? ''); // Phone/contact
 
-            // Row 2
-            $r = $startRow + 1;
-            $worksheet->setCellValue("C{$r}", $item[2] ?? '');
-            $worksheet->setCellValue("E{$r}", $packages[1]['package_type'] ?? '');
-            $worksheet->setCellValue("F{$r}", $packages[1]['quantity'] ?? '');
+            // NAME OF CONSIGNEES - Merge for entire block
+            $worksheet->mergeCells("D{$startRow}:D" . ($startRow + $totalBlockRows - 1));
+            $consigneeInfo = ($item[5] ?? '') . "\n" . ($item[6] ?? '') . "\n" . ($item[8] ?? '');
+            $worksheet->setCellValue("D{$startRow}", $consigneeInfo);
+            $worksheet->getStyle("D{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
 
-            // Row 3
-            $r = $startRow + 2;
-            $worksheet->setCellValue("C{$r}", $item[14] ?? '');
-            $worksheet->setCellValue("E{$r}", $packages[2]['package_type'] ?? '');
-            $worksheet->setCellValue("F{$r}", $packages[2]['quantity'] ?? '');
-
-            // Row 4
-            $r = $startRow + 3;
-            $worksheet->setCellValue("C{$r}", $item[4] ?? '');
-            $worksheet->setCellValue("E{$r}", $packages[3]['package_type'] ?? '');
-            $worksheet->setCellValue("F{$r}", $packages[3]['quantity'] ?? '');
-
-            // Additional Package Rows
-            if ($packageCount > 4) {
-                for ($i = 4; $i < $packageCount; $i++) {
-                    $r = $startRow + $i;
-                    $worksheet->setCellValue("E{$r}", $packages[$i]['package_type'] ?? '');
-                    $worksheet->setCellValue("F{$r}", $packages[$i]['quantity'] ?? '');
+            // TYPE OF PKGS and NO.OF PKGS - Fill package data row by row
+            for ($i = 0; $i < $dataRowCount; $i++) {
+                $row = $startRow + $i;
+                if (isset($packages[$i])) {
+                    $worksheet->setCellValue("E{$row}", $packages[$i]['package_type'] ?? '');
+                    $worksheet->setCellValue("F{$row}", $packages[$i]['quantity'] ?? '');
                 }
+                // Center align package data
+                $worksheet->getStyle("E{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $worksheet->getStyle("F{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
+
+            // VOLUME CBM and GWHT - Leave empty for individual package rows, will be filled in total row
+
+            // DESCRIPTION - Merge for entire block
+            $worksheet->mergeCells("I{$startRow}:I" . ($startRow + $totalBlockRows - 1));
+            $worksheet->setCellValue("I{$startRow}", "PERSONAL\nEFFECTS");
+            $worksheet->getStyle("I{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            // DELIVERY - Merge for entire block
+            $worksheet->mergeCells("J{$startRow}:J" . ($startRow + $totalBlockRows - 1));
+            $worksheet->setCellValue("J{$startRow}", $item[13] ?? 'CMB');
+            $worksheet->getStyle("J{$startRow}")->getFont()->setBold(true);
+            $worksheet->getStyle("J{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+            // REMARKS - Merge for entire block
+            $worksheet->mergeCells("K{$startRow}:K" . ($startRow + $totalBlockRows - 1));
+            $worksheet->setCellValue("K{$startRow}", "GIFT CARGO\nDOH & CMB\nPAID");
+            $worksheet->getStyle("K{$startRow}")->getFont()->setBold(true);
+            $worksheet->getStyle("K{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             // Total Row
             $totalRow = $startRow + $dataRowCount;
@@ -300,32 +296,19 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             // Style Total Row
             $worksheet->getStyle("E{$totalRow}:H{$totalRow}")->getFont()->setBold(true);
             $worksheet->getStyle("E{$totalRow}:H{$totalRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THICK);
+            $worksheet->getStyle("E{$totalRow}:H{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-            // Set Vertical Alignments for the block
-            $worksheet->getStyle("A{$startRow}:K{$totalRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
-            $worksheet->getStyle("A{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $worksheet->getStyle("B{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $worksheet->getStyle("C{$startRow}:C{$totalRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_LEFT)->setWrapText(true);
-            $worksheet->getStyle("D{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
-            $worksheet->getStyle("E{$startRow}:H{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $worksheet->getStyle("I{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $worksheet->getStyle("J{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $worksheet->getStyle("K{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            // Set general alignment and wrapping
+            $worksheet->getStyle("C{$startRow}:C" . ($startRow + $dataRowCount - 1))->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_LEFT)->setWrapText(true);
 
-            // Remove all borders for first 4 rows in columns E, F, G, H (TYPE OF PKGS, NO.OF PKGS, VOLUME CBM, GWHT)
-            $firstFourRowsEnd = $startRow + 3; // First 4 rows (0-based, so +3)
-            $worksheet->getStyle("E{$startRow}:H{$firstFourRowsEnd}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-
-            // Fill NAME OF SHIPPER, NAME OF CONSIGNEES, TYPE OF PKGS, NO.OF PKGS, VOLUME CBM, and GWHT data cells with white color
+            // Fill data cells with white background
             for ($i = 0; $i < $dataRowCount; $i++) {
                 $row = $startRow + $i;
-                $worksheet->getStyle("C{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
-                $worksheet->getStyle("D{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
-                $worksheet->getStyle("E{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
-                $worksheet->getStyle("F{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
-                $worksheet->getStyle("G{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
-                $worksheet->getStyle("H{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
+                $worksheet->getStyle("C{$row}:H{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
             }
+
+            // Remove borders from package data cells (will be re-added selectively)
+            $worksheet->getStyle("E{$startRow}:H" . ($startRow + $dataRowCount - 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
 
             $currentRow = $totalRow + 1;
         }
@@ -352,9 +335,8 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         // --- Borders and Final Styling ---
         $worksheet->getStyle("A1:K{$lastDataRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        // Remove borders from green colored cells (TYPE OF PKGS column) - must be after global border styling
+        // Remove borders from data cells and add selective borders
         $currentRowForBorderRemoval = 10;
-        $serialNumberForBorderRemoval = 1;
         foreach ($data as $item) {
             $startRowForBorderRemoval = $currentRowForBorderRemoval;
             $packages = collect($item[9]);
@@ -362,43 +344,20 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             $dataRowCount = max(4, $packageCount);
             $totalBlockRows = $dataRowCount + 1;
 
-            // Remove all borders from NAME OF SHIPPER, NAME OF CONSIGNEES, TYPE OF PKGS, NO.OF PKGS, VOLUME CBM, and GWHT columns, then add left border
+            // Remove all borders from data cells in columns C-H, then add left borders
             for ($i = 0; $i < $dataRowCount; $i++) {
                 $row = $startRowForBorderRemoval + $i;
-                // Remove all borders completely from NAME OF SHIPPER (column C)
-                $worksheet->getStyle("C{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-                // Add left border back to NAME OF SHIPPER (column C)
-                $worksheet->getStyle("C{$row}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
 
-                // Remove all borders completely from NAME OF CONSIGNEES (column D)
-                $worksheet->getStyle("D{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-                // Add left border back to NAME OF CONSIGNEES (column D)
-                $worksheet->getStyle("D{$row}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
-
-                // Remove all borders completely from TYPE OF PKGS (column E)
-                $worksheet->getStyle("E{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-                // Add left border back to TYPE OF PKGS (column E)
-                $worksheet->getStyle("E{$row}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
-
-                // Remove all borders completely from NO.OF PKGS (column F)
-                $worksheet->getStyle("F{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-                // Add left border back to NO.OF PKGS (column F)
-                $worksheet->getStyle("F{$row}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
-
-                // Remove all borders completely from VOLUME CBM (column G)
-                $worksheet->getStyle("G{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-                // Add left border back to VOLUME CBM (column G)
-                $worksheet->getStyle("G{$row}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
-
-                // Remove all borders completely from GWHT (column H)
-                $worksheet->getStyle("H{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
-                // Add left border back to GWHT (column H)
-                $worksheet->getStyle("H{$row}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
+                // Remove all borders and add left border for each column
+                $columns = ['C', 'D', 'E', 'F', 'G', 'H'];
+                foreach ($columns as $col) {
+                    $worksheet->getStyle("{$col}{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
+                    $worksheet->getStyle("{$col}{$row}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
+                }
             }
 
-            $currentRowForBorderRemoval = $startRowForBorderRemoval + $totalBlockRows + 1;
+            $currentRowForBorderRemoval = $startRowForBorderRemoval + $totalBlockRows;
         }
-        //
 
         // ### NEW: Set Column Widths ###
         $worksheet->getColumnDimension('A')->setWidth(8);   // SR NO
