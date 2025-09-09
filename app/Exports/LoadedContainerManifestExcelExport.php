@@ -202,7 +202,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
         // --- HBL Table Header ---
         // Create a clean header row with column titles
-        $hblHeaders = ['SR NO', 'HBL NO', 'NAME OF SHIPPER', 'NAME OF CONSIGNEES', 'TYPE OF PKGS', 'NO.OF PKGS', 'VOLUME CBM', 'GWHT', 'DESCRIPTION', 'DELIVERY', 'REMARKS'];
+        $hblHeaders = ['SR NO', 'HBL NO', 'NAME OF SHIPPER', 'NAME OF CONSIGNEES', 'TYPE OF PKGS', 'NO.OF PKGS', 'VOLUME CBM', 'GWHT', 'DESCRIPTION OF CARGO', 'DELIVERY', 'REMARKS'];
         $worksheet->fromArray($hblHeaders, null, 'A9');
         $worksheet->getStyle('A9:K9')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         $worksheet->getStyle('A9:K9')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
@@ -241,11 +241,11 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             $worksheet->setCellValue("B{$startRow}", $item[0] ?? '');
             $worksheet->getStyle("B{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-            // NAME OF SHIPPER - Fill row by row with shipper information
-            $worksheet->setCellValue("C{$startRow}", $item[1] ?? ''); // Shipper name
-            $worksheet->setCellValue("C" . ($startRow + 1), $item[2] ?? ''); // Shipper address
-            $worksheet->setCellValue("C" . ($startRow + 2), $item[14] ?? ''); // Additional shipper info
-            $worksheet->setCellValue("C" . ($startRow + 3), $item[4] ?? ''); // Phone/contact
+            // NAME OF SHIPPER - Merge for entire block (excluding total row to not affect PP no data)
+            $worksheet->mergeCells("C{$startRow}:C" . ($startRow + $dataRowCount - 1));
+            $shipperInfo = ($item[1] ?? '') . "\n" . ($item[2] ?? '') . "\n" . ($item[14] ?? '') . "\n" . ($item[4] ?? '');
+            $worksheet->setCellValue("C{$startRow}", $shipperInfo);
+            $worksheet->getStyle("C{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
 
             // NAME OF CONSIGNEES - Merge for entire block
             $worksheet->mergeCells("D{$startRow}:D" . ($startRow + $totalBlockRows - 1));
@@ -263,14 +263,17 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                 // Center align package data
                 $worksheet->getStyle("E{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $worksheet->getStyle("F{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+                // Increase row height for data rows to provide more space
+                $worksheet->getRowDimension($row)->setRowHeight(25); // Increased from 18 to 25 for better readability
             }
 
             // VOLUME CBM and GWHT - Leave empty for individual package rows, will be filled in total row
 
-            // DESCRIPTION - Merge for entire block
+            // DESCRIPTION - Merge for entire block like example image
             $worksheet->mergeCells("I{$startRow}:I" . ($startRow + $totalBlockRows - 1));
             $worksheet->setCellValue("I{$startRow}", "PERSONAL\nEFFECTS");
-            $worksheet->getStyle("I{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $worksheet->getStyle("I{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
 
             // DELIVERY - Merge for entire block
             $worksheet->mergeCells("J{$startRow}:J" . ($startRow + $totalBlockRows - 1));
@@ -282,7 +285,8 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             $worksheet->mergeCells("K{$startRow}:K" . ($startRow + $totalBlockRows - 1));
             $worksheet->setCellValue("K{$startRow}", "GIFT CARGO\nDOH & CMB\nPAID");
             $worksheet->getStyle("K{$startRow}")->getFont()->setBold(true);
-            $worksheet->getStyle("K{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            // Align REMARKS to top and center horizontally, preserve wrap
+            $worksheet->getStyle("K{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
 
             // Total Row
             $totalRow = $startRow + $dataRowCount;
@@ -361,7 +365,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         }
 
         // ### NEW: Set Column Widths ###
-        $worksheet->getColumnDimension('A')->setWidth(8);   // SR NO
+        $worksheet->getColumnDimension('A')->setWidth(5);   // SR NO
         $worksheet->getColumnDimension('B')->setWidth(12);  // HBL NO
         $worksheet->getColumnDimension('C')->setWidth(22);  // NAME OF SHIPPER
         $worksheet->getColumnDimension('D')->setWidth(25);  // NAME OF CONSIGNEES
@@ -369,7 +373,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->getColumnDimension('F')->setWidth(10);  // NO.OF PKGS
         $worksheet->getColumnDimension('G')->setWidth(10);  // VOLUME CBM
         $worksheet->getColumnDimension('H')->setWidth(10);  // GWHT
-        $worksheet->getColumnDimension('I')->setWidth(15);  // DESCRIPTION
+        $worksheet->getColumnDimension('I')->setWidth(18);  // DESCRIPTION
         $worksheet->getColumnDimension('J')->setWidth(15);  // DELIVERY
         $worksheet->getColumnDimension('K')->setWidth(20);  // REMARKS
 
@@ -511,3 +515,4 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         return null;
     }
 }
+//Honurable mention to ChatGPT and cluade code for helping me with the logic and structure of this export.
