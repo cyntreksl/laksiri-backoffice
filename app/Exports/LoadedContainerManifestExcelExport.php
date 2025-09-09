@@ -180,25 +180,25 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->mergeCells('B7:C7');
         $worksheet->setCellValue('B7', $this->container?->container_number ?? 'TCLU1650570');
         $worksheet->mergeCells('D7:G7');
-        $worksheet->setCellValue('D7', 'SEAL NO:');
-        $worksheet->mergeCells('H7:I7');
-        $worksheet->setCellValue('H7', $this->container?->seal_number ?? 'QA01390A');
-        $worksheet->mergeCells('J7:K7');
-        $worksheet->setCellValue('J7', 'CONTAINER TYPE : 01 X 40\' H/C');
+        $worksheet->setCellValue('D7', 'SEAL NO: ' . ($this->container?->seal_number ?? 'No Seal No'));
+        $worksheet->getStyle('D7:I7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $worksheet->mergeCells('H7:K7');
+        $worksheet->setCellValue('H7', 'CONTAINER TYPE : ' . ($this->container?->container_type ?? 'No data'));
         $worksheet->getStyle('A7:K7')->getFont()->setBold(true);
 
         // Row 8 - Package count
         $worksheet->getStyle('A8:K8')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         $worksheet->getStyle('A8:K8')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
         $worksheet->setCellValue('A8', 'NO OF PKG:');
-        $worksheet->mergeCells('B8:D8');
+        $worksheet->mergeCells('B8:C8');
         $worksheet->setCellValue('B8', number_format($total_nototal, 0));
-        $worksheet->mergeCells('E8:G8');
-        $worksheet->setCellValue('E8', 'TOTAL  VOLUME  : ' . number_format($total_vtotal, 3));
+        $worksheet->mergeCells('D8:G8');
+        $worksheet->setCellValue('D8', 'TOTAL  VOLUME  : ' . number_format($total_vtotal, 3));
         $worksheet->mergeCells('H8:K8');
         $worksheet->setCellValue('H8', 'TOTAL WEIGHT: KG        ' . number_format($total_gtotal, 3));
         $worksheet->getStyle('H8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         $worksheet->getStyle('A8:K8')->getFont()->setBold(true);
+        $worksheet->getStyle('A8:K8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // --- HBL Table Header ---
         // Create a clean header row with column titles
@@ -207,6 +207,11 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->getStyle('A9:K9')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
         $worksheet->getStyle('A9:K9')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
         $worksheet->getStyle('A9:K9')->getFont()->setBold(true);
+
+        // Add gray background color
+        $worksheet->getStyle('A9:K9')->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFCCCCCC'); // Light gray color
 
         // --- HBL Data Rows Loop ---
         $currentRow = 10; // Start immediately after the header row
@@ -391,19 +396,20 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
             $currentRowForBorderRemoval = $startRowForBorderRemoval + $totalBlockRows + 1;
         }
+        //
 
         // ### NEW: Set Column Widths ###
         $worksheet->getColumnDimension('A')->setWidth(8);   // SR NO
         $worksheet->getColumnDimension('B')->setWidth(12);  // HBL NO
         $worksheet->getColumnDimension('C')->setWidth(22);  // NAME OF SHIPPER
         $worksheet->getColumnDimension('D')->setWidth(25);  // NAME OF CONSIGNEES
-        $worksheet->getColumnDimension('E')->setWidth(8);   // CHR
+        $worksheet->getColumnDimension('E')->setWidth(10);   // CHR
         $worksheet->getColumnDimension('F')->setWidth(10);  // NO.OF PKGS
         $worksheet->getColumnDimension('G')->setWidth(10);  // VOLUME CBM
         $worksheet->getColumnDimension('H')->setWidth(10);  // GWHT
         $worksheet->getColumnDimension('I')->setWidth(15);  // DESCRIPTION
-        $worksheet->getColumnDimension('J')->setWidth(10);  // DELIVERY
-        $worksheet->getColumnDimension('K')->setWidth(15);  // REMARKS
+        $worksheet->getColumnDimension('J')->setWidth(15);  // DELIVERY
+        $worksheet->getColumnDimension('K')->setWidth(20);  // REMARKS
 
         // Add overall border to the entire table
         $worksheet->getStyle("A1:K{$lastDataRow}")->getBorders()->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
