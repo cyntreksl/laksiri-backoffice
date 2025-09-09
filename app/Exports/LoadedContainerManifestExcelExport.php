@@ -242,9 +242,11 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
             $worksheet->mergeCells("J{$startRow}:J" . ($startRow + $totalBlockRows - 1)); // DELIVERY
             $worksheet->setCellValue("J{$startRow}", $item[13] ?? 'CMB');
+            $worksheet->getStyle("J{$startRow}")->getFont()->setBold(true); // Make DELIVERY column bold
 
             $worksheet->mergeCells("K{$startRow}:K" . ($startRow + $totalBlockRows - 1)); // REMARKS
             $worksheet->setCellValue("K{$startRow}", "GIFT CARGO\nDOH & CMB\nPAID");
+            $worksheet->getStyle("K{$startRow}")->getFont()->setBold(true); // Make REMARKS column bold
 
             $worksheet->mergeCells("D{$startRow}:D" . ($startRow + $totalBlockRows - 1)); // NAME OF CONSIGNEES
             $worksheet->setCellValue("D{$startRow}", ($item[5] ?? '') . "\n" . ($item[6] ?? '') . "\n" . ($item[8] ?? ''));
