@@ -8,6 +8,7 @@ use App\Enum\WarehouseType;
 use App\Models\Container;
 use App\Models\HBL;
 use App\Models\Scopes\BranchScope;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -15,25 +16,30 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSize, WithStyles, WithEvents, WithCustomStartCell
+class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSize, WithCustomStartCell, WithEvents, WithStyles
 {
     use Exportable;
 
     private Container $container;
+
     private ?array $processedData = null;
+
     private ?int $giftCount = null;
+
     private ?int $upbCount = null;
+
     private ?int $d2dCount = null;
+
     private ?string $cargoType = null;
+
     private $settings;
+
     private $branch;
 
     public function __construct(Container $container, $settings = null, $branch = null)
@@ -82,7 +88,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $total_vtotal = 0;
         $total_gtotal = 0;
 
-        if (!empty($this->container?->shipment_weight) && $this->container->shipment_weight > 0) {
+        if (! empty($this->container?->shipment_weight) && $this->container->shipment_weight > 0) {
             $total_gtotal = $this->container->shipment_weight;
         } else {
             foreach ($data as $item) {
@@ -116,7 +122,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->setCellValue('D1', 'UNIVERSAL FREIGHT SERVICES');
         $worksheet->getStyle('H1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $worksheet->setCellValue('K1', 'SHIPMENT  NO' . ($this->container?->reference ?? '2745'));
+        $worksheet->setCellValue('K1', 'SHIPMENT  NO'.($this->container?->reference ?? '2745'));
         $worksheet->getStyle('K1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
         $worksheet->getStyle('A1:K1')->getFont()->setBold(true)->setSize(11);        // Row 2 - Manifest title with gray background
@@ -136,7 +142,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->setCellValue('B3', $this->container?->vessel_name ?? 'YM COSMOS');
 
         $worksheet->mergeCells('D3:G3');
-        $worksheet->setCellValue('D3', 'DATE LOADED : ' . ($this->container?->loading_started_at ? \Carbon\Carbon::parse($this->container?->loading_started_at)->format('d.m.Y') : '09.01.2025'));
+        $worksheet->setCellValue('D3', 'DATE LOADED : '.($this->container?->loading_started_at ? \Carbon\Carbon::parse($this->container?->loading_started_at)->format('d.m.Y') : '09.01.2025'));
 
         $worksheet->setCellValue('H3', 'VOYAGE:');
         $worksheet->setCellValue('I3', $this->container?->voyage_number ?? '181E');
@@ -180,10 +186,10 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->mergeCells('B7:C7');
         $worksheet->setCellValue('B7', $this->container?->container_number ?? 'TCLU1650570');
         $worksheet->mergeCells('D7:G7');
-        $worksheet->setCellValue('D7', 'SEAL NO: ' . ($this->container?->seal_number ?? 'No Seal No'));
+        $worksheet->setCellValue('D7', 'SEAL NO: '.($this->container?->seal_number ?? 'No Seal No'));
         $worksheet->getStyle('D7:I7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $worksheet->mergeCells('H7:K7');
-        $worksheet->setCellValue('H7', 'CONTAINER TYPE : ' . ($this->container?->container_type ?? 'No data'));
+        $worksheet->setCellValue('H7', 'CONTAINER TYPE : '.($this->container?->container_type ?? 'No data'));
         $worksheet->getStyle('A7:K7')->getFont()->setBold(true);
 
         // Row 8 - Package count
@@ -193,9 +199,9 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->mergeCells('B8:C8');
         $worksheet->setCellValue('B8', number_format($total_nototal, 0));
         $worksheet->mergeCells('D8:G8');
-        $worksheet->setCellValue('D8', 'TOTAL  VOLUME  : ' . number_format($total_vtotal, 3));
+        $worksheet->setCellValue('D8', 'TOTAL  VOLUME  : '.number_format($total_vtotal, 3));
         $worksheet->mergeCells('H8:K8');
-        $worksheet->setCellValue('H8', 'TOTAL WEIGHT: KG        ' . number_format($total_gtotal, 3));
+        $worksheet->setCellValue('H8', 'TOTAL WEIGHT: KG        '.number_format($total_gtotal, 3));
         $worksheet->getStyle('H8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         $worksheet->getStyle('A8:K8')->getFont()->setBold(true);
         $worksheet->getStyle('A8:K8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -231,25 +237,25 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             $totalBlockRows = $dataRowCount + 1; // +1 for the total row
 
             // SR NO - Merge for entire block including total row
-            $worksheet->mergeCells("A{$startRow}:A" . ($startRow + $totalBlockRows - 1));
+            $worksheet->mergeCells("A{$startRow}:A".($startRow + $totalBlockRows - 1));
             $worksheet->setCellValue("A{$startRow}", $serialNumber++);
             $worksheet->getStyle("A{$startRow}")->getFont()->setBold(true);
             $worksheet->getStyle("A{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             // HBL NO - Merge for data rows only (excluding total row)
-            $worksheet->mergeCells("B{$startRow}:B" . ($startRow + $dataRowCount - 1));
+            $worksheet->mergeCells("B{$startRow}:B".($startRow + $dataRowCount - 1));
             $worksheet->setCellValue("B{$startRow}", $item[0] ?? '');
             $worksheet->getStyle("B{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             // NAME OF SHIPPER - Merge for entire block (excluding total row to not affect PP no data)
-            $worksheet->mergeCells("C{$startRow}:C" . ($startRow + $dataRowCount - 1));
-            $shipperInfo = ($item[1] ?? '') . "\n" . ($item[2] ?? '') . "\n" . ($item[14] ?? '') . "\n" . ($item[4] ?? '');
+            $worksheet->mergeCells("C{$startRow}:C".($startRow + $dataRowCount - 1));
+            $shipperInfo = ($item[1] ?? '')."\n".($item[2] ?? '')."\n".($item[14] ?? '')."\n".($item[4] ?? '');
             $worksheet->setCellValue("C{$startRow}", $shipperInfo);
             $worksheet->getStyle("C{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
 
             // NAME OF CONSIGNEES - Merge for entire block
-            $worksheet->mergeCells("D{$startRow}:D" . ($startRow + $totalBlockRows - 1));
-            $consigneeInfo = ($item[5] ?? '') . "\n" . ($item[6] ?? '') . "\n" . ($item[8] ?? '');
+            $worksheet->mergeCells("D{$startRow}:D".($startRow + $totalBlockRows - 1));
+            $consigneeInfo = ($item[5] ?? '')."\n".($item[6] ?? '')."\n".($item[8] ?? '');
             $worksheet->setCellValue("D{$startRow}", $consigneeInfo);
             $worksheet->getStyle("D{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setWrapText(true);
 
@@ -271,18 +277,18 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             // VOLUME CBM and GWHT - Leave empty for individual package rows, will be filled in total row
 
             // DESCRIPTION - Merge for entire block like example image
-            $worksheet->mergeCells("I{$startRow}:I" . ($startRow + $totalBlockRows - 1));
+            $worksheet->mergeCells("I{$startRow}:I".($startRow + $totalBlockRows - 1));
             $worksheet->setCellValue("I{$startRow}", "PERSONAL\nEFFECTS");
             $worksheet->getStyle("I{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
 
             // DELIVERY - Merge for entire block
-            $worksheet->mergeCells("J{$startRow}:J" . ($startRow + $totalBlockRows - 1));
+            $worksheet->mergeCells("J{$startRow}:J".($startRow + $totalBlockRows - 1));
             $worksheet->setCellValue("J{$startRow}", $item[13] ?? 'CMB');
             $worksheet->getStyle("J{$startRow}")->getFont()->setBold(true);
             $worksheet->getStyle("J{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             // REMARKS - Merge for entire block
-            $worksheet->mergeCells("K{$startRow}:K" . ($startRow + $totalBlockRows - 1));
+            $worksheet->mergeCells("K{$startRow}:K".($startRow + $totalBlockRows - 1));
             $worksheet->setCellValue("K{$startRow}", "GIFT CARGO\nDOH & CMB\nPAID");
             $worksheet->getStyle("K{$startRow}")->getFont()->setBold(true);
             // Align REMARKS to top and center horizontally, preserve wrap
@@ -290,7 +296,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
             // Total Row
             $totalRow = $startRow + $dataRowCount;
-            $worksheet->setCellValue("B{$totalRow}", "PP No");
+            $worksheet->setCellValue("B{$totalRow}", 'PP No');
             $worksheet->setCellValue("C{$totalRow}", $item[3] ?? ''); // PP Number
             $worksheet->setCellValue("E{$totalRow}", 'TOTAL');
             $worksheet->setCellValue("F{$totalRow}", $totalQuantity);
@@ -304,7 +310,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             $worksheet->getStyle("E{$totalRow}:H{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             // Set general alignment and wrapping
-            $worksheet->getStyle("C{$startRow}:C" . ($startRow + $dataRowCount - 1))->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_LEFT)->setWrapText(true);
+            $worksheet->getStyle("C{$startRow}:C".($startRow + $dataRowCount - 1))->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_LEFT)->setWrapText(true);
 
             // Fill data cells with white background
             for ($i = 0; $i < $dataRowCount; $i++) {
@@ -313,7 +319,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             }
 
             // Remove borders from package data cells (will be re-added selectively)
-            $worksheet->getStyle("E{$startRow}:H" . ($startRow + $dataRowCount - 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
+            $worksheet->getStyle("E{$startRow}:H".($startRow + $dataRowCount - 1))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_NONE);
 
             $currentRow = $totalRow + 1;
         }
@@ -332,10 +338,10 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
         $currentRow += 2; // spacer
 
-        $worksheet->setCellValue("C{$currentRow}", "UBP CARGO - " . ($this->upbCount ?? 0));
-        $worksheet->setCellValue("C" . ($currentRow + 1), "GIFT CARGO - " . ($this->giftCount ?? 0));
-        $worksheet->setCellValue("C" . ($currentRow + 2), "DOOR TO DOOR CARGO - " . ($this->d2dCount ?? 0));
-        $worksheet->getStyle("C{$currentRow}:C" . ($currentRow + 2))->getFont()->setBold(true);
+        $worksheet->setCellValue("C{$currentRow}", 'UBP CARGO - '.($this->upbCount ?? 0));
+        $worksheet->setCellValue('C'.($currentRow + 1), 'GIFT CARGO - '.($this->giftCount ?? 0));
+        $worksheet->setCellValue('C'.($currentRow + 2), 'DOOR TO DOOR CARGO - '.($this->d2dCount ?? 0));
+        $worksheet->getStyle("C{$currentRow}:C".($currentRow + 2))->getFont()->setBold(true);
 
         // --- Borders and Final Styling ---
         $worksheet->getStyle("A1:K{$lastDataRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
@@ -397,15 +403,16 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
         if ($this->container->duplicate_hbl_packages) {
             foreach ($this->container->duplicate_hbl_packages->groupBy('hbl_id') as $hblId => $packages) {
-                $stillLoadedPackages = $packages->filter(fn($package) => in_array($package->id, $currentlyLoadedPackageIds));
+                $stillLoadedPackages = $packages->filter(fn ($package) => in_array($package->id, $currentlyLoadedPackageIds));
 
-                if ($stillLoadedPackages->isEmpty())
+                if ($stillLoadedPackages->isEmpty()) {
                     continue;
+                }
 
                 $hbl = HBL::withoutGlobalScope(BranchScope::class)->with('mhbl')->find($hblId);
                 if ($hbl && $hbl->mhbl) {
                     $loadedMHBLPackages[$hbl->mhbl->id][] = $stillLoadedPackages;
-                } else if ($hbl) {
+                } elseif ($hbl) {
                     $loadedHBLPackages[$hblId] = ['hbl' => $hbl, 'packages' => $stillLoadedPackages];
                 }
             }
@@ -415,7 +422,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             try {
                 $mhbl = GetMHBLById::run($mhblId);
                 $hblPackages = [];
-                if (!empty($mhbl->hbls)) {
+                if (! empty($mhbl->hbls)) {
                     foreach ($mhbl->hbls as $mhblHBL) {
                         foreach ($mhblHBL->packages as $hblPackage) {
                             $hblPackages[] = $hblPackage;
@@ -446,7 +453,8 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                     null,
                 ];
             } catch (\Exception $e) {
-                Log::error('Error processing MHBL package: ' . $e->getMessage());
+                Log::error('Error processing MHBL package: '.$e->getMessage());
+
                 continue;
             }
         }
@@ -459,11 +467,11 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                 $hblLoadedLatestContainer = $hblLoadedContainers->first();
 
                 $status = (count($hblLoadedContainers) > 1 && $hblLoadedLatestContainer && $hblLoadedLatestContainer['id'] === $this->container['id']) ? 'BALANCE' : 'SHORT LOADED';
-                if (($hbl->packages ? $hbl->packages->every(fn($p) => $p->duplicate_containers->isNotEmpty()) : false) && count($hblLoadedContainers) === 1) {
+                if (($hbl->packages ? $hbl->packages->every(fn ($p) => $p->duplicate_containers->isNotEmpty()) : false) && count($hblLoadedContainers) === 1) {
                     $status = '';
                 }
 
-                $referencesString = $hbl->packages ? $hbl->packages->load('duplicate_containers')->pluck('duplicate_containers')->flatten()->pluck('reference')->unique()->reject(fn($ref) => $ref == $this->container['reference'])->implode(',') : '';
+                $referencesString = $hbl->packages ? $hbl->packages->load('duplicate_containers')->pluck('duplicate_containers')->flatten()->pluck('reference')->unique()->reject(fn ($ref) => $ref == $this->container['reference'])->implode(',') : '';
 
                 $data[] = [
                     $hbl->hbl_number ?: $hbl->reference, // 0
@@ -474,7 +482,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                     $hbl->consignee_name, // 5
                     $hbl->consignee_address, // 6
                     $hbl->consignee_nic, // 7
-                    $hbl->consignee_contact . ($hbl->consignee_additional_mobile_number ? '/' . $hbl->consignee_additional_mobile_number : ''), // 8
+                    $hbl->consignee_contact.($hbl->consignee_additional_mobile_number ? '/'.$hbl->consignee_additional_mobile_number : ''), // 8
                     $loadedHBLPackages[$hbl->id]['packages'], // 9
                     $hbl->paid_amount > 0 ? 'PAID' : 'UNPAID', // 10
                     $hbl->hbl_type, // 11
@@ -485,20 +493,23 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                     $hbl->is_destination_charges_paid, // 16
                     $status, // 17
                     $referencesString ? "SHIP NO. $referencesString" : null, // 18
-                    ($hbl->branch['currency_symbol'] ?? '') . ' ' . ($hbl['grand_total'] ?? ''), // 19
+                    ($hbl->branch['currency_symbol'] ?? '').' '.($hbl['grand_total'] ?? ''), // 19
                 ];
             } catch (\Exception $e) {
-                Log::error('Error processing HBL package: ' . $e->getMessage());
+                Log::error('Error processing HBL package: '.$e->getMessage());
+
                 continue;
             }
         }
+
         return $data;
     }
 
     private function getWarehouseCode($hbl): ?string
     {
-        if (!$hbl)
+        if (! $hbl) {
             return null;
+        }
         if ($hbl->warehouse_id ?? null) {
             return match ($hbl->warehouse_id) {
                 GetBranchByName::run(WarehouseType::COLOMBO->value)['id'] => 'CMB',
@@ -512,7 +523,8 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                 default => null,
             };
         }
+
         return null;
     }
 }
-//Honurable mention to ChatGPT and cluade code for helping me with the logic and structure of this export.
+// Honurable mention to ChatGPT and cluade code for helping me with the logic and structure of this export.
