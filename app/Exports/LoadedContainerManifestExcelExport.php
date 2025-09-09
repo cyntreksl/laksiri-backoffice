@@ -239,7 +239,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             // HBL NO - Merge for data rows only (excluding total row)
             $worksheet->mergeCells("B{$startRow}:B" . ($startRow + $dataRowCount - 1));
             $worksheet->setCellValue("B{$startRow}", $item[0] ?? '');
-            $worksheet->getStyle("B{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER)->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $worksheet->getStyle("B{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP)->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
             // NAME OF SHIPPER - Fill row by row with shipper information
             $worksheet->setCellValue("C{$startRow}", $item[1] ?? ''); // Shipper name
@@ -294,6 +294,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
             $worksheet->setCellValue("H{$totalRow}", number_format($hblweight, 2));
 
             // Style Total Row
+            $worksheet->getStyle("C{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT); // Align PP No to left
             $worksheet->getStyle("E{$totalRow}:H{$totalRow}")->getFont()->setBold(true);
             $worksheet->getStyle("E{$totalRow}:H{$totalRow}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THICK);
             $worksheet->getStyle("E{$totalRow}:H{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
