@@ -93,6 +93,9 @@ Route::name('loading.')->group(function () {
     Route::get('containers/tally-sheet-downloads/{container}', [LoadedContainerController::class, 'tallySheetDownloadPDF'])
         ->name('containers.tally-sheet-downloads');
 
+    Route::get('containers/tally-sheet-excel-downloads/{container}', [LoadedContainerController::class, 'tallySheetDownloadExcel'])
+        ->name('containers.tally-sheet-excel-downloads');
+
     Route::post('containers/{container}/set/rtf', [ContainerController::class, 'setRTF'])
         ->name('containers.set.rtf');
 
