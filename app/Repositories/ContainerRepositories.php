@@ -263,16 +263,16 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
         $logoBase64 = null;
 
-        if ($settings && !empty($settings->logo)) {
+        if ($settings && ! empty($settings->logo)) {
             try {
                 if (Storage::disk('s3')->exists($settings->logo)) {
                     $logoContent = Storage::disk('s3')->get($settings->logo);
                     $mime = Storage::disk('s3')->mimeType($settings->logo);
 
-                    $logoBase64 = 'data:' . $mime . ';base64,' . base64_encode($logoContent);
+                    $logoBase64 = 'data:'.$mime.';base64,'.base64_encode($logoContent);
                 }
             } catch (\Exception $e) {
-                \Log::warning('Unable to access logo file: ' . $e->getMessage());
+                \Log::warning('Unable to access logo file: '.$e->getMessage());
             }
         }
 
@@ -287,7 +287,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
             // Build a flat package list from all HBLs
             $packages = collect($hblsWithPackages)->flatMap(function ($hbl) {
-                if (!isset($hbl['packages']) || !is_iterable($hbl['packages'])) {
+                if (! isset($hbl['packages']) || ! is_iterable($hbl['packages'])) {
                     return [];
                 }
 
@@ -343,7 +343,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         $dompdf->render();
 
         // Define the final PDF file path
-        $finalPdfPath = $pdfDirectory . $container->reference . '_mhbl_combined_' . date('Y_m_d_h_i_s') . '.pdf';
+        $finalPdfPath = $pdfDirectory.$container->reference.'_mhbl_combined_'.date('Y_m_d_h_i_s').'.pdf';
 
         // Save the generated PDF to a file
         file_put_contents($finalPdfPath, $dompdf->output());

@@ -230,7 +230,7 @@ class ContainerController extends Controller
     public function batchMHBLDownloadPDF(Container $container)
     {
         $this->authorize('hbls.download pdf');
-        
+
         return $this->containerRepository->batchMHBLDownload($container);
     }
 
