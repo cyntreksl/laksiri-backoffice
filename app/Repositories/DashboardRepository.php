@@ -38,7 +38,7 @@ class DashboardRepository implements DashboardRepositoryInterface
     {
         return Container::whereIn('status', [
             ContainerStatus::LOADED->value,
-            ContainerStatus::IN_TRANSIT->value
+            ContainerStatus::IN_TRANSIT->value,
         ])->count();
     }
 
