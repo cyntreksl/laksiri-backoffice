@@ -125,9 +125,9 @@ const fetchDuePayments = async (page = 1, search = "", sortField = 'created_at',
     }
 };
 
-const getCashSettlementSummary = async () => {
+const getDuePaymentSummary = async () => {
     try {
-        const response = await fetch("/cash-settlement-summery", {
+        const response = await fetch("/due-payment-summery", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -138,7 +138,7 @@ const getCashSettlementSummary = async () => {
                 deliveryType: filters.value.hbl_type.value,
                 cargoMode: filters.value.cargo_type.value,
                 isHold: filters.value.is_hold.value,
-                officers: filters.value.user.value,
+                createdBy: filters.value.user.value,
                 paymentStatus: filters.value.payments.value,
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
@@ -170,42 +170,42 @@ watch(() => filters.value.global.value, (newValue) => {
 
 watch(() => filters.value.warehouse.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 watch(() => filters.value.hbl_type.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 watch(() => filters.value.cargo_type.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 watch(() => filters.value.is_hold.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 watch(() => filters.value.user.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 watch(() => filters.value.payments.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 watch(() => fromDate.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 watch(() => toDate.value, (newValue) => {
     fetchDuePayments(1, filters.value.global.value);
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 const onPageChange = (event) => {
@@ -220,7 +220,7 @@ const onSort = (event) => {
 
 onMounted(() => {
     fetchDuePayments();
-    getCashSettlementSummary();
+    getDuePaymentSummary();
 });
 
 const resolveHBLType = (hbl) => {
@@ -316,6 +316,7 @@ const clearFilter = () => {
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchDuePayments(currentPage.value);
+    getDuePaymentSummary();
 };
 
 const confirmHBLHold = (hbl) => {
@@ -343,6 +344,7 @@ const confirmHBLHold = (hbl) => {
                     onSuccess: () => {
                         push.success(`Operation Successfully!`);
                         fetchDuePayments(currentPage.value);
+                        getDuePaymentSummary();
                     },
                     onError: () => {
                         push.error("Something went to wrong!");
