@@ -448,6 +448,17 @@ class HBLController extends Controller
         return $this->HBLRepository->undoPackageRTF($hbl_package);
     }
 
+    public function setPackageDetain(HBLPackage $hbl_package, Request $request)
+    {
+        $detainType = $request->input('detain_type', 'RTF');
+        return $this->HBLRepository->doPackageDetain($hbl_package, $detainType);
+    }
+
+    public function unsetPackageDetain(HBLPackage $hbl_package)
+    {
+        return $this->HBLRepository->undoPackageDetain($hbl_package);
+    }
+
     public function hblChargeDetails(Request $request)
     {
         $id = $request->id;
