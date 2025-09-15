@@ -1138,7 +1138,7 @@ const menuModel = ref([
         visible: () => (
             canSomeStartWith('container') ||
             canSomeStartWith('shipment')
-        ) && isDep(),
+        ),
         command: () => {
             setMenu('loading');
         }
