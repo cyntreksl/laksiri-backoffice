@@ -19,6 +19,8 @@ interface ContainerRepositoryInterface
 
     public function batchHBLDownload(Container $container);
 
+    public function batchMHBLDownload(Container $container);
+
     public function deleteLoading(Container $container);
 
     public function getLoadedContainers();

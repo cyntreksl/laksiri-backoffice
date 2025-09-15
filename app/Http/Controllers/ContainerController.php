@@ -227,6 +227,13 @@ class ContainerController extends Controller
         return $this->containerRepository->batchHBLDownload($container);
     }
 
+    public function batchMHBLDownloadPDF(Container $container)
+    {
+        $this->authorize('hbls.download pdf');
+
+        return $this->containerRepository->batchMHBLDownload($container);
+    }
+
     public function deleteLoading(Container $container)
     {
         return $this->containerRepository->deleteLoading($container);

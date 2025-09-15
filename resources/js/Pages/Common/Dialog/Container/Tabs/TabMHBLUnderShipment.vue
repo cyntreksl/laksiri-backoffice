@@ -110,6 +110,10 @@ watch(() => containerData.value, () => {
             <a v-if="filteredHBLSPackagesCount > 0" :href="route('loading.loaded-containers.doorToDoor.export', container.id)">
                 <Button icon="pi pi-print" label="Print Manifest" severity="info" size="small" />
             </a>
+            
+            <a v-if="container.status === 'LOADED' && mhblsCount > 0" :href="route('loading.mhbls.batch-downloads', container.id)">
+                <Button icon="pi pi-print" label="Print All MHBL" severity="info" size="small" />
+            </a>
         </div>
     </div>
 
