@@ -329,7 +329,7 @@ const updateChecked = (notification, isChecked) => {
 
                         <div v-if="usePage().props.currentBranch.type === 'Destination'" class="col-span-12 sm:col-span-4">
                             <IftaLabel>
-                                <InputNumber v-model="form.maximum_demurrage_discount" fluid inputId="demurrage-discount" min="0" suffix=" days" variant="filled" />
+                                <InputNumber v-model="form.maximum_demurrage_discount" fluid inputId="demurrage-discount" min="0" variant="filled" />
                                 <label for="demurrage-discount">Maximum Demurrage Discount (%)</label>
                             </IftaLabel>
                             <InputError :message="form.errors.maximum_demurrage_discount"/>
