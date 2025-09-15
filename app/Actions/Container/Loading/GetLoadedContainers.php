@@ -21,7 +21,7 @@ class GetLoadedContainers
                             $hblQuery->with('mhbl', 'mhbl.shipper', 'mhbl.consignee')->withoutGlobalScope(BranchScope::class);
                         }]);
                 },
-                'branch', 'warehouse', 'latestRtfRecord',
+                'branch', 'warehouse', 'latestDetainRecord',
             ])
             ->withCount(['hbl_packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class);
