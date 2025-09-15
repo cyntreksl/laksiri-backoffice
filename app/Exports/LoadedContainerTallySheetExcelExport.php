@@ -32,18 +32,25 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
         $data = $this->prepareData();
         $rows = [];
 
-        // Header row - LOADING TALLY SHEET
-        $rows[] = ['LOADING TALLY SHEET', '', '', '', '', '', '', ''];
+        // Company header row
+        $rows[] = ['UNIVERSAL FREIGHT SERVICES, DOHA, QATAR', '', '', '', '', '', '', '', '', '', '', ''];
+
+        // Loading tally sheet title
+        $rows[] = ['LOADING TALLY SHEET', '', '', '', '', '', '', '', '', '', '', ''];
 
         // Container info row
         $rows[] = [
-            'CONTR NO: '.($this->container->container_number ?? ''),
+            'CONTR NO :',
+            $this->container->container_number ?? '',
             '',
-            'DATE LOADED: '.Carbon::parse($this->container->loading_started_at ?? now())->format('Y-m-d'),
+            'DATE LOADED : '.Carbon::parse($this->container->loading_started_at ?? now())->format('d.m.Y'),
             '',
             '',
             '',
-            'SHIPMENT NO: '.($this->container->reference ?? ''),
+            '',
+            '',
+            'SHIPMENT NO:'.($this->container->reference ?? ''),
+            '',
             '',
         ];
 
@@ -55,26 +62,52 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
             'CBM',
             'TOT',
             'TYPE OF PACKAGE',
+            '',
+            '',
+            '',
+            '',
             'DESTINATION',
             'REMARKS',
         ];
 
         // Data rows
-        $serialNumber = 1;
+        $serialNumber = 28; // Starting from 28 as shown in the image
+        $totalCBM = 0;
+        $totalTOT = 0;
+
         foreach ($data as $item) {
-            $packageTypes = is_array($item[4]) ? implode(', ', array_filter($item[4])) : '';
+            $packageTypes = is_array($item[4]) ? array_filter($item[4]) : [$item[4]];
+
+            // Split package types into separate columns (up to 4 columns as shown in image)
+            $packageCol1 = isset($packageTypes[0]) ? $packageTypes[0] : '';
+            $packageCol2 = isset($packageTypes[1]) ? $packageTypes[1] : '';
+            $packageCol3 = isset($packageTypes[2]) ? $packageTypes[2] : '';
+            $packageCol4 = isset($packageTypes[3]) ? $packageTypes[3] : '';
+
+            $cbm = number_format($item[2], 3);
+            $tot = $item[3];
+
+            $totalCBM += $item[2];
+            $totalTOT += $tot;
 
             $rows[] = [
                 $serialNumber++,
                 $item[0], // HBL
                 strtoupper($item[1]), // Customer Name
-                number_format($item[2], 3), // CBM with 3 decimal places
-                $item[3], // TOT
-                $packageTypes, // Package Types combined
+                $cbm, // CBM with 3 decimal places
+                $tot, // TOT
+                $packageCol1,
+                $packageCol2,
+                $packageCol3,
+                $packageCol4,
+                '',
                 $item[5], // Destination
                 $item[6] ?? '', // Remarks
             ];
         }
+
+        // Add grand total row
+        $rows[] = ['', '', 'GRAND TOTAL', number_format($totalCBM, 3), $totalTOT, '', '', '', '', '', '', ''];
 
         return $rows;
     }
@@ -114,20 +147,26 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
     public function styles(Worksheet $sheet)
     {
         return [
-            // Header row styling
+            // Company header row styling
             1 => [
+                'font' => ['bold' => true, 'size' => 14],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => 'FFFFFF']],
+            ],
+            // Loading tally sheet title row styling
+            2 => [
                 'font' => ['bold' => true, 'size' => 12],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => 'E8E8E8']],
             ],
             // Info row styling
-            2 => [
-                'font' => ['bold' => true, 'size' => 9],
+            3 => [
+                'font' => ['bold' => true, 'size' => 10],
                 'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
-                'fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => 'F5F5F5']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => 'FFFFFF']],
             ],
             // Column headers styling
-            3 => [
+            4 => [
                 'font' => ['bold' => true, 'size' => 10],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
                 'fill' => ['fillType' => Fill::FILL_SOLID, 'color' => ['rgb' => 'E8E8E8']],
@@ -141,17 +180,23 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Merge header cell
-                $sheet->mergeCells('A1:H1');
+                // Merge company header cell
+                $sheet->mergeCells('A1:L1');
+
+                // Merge loading tally sheet title cell
+                $sheet->mergeCells('A2:L2');
 
                 // Merge container info cells
-                $sheet->mergeCells('A2:B2'); // CONTR NO
-                $sheet->mergeCells('C2:F2'); // DATE LOADED
-                $sheet->mergeCells('G2:H2'); // SHIPMENT NO
+                $sheet->mergeCells('A3:B3'); // CONTR NO
+                $sheet->mergeCells('D3:I3'); // DATE LOADED
+                $sheet->mergeCells('J3:L3'); // SHIPMENT NO
+
+                // Merge TYPE OF PACKAGE columns in header row
+                $sheet->mergeCells('F4:J4'); // TYPE OF PACKAGE
 
                 // Set borders for all cells
                 $highestRow = $sheet->getHighestRow();
-                $sheet->getStyle('A1:H'.$highestRow)->applyFromArray([
+                $sheet->getStyle('A1:L'.$highestRow)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
@@ -162,21 +207,26 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
 
                 // Set row heights
                 $sheet->getRowDimension(1)->setRowHeight(25);
-                $sheet->getRowDimension(2)->setRowHeight(20);
+                $sheet->getRowDimension(2)->setRowHeight(25);
                 $sheet->getRowDimension(3)->setRowHeight(20);
+                $sheet->getRowDimension(4)->setRowHeight(20);
 
-                // Set column widths
+                // Set column widths to match the image layout
                 $sheet->getColumnDimension('A')->setWidth(6);   // SN
-                $sheet->getColumnDimension('B')->setWidth(12);  // HBL
+                $sheet->getColumnDimension('B')->setWidth(10);  // HBL
                 $sheet->getColumnDimension('C')->setWidth(20);  // NAME OF CUSTOMER
                 $sheet->getColumnDimension('D')->setWidth(8);   // CBM
                 $sheet->getColumnDimension('E')->setWidth(6);   // TOT
-                $sheet->getColumnDimension('F')->setWidth(15);  // TYPE OF PACKAGE
-                $sheet->getColumnDimension('G')->setWidth(12);  // DESTINATION
-                $sheet->getColumnDimension('H')->setWidth(12);  // REMARKS
+                $sheet->getColumnDimension('F')->setWidth(8);   // TYPE OF PACKAGE 1
+                $sheet->getColumnDimension('G')->setWidth(8);   // TYPE OF PACKAGE 2
+                $sheet->getColumnDimension('H')->setWidth(8);   // TYPE OF PACKAGE 3
+                $sheet->getColumnDimension('I')->setWidth(8);   // TYPE OF PACKAGE 4
+                $sheet->getColumnDimension('J')->setWidth(8);   // Empty column
+                $sheet->getColumnDimension('K')->setWidth(12);  // DESTINATION
+                $sheet->getColumnDimension('L')->setWidth(15);  // REMARKS
 
                 // Apply center alignment to data rows
-                $sheet->getStyle('A4:H'.$highestRow)->applyFromArray([
+                $sheet->getStyle('A5:L'.$highestRow)->applyFromArray([
                     'alignment' => [
                         'horizontal' => Alignment::HORIZONTAL_CENTER,
                         'vertical' => Alignment::VERTICAL_CENTER,
@@ -184,19 +234,37 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
                 ]);
 
                 // Left align customer names (column C)
-                $sheet->getStyle('C4:C'.$highestRow)->applyFromArray([
+                $sheet->getStyle('C5:C'.$highestRow)->applyFromArray([
                     'alignment' => [
                         'horizontal' => Alignment::HORIZONTAL_LEFT,
                         'vertical' => Alignment::VERTICAL_CENTER,
                     ],
                 ]);
 
-                // Apply word wrap for TYPE OF PACKAGE column
-                $sheet->getStyle('F4:F'.$highestRow)->applyFromArray([
-                    'alignment' => [
-                        'wrapText' => true,
-                        'horizontal' => Alignment::HORIZONTAL_CENTER,
-                        'vertical' => Alignment::VERTICAL_CENTER,
+                // Apply special styling for grand total row
+                $grandTotalRow = $highestRow;
+
+                // Remove all borders from grand total row first
+                $sheet->getStyle('A'.$grandTotalRow.':L'.$grandTotalRow)->applyFromArray([
+                    'font' => ['bold' => true],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => Border::BORDER_NONE,
+                        ],
+                        'top' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000'],
+                        ],
+                    ],
+                ]);
+
+                // Apply bottom border only to specific cells (C, D, E for GRAND TOTAL, CBM, TOT)
+                $sheet->getStyle('C'.$grandTotalRow.':E'.$grandTotalRow)->applyFromArray([
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['rgb' => '000000'],
+                        ],
                     ],
                 ]);
             },
