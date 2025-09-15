@@ -65,7 +65,8 @@ class ContainerResource extends JsonResource
             'warehouse_dwell_time' => ($this->arrived_at_primary_warehouse && $this->departed_at_primary_warehouse)
                 ? $this->formatDwellTime($this->arrived_at_primary_warehouse, $this->departed_at_primary_warehouse)
                 : null,
-            'is_rtf' => $this->latestRtfRecord?->is_rtf ?? false,
+            'is_rtf' => $this->latestDetainRecord?->is_rtf ?? false,
+            'detain_type' => $this->latestDetainRecord?->detain_type ?? null,
         ];
     }
 
