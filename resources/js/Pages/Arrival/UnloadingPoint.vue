@@ -11,6 +11,8 @@ import Button from "primevue/button";
 import { push } from 'notivue';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
+import Dropdown from "primevue/dropdown";
+import {useConfirm} from "primevue/useconfirm";
 import axios from 'axios';
 
 const props = defineProps({
@@ -224,6 +226,52 @@ const handleRemoveDraftUnload = (packages) => {
 const showUnloadingIssueModal = ref(false);
 
 const hblPackageId = ref(null);
+const confirm = useConfirm();
+
+// Detain By dropdown options
+const detainByOptions = [
+    { label: 'RTF', value: 'RTF' },
+    { label: 'DDC', value: 'DDC' },
+    { label: 'SDDC', value: 'SDDC' },
+    { label: 'IAU', value: 'IAU' },
+    { label: 'DC', value: 'DC' },
+    { label: 'CO', value: 'CO' },
+    { label: 'ICT', value: 'ICT' }
+];
+
+const selectedDetainBy = ref(null);
+
+const handleDetainPackage = (packageId, detainType) => {
+    confirm.require({
+        message: `Would you like to detain this package by ${detainType}?`,
+        header: `Detain Package by ${detainType}?`,
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: `Sure, Detain by ${detainType}`,
+            severity: 'warn'
+        },
+        accept: () => {
+            router.post(route("hbl-packages.set.detain", packageId), { detain_type: detainType }, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success(`Package detained by ${detainType}`);
+                    window.location.reload();
+                },
+                onError: () => {
+                    push.error('Something went wrong!');
+                }
+            })
+        },
+        reject: () => {
+        }
+    })
+}
 
 const confirmShowCreateIssueModal = (index) => {
     hblPackageId.value = warehouseArr.value[index].id;
@@ -907,10 +955,25 @@ const formatDate = (dateString) => {
                                                 </p>
                                             </div>
                                             <div class="flex items-center space-x-2 px-2.5">
-                                                <Button :disabled="element.unloading_issue.length > 0"
-                                                        icon="pi pi-exclamation-triangle" label="Create Unloading Issue"
-                                                        severity="warn" size="small"
-                                                        @click.prevent="confirmShowCreateIssueModal(index)"/>
+                                                <div v-if="element.unloading_issue.length === 0" class="flex items-center gap-2">
+                                                    <Dropdown
+                                                        v-model="selectedDetainBy"
+                                                        :options="detainByOptions"
+                                                        class="w-40"
+                                                        optionLabel="label"
+                                                        optionValue="value"
+                                                        placeholder="Select Detain By"
+                                                    />
+                                                    <Button
+                                                        :disabled="!selectedDetainBy"
+                                                        icon="pi pi-lock"
+                                                        label="Detain Package"
+                                                        severity="warn"
+                                                        size="small"
+                                                        variant="outlined"
+                                                        @click.prevent="handleDetainPackage(element.id, selectedDetainBy)"
+                                                    />
+                                                </div>
                                                 <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
                                                 <Button v-tooltip.left="'Click to Re-Load'" aria-label="Filter"
                                                         icon="ti ti-corner-up-left-double text-2xl" rounded

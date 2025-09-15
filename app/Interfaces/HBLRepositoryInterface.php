@@ -96,4 +96,8 @@ interface HBLRepositoryInterface
     public function doPackageRTF(HBLPackage $hbl_package);
 
     public function undoPackageRTF(HBLPackage $hbl_package);
+
+    public function doPackageDetain(HBLPackage $hbl_package, string $detainType);
+
+    public function undoPackageDetain(HBLPackage $hbl_package);
 }

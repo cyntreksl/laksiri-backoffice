@@ -664,4 +664,22 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             throw new \Exception('Failed to undo rtf HBL Package: '.$e->getMessage());
         }
     }
+
+    public function doPackageDetain(HBLPackage $hbl_package, string $detainType): void
+    {
+        try {
+            \App\Actions\HBL\HBLPackage\MarkAsDetain::run($hbl_package, $detainType);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to detain HBL Package: '.$e->getMessage());
+        }
+    }
+
+    public function undoPackageDetain(HBLPackage $hbl_package): void
+    {
+        try {
+            \App\Actions\HBL\HBLPackage\MarkAsUnDetain::run($hbl_package);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to lift detain HBL Package: '.$e->getMessage());
+        }
+    }
 }
