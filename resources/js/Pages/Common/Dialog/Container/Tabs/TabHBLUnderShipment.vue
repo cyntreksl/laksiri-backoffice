@@ -162,7 +162,7 @@ watch(
                         label="Add HBL To Shipment" size="small" @click.prevent="confirmAddHBLModal"/>
             </template>
 
-            <a v-if="container.status === 'LOADED'" :href="route('loading.hbls.batch-downloads', container.id)">
+            <a :href="route('loading.hbls.batch-downloads', container.id)">
                 <Button icon="pi pi-print" label="Print All HBL" severity="info" size="small"/>
             </a>
         </div>
