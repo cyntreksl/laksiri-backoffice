@@ -38,11 +38,29 @@ class HBLController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        // Get shipments (containers) with specific statuses
+        $shipments = Container::whereIn('status', [
+            ContainerStatus::IN_TRANSIT->value,
+            ContainerStatus::REACHED_DESTINATION->value,
+            ContainerStatus::UNLOADED->value,
+            ContainerStatus::LOADED->value,
+        ])
+            ->select('id', 'reference', 'container_number', 'vessel_name', 'status', 'estimated_time_of_arrival')
+            ->get()
+            ->map(function ($container) {
+                return [
+                    'id' => $container->id,
+                    'name' => ($container->container_number ?? $container->reference).' - '.$container->status.' ('.($container->vessel_name ?? 'Unknown Vessel').')',
+                    'value' => $container->id,
+                ];
+            });
+
         return Inertia::render('CallCenter/HBL/HBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
+            'shipments' => $shipments,
         ]);
     }
 
