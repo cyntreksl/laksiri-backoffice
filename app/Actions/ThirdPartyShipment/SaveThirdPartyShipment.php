@@ -5,6 +5,7 @@ namespace App\Actions\ThirdPartyShipment;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\HBL\GenerateHBLReferenceNumber;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HblPackage;
@@ -105,6 +106,7 @@ class SaveThirdPartyShipment
                         'container_id' => $requestData['shipment'],
                         'packages' => $allPackageIds,
                         'note' => 'Third party shipment - Auto loaded via CSV import',
+                        'status' => ContainerStatus::IN_TRANSIT->value,
                     ]);
                 }
             }
