@@ -7,6 +7,7 @@ use App\Actions\HBL\GenerateCRNumber;
 use App\Actions\HBL\GenerateHBLNumber;
 use App\Actions\HBL\GenerateHBLReferenceNumber;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\ContainerStatus;
 use App\Enum\WarehouseType;
 use App\Models\Container;
 use App\Models\HBL;
@@ -97,6 +98,7 @@ class SaveThirdPartyShipmentV2
                         'container_id' => $data['shipment'],
                         'packages' => $allPackageIds,
                         'note' => 'Third party shipment - Manual Create Option',
+                        'status' => ContainerStatus::IN_TRANSIT->value,
                     ]);
                 }
             }
