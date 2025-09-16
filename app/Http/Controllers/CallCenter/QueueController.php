@@ -58,6 +58,11 @@ class QueueController extends Controller
         return $this->queueRepository->getPackageDetailsByToken($token);
     }
 
+    public function getPackagesForReturn($token): \Illuminate\Http\JsonResponse
+    {
+        return $this->queueRepository->getPackagesForReturn($token);
+    }
+
     public function returnPackage(ReturnPackageRequest $request)
     {
         $this->queueRepository->returnPackage($request->validated());

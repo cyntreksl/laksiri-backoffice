@@ -25,6 +25,9 @@ Route::get('/get-package-queue', [QueueController::class, 'getPackageQueue']);
 Route::get('/get-package-details-by-token/{token}', [QueueController::class, 'getPackageDetailsByToken'])
     ->name('package.details.by.token');
 
+Route::get('/get-packages-for-return/{token}', [QueueController::class, 'getPackagesForReturn'])
+    ->name('packages.for.return');
+
 Route::post('/return-package', [QueueController::class, 'returnPackage'])
     ->name('package.return');
 
