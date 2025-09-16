@@ -72,6 +72,7 @@ class HBLResource extends JsonResource
             'detain_type' => $this->latestDetainRecord?->detain_type ?? null,
             'is_destination_charges_paid' => $this->is_destination_charges_paid,
             'is_departure_charges_paid' => $this->is_departure_charges_paid,
+            'is_third_party' => $this->is_third_party,
         ];
     }
 }

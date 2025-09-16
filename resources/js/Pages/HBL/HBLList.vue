@@ -107,13 +107,13 @@ const menuModel = ref([
         label: "Download",
         icon: "pi pi-fw pi-download",
         url: () => route("hbls.download", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download pdf"),
+        disabled: !usePage().props.user.permissions.includes("hbls.download pdf") || selectedHBL.value?.is_third_party,
     },
     {
         label: "Invoice",
         icon: "pi pi-fw pi-receipt",
         url: () => route("hbls.download.invoice", selectedHBL.value.id),
-        disabled: !usePage().props.user.permissions.includes("hbls.download invoice"),
+        disabled: !usePage().props.user.permissions.includes("hbls.download invoice") || selectedHBL.value?.is_third_party,
     },
     {
         label: "Barcode",
