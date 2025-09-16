@@ -47,6 +47,7 @@ const props = defineProps({
 
 const hbl = ref({});
 const hblTotalSummary = ref({});
+const hblCharges = ref({});
 const isLoadingHbl = ref(false);
 const paymentRecord = ref([]);
 const isLoading = ref(false);
@@ -60,6 +61,23 @@ const computedOutstanding = computed(() => {
         parseFloat(form.additional_charges || 0) -
         parseFloat(form.discount || 0)
     );
+});
+
+// Calculate maximum discount based on demurrage charge and branch maximum discount percentage
+const maxDiscountAmount = computed(() => {
+    const demurrageCharge = parseFloat(hblCharges.value?.destination_demurrage_charge || 0);
+    const maxDiscountPercentage = parseFloat(props.branch?.maximum_demurrage_discount || 0);
+    
+    if (demurrageCharge > 0 && maxDiscountPercentage > 0) {
+        return (demurrageCharge * maxDiscountPercentage) / 100;
+    }
+    return 0;
+});
+
+// Check if discount should be disabled (when demurrage charge is 0)
+const isDiscountDisabled = computed(() => {
+    const demurrageCharge = parseFloat(hblCharges.value?.destination_demurrage_charge || 0);
+    return demurrageCharge === 0;
 });
 
 const fetchHBL = async () => {
@@ -110,9 +128,30 @@ const getHBLTotalSummary = async () => {
     }
 };
 
+const getHBLCharges = async () => {
+    try {
+        const response = await fetch(`/hbl-charge/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok.");
+        } else {
+            hblCharges.value = await response.json();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
 if (props.hblId !== null) {
     fetchHBL();
     getHBLTotalSummary();
+    getHBLCharges();
 }
 
 const getHBLPayments = async () => {
@@ -323,12 +362,22 @@ watch(computedOutstanding, (val) => {
                 <!-- Discount Field -->
                 <div>
                     <IftaLabel>
-                        <InputNumber v-model="form.discount" :maxFractionDigits="2" :minFractionDigits="2"
+                        <InputNumber v-model="form.discount" :disabled="isDiscountDisabled" :max="maxDiscountAmount" :maxFractionDigits="2" :minFractionDigits="2"
                                      class="w-full" inputId="discount" min="0" step="any"
                                      variant="filled"/>
-                        <label for="discount">Discount</label>
+                        <label for="discount">
+                            <span v-if="isDiscountDisabled">Discount (Not Available)</span>
+                            <span v-else>Discount (Max: {{ currencyCode }} {{ maxDiscountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})</span>
+                        </label>
                     </IftaLabel>
                     <InputError :message="form.errors.discount"/>
+                    <small v-if="isDiscountDisabled" class="text-red-500 mt-1 block">
+                        <i class="pi pi-exclamation-triangle mr-1"></i>
+                        Discount not available - No demurrage charges found
+                    </small>
+                    <small v-else-if="maxDiscountAmount > 0" class="text-gray-500 mt-1 block">
+                        Based on {{ (props.branch?.maximum_demurrage_discount || 0) }}% of demurrage charge ({{ currencyCode }} {{ parseFloat(hblCharges?.destination_demurrage_charge || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})
+                    </small>
                 </div>
 
                 <div>
