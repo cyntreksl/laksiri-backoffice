@@ -66,6 +66,7 @@ class SaveThirdPartyShipmentV2
                 'system_status' => HBL::SYSTEM_STATUS_HBL_CREATED,
                 'is_departure_charges_paid' => 1,
                 'is_destination_charges_paid' => $data['is_destination_charges_paid'],
+                'is_third_party' => true,
             ]);
 
             // Create HBL packages

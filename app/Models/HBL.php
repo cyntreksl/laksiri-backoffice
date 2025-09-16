@@ -133,6 +133,7 @@ class HBL extends Model
         'is_short_load',
         'is_unmanifest',
         'is_overland',
+        'is_third_party',
     ];
 
     protected $appends = [

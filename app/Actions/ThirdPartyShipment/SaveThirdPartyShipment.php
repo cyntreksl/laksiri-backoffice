@@ -71,6 +71,7 @@ class SaveThirdPartyShipment
                     'grand_total' => 0,
                     'do_charge' => 0,
                     'is_departure_charges_paid' => 1, // Set departure charges as paid
+                    'is_third_party' => true,
                 ]);
 
                 // Create HBL packages
