@@ -49,8 +49,8 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
             '',
             '',
             '',
-            'SHIPMENT NO:'.($this->container->reference ?? ''),
             '',
+            'SHIPMENT NO:'.($this->container->reference ?? ''),
             '',
         ];
 
@@ -188,8 +188,8 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
 
                 // Merge container info cells
                 $sheet->mergeCells('A3:B3'); // CONTR NO
-                $sheet->mergeCells('D3:I3'); // DATE LOADED
-                $sheet->mergeCells('J3:L3'); // SHIPMENT NO
+                $sheet->mergeCells('D3:J3'); // DATE LOADED
+                $sheet->mergeCells('K3:L3'); // SHIPMENT NO
 
                 // Merge TYPE OF PACKAGE columns in header row
                 $sheet->mergeCells('F4:J4'); // TYPE OF PACKAGE
@@ -259,7 +259,7 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
                 ]);
 
                 // Apply bottom border only to specific cells (C, D, E for GRAND TOTAL, CBM, TOT)
-                $sheet->getStyle('C'.$grandTotalRow.':E'.$grandTotalRow)->applyFromArray([
+                $sheet->getStyle('D'.$grandTotalRow.':E'.$grandTotalRow)->applyFromArray([
                     'borders' => [
                         'bottom' => [
                             'borderStyle' => Border::BORDER_THIN,
