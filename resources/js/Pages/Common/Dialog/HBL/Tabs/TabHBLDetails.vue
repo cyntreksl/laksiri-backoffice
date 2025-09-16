@@ -199,8 +199,11 @@ const closeRemarksDialog = () => {
             <Card v-else class="!bg-emerald-50 !border !border-emerald-200 !shadow-none">
                 <template #content>
                     <div class="flex items-center space-x-5">
-                        <div v-if="hbl?.latest_rtf_record?.is_rtf" class="flex space-x-2">
-                            <i v-tooltip.left="`Detained by ${hbl?.latest_rtf_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                        <div class="flex space-x-2">
+                            <i v-if="hbl?.latest_rtf_record?.is_rtf" v-tooltip.left="`Detained by ${hbl?.latest_rtf_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                            <i v-if="hbl?.is_short_load" v-tooltip.left="'Short Load'" class="ti ti-truck-loading text-2xl text-orange-500"></i>
+                            <i v-if="hbl?.is_unmanifest" v-tooltip.left="'Unmanifest'" class="ti ti-file-x text-2xl text-purple-500"></i>
+                            <i v-if="hbl?.is_overland" v-tooltip.left="'Overland'" class="ti ti-road text-2xl text-blue-500"></i>
                         </div>
                         <p class="text-3xl uppercase font-normal">
                             {{ hbl?.branch.name }}

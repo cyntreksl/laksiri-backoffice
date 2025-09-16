@@ -653,4 +653,21 @@ class HBLController extends Controller
         $remark->user_id = Auth::id();
         $hbl_package->remarks()->save($remark);
     }
+
+    public function updateHBLStatus(Request $request, HBL $hbl)
+    {
+        $request->validate([
+            'is_short_load' => 'sometimes|boolean',
+            'is_unmanifest' => 'sometimes|boolean',
+            'is_overland' => 'sometimes|boolean',
+        ]);
+
+        $hbl->update($request->only(['is_short_load', 'is_unmanifest', 'is_overland']));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'HBL status updated successfully',
+            'hbl' => $hbl->fresh()
+        ]);
+    }
 }

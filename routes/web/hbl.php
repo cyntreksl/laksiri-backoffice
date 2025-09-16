@@ -132,3 +132,6 @@ Route::post('/hbls/{hbl}/remarks', [HblController::class, 'storeRemark'])
 
 Route::post('/hbl-packages/{hbl_package}/remarks', [HblController::class, 'storePackageRemark'])
     ->name('hbl_packages.remarks.store');
+
+Route::post('hbls/{hbl}/update-status', [HBLController::class, 'updateHBLStatus'])
+    ->name('hbls.update-status');

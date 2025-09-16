@@ -129,4 +129,46 @@ class Container extends Model
     {
         return $this->morphMany(Remark::class, 'remarkable');
     }
+
+    public function hbls(): BelongsToMany
+    {
+        return $this->belongsToMany(HBL::class, 'container_hbl_package', 'container_id', 'hbl_package_id')
+            ->through(HBLPackage::class);
+    }
+
+    public function hasShortLoadHBLs(): bool
+    {
+        return $this->hbl_packages()
+            ->whereHas('hbl', function ($query) {
+                $query->where('is_short_load', true);
+            })
+            ->exists();
+    }
+
+    public function hasUnmanifestHBLs(): bool
+    {
+        return $this->hbl_packages()
+            ->whereHas('hbl', function ($query) {
+                $query->where('is_unmanifest', true);
+            })
+            ->exists();
+    }
+
+    public function hasOverlandHBLs(): bool
+    {
+        return $this->hbl_packages()
+            ->whereHas('hbl', function ($query) {
+                $query->where('is_overland', true);
+            })
+            ->exists();
+    }
+
+    public function getStatusFlags(): array
+    {
+        return [
+            'has_short_load' => $this->hasShortLoadHBLs(),
+            'has_unmanifest' => $this->hasUnmanifestHBLs(),
+            'has_overland' => $this->hasOverlandHBLs(),
+        ];
+    }
 }
