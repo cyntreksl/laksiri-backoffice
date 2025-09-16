@@ -14,6 +14,7 @@ use App\Enum\ContainerStatus;
 use App\Enum\HBLType;
 use App\Exports\DoorToDoorManifestExport;
 use App\Exports\LoadedContainerManifestExport;
+use App\Exports\LoadedContainerTallySheetExcelExport;
 use App\Exports\LoadedContainerTallySheetExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
@@ -27,6 +28,7 @@ use App\Traits\HandlesDeadlocks;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
@@ -266,5 +268,15 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
+    }
+
+    public function tallySheetDownloadExcel($container)
+    {
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+        $filename = $container->reference.'_tally_sheet_'.date('Y_m_d_h_i_s').'.xlsx';
+
+        $export = new LoadedContainerTallySheetExcelExport($container);
+
+        return Excel::download($export, $filename);
     }
 }

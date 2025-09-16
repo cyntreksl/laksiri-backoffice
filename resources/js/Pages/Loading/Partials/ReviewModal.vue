@@ -75,6 +75,10 @@ const handleDownLoadTallySheet = () => {
     window.location.href = route("loading.containers.tally-sheet-downloads", form.container_id);
 }
 
+const handleDownLoadTallySheetExcel = () => {
+    window.location.href = route("loading.containers.tally-sheet-excel-downloads", form.container_id);
+}
+
 const getMHBLPackageCount = (hbls) => {
     return hbls.reduce((total, hbl) => {
         return total + (hbl.packages ? hbl.packages.length : 0);
@@ -183,6 +187,13 @@ const handleCreateLoadedContainer = (printTallySheet) => {
                     size="small"
                     type="button"
                     @click.prevent="handleDownLoadTallySheet"></Button>
+
+            <Button icon="pi pi-file-excel" label="Download Tally Sheet (Excel)"
+                    outlined
+                    severity="success"
+                    size="small"
+                    type="button"
+                    @click.prevent="handleDownLoadTallySheetExcel"></Button>
 
             <Button label="Finish Loading & Download Tally Sheet" outlined
                     severity="help"
