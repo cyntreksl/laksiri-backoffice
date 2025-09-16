@@ -32,6 +32,11 @@ const hblsCount = ref(0)
 const filteredHBLSPackagesCount = ref(0);
 const filteredHBLSPackagesWeight = ref(0);
 const filteredHBLSPackagesVolume = ref(0);
+const containerStatusFlags = ref({
+    has_short_load: false,
+    has_unmanifest: false,
+    has_overland: false
+});
 
 const fetchLoadedContainer = async () => {
     try {
@@ -72,6 +77,19 @@ const hbls = () => {
     filteredHBLSPackagesVolume.value = filteredHblPackages.reduce((sum, pkg) => {
         return sum + (pkg.volume || 0);
     }, 0);
+
+    // Calculate container status flags based on HBLs
+    updateContainerStatusFlags();
+}
+
+const updateContainerStatusFlags = () => {
+    const allHBLs = containerData.value.hbls ? Object.values(containerData.value.hbls) : [];
+    
+    containerStatusFlags.value = {
+        has_short_load: allHBLs.some(hbl => hbl.is_short_load),
+        has_unmanifest: allHBLs.some(hbl => hbl.is_unmanifest),
+        has_overland: allHBLs.some(hbl => hbl.is_overland)
+    };
 }
 
 watch(() => containerData.value, () => {
@@ -152,9 +170,16 @@ watch(
                     {{ container.warehouse.name }}
                 </div>
             </div>
-            <h3 class="text-2xl font-semibold text-slate-700 dark:text-navy-100">
-                {{ container.reference }}
-            </h3>
+            <div class="flex items-center gap-3">
+                <h3 class="text-2xl font-semibold text-slate-700 dark:text-navy-100">
+                    {{ container.reference }}
+                </h3>
+                <div class="flex gap-2">
+                    <i v-if="containerStatusFlags.has_short_load" v-tooltip="'Container has Short Load HBLs'" class="ti ti-truck-loading text-xl text-orange-500"></i>
+                    <i v-if="containerStatusFlags.has_unmanifest" v-tooltip="'Container has Unmanifest HBLs'" class="ti ti-file-x text-xl text-purple-500"></i>
+                    <i v-if="containerStatusFlags.has_overland" v-tooltip="'Container has Overland HBLs'" class="ti ti-road text-xl text-blue-500"></i>
+                </div>
+            </div>
         </div>
         <div class="flex items-center space-x-2">
             <template v-if="container.status !== 'IN TRANSIT'">

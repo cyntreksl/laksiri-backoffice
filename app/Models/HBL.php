@@ -130,6 +130,9 @@ class HBL extends Model
         'is_arrived_to_primary_warehouse',
         'currency_rate',
         'package_charges',
+        'is_short_load',
+        'is_unmanifest',
+        'is_overland',
     ];
 
     protected $appends = [
