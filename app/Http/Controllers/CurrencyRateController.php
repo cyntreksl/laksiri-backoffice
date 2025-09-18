@@ -7,17 +7,22 @@ use App\Http\Requests\StoreCurrencyRateRequest;
 use App\Http\Requests\UpdateCurrencyRateRequest;
 use App\Interfaces\CurrencyRepositoryInterface;
 use App\Models\Currency;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CurrencyRateController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly CurrencyRepositoryInterface $currencyRepository,
     ) {}
 
     public function index()
     {
+        $this->authorize('currencies.index');
+
         $data = collect(GetBranches::run())
             ->filter(function ($branch) {
                 return $branch['currency_name'] !== 'Sri Lankan Rupee'

@@ -6,17 +6,22 @@ use App\Http\Requests\StoreAirLineRequest;
 use App\Http\Requests\UpdateAirLineRequest;
 use App\Interfaces\AirLineRepositoryInterface;
 use App\Models\AirLine;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AirLineController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly AirLineRepositoryInterface $airLineRepository,
     ) {}
 
     public function index(Request $request)
     {
+        $this->authorize('air-line.index');
+
         return Inertia::render('Setting/AirLine/AirLineList', [
             'isDOChargesPage' => str_contains($request->path(), 'do-charges'),
         ]);

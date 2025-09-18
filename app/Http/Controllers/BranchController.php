@@ -13,10 +13,13 @@ use App\Interfaces\BranchRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\SettingRepositoryInterface;
 use App\Models\Branch;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 
 class BranchController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         private readonly BranchRepositoryInterface $branchRepository,
         private readonly SettingRepositoryInterface $settingRepository,
@@ -28,6 +31,8 @@ class BranchController extends Controller
      */
     public function index()
     {
+        $this->authorize('branches.list');
+
         return Inertia::render('Branch/BranchList', [
             'branches' => $this->branchRepository->getBranches(),
         ]);
@@ -38,6 +43,8 @@ class BranchController extends Controller
      */
     public function create()
     {
+        $this->authorize('branches.create');
+
         return Inertia::render('Branch/CreateBranch', [
             'cargoModes' => CargoType::cases(),
             'deliveryTypes' => HBLType::cases(),
@@ -59,6 +66,8 @@ class BranchController extends Controller
      */
     public function edit(Branch $branch)
     {
+        $this->authorize('branches.edit');
+
         return Inertia::render('Branch/EditBranch', [
             'cargoModes' => CargoType::cases(),
             'deliveryTypes' => HBLType::cases(),
@@ -86,6 +95,6 @@ class BranchController extends Controller
      */
     public function destroy(Branch $branch)
     {
-        //
+        $this->authorize('branches.delete');
     }
 }
