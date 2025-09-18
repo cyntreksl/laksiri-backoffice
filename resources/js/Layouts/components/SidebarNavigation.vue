@@ -292,7 +292,7 @@ const setMenu = (menu) => {
         case "hbls-dest":
             let hblDestMenu = [];
 
-            if (can("hbls.index")) {
+            if (can("hbls.index") && notRole('call center') && notRole('finance team') && notRole('clearance team')) {
                 hblDestMenu.splice(
                     2,
                     0,
@@ -1148,7 +1148,8 @@ const menuModel = ref([
         visible: () => (
             can('delivers.show deliver order') ||
             can('hbls.show draft hbls') ||
-            can('hbls.show cancelled hbls')
+            can('hbls.show cancelled hbls') ||
+            can('hbls.index')
         ) && isDest(),
         command: () => {
             setMenu('hbls-dest');
