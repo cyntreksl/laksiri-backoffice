@@ -670,4 +670,15 @@ class HBLController extends Controller
             'hbl' => $hbl->fresh()
         ]);
     }
+
+    public function showStatusDefault()
+    {
+        $this->authorize('hbls.index');
+
+        return Inertia::render('HBL/HBLStatusDefault', [
+            'users' => $this->userRepository->getUsers(['customer']),
+            'paymentStatus' => HBLPaymentStatus::cases(),
+            'warehouses' => GetDestinationBranches::run(),
+        ]);
+    }
 }
