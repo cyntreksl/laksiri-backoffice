@@ -569,7 +569,7 @@ const onNodeSelect = (event) => {
 
         <div class="grid grid-cols-12 gap-4 my-5">
             <!-- Container List -->
-            <Card class="col-span-12 sm:col-span-5 md:col-span-4 lg:col-span-3 border-2 border-gray-200 !shadow-none">
+            <Card class="col-span-12 lg:col-span-4 xl:col-span-3 border-2 border-gray-200 !shadow-none">
                 <template #title>
                     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                         <div class="text-base font-semibold">Available Shipments</div>
@@ -584,8 +584,11 @@ const onNodeSelect = (event) => {
                         v-model:selectionKeys="selectedKey"
                         :meta-key-selection="false"
                         :value="treeTableData"
-                        scroll-height="1000px"
-                        scrollable
+                        class="p-treetable-responsive"
+                        responsive-layout="scroll"
+                        :scrollable="true"
+                        scroll-height="400px"
+                        breakpoint="960px"
                         selection-mode="single"
                         @node-select="onNodeSelect"
                     >
@@ -603,16 +606,34 @@ const onNodeSelect = (event) => {
 
                                     <div v-else>
                                         <div class="space-y-2">
-                                            <div class="font-medium text-base text-lg">
-                                                {{node.data.reference}}
-                                                <i class="ti ti-plane-departure text-xl mx-2"></i>
-                                                {{node.data.branch?.name}}
+                                            <div class="font-medium text-sm md:text-base break-words">
+                                                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                                    <span class="truncate">{{node.data.reference}}</span>
+                                                    <div class="flex items-center text-xs sm:text-sm text-gray-600">
+                                                        <i class="ti ti-plane-departure text-base sm:text-xl"></i>
+                                                        <span class="ml-1 truncate">{{node.data.branch?.name}}</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="grid grid-cols-2 gap-3 bg-sky-100 border border-sky-300 p-5 rounded-xl">
-                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.container_type " label="Type"/>
-                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.estimated_time_of_arrival " label="ETA"/>
-                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.cargo_type " label="Cargo Type"/>
-                                                <InfoDisplay v-if="node.data.type === 'shipment'" :value="node.data.warehouse?.name " label="Warehouse"/>
+                                            <div class="bg-sky-50 border border-sky-200 p-2 sm:p-3 rounded-lg">
+                                                <div class="grid grid-cols-1 gap-2 text-xs">
+                                                    <div v-if="node.data.type === 'shipment'" class="flex justify-between">
+                                                        <span class="text-gray-500 font-medium">Type:</span>
+                                                        <span class="text-gray-900 truncate ml-2">{{ node.data.container_type }}</span>
+                                                    </div>
+                                                    <div v-if="node.data.type === 'shipment'" class="flex justify-between">
+                                                        <span class="text-gray-500 font-medium">ETA:</span>
+                                                        <span class="text-gray-900 truncate ml-2">{{ node.data.estimated_time_of_arrival }}</span>
+                                                    </div>
+                                                    <div v-if="node.data.type === 'shipment'" class="flex justify-between">
+                                                        <span class="text-gray-500 font-medium">Cargo:</span>
+                                                        <span class="text-gray-900 truncate ml-2">{{ node.data.cargo_type }}</span>
+                                                    </div>
+                                                    <div v-if="node.data.type === 'shipment'" class="flex justify-between">
+                                                        <span class="text-gray-500 font-medium">Warehouse:</span>
+                                                        <span class="text-gray-900 truncate ml-2">{{ node.data.warehouse?.name }}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -634,7 +655,7 @@ const onNodeSelect = (event) => {
             </Card>
 
             <!-- Tabs Panel -->
-            <Card class="col-span-12 sm:col-span-7 md:col-span-8 lg:col-span-9 border-2 border-gray-200 !shadow-none">
+            <Card class="col-span-12 lg:col-span-8 xl:col-span-9 border-2 border-gray-200 !shadow-none">
                 <template #title>
                     <div v-if="loadingContainerData" class="flex flex-col space-y-3">
                         <div class="flex items-center space-x-4">
@@ -702,6 +723,10 @@ const onNodeSelect = (event) => {
                                 <div v-else class="overflow-x-auto">
                                     <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                                                :value="filteredHBLS"
+                                               class="p-datatable-responsive"
+                                               responsive-layout="scroll"
+                                               :scrollable="true"
+                                               breakpoint="960px"
                                                paginator row-hover
                                                tableStyle="min-width: 50rem">
                                         <template #empty>No HBLs found.</template>
@@ -757,6 +782,10 @@ const onNodeSelect = (event) => {
                                 <div v-else class="overflow-x-auto">
                                     <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]"
                                                :value="filteredMHBLS"
+                                               class="p-datatable-responsive"
+                                               responsive-layout="scroll"
+                                               :scrollable="true"
+                                               breakpoint="960px"
                                                paginator row-hover
                                                tableStyle="min-width: 50rem">
                                         <template #empty>No MHBLs found.</template>
@@ -1036,7 +1065,7 @@ const onNodeSelect = (event) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-10">
+                                <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
 
                                     <InfoDisplay :value="selectedContainer.cargo_type" label="Cargo Mode"/>
                                     <InfoDisplay :value="selectedContainer.container_type" label="Container Type"/>
@@ -1102,7 +1131,7 @@ const onNodeSelect = (event) => {
                                         <InputError :message="updateForm.errors.is_returned"/>
                                     </div>
 
-                                    <div class="text-right col-span-1 sm:col-span-2 lg:col-span-4">
+                                    <div class="text-right col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4">
                                         <Button :class="{ 'opacity-25': updateForm.processing }"
                                                 :disabled="updateForm.processing" icon="pi pi-save" label="Save Changes"
                                                 severity="info" size="small" @click="handleUpdateContainer"/>
