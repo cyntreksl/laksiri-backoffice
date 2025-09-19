@@ -51,6 +51,7 @@ const selectedHBL = ref(null);
 const selectedHBLID = ref(null);
 const confirm = useConfirm();
 const searchError = ref("");
+const hblStatusData = ref({});
 
 const menuModel = ref([
     {
@@ -100,6 +101,7 @@ const searchHBL = async () => {
     loading.value = true;
     searchError.value = "";
     hblData.value = null;
+    hblStatusData.value = {};
 
     try {
         const response = await axios.get(`/get-hbl-by-reference/${hblNumber.value.trim()}`);
@@ -107,6 +109,9 @@ const searchHBL = async () => {
         if (response.data) {
             // Transform the response to match the HBL list format
             hblData.value = [response.data];
+            
+            // Fetch HBL status for the found HBL
+            await fetchHBLStatus(response.data.id);
         } else {
             searchError.value = "HBL not found";
         }
@@ -122,10 +127,68 @@ const searchHBL = async () => {
     }
 };
 
+const fetchHBLStatus = async (hblId) => {
+    try {
+        const response = await axios.get(`/get-hbl-status/${hblId}`, {
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (response.data && response.data.status) {
+            hblStatusData.value[hblId] = response.data.status;
+        }
+    } catch (error) {
+        console.error("Error fetching HBL status:", error);
+    }
+};
+
+const getLatestHBLStatus = (hblId) => {
+    const statuses = hblStatusData.value[hblId];
+    if (statuses && statuses.length > 0) {
+        return statuses[statuses.length - 1];
+    }
+    return null;
+};
+
+const hblStatusColor = (status) => {
+    switch (status) {
+        case 'HBL Preparation by warehouse':
+        case 'HBL Preparation by driver':
+            return 'bg-primary';
+        case 'Cash Received by Accountant':
+            return 'bg-secondary';
+        case 'Container Loading':
+            return 'bg-success';
+        case 'Container Shipped':
+            return 'bg-error';
+        case 'Container Arrival':
+            return 'bg-slate-500';
+        case 'Blocked By RTF':
+            return 'bg-red-500';
+        case 'Revert To Cash Settlement':
+            return 'bg-amber-400';
+        case 'Container Unloaded in Colombo':
+            return 'bg-gray-400';
+        case 'Container Loading in Colombo':
+            return 'bg-success';
+        case 'Container Unloaded in Nintavur':
+            return 'bg-red-600';
+        case 'Container In Transit':
+            return 'bg-cyan-600';
+        case 'Container Reached Destination ':
+            return 'bg-emerald-600';
+        default:
+            return 'bg-gray-400';
+    }
+};
+
 const clearSearch = () => {
     hblNumber.value = "";
     hblData.value = null;
     searchError.value = "";
+    hblStatusData.value = {};
 };
 
 const onRowContextMenu = (event) => {
@@ -379,58 +442,6 @@ const handleKeyPress = (event) => {
                             </template>
                         </Column>
 
-                        <Column field="hbl_type" header="HBL Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type" />
-                            </template>
-                        </Column>
-
-                        <Column field="cargo_type" header="Cargo Type" sortable>
-                            <template #body="slotProps">
-                                <div class="flex items-center">
-                                    <i 
-                                        :class="[resolveCargoType(slotProps.data)?.icon, `text-${resolveCargoType(slotProps.data)?.color}`]"
-                                        class="mr-2"
-                                    ></i>
-                                    {{ slotProps.data.cargo_type }}
-                                </div>
-                            </template>
-                        </Column>
-
-                        <Column field="warehouse" header="Warehouse" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse" />
-                            </template>
-                        </Column>
-
-                        <Column field="grand_total" header="Grand Total" sortable>
-                            <template #body="slotProps">
-                                <div class="font-semibold">
-                                    LKR {{ parseFloat(slotProps.data.grand_total || 0).toLocaleString() }}
-                                </div>
-                            </template>
-                        </Column>
-
-                        <Column field="paid_amount" header="Paid Amount" sortable>
-                            <template #body="slotProps">
-                                <div class="font-medium text-success">
-                                    LKR {{ parseFloat(slotProps.data.paid_amount || 0).toLocaleString() }}
-                                </div>
-                            </template>
-                        </Column>
-
-                        <Column field="status" header="Payment Status" sortable>
-                            <template #body="slotProps">
-                                <div class="flex items-center">
-                                    <i 
-                                        :class="[resolvePaymentStatus(slotProps.data)?.icon, `text-${resolvePaymentStatus(slotProps.data)?.color}`]"
-                                        class="mr-2"
-                                    ></i>
-                                    {{ slotProps.data.status || 'Not Paid' }}
-                                </div>
-                            </template>
-                        </Column>
-
                         <Column field="is_hold" header="Hold Status" sortable>
                             <template #body="slotProps">
                                 <Tag 
@@ -440,16 +451,25 @@ const handleKeyPress = (event) => {
                             </template>
                         </Column>
 
-                        <Column field="created_at" header="Created Date" sortable>
+                        <Column field="latest_status" header="Latest Status" sortable>
                             <template #body="slotProps">
-                                <div class="text-sm">
-                                    {{ moment(slotProps.data.created_at).format('MMM DD, YYYY') }}
-                                    <div class="text-gray-500">
-                                        {{ moment(slotProps.data.created_at).format('HH:mm') }}
+                                <div v-if="getLatestHBLStatus(slotProps.data.id)" class="flex items-center">
+                                    <div 
+                                        :class="`w-3 h-3 rounded-full mr-2 ${hblStatusColor(getLatestHBLStatus(slotProps.data.id).status)}`"
+                                    ></div>
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-sm">{{ getLatestHBLStatus(slotProps.data.id).status }}</span>
+                                        <span class="text-xs text-gray-500">
+                                            {{ moment(getLatestHBLStatus(slotProps.data.id).created_at).format('MMM DD, YYYY HH:mm') }}
+                                        </span>
                                     </div>
+                                </div>
+                                <div v-else class="text-gray-400 text-sm">
+                                    No status available
                                 </div>
                             </template>
                         </Column>
+                       
                     </DataTable>
                 </template>
             </Card>
