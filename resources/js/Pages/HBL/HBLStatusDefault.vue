@@ -493,8 +493,9 @@ const handleKeyPress = (event) => {
         <HBLDetailModal
             v-if="showConfirmViewHBLModal"
             :hbl-id="selectedHBLID"
-            :visible="showConfirmViewHBLModal"
+            :show="showConfirmViewHBLModal"
             @close="closeModal"
+            @update:show="showConfirmViewHBLModal = $event"
         />
     </AppLayout>
 </template>
