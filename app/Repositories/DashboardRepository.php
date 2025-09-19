@@ -36,7 +36,10 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function countLoadedShipments(): int
     {
-        return Container::where('status', ContainerStatus::LOADED->value)->count();
+        return Container::whereIn('status', [
+            ContainerStatus::LOADED->value,
+            ContainerStatus::IN_TRANSIT->value,
+        ])->count();
     }
 
     public function countTotalContainers(): int
