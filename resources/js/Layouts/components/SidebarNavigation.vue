@@ -200,6 +200,17 @@ const setMenu = (menu) => {
                 );
             }
 
+            if (can("hbls.index")) {
+                hblMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "HBL Status Default",
+                        route: "hbls.status-default",
+                    }
+                );
+            }
+
             if (can("hbls.hbl finance approval list") && currentBranchIs('Destination')) {
                 hblMenu.splice(
                     2,

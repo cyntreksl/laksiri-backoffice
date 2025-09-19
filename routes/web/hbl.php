@@ -135,3 +135,6 @@ Route::post('/hbl-packages/{hbl_package}/remarks', [HblController::class, 'store
 
 Route::post('hbls/{hbl}/update-status', [HBLController::class, 'updateHBLStatus'])
     ->name('hbls.update-status');
+
+Route::get('hbls/show/status-default', [HBLController::class, 'showStatusDefault'])
+    ->name('hbls.status-default');
