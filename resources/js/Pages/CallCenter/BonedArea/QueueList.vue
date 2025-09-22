@@ -112,13 +112,39 @@ const isPackageSelected = (packageData) => {
     );
 };
 
-const selectAllPackagesInHBL = (hblGroup) => {
+// Computed properties to optimize the complex filtering logic
+const hblGroupSelectionStates = computed(() => {
+    if (!returnForm.package_details?.hbl_groups) {
+        return {};
+    }
+
+    const states = {};
+    
+    returnForm.package_details.hbl_groups.forEach((hblGroup, index) => {
+        const releasedPackages = hblGroup.packages.filter(pkg => pkg.is_released);
+        const allSelected = releasedPackages.every(pkg => isPackageSelected(pkg));
+        const noneSelected = releasedPackages.every(pkg => !isPackageSelected(pkg));
+        const someSelected = !allSelected && !noneSelected;
+        
+        states[index] = {
+            releasedPackagesCount: releasedPackages.length,
+            allSelected,
+            noneSelected,
+            someSelected,
+            buttonLabel: allSelected ? 'Deselect All' : 'Select All Released',
+            buttonSeverity: allSelected ? 'secondary' : 'info',
+            disabled: releasedPackages.length === 0
+        };
+    });
+    
+    return states;
+});
+
+const selectAllPackagesInHBL = (hblGroup, hblIndex) => {
+    const state = hblGroupSelectionStates.value[hblIndex];
     const releasedPackages = hblGroup.packages.filter(pkg => pkg.is_released);
     
-    // Check if all released packages in this HBL are already selected
-    const allSelected = releasedPackages.every(pkg => isPackageSelected(pkg));
-    
-    if (allSelected) {
+    if (state.allSelected) {
         // Deselect all packages in this HBL
         releasedPackages.forEach(pkg => {
             const index = returnForm.selected_packages.findIndex(
@@ -377,11 +403,11 @@ const showLogDialog = (token) => {
                                         <strong>Customer:</strong> {{ hblGroup.customer }}
                                     </div>
                                     <Button 
-                                        :label="hblGroup.packages.filter(pkg => pkg.is_released).every(pkg => isPackageSelected(pkg)) ? 'Deselect All' : 'Select All Released'"
-                                        :severity="hblGroup.packages.filter(pkg => pkg.is_released).every(pkg => isPackageSelected(pkg)) ? 'secondary' : 'info'"
+                                        :label="hblGroupSelectionStates[index]?.buttonLabel || 'Select All Released'"
+                                        :severity="hblGroupSelectionStates[index]?.buttonSeverity || 'info'"
                                         size="small"
-                                        @click="selectAllPackagesInHBL(hblGroup)"
-                                        :disabled="hblGroup.packages.filter(pkg => pkg.is_released).length === 0"
+                                        @click="selectAllPackagesInHBL(hblGroup, index)"
+                                        :disabled="hblGroupSelectionStates[index]?.disabled || hblGroup.packages.filter(pkg => pkg.is_released).length === 0"
                                     />
                                 </div>
 
