@@ -205,7 +205,7 @@ const setMenu = (menu) => {
                     2,
                     0,
                     {
-                        title: "HBL Status ",
+                        title: "HBL Status",
                         route: "hbls.status-default",
                     }
                 );
