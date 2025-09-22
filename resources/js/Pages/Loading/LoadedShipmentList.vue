@@ -96,6 +96,12 @@ const menuModel = ref([
         disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
     },
     {
+        label: 'Main Manifest Excel',
+        icon: 'pi pi-fw pi-file-excel',
+        url: () => route("loading.loaded-containers.manifest.excel", selectedContainer.value.id),
+        disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
+    },
+    {
         label: 'Door to Door Manifest',
         icon: 'pi pi-fw pi-download',
         url: () => route("loading.loaded-containers.doorToDoor.export", selectedContainer.value.id),
