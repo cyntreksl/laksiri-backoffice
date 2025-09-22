@@ -346,7 +346,6 @@ const handleKeyPress = (event) => {
                                     :class="{ 'p-invalid': searchError }"
                                     @keypress="handleKeyPress"
                                 />
-                        
                             </FloatLabel>
                             <small v-if="searchError" class="text-red-500 mt-1 block">{{ searchError }}</small>
                         </div>
