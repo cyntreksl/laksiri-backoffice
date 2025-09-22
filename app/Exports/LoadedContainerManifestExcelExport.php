@@ -152,7 +152,6 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
         $worksheet->getStyle('A3:K3')->getFont()->setBold(true);
 
-        $worksheet->getStyle('A3:K3')->getFont()->setBold(true);
 
         // Row 4-6 - Shipper, consignee, notify info - Individual rows
         // Row 4 - Shipper
