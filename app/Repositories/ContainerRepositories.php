@@ -52,6 +52,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -188,7 +189,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
                     $logoBase64 = 'data:'.$mime.';base64,'.base64_encode($logoContent);
                 }
             } catch (\Exception $e) {
-                \Log::warning('Unable to access logo file: '.$e->getMessage());
+                Log::warning('Unable to access logo file: '.$e->getMessage());
             }
         }
 
@@ -219,6 +220,145 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
         // Return the combined PDF as a download response
         return response()->download($finalPdfPath)->deleteFileAfterSend(true);
+    }
+
+    public function batchMHBLDownload(Container $container): BinaryFileResponse
+    {
+        // Define the PDF directory
+        $pdfDirectory = public_path('pdf/');
+
+        // Ensure the PDF directory exists and clean it
+        if (! File::exists($pdfDirectory)) {
+            File::makeDirectory($pdfDirectory, 0755, true);
+        } else {
+            $pdfFile = new Filesystem;
+            $pdfFile->cleanDirectory($pdfDirectory);
+        }
+
+        $container = GetLoadedContainerById::run($container);
+
+        // Get all MHBLs from the container
+        $mhbls = collect($container->hbls)
+            ->filter(function ($hbl) {
+                return $hbl->mhbl !== null;
+            })
+            ->groupBy('mhbl.id')
+            ->map(function ($hbls) {
+                return $hbls->first()->mhbl;
+            })
+            ->values();
+
+        if ($mhbls->isEmpty()) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException('No MHBLs found in this container.');
+        }
+
+        // Initialize a new Dompdf instance with custom options
+        $options = new Options;
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Create an empty string to store the combined HTML
+        $combinedHtml = '';
+
+        $settings = GetSettings::run();
+
+        $logoBase64 = null;
+
+        if ($settings && ! empty($settings->logo)) {
+            try {
+                if (Storage::disk('s3')->exists($settings->logo)) {
+                    $logoContent = Storage::disk('s3')->get($settings->logo);
+                    $mime = Storage::disk('s3')->mimeType($settings->logo);
+
+                    $logoBase64 = 'data:'.$mime.';base64,'.base64_encode($logoContent);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Unable to access logo file: '.$e->getMessage());
+            }
+        }
+
+        foreach ($mhbls as $mhbl) {
+            // Get all HBLs for this MHBL
+            $hbls = $mhbl->hbls;
+
+            // Get all HBLs with their packages
+            $hblsWithPackages = $hbls->map(function ($hbl) {
+                return \App\Actions\HBL\GetHBLByIdWithPackages::run($hbl->id);
+            });
+
+            // Build a flat package list from all HBLs
+            $packages = collect($hblsWithPackages)->flatMap(function ($hbl) {
+                return $this->mapPackagesWithHblData($hbl);
+            })->values();
+
+            $hblsCollection = collect($hblsWithPackages);
+
+            $summary = [
+                'total_packages' => $packages->count(),
+                'total_quantity' => $packages->sum('quantity'),
+                'freight_charge' => $hblsCollection->sum('freight_charge'),
+                'destination_charge' => $hblsCollection->sum('destination_charge'),
+                'bill_charge' => $hblsCollection->sum('bill_charge'),
+                'grand_total' => $hblsCollection->sum('grand_total'),
+                'paid_amount' => $hblsCollection->sum('paid_amount'),
+                'total_volume' => $packages->sum('volume'),
+                'total_weight' => $packages->sum('actual_weight'),
+            ];
+
+            // Render each MHBL as HTML and append to combinedHtml
+            $combinedHtml .= view('pdf.mhbl.hbl', [
+                'mhbl' => $mhbl,
+                'packages' => $packages,
+                'settings' => $settings,
+                'logoPath' => $logoBase64,
+                'summary' => $summary,
+            ])->render();
+        }
+
+        // Load the combined HTML into Dompdf
+        $dompdf->loadHtml($combinedHtml);
+
+        // Set paper size and orientation if needed
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the PDF
+        $dompdf->render();
+
+        // Define the final PDF file path
+        $finalPdfPath = $pdfDirectory.$container->reference.'_mhbl_combined_'.date('Y_m_d_h_i_s').'.pdf';
+
+        // Save the generated PDF to a file
+        file_put_contents($finalPdfPath, $dompdf->output());
+
+        // Return the combined PDF as a download response
+        return response()->download($finalPdfPath)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Map packages with HBL data
+     */
+    private function mapPackagesWithHblData(array $hbl): array
+    {
+        if (! isset($hbl['packages']) || ! is_iterable($hbl['packages'])) {
+            return [];
+        }
+
+        return collect($hbl['packages'])->map(function ($package) use ($hbl) {
+            return array_merge(
+                is_array($package) ? $package : $package->toArray(),
+                [
+                    'hbl_number' => $hbl['hbl_number'] ?? '',
+                    'consignee_name' => $hbl['consignee_name'] ?? '',
+                    'consignee_address' => $hbl['consignee_address'] ?? '',
+                    'consignee_contact' => $hbl['consignee_contact'] ?? '',
+                    'consignee_nic' => $hbl['consignee_nic'] ?? '',
+                    'shipper_name' => $hbl['hbl_name'] ?? '',
+                    'shipper_address' => $hbl['address'] ?? '',
+                    'shipper_contact' => $hbl['contact_number'] ?? '',
+                    'shipper_nic' => $hbl['nic'] ?? '',
+                ]
+            );
+        })->all();
     }
 
     public function deleteLoading(Container $container)

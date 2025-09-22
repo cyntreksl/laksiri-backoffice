@@ -23,4 +23,6 @@ interface LoadedContainerRepositoryInterface
     public function tallySheetDownloadPDF($container);
 
     public function tallySheetDownloadExcel($container);
+
+    public function downloadManifestExcel($container);
 }

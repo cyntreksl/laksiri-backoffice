@@ -68,9 +68,11 @@ class HBLResource extends JsonResource
             'payment_status' => $this->hblPayment()->latest()->first()->status ?? 'Not Updated',
             'finance_status' => $this->is_finance_release_approved ? 'Approved' : 'Not Approved',
             'currency_rate' => $this->currency_rate ?? 1.0,
-            'is_rtf' => $this->latestRtfRecord?->is_rtf ?? false,
+            'is_rtf' => $this->latestDetainRecord?->is_rtf ?? false,
+            'detain_type' => $this->latestDetainRecord?->detain_type ?? null,
             'is_destination_charges_paid' => $this->is_destination_charges_paid,
             'is_departure_charges_paid' => $this->is_departure_charges_paid,
+            'is_third_party' => $this->is_third_party,
         ];
     }
 }

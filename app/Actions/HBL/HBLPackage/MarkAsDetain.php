@@ -5,21 +5,21 @@ namespace App\Actions\HBL\HBLPackage;
 use App\Models\HBLPackage;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class MarkAsRTF
+class MarkAsDetain
 {
     use AsAction;
 
-    public function handle(HBLPackage $HBLPackage): void
+    public function handle(HBLPackage $HBLPackage, string $detainType = 'RTF'): void
     {
         try {
             $HBLPackage->detainRecords()->create([
                 'is_rtf' => true,
-                'detain_type' => 'RTF',
+                'detain_type' => $detainType,
                 'rtf_by' => auth()->id(),
-                'note' => 'RTF marked due to completion of checks.',
+                'note' => "Package detained by {$detainType} due to completion of checks.",
             ]);
         } catch (\Exception $e) {
-            throw new \Exception('Failed to mark as rtf HBL Package: '.$e->getMessage());
+            throw new \Exception('Failed to detain HBL Package: '.$e->getMessage());
         }
     }
 }

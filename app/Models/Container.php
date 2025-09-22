@@ -107,16 +107,68 @@ class Container extends Model
 
     public function rtfRecords(): MorphMany
     {
-        return $this->morphMany(RtfRecord::class, 'rtfable');
+        return $this->morphMany(DetainRecord::class, 'rtfable');
     }
 
     public function latestRtfRecord(): MorphOne
     {
-        return $this->morphOne(RtfRecord::class, 'rtfable')->latestOfMany();
+        return $this->morphOne(DetainRecord::class, 'rtfable')->latestOfMany();
+    }
+
+    public function detainRecords(): MorphMany
+    {
+        return $this->morphMany(DetainRecord::class, 'rtfable');
+    }
+
+    public function latestDetainRecord(): MorphOne
+    {
+        return $this->morphOne(DetainRecord::class, 'rtfable')->latestOfMany();
     }
 
     public function remarks(): MorphMany
     {
         return $this->morphMany(Remark::class, 'remarkable');
+    }
+
+    public function hbls(): BelongsToMany
+    {
+        return $this->belongsToMany(HBL::class, 'container_hbl_package', 'container_id', 'hbl_package_id')
+            ->through(HBLPackage::class);
+    }
+
+    public function hasShortLoadHBLs(): bool
+    {
+        return $this->hbl_packages()
+            ->whereHas('hbl', function ($query) {
+                $query->where('is_short_load', true);
+            })
+            ->exists();
+    }
+
+    public function hasUnmanifestHBLs(): bool
+    {
+        return $this->hbl_packages()
+            ->whereHas('hbl', function ($query) {
+                $query->where('is_unmanifest', true);
+            })
+            ->exists();
+    }
+
+    public function hasOverlandHBLs(): bool
+    {
+        return $this->hbl_packages()
+            ->whereHas('hbl', function ($query) {
+                $query->where('is_overland', true);
+            })
+            ->exists();
+    }
+
+    public function getStatusFlags(): array
+    {
+        return [
+            'has_short_load' => $this->hasShortLoadHBLs(),
+            'has_unmanifest' => $this->hasUnmanifestHBLs(),
+            'has_overland' => $this->hasOverlandHBLs(),
+        ];
     }
 }

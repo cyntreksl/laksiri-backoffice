@@ -217,6 +217,9 @@ const mergedHBLData = computed(() => {
             contact_number: hbl.contact_number,
             consignee_name: hbl.consignee_name,
             consignee_address: hbl.consignee_address,
+            is_short_load: hbl.is_short_load,
+            is_unmanifest: hbl.is_unmanifest,
+            is_overland: hbl.is_overland,
         })),
         ...containerMHBLS.map(mhbl => ({
             type: 'MHBL',
@@ -239,7 +242,18 @@ const mergedHBLData = computed(() => {
         <DataTable :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100]" :value="mergedHBLData" paginator row-hover
                    tableStyle="min-width: 50rem">
             <template #empty>No HBLs found.</template>
-            <Column class="font-bold" field="hbl_number" header="HBL"></Column>
+            <Column class="font-bold" field="hbl_number" header="HBL">
+                <template #body="slotProps">
+                    <div class="flex items-center gap-2">
+                        <span>{{ slotProps.data.hbl_number }}</span>
+                        <div v-if="slotProps.data.type === 'HBL'" class="flex gap-1">
+                            <i v-if="slotProps.data.is_short_load" v-tooltip="'Short Load'" class="ti ti-truck-loading text-orange-500"></i>
+                            <i v-if="slotProps.data.is_unmanifest" v-tooltip="'Unmanifest'" class="ti ti-file-x text-purple-500"></i>
+                            <i v-if="slotProps.data.is_overland" v-tooltip="'Overland'" class="ti ti-road text-blue-500"></i>
+                        </div>
+                    </div>
+                </template>
+            </Column>
             <Column field="packages_count" header="Packages">
                 <template #body="slotProps">
                     <div class="flex items-center">

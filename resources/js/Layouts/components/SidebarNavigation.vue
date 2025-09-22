@@ -200,6 +200,17 @@ const setMenu = (menu) => {
                 );
             }
 
+            if (can("hbls.index")) {
+                hblMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "HBL Status",
+                        route: "hbls.status-default",
+                    }
+                );
+            }
+
             if (can("hbls.hbl finance approval list") && currentBranchIs('Destination')) {
                 hblMenu.splice(
                     2,
@@ -1138,7 +1149,7 @@ const menuModel = ref([
         visible: () => (
             canSomeStartWith('container') ||
             canSomeStartWith('shipment')
-        ) && isDep(),
+        ),
         command: () => {
             setMenu('loading');
         }

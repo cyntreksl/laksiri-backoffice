@@ -102,12 +102,22 @@ class HBLPackage extends Model
 
     public function rtfRecords(): MorphMany
     {
-        return $this->morphMany(RtfRecord::class, 'rtfable');
+        return $this->morphMany(DetainRecord::class, 'rtfable');
     }
 
     public function latestRtfRecord(): MorphOne
     {
-        return $this->morphOne(RtfRecord::class, 'rtfable')->latestOfMany();
+        return $this->morphOne(DetainRecord::class, 'rtfable')->latestOfMany();
+    }
+
+    public function detainRecords(): MorphMany
+    {
+        return $this->morphMany(DetainRecord::class, 'rtfable');
+    }
+
+    public function latestDetainRecord(): MorphOne
+    {
+        return $this->morphOne(DetainRecord::class, 'rtfable')->latestOfMany();
     }
 
     public function remarks(): MorphMany
