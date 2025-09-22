@@ -127,4 +127,11 @@ class LoadedContainerController extends Controller
 
         return $this->loadedContainerRepository->tallySheetDownloadPDF($container);
     }
+
+    public function tallySheetDownloadExcel($container)
+    {
+        $this->authorize('shipment.download tally sheet');
+
+        return $this->loadedContainerRepository->tallySheetDownloadExcel($container);
+    }
 }
