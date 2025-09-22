@@ -52,6 +52,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -188,7 +189,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
                     $logoBase64 = 'data:'.$mime.';base64,'.base64_encode($logoContent);
                 }
             } catch (\Exception $e) {
-                \Log::warning('Unable to access logo file: '.$e->getMessage());
+                Log::warning('Unable to access logo file: '.$e->getMessage());
             }
         }
 
@@ -248,7 +249,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             ->values();
 
         if ($mhbls->isEmpty()) {
-            throw new \Exception('No MHBLs found in this container.');
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException('No MHBLs found in this container.');
         }
 
         // Initialize a new Dompdf instance with custom options
@@ -272,7 +273,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
                     $logoBase64 = 'data:'.$mime.';base64,'.base64_encode($logoContent);
                 }
             } catch (\Exception $e) {
-                \Log::warning('Unable to access logo file: '.$e->getMessage());
+                Log::warning('Unable to access logo file: '.$e->getMessage());
             }
         }
 
@@ -287,26 +288,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
             // Build a flat package list from all HBLs
             $packages = collect($hblsWithPackages)->flatMap(function ($hbl) {
-                if (! isset($hbl['packages']) || ! is_iterable($hbl['packages'])) {
-                    return [];
-                }
-
-                return collect($hbl['packages'])->map(function ($package) use ($hbl) {
-                    return array_merge(
-                        is_array($package) ? $package : $package->toArray(),
-                        [
-                            'hbl_number' => $hbl['hbl_number'] ?? '',
-                            'consignee_name' => $hbl['consignee_name'] ?? '',
-                            'consignee_address' => $hbl['consignee_address'] ?? '',
-                            'consignee_contact' => $hbl['consignee_contact'] ?? '',
-                            'consignee_nic' => $hbl['consignee_nic'] ?? '',
-                            'shipper_name' => $hbl['hbl_name'] ?? '',
-                            'shipper_address' => $hbl['address'] ?? '',
-                            'shipper_contact' => $hbl['contact_number'] ?? '',
-                            'shipper_nic' => $hbl['nic'] ?? '',
-                        ]
-                    );
-                });
+                return $this->mapPackagesWithHblData($hbl);
             })->values();
 
             $hblsCollection = collect($hblsWithPackages);
@@ -350,6 +332,36 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
         // Return the combined PDF as a download response
         return response()->download($finalPdfPath)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Map packages with HBL data
+     *
+     * @param array $hbl
+     * @return array
+     */
+    private function mapPackagesWithHblData(array $hbl): array
+    {
+        if (! isset($hbl['packages']) || ! is_iterable($hbl['packages'])) {
+            return [];
+        }
+
+        return collect($hbl['packages'])->map(function ($package) use ($hbl) {
+            return array_merge(
+                is_array($package) ? $package : $package->toArray(),
+                [
+                    'hbl_number' => $hbl['hbl_number'] ?? '',
+                    'consignee_name' => $hbl['consignee_name'] ?? '',
+                    'consignee_address' => $hbl['consignee_address'] ?? '',
+                    'consignee_contact' => $hbl['consignee_contact'] ?? '',
+                    'consignee_nic' => $hbl['consignee_nic'] ?? '',
+                    'shipper_name' => $hbl['hbl_name'] ?? '',
+                    'shipper_address' => $hbl['address'] ?? '',
+                    'shipper_contact' => $hbl['contact_number'] ?? '',
+                    'shipper_nic' => $hbl['nic'] ?? '',
+                ]
+            );
+        })->all();
     }
 
     public function deleteLoading(Container $container)
