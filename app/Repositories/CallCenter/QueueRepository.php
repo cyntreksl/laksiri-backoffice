@@ -188,7 +188,7 @@ class QueueRepository implements QueueRepositoryInterface
     public function returnPackage(array $data): void
     {
         // Handle selective package returns
-        if (isset($data['selected_packages']) && ! empty($data['selected_packages'])) {
+        if (isset($data['selected_packages'])) {
             foreach ($data['selected_packages'] as $packageData) {
                 $packageQueue = PackageQueue::find($packageData['package_queue_id']);
 
