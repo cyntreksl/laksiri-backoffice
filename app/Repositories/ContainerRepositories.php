@@ -336,9 +336,20 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     /**
      * Map packages with HBL data
+     *
+     * @param array|App\Models\HBL $hbl
+     * @return array
      */
-    private function mapPackagesWithHblData(array $hbl): array
+    private function mapPackagesWithHblData(array|HBL $hbl): array
     {
+        // Convert HBL model to array if needed
+        if ($hbl instanceof HBL) {
+            $hbl = $hbl->toArray();
+            if (isset($hbl['packages']) && $hbl['packages'] instanceof \Illuminate\Database\Eloquent\Collection) {
+                $hbl['packages'] = $hbl['packages']->toArray();
+            }
+        }
+
         if (! isset($hbl['packages']) || ! is_iterable($hbl['packages'])) {
             return [];
         }
