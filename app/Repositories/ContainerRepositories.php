@@ -336,9 +336,6 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
     /**
      * Map packages with HBL data
-     *
-     * @param array $hbl
-     * @return array
      */
     private function mapPackagesWithHblData(array $hbl): array
     {
