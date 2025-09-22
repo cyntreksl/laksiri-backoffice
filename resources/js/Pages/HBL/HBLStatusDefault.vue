@@ -177,7 +177,7 @@ const hblStatusColor = (status) => {
             return 'bg-red-600';
         case 'Container In Transit':
             return 'bg-cyan-600';
-        case 'Container Reached Destination ':
+        case 'Container Reached Destination':
             return 'bg-emerald-600';
         default:
             return 'bg-gray-400';
