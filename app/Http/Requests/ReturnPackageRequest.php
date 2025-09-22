@@ -36,7 +36,7 @@ class ReturnPackageRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             if (! $this->token_number && (! $this->selected_packages || empty($this->selected_packages))) {
-                $validator->errors()->add('token_number', 'Either token number or selected packages must be provided.');
+                $validator->errors()->add('form', 'Either token number or selected packages must be provided.');
             }
 
             // If selected_packages is provided, ensure at least one package is selected
