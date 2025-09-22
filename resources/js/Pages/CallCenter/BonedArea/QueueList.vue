@@ -80,7 +80,7 @@ const loadPackageDetails = async () => {
         if (error.response?.status === 404) {
             push.error('No packages found for this token!');
         } else {
-            push.error('Error loading package details');
+            push.error(`Error loading package details: ${error.message || error.response?.status || 'Unknown error'}`);
         }
         returnForm.package_details = null;
     }
