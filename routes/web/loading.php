@@ -40,6 +40,9 @@ Route::name('loading.')->group(function () {
     Route::get('containers/hbl/batch-downloads/{container}', [ContainerController::class, 'batchDownloadPDF'])
         ->name('hbls.batch-downloads');
 
+    Route::get('containers/mhbl/batch-downloads/{container}', [ContainerController::class, 'batchMHBLDownloadPDF'])
+        ->name('mhbls.batch-downloads');
+
     Route::get('hbls/get-unloaded-hbl/list', [ContainerController::class, 'getUnloadedHBLs']);
 
     Route::get('hbls/get-destination-unloaded-hbl/list', [ContainerController::class, 'getDestinationUnloadedHBLs']);
