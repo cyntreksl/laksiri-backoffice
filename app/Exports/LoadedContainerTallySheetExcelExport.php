@@ -20,6 +20,8 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
 {
     use Exportable;
 
+    private const PACKAGE_TYPE_COLUMNS = 9;
+
     private Container $container;
 
     public function __construct(Container $container)
@@ -83,18 +85,7 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
         $totalTOT = 0;
 
         foreach ($data as $item) {
-            $packageTypes = is_array($item[4]) ? array_filter($item[4]) : [$item[4]];
-
-            // Split package types into separate columns (up to 9 columns to match PDF format)
-            $packageCol1 = isset($packageTypes[0]) ? $packageTypes[0] : '';
-            $packageCol2 = isset($packageTypes[1]) ? $packageTypes[1] : '';
-            $packageCol3 = isset($packageTypes[2]) ? $packageTypes[2] : '';
-            $packageCol4 = isset($packageTypes[3]) ? $packageTypes[3] : '';
-            $packageCol5 = isset($packageTypes[4]) ? $packageTypes[4] : '';
-            $packageCol6 = isset($packageTypes[5]) ? $packageTypes[5] : '';
-            $packageCol7 = isset($packageTypes[6]) ? $packageTypes[6] : '';
-            $packageCol8 = isset($packageTypes[7]) ? $packageTypes[7] : '';
-            $packageCol9 = isset($packageTypes[8]) ? $packageTypes[8] : '';
+            $packageColumns = $item[4]; // Already padded to PACKAGE_TYPE_COLUMNS elements
 
             $cbm = number_format($item[2], 3);
             $tot = $item[3];
@@ -108,15 +99,7 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
                 strtoupper($item[1]), // Customer Name
                 $cbm, // CBM with 3 decimal places
                 $tot, // TOT
-                $packageCol1,
-                $packageCol2,
-                $packageCol3,
-                $packageCol4,
-                $packageCol5,
-                $packageCol6,
-                $packageCol7,
-                $packageCol8,
-                $packageCol9,
+                ...$packageColumns,
                 $item[5], // Destination
                 $item[6] ?? '', // Remarks
             ];
@@ -147,18 +130,18 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
         foreach ($groupedPackages as $hblNumber => $hblPackages) {
             $hbl = GetHBLByHBLNumber::run($hblNumber);
             
-            // Get all package types and ensure we have all 9 slots for consistency with PDF
+            // Get all package types and ensure we have all PACKAGE_TYPE_COLUMNS slots for consistency with PDF
             $packageTypes = $hblPackages->pluck('package_type')->filter()->values()->all();
-            
-            // Pad array to 9 elements to match PDF template (which uses indices 0-8)
-            $packageTypes = array_pad($packageTypes, 9, '');
-            
+
+            // Pad array to PACKAGE_TYPE_COLUMNS elements to match PDF template (which uses indices 0-8)
+            $packageTypes = array_pad($packageTypes, self::PACKAGE_TYPE_COLUMNS, '');
+
             $data[] = [
                 $hbl->hbl_number,
                 $hbl->hbl_name,
                 $hblPackages->sum('volume'),
                 count($hblPackages),
-                $packageTypes, // Now contains up to 9 package types
+                $packageTypes, // Now contains exactly PACKAGE_TYPE_COLUMNS package types
                 $hbl->warehouse === 'COLOMBO' ? 'CMB' : 'NTR',
                 '',
             ];
