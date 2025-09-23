@@ -301,11 +301,12 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
             // Start with cargo type (like in blade file line 238)
             $remarksValue = '';
-            if ($hblType == 'GIFT' || $hblType == 'Gift') {
+            $normalizedHblType = strtoupper($hblType);
+            if ($normalizedHblType == 'GIFT') {
                 $remarksValue = 'GIFT CARGO' . "\n";
-            } elseif ($hblType == 'UBP') {
+            } elseif ($normalizedHblType == 'UBP') {
                 $remarksValue = 'UBP CARGO' . "\n";
-            } elseif ($hblType == 'D2D') {
+            } elseif ($normalizedHblType == 'D2D') {
                 $remarksValue = 'DOOR TO DOOR CARGO' . "\n";
             }
 
