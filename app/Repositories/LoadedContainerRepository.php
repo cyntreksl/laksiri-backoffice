@@ -141,7 +141,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             return $a[0] <=> $b[0];
         });
 
-        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === HBLType::GIFT->value));
+        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === strtolower(HBLType::GIFT->value)));
 
         $upbCount = count(array_filter($data, fn ($item) => $item[11] === HBLType::UPB->value));
 
@@ -297,7 +297,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
             return $a[0] <=> $b[0];
         });
 
-        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === HBLType::GIFT->value));
+        $giftCount = count(array_filter($data, fn ($item) => strtolower($item[11]) === strtolower(HBLType::GIFT->value)));
         $upbCount = count(array_filter($data, fn ($item) => $item[11] === HBLType::UPB->value));
         $d2dCount = count(array_filter($data, fn ($item) => $item[11] === HBLType::DOOR_TO_DOOR->value));
 
