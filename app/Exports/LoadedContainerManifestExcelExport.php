@@ -310,8 +310,10 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                 $remarksValue = 'DOOR TO DOOR CARGO' . "\n";
             }
 
-            // Add HBL Type
-            $remarksValue .= $hblType;
+            // Only add HBL Type if not already described
+            if ($remarksValue === '') {
+                $remarksValue = $hblType;
+            }
 
             // Add payment logic exactly as in blade file
             if ($isDepartureChargesPaid && $isDestinationChargesPaid) {
