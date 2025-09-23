@@ -40,8 +40,8 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
 
         // Container info row
         $rows[] = [
-            'CONTR NO :',
-            $this->container->container_number ?? '',
+            'CONTR NO : '.($this->container->container_number ?? ''),
+            '',
             '',
             'DATE LOADED : '.Carbon::parse($this->container->loading_started_at ?? now())->format('d.m.Y'),
             '',
@@ -210,7 +210,7 @@ class LoadedContainerTallySheetExcelExport implements FromArray, ShouldAutoSize,
                 $sheet->mergeCells('A2:P2');
 
                 // Merge container info cells
-                $sheet->mergeCells('A3:B3'); // CONTR NO
+                $sheet->mergeCells('A3:C3'); // CONTR NO
                 $sheet->mergeCells('D3:M3'); // DATE LOADED
                 $sheet->mergeCells('N3:P3'); // SHIPMENT NO
 
