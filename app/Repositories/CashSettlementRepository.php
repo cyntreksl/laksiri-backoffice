@@ -93,7 +93,12 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         ];
     }
 
-    public function getDuePaymentSummary(array $filters = []): array
+    public function getSummary(array $filters = []): array
+    {
+        return $this->getSummery($filters);
+    }
+
+    public function getDuePaymentSummery(array $filters = []): array
     {
         $query = HBL::query();
 
@@ -113,6 +118,11 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
             'sumAmount' => $records->sum('grand_total'),
             'sumPaidAmount' => $records->sum('paid_amount'),
         ];
+    }
+
+    public function getDuePaymentSummary(array $filters = []): array
+    {
+        return $this->getDuePaymentSummery($filters);
     }
 
     public function cashReceived(array $hblIds)
