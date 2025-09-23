@@ -93,7 +93,7 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         ];
     }
 
-    public function getDuePaymentSummery(array $filters = []): array
+    public function getDuePaymentSummary(array $filters = []): array
     {
         $query = HBL::query();
 
