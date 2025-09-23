@@ -6,7 +6,9 @@ use App\Models\HBL;
 
 interface CashSettlementInterface
 {
-    public function getSummery(array $filters = []);
+    public function getSummary(array $filters = []);
+
+    public function getDuePaymentSummary(array $filters = []);
 
     public function cashReceived(array $hblIds);
 

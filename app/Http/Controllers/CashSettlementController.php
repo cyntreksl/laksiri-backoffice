@@ -56,6 +56,13 @@ class CashSettlementController extends Controller
         return $this->cashSettlementRepository->getSummery($filters);
     }
 
+    public function getDuePaymentSummery(Request $request)
+    {
+        $filters = $request->only(['fromDate', 'toDate', 'cargoMode', 'isHold', 'createdBy', 'paymentStatus', 'deliveryType', 'warehouse']);
+
+        return $this->cashSettlementRepository->getDuePaymentSummery($filters);
+    }
+
     public function cashReceived(Request $request)
     {
         $this->authorize('cash.cash received');
