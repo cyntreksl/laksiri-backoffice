@@ -301,19 +301,16 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
             // Start with cargo type (like in blade file line 238)
             $remarksValue = '';
-            $normalizedHblType = strtoupper($hblType);
-            if ($normalizedHblType == 'GIFT') {
+            if ($hblType == 'GIFT' || $hblType == 'Gift') {
                 $remarksValue = 'GIFT CARGO' . "\n";
-            } elseif ($normalizedHblType == 'UBP') {
+            } elseif ($hblType == 'UBP') {
                 $remarksValue = 'UBP CARGO' . "\n";
-            } elseif ($normalizedHblType == 'D2D') {
+            } elseif ($hblType == 'D2D') {
                 $remarksValue = 'DOOR TO DOOR CARGO' . "\n";
             }
 
-            // Only add HBL Type if not already described
-            if ($remarksValue === '') {
-                $remarksValue = $hblType;
-            }
+            // Add HBL Type
+            $remarksValue .= $hblType;
 
             // Add payment logic exactly as in blade file
             if ($isDepartureChargesPaid && $isDestinationChargesPaid) {
@@ -473,12 +470,6 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                     }
                 }
                 $warehouse = $this->getWarehouseCode($mhbl->hbls[0] ?? null);
-                // Get the actual HBL type from the first HBL in the MHBL, default to 'Gift' if not found
-                $hblType = 'Gift'; // default
-                if (!empty($mhbl->hbls) && $mhbl->hbls->count() > 0) {
-                    $hblType = $mhbl->hbls->first()->hbl_type ?? 'Gift';
-                }
-                
                 $data[] = [
                     $mhbl->hbl_number ?: $mhbl->reference, // 0
                     $mhbl->shipper->name ?? '', // 1
@@ -491,7 +482,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
                     $mhbl->consignee->mobile_number ?? '', // 8
                     collect($hblPackages ?? []), // 9
                     $mhbl->hbls[0]->paid_amount > 0 ? 'PAID' : 'UNPAID', // 10
-                    $hblType, // 11 - Use the actual HBL type
+                    'Gift', // 11
                     '', // 12
                     $warehouse, // 13
                     '', // 14
@@ -576,3 +567,4 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         return null;
     }
 }
+// Honurable mention to ChatGPT and cluade code for helping me with the logic and structure of this export.
