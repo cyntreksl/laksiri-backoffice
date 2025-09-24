@@ -159,7 +159,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->getStyle('A4:K4')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
         $worksheet->setCellValue('A4', 'SHIPPER');
         $worksheet->mergeCells('B4:K4');
-        $worksheet->setCellValue('B4', ': UNIVERSAL FREIGHT SERVICES, P.O.BOX: 55239, DOHA, QATAR. TEL: +974 4620961 TEL/FAX: +974 4620812');
+        $worksheet->setCellValue('B4', ': ' . ($settings?->invoice_header_title ?? '') . ', ' . ($settings?->invoice_header_address ?? '') . '. TEL: ' . ($settings?->invoice_header_telephone ?? ''));
         $worksheet->getStyle('A4:K4')->getFont()->setBold(true);
 
         // Row 5 - Consignee
