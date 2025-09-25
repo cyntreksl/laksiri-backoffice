@@ -90,7 +90,7 @@ const togglePackageSelection = (packageData) => {
     const index = returnForm.selected_packages.findIndex(
         p => p.package_queue_id === packageData.package_queue_id
     );
-    
+
     if (index >= 0) {
         // Remove from selection
         returnForm.selected_packages.splice(index, 1);
@@ -119,13 +119,13 @@ const hblGroupSelectionStates = computed(() => {
     }
 
     const states = {};
-    
+
     returnForm.package_details.hbl_groups.forEach((hblGroup, index) => {
         const releasedPackages = hblGroup.packages.filter(pkg => pkg.is_released);
         const allSelected = releasedPackages.every(pkg => isPackageSelected(pkg));
         const noneSelected = releasedPackages.every(pkg => !isPackageSelected(pkg));
         const someSelected = !allSelected && !noneSelected;
-        
+
         states[index] = {
             releasedPackagesCount: releasedPackages.length,
             allSelected,
@@ -136,14 +136,14 @@ const hblGroupSelectionStates = computed(() => {
             disabled: releasedPackages.length === 0
         };
     });
-    
+
     return states;
 });
 
 const selectAllPackagesInHBL = (hblGroup, hblIndex) => {
     const state = hblGroupSelectionStates.value[hblIndex];
     const releasedPackages = hblGroup.packages.filter(pkg => pkg.is_released);
-    
+
     if (state.allSelected) {
         // Deselect all packages in this HBL
         releasedPackages.forEach(pkg => {
@@ -349,9 +349,9 @@ const showLogDialog = (token) => {
                         placeholder="Enter token number (e.g., 1, 2, 3...)"
                         @keyup.enter="loadPackageDetails"
                     />
-                    <Button 
-                        label="Load Packages" 
-                        icon="pi pi-search" 
+                    <Button
+                        label="Load Packages"
+                        icon="pi pi-search"
                         @click="loadPackageDetails"
                         :disabled="!returnForm.token_number"
                     />
@@ -377,7 +377,7 @@ const showLogDialog = (token) => {
                             <strong>Total HBLs:</strong> {{ returnForm.package_details.summary.total_hbls }}
                         </div>
                         <div>
-                            <strong>Available for Return:</strong> 
+                            <strong>Available for Return:</strong>
                             <Tag :value="returnForm.package_details.summary.available_for_return" severity="info" />
                         </div>
                     </div>
@@ -389,10 +389,10 @@ const showLogDialog = (token) => {
                         <i class="pi pi-list"></i>
                         Select Packages to Return
                     </h4>
-                    
+
                     <Accordion multiple>
-                        <AccordionTab 
-                            v-for="(hblGroup, index) in returnForm.package_details.hbl_groups" 
+                        <AccordionTab
+                            v-for="(hblGroup, index) in returnForm.package_details.hbl_groups"
                             :key="index"
                             :header="`📋 HBL: ${hblGroup.hbl_reference} (${hblGroup.released_packages}/${hblGroup.total_packages} released)`"
                         >
@@ -402,7 +402,7 @@ const showLogDialog = (token) => {
                                     <div class="text-sm text-gray-600">
                                         <strong>Customer:</strong> {{ hblGroup.customer }}
                                     </div>
-                                    <Button 
+                                    <Button
                                         :label="hblGroupSelectionStates[index]?.buttonLabel || 'Select All Released'"
                                         :severity="hblGroupSelectionStates[index]?.buttonSeverity || 'info'"
                                         size="small"
@@ -413,8 +413,8 @@ const showLogDialog = (token) => {
 
                                 <!-- Package List -->
                                 <div class="grid gap-3">
-                                    <div 
-                                        v-for="packageData in hblGroup.packages" 
+                                    <div
+                                        v-for="packageData in hblGroup.packages"
                                         :key="packageData.id"
                                         class="border rounded-lg p-4 transition-all"
                                         :class="{
@@ -426,7 +426,7 @@ const showLogDialog = (token) => {
                                         <div class="flex items-start justify-between">
                                             <div class="flex items-start gap-3 flex-1">
                                                 <!-- Selection Checkbox -->
-                                                <Checkbox 
+                                                <Checkbox
                                                     v-if="packageData.is_released"
                                                     :modelValue="isPackageSelected(packageData)"
                                                     @update:modelValue="togglePackageSelection(packageData)"
@@ -439,8 +439,8 @@ const showLogDialog = (token) => {
                                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mb-2">
                                                         <div><strong>Reference:</strong> {{ packageData.reference }}</div>
                                                         <div><strong>Packages:</strong> {{ packageData.package_count }}</div>
-                                                        <div><strong>Status:</strong> 
-                                                            <Tag 
+                                                        <div><strong>Status:</strong>
+                                                            <Tag
                                                                 :value="packageData.is_released ? 'Released' : 'Not Released'"
                                                                 :severity="packageData.is_released ? 'success' : 'warning'"
                                                             />
@@ -449,7 +449,7 @@ const showLogDialog = (token) => {
                                                             <strong>Released:</strong> {{ new Date(packageData.released_at).toLocaleDateString() }}
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <!-- Release History -->
                                                     <div v-if="packageData.logs && packageData.logs.length > 0" class="mt-2">
                                                         <details class="text-xs">
@@ -483,17 +483,17 @@ const showLogDialog = (token) => {
                         Selected Packages for Return ({{ returnForm.selected_packages.length }})
                     </h4>
                     <div class="flex flex-wrap gap-2">
-                        <div 
-                            v-for="(pkg, index) in returnForm.selected_packages" 
+                        <div
+                            v-for="(pkg, index) in returnForm.selected_packages"
                             :key="index"
                             class="flex items-center gap-2 bg-white border border-green-300 rounded-full px-3 py-1 text-sm"
                         >
                             <span>{{ pkg.reference }} ({{ pkg.package_count }})</span>
-                            <Button 
-                                icon="pi pi-times" 
-                                severity="danger" 
-                                text 
-                                rounded 
+                            <Button
+                                icon="pi pi-times"
+                                severity="danger"
+                                text
+                                rounded
                                 size="small"
                                 @click="removeSelectedPackage(index)"
                             />
@@ -529,9 +529,9 @@ const showLogDialog = (token) => {
                     </span>
                 </div>
                 <div class="flex gap-2">
-                    <Button 
-                        label="Cancel" 
-                        severity="secondary" 
+                    <Button
+                        label="Cancel"
+                        severity="secondary"
                         @click="returnDialogVisible = false"
                     />
                     <Button
@@ -583,8 +583,22 @@ const showLogDialog = (token) => {
                     </div>
                 </template>
             </Column>
-            <Column field="remarks" header="Remarks"></Column>
-            <Column field="createdBy.name" header="Created By"></Column>
+            <Column field="remarks" header="Remarks">
+                <template #body="slotProps">
+                    <span v-if="slotProps.data.remarks">{{ slotProps.data.remarks }}</span>
+                    <span v-else class="text-gray-400">No remarks</span>
+                </template>
+            </Column>
+
+            <Column header="Created By">
+                <template #body="slotProps">
+        <span v-if="slotProps.data.created_by?.name">
+            {{ slotProps.data.created_by.name }}
+        </span>
+                    <span v-else class="text-gray-400">Unknown user</span>
+                </template>
+            </Column>
+
         </DataTable>
 
         <template #footer>
