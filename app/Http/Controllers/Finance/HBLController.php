@@ -23,14 +23,11 @@ class HBLController extends Controller
     ) {}
 
     /**
-     * Display a listing of the resource.
+     * Get shipment options for containers with specific statuses.
      */
-    public function approveHBLs()
+    private function getShipmentOptions()
     {
-        $this->authorize('hbls.hbl finance approval list');
-
-        // Get shipments (containers) with specific statuses
-        $shipments = Container::whereIn('status', [
+        return Container::whereIn('status', [
             ContainerStatus::IN_TRANSIT->value,
             ContainerStatus::REACHED_DESTINATION->value,
             ContainerStatus::UNLOADED->value,
@@ -45,6 +42,17 @@ class HBLController extends Controller
                     'value' => $container->id,
                 ];
             });
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function approveHBLs()
+    {
+        $this->authorize('hbls.hbl finance approval list');
+
+        // Get shipments (containers) with specific statuses
+        $shipments = $this->getShipmentOptions();
 
         return Inertia::render('Finance/HBL/FinanceHBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
@@ -60,21 +68,7 @@ class HBLController extends Controller
         $this->authorize('hbls.finance approved hbl list');
 
         // Get shipments (containers) with specific statuses
-        $shipments = Container::whereIn('status', [
-            ContainerStatus::IN_TRANSIT->value,
-            ContainerStatus::REACHED_DESTINATION->value,
-            ContainerStatus::UNLOADED->value,
-            ContainerStatus::LOADED->value,
-        ])
-            ->select('id', 'reference', 'container_number', 'vessel_name', 'status', 'estimated_time_of_arrival')
-            ->get()
-            ->map(function ($container) {
-                return [
-                    'id' => $container->id,
-                    'name' => ($container->container_number ?? $container->reference).' - '.$container->status.' ('.($container->vessel_name ?? 'Unknown Vessel').')',
-                    'value' => $container->id,
-                ];
-            });
+        $shipments = $this->getShipmentOptions();
 
         return Inertia::render('Finance/HBL/FinanceApprovedHBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
