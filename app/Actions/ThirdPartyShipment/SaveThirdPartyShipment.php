@@ -5,6 +5,7 @@ namespace App\Actions\ThirdPartyShipment;
 use App\Actions\Container\Loading\CreateOrUpdateLoadedContainer;
 use App\Actions\HBL\GenerateHBLReferenceNumber;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HblPackage;
@@ -70,6 +71,7 @@ class SaveThirdPartyShipment
                     'grand_total' => 0,
                     'do_charge' => 0,
                     'is_departure_charges_paid' => 1, // Set departure charges as paid
+                    'is_third_party' => true,
                 ]);
 
                 // Create HBL packages
@@ -105,6 +107,7 @@ class SaveThirdPartyShipment
                         'container_id' => $requestData['shipment'],
                         'packages' => $allPackageIds,
                         'note' => 'Third party shipment - Auto loaded via CSV import',
+                        'status' => ContainerStatus::IN_TRANSIT->value,
                     ]);
                 }
             }

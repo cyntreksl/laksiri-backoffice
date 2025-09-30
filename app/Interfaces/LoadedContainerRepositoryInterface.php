@@ -21,4 +21,8 @@ interface LoadedContainerRepositoryInterface
     public function loadMHBL(array $data);
 
     public function tallySheetDownloadPDF($container);
+
+    public function tallySheetDownloadExcel($container);
+
+    public function downloadManifestExcel($container);
 }

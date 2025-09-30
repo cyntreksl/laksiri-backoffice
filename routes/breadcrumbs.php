@@ -109,6 +109,12 @@ Breadcrumbs::for('hbls.cancelled-hbls', function (BreadcrumbTrail $trail) {
     $trail->push('Cancelled HBLs', route('hbls.cancelled-hbls'));
 });
 
+Breadcrumbs::for('hbls.status-default', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('HBL', route('hbls.index'));
+    $trail->push('HBL Status Default', route('hbls.status-default'));
+});
+
 // MHBL > create
 Breadcrumbs::for('mhbls.create', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

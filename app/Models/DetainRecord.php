@@ -13,13 +13,13 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 #[ScopedBy(BranchScope::class)]
-class RtfRecord extends Model
+class DetainRecord extends Model
 {
     use LogsActivity;
 
-    protected $fillable = ['is_rtf', 'rtf_by', 'note'];
+    protected $fillable = ['is_rtf', 'detain_type', 'rtf_by', 'note'];
 
-    protected $table = 'rtf_records';
+    protected $table = 'detain_records';
 
     protected $casts = [
         'is_rtf' => 'boolean',

@@ -12,6 +12,7 @@ import {push} from "notivue";
 import {useConfirm} from "primevue/useconfirm";
 import Dialog from "primevue/dialog";
 import Input from "primevue/inputtext";
+import Dropdown from "primevue/dropdown";
 import axios from "axios";
 
 const props = defineProps({
@@ -38,10 +39,23 @@ const loading = ref(false);
 const fetching = ref(false);
 const page = usePage();
 
-const handleRTFHBLPackage = (packageId) => {
+// Detain By dropdown options
+const detainByOptions = [
+    { label: 'RTF', value: 'RTF' },
+    { label: 'DDC', value: 'DDC' },
+    { label: 'SDDC', value: 'SDDC' },
+    { label: 'IAU', value: 'IAU' },
+    { label: 'DC', value: 'DC' },
+    { label: 'CO', value: 'CO' },
+    { label: 'ICT', value: 'ICT' }
+];
+
+const selectedDetainBy = ref(null);
+
+const handleDetainPackage = (packageId, detainType) => {
     confirm.require({
-        message: 'Would you like to RTF this package?',
-        header: 'RTF Package?',
+        message: `Would you like to detain this package by ${detainType}?`,
+        header: `Detain Package by ${detainType}?`,
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -50,18 +64,18 @@ const handleRTFHBLPackage = (packageId) => {
             outlined: true
         },
         acceptProps: {
-            label: 'Sure, RTF',
+            label: `Sure, Detain by ${detainType}`,
             severity: 'warn'
         },
         accept: () => {
-            router.post(route("hbl-packages.set.rtf", packageId), {}, {
+            router.post(route("hbl-packages.set.detain", packageId), { detain_type: detainType }, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    push.success('Package going to RTF');
+                    push.success(`Package detained by ${detainType}`);
                     window.location.reload();
                 },
                 onError: () => {
-                    push.error('Something went to wrong!');
+                    push.error('Something went wrong!');
                 }
             })
         },
@@ -70,10 +84,10 @@ const handleRTFHBLPackage = (packageId) => {
     })
 }
 
-const handleUndoRTFHBLPackage = (packageId) => {
+const handleLiftDetainPackage = (packageId) => {
     confirm.require({
-        message: 'Would you like to Undo RTF for this package?',
-        header: 'Undo RTF Package?',
+        message: 'Would you like to lift the detain for this package?',
+        header: 'Lift Detain Package?',
         icon: 'pi pi-info-circle',
         rejectLabel: 'Cancel',
         rejectProps: {
@@ -82,18 +96,18 @@ const handleUndoRTFHBLPackage = (packageId) => {
             outlined: true
         },
         acceptProps: {
-            label: 'Sure, Remove RTF',
+            label: 'Sure, Lift Detain',
             severity: 'warn'
         },
         accept: () => {
-            router.post(route("hbl-packages.unset.rtf", packageId), {}, {
+            router.post(route("hbl-packages.unset.detain", packageId), {}, {
                 preserveScroll: true,
                 onSuccess: () => {
-                    push.success('Undo RTF for this package successfully!');
+                    push.success('Detain lifted for this package successfully!');
                     window.location.reload();
                 },
                 onError: () => {
-                    push.error('Something went to wrong!');
+                    push.error('Something went wrong!');
                 }
             })
         },
@@ -185,8 +199,11 @@ const closeRemarksDialog = () => {
             <Card v-else class="!bg-emerald-50 !border !border-emerald-200 !shadow-none">
                 <template #content>
                     <div class="flex items-center space-x-5">
-                        <div v-if="hbl?.latest_rtf_record?.is_rtf" class="flex space-x-2">
-                            <i v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                        <div class="flex space-x-2">
+                            <i v-if="hbl?.latest_rtf_record?.is_rtf" v-tooltip.left="`Detained by ${hbl?.latest_rtf_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                            <i v-if="hbl?.is_short_load" v-tooltip.left="'Short Load'" class="ti ti-truck-loading text-2xl text-orange-500"></i>
+                            <i v-if="hbl?.is_unmanifest" v-tooltip.left="'Unmanifest'" class="ti ti-file-x text-2xl text-purple-500"></i>
+                            <i v-if="hbl?.is_overland" v-tooltip.left="'Overland'" class="ti ti-road text-2xl text-blue-500"></i>
                         </div>
                         <p class="text-3xl uppercase font-normal">
                             {{ hbl?.branch.name }}
@@ -249,15 +266,15 @@ const closeRemarksDialog = () => {
                             <span>This Package is on hold</span>
                         </div>
 
-                        <div v-if="item.is_rtf" class="flex items-center text-xs text-orange-800">
+                        <div v-if="item.is_rtf || item?.latest_rtf_record?.is_rtf" class="flex items-center text-xs text-orange-800">
                             <i class="pi pi-exclamation-triangle mr-1"></i>
-                            <span>This Package is on RTF</span>
+                            <span>This Package is detained by {{ item?.latest_rtf_record?.detain_type || 'RTF' }}</span>
                         </div>
 
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="flex items-center space-x-2">
-                                    <i v-if="item?.latest_rtf_record?.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <i v-if="item?.latest_rtf_record?.is_rtf" v-tooltip.left="`Detained by ${item?.latest_rtf_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
                                     <i class="ti ti-package text-xl"></i>
                                     <p class="text-xl uppercase font-normal">
                                         {{ item.package_type ?? '-' }}
@@ -296,13 +313,30 @@ const closeRemarksDialog = () => {
 
                         <div class="mt-3">
                             <template v-if="$page.props.user.permissions.includes('set_rtf')">
-                                <Button v-if="!item?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="Set RTF Package"
-                                        severity="warn" size="small" variant="outlined" @click.prevent="handleRTFHBLPackage(item.id)" />
+                                <div v-if="!item?.latest_rtf_record?.is_rtf" class="flex items-center gap-2">
+                                    <Dropdown
+                                        v-model="selectedDetainBy"
+                                        :options="detainByOptions"
+                                        class="w-48"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        placeholder="Select Detain By"
+                                    />
+                                    <Button
+                                        :disabled="!selectedDetainBy"
+                                        icon="pi pi-lock"
+                                        label="Detain Package"
+                                        severity="warn"
+                                        size="small"
+                                        variant="outlined"
+                                        @click.prevent="handleDetainPackage(item.id, selectedDetainBy)"
+                                    />
+                                </div>
                             </template>
 
                             <template v-if="$page.props.user.permissions.includes('lift_rtf')">
-                                <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Package"
-                                        severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFHBLPackage(item.id)" />
+                                <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift Detain"
+                                        severity="warn" size="small" variant="outlined" @click.prevent="handleLiftDetainPackage(item.id)" />
                             </template>
                         </div>
                     </template>

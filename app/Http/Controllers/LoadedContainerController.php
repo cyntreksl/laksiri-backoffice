@@ -81,6 +81,15 @@ class LoadedContainerController extends Controller
         return $this->loadedContainerRepository->downloadManifestFile($container);
     }
 
+    public function exportManifestExcel($container)
+    {
+        $this->authorize('shipment.download manifest');
+
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+
+        return $this->loadedContainerRepository->downloadManifestExcel($container->getKey());
+    }
+
     public function verifyDocument(Request $request)
     {
         return $this->loadedContainerRepository->updateVerificationStatus($request->all());
@@ -117,5 +126,12 @@ class LoadedContainerController extends Controller
         $this->authorize('shipment.download tally sheet');
 
         return $this->loadedContainerRepository->tallySheetDownloadPDF($container);
+    }
+
+    public function tallySheetDownloadExcel($container)
+    {
+        $this->authorize('shipment.download tally sheet');
+
+        return $this->loadedContainerRepository->tallySheetDownloadExcel($container);
     }
 }

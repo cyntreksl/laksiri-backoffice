@@ -65,7 +65,9 @@ class DuePaymentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
             'Id' => $row->id,
             'HBL Number' => $row->hbl_number,
             'Name' => $row->hbl_name,
-            'Pickup Date' => $row->pickup ? $row->pickup['pickup_date'] : null,
+            'Pickup Date' => (isset($row->pickup['pickup_date']) && !empty($row->pickup['pickup_date']))
+                ? $row->pickup['pickup_date']
+                : $row->created_at->format('Y-m-d'),
             'Weight' => $row['packages_sum_actual_weight'],
             'Volume' => $row['packages_sum_volume'],
             'No of Packages' => count($row->packages),

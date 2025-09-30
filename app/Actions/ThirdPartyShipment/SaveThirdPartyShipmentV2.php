@@ -7,6 +7,7 @@ use App\Actions\HBL\GenerateCRNumber;
 use App\Actions\HBL\GenerateHBLNumber;
 use App\Actions\HBL\GenerateHBLReferenceNumber;
 use App\Actions\User\GetUserCurrentBranchID;
+use App\Enum\ContainerStatus;
 use App\Enum\WarehouseType;
 use App\Models\Container;
 use App\Models\HBL;
@@ -65,6 +66,7 @@ class SaveThirdPartyShipmentV2
                 'system_status' => HBL::SYSTEM_STATUS_HBL_CREATED,
                 'is_departure_charges_paid' => 1,
                 'is_destination_charges_paid' => $data['is_destination_charges_paid'],
+                'is_third_party' => true,
             ]);
 
             // Create HBL packages
@@ -97,6 +99,7 @@ class SaveThirdPartyShipmentV2
                         'container_id' => $data['shipment'],
                         'packages' => $allPackageIds,
                         'note' => 'Third party shipment - Manual Create Option',
+                        'status' => ContainerStatus::IN_TRANSIT->value,
                     ]);
                 }
             }

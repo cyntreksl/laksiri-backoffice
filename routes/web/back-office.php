@@ -12,6 +12,8 @@ Route::name('back-office.')->group(function () {
         ->name('cash-settlements.list');
     Route::post('cash-settlement-summery', [CashSettlementController::class, 'getSummery'])
         ->name('cash-settlements.summery');
+    Route::post('due-payment-summery', [CashSettlementController::class, 'getDuePaymentSummery'])
+        ->name('duepayments.summery');
     Route::post('cash-received', [CashSettlementController::class, 'cashReceived'])
         ->name('cash-settlements.cashReceived');
     Route::put('update/payments/{hbl}', [CashSettlementController::class, 'paymentUpdate'])

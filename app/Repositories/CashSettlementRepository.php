@@ -93,6 +93,38 @@ class CashSettlementRepository implements CashSettlementInterface, GridJsInterfa
         ];
     }
 
+    public function getSummary(array $filters = []): array
+    {
+        return $this->getSummery($filters);
+    }
+
+    public function getDuePaymentSummery(array $filters = []): array
+    {
+        $query = HBL::query();
+
+        $query->duePayment()->whereHas('packages');
+
+        // Ensure the 'isHold' key exists and set to boolean
+        $filters['isHold'] = isset($filters['isHold']) ? (bool) $filters['isHold'] : false;
+
+        // Apply filters
+        FilterFactory::apply($query, $filters);
+
+        // Fetch records
+        $records = $query->get();
+
+        return [
+            'totalRecords' => $records->count(),
+            'sumAmount' => $records->sum('grand_total'),
+            'sumPaidAmount' => $records->sum('paid_amount'),
+        ];
+    }
+
+    public function getDuePaymentSummary(array $filters = []): array
+    {
+        return $this->getDuePaymentSummery($filters);
+    }
+
     public function cashReceived(array $hblIds)
     {
         $hblList = GetCashSettlementByIds::run($hblIds);
