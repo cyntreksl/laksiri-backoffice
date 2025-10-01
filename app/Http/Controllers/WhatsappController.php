@@ -68,7 +68,7 @@ class WhatsappController extends Controller
     public function handleWebhook(Request $request)
     {
         $data = $request->all();
-        Log::info('WhatsApp Webhook Data: ', $data);
+
 
         // Check if there are messages
         if (isset($data['entry'][0]['changes'][0]['value']['messages'][0])) {
@@ -79,7 +79,7 @@ class WhatsappController extends Controller
             $text = $message['text']['body'] ?? 'No text'; // Message text
 
             // Process the message (you can store it, send an automated reply, etc.)
-            Log::info("Message from $from: $text");
+
 
             return response()->json(['status' => 'success']);
         }
@@ -225,7 +225,7 @@ class WhatsappController extends Controller
             $contact->update($validated);
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error updating WhatsApp contact: '.$e->getMessage());
+            Log::error('Error updating WhatsApp contact: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
