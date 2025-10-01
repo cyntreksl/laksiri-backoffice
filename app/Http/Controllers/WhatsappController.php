@@ -128,7 +128,11 @@ class WhatsappController extends Controller
                 ], 400);
             }
         } catch (\Exception $e) {
-
+            Log::error('WhatsApp send message error: '.$e->getMessage(), [
+                'recipient' => $request->recipient ?? 'unknown',
+                'message_length' => strlen($request->message ?? ''),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
             return response()->json([
                 'success' => false,
@@ -176,7 +180,7 @@ class WhatsappController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-
+            Log::error('WhatsApp get messages error: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -221,7 +225,7 @@ class WhatsappController extends Controller
             $contact->update($validated);
 
         } catch (\Exception $e) {
-
+            Log::error('Error updating WhatsApp contact: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -247,7 +251,7 @@ class WhatsappController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-
+            Log::error('Error deleting WhatsApp contact: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,

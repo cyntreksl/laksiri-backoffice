@@ -131,11 +131,11 @@ const fetchMessages = async (phone, fetchLatestOnly = false) => {
 
 
         } else {
-
+            console.error('Failed to fetch messages:', result.message);
             messages.value = [];
         }
     } catch (error) {
-
+        console.error('Error fetching messages:', error);
         messages.value = [];
     } finally {
         loadingMessages.value = false;
@@ -206,7 +206,7 @@ const sendMessage = async () => {
         }
 
     } catch (error) {
-
+        console.error('Failed to send message:', error)
 
         message.status = 'failed'
 
@@ -401,7 +401,7 @@ const deleteContact = async (contactId) => {
             throw new Error(result.message || 'Failed to delete contact');
         }
     } catch (error) {
-
+        console.error('Failed to delete contact:', error);
         push.error(`Failed to delete contact: ${error.message}`);
     }
 }
