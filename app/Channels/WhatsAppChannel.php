@@ -16,10 +16,7 @@ class WhatsAppChannel
         try {
             $this->whatAppService->sendMessageByTemplate($message);
         } catch (\Exception $e) {
-            Log::error('WhatsApp message exception', [
-                'message' => $e->getMessage(),
-                'code' => $e->getCode(),
-            ]);
+
         }
     }
 }

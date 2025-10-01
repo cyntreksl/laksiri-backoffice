@@ -68,7 +68,7 @@ class WhatsappController extends Controller
     public function handleWebhook(Request $request)
     {
         $data = $request->all();
-        Log::info('WhatsApp Webhook Data: ', $data);
+
 
         // Check if there are messages
         if (isset($data['entry'][0]['changes'][0]['value']['messages'][0])) {
@@ -79,7 +79,7 @@ class WhatsappController extends Controller
             $text = $message['text']['body'] ?? 'No text'; // Message text
 
             // Process the message (you can store it, send an automated reply, etc.)
-            Log::info("Message from $from: $text");
+
 
             return response()->json(['status' => 'success']);
         }
@@ -128,11 +128,7 @@ class WhatsappController extends Controller
                 ], 400);
             }
         } catch (\Exception $e) {
-            Log::error('WhatsApp send message error: '.$e->getMessage(), [
-                'recipient' => $request->recipient ?? 'unknown',
-                'message_length' => strlen($request->message ?? ''),
-                'trace' => $e->getTraceAsString(),
-            ]);
+
 
             return response()->json([
                 'success' => false,
@@ -180,7 +176,7 @@ class WhatsappController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            Log::error('WhatsApp get messages error: '.$e->getMessage());
+
 
             return response()->json([
                 'success' => false,
@@ -225,7 +221,7 @@ class WhatsappController extends Controller
             $contact->update($validated);
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error updating WhatsApp contact: '.$e->getMessage());
+
 
             return response()->json([
                 'success' => false,
@@ -251,7 +247,7 @@ class WhatsappController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting WhatsApp contact: '.$e->getMessage());
+
 
             return response()->json([
                 'success' => false,

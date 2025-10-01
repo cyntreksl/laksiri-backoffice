@@ -129,13 +129,13 @@ const fetchMessages = async (phone, fetchLatestOnly = false) => {
                 }
             }
 
-            console.log('Messages loaded successfully:', result.data.messages.length);
+
         } else {
-            console.error('Failed to fetch messages:', result.message);
+
             messages.value = [];
         }
     } catch (error) {
-        console.error('Error fetching messages:', error);
+
         messages.value = [];
     } finally {
         loadingMessages.value = false;
@@ -200,17 +200,13 @@ const sendMessage = async () => {
                 }
             }
 
-            console.log('Message sent successfully:', {
-                messageId: result.data.message_id,
-                recipient: result.data.recipient,
-                storedMessage: result.data.stored_message
-            })
+
         } else {
             throw new Error(result.message || 'Failed to send message')
         }
 
     } catch (error) {
-        console.error('Failed to send message:', error)
+
 
         message.status = 'failed'
 
@@ -240,7 +236,7 @@ const handleContactSaved = (contact) => {
 
 onMounted(async () => {
     if (chatList.value.length > 0) {
-        console.log('Fetching latest messages for all chats on initial load');
+
         for (const chat of chatList.value) {
             await fetchMessages(chat.phone, true);
         }
@@ -405,7 +401,7 @@ const deleteContact = async (contactId) => {
             throw new Error(result.message || 'Failed to delete contact');
         }
     } catch (error) {
-        console.error('Failed to delete contact:', error);
+
         push.error(`Failed to delete contact: ${error.message}`);
     }
 }

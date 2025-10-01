@@ -66,11 +66,7 @@ class WhatsAppService
             if ($response->successful()) {
                 $responseData = $response->json();
 
-                Log::info('WhatsApp template message sent successfully', [
-                    'to' => $body['to'] ?? 'unknown',
-                    'message_id' => $responseData['messages'][0]['id'] ?? null,
-                    'response' => $responseData,
-                ]);
+
 
                 return $responseData;
             } else {
@@ -137,11 +133,7 @@ class WhatsAppService
             if ($response->successful()) {
                 $responseData = $response->json();
 
-                Log::info('WhatsApp text message sent successfully', [
-                    'to' => $to,
-                    'message_id' => $responseData['messages'][0]['id'] ?? null,
-                    'response' => $responseData,
-                ]);
+
 
                 return [
                     'success' => true,
@@ -218,13 +210,7 @@ class WhatsAppService
             if ($response->successful()) {
                 $responseData = $response->json();
 
-                Log::info('WhatsApp media message sent successfully', [
-                    'to' => $to,
-                    'type' => $type,
-                    'media_id' => $mediaId,
-                    'message_id' => $responseData['messages'][0]['id'] ?? null,
-                    'response' => $responseData,
-                ]);
+
 
                 return [
                     'success' => true,
