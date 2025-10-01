@@ -22,6 +22,11 @@ Route::get('/tracking', [HBLController::class, 'showTracking'])
 
 require_once __DIR__.'/web/feedback.php';
 
+// Test route for manifest import (temporary - remove in production)
+Route::get('/manifest-test', function() {
+    return view('manifest.import');
+})->name('manifest.test');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -47,6 +52,7 @@ Route::middleware([
     require_once __DIR__.'/web/gate-control.php';
     require_once __DIR__.'/web/whatsapp.php';
     require_once __DIR__.'/web/remarks.php';
+    require_once __DIR__.'/web/manifest.php';
 
     // call center routes
     Route::name('call-center.')->prefix('call-center')->group(function () {
