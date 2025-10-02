@@ -129,7 +129,7 @@ const fetchMessages = async (phone, fetchLatestOnly = false) => {
                 }
             }
 
-            console.log('Messages loaded successfully:', result.data.messages.length);
+
         } else {
             console.error('Failed to fetch messages:', result.message);
             messages.value = [];
@@ -200,11 +200,7 @@ const sendMessage = async () => {
                 }
             }
 
-            console.log('Message sent successfully:', {
-                messageId: result.data.message_id,
-                recipient: result.data.recipient,
-                storedMessage: result.data.stored_message
-            })
+
         } else {
             throw new Error(result.message || 'Failed to send message')
         }
@@ -240,7 +236,7 @@ const handleContactSaved = (contact) => {
 
 onMounted(async () => {
     if (chatList.value.length > 0) {
-        console.log('Fetching latest messages for all chats on initial load');
+
         for (const chat of chatList.value) {
             await fetchMessages(chat.phone, true);
         }
