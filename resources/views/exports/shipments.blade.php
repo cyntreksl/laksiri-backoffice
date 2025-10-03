@@ -202,8 +202,8 @@
             <tr>
                 <td rowspan="{{ $packageCount > 4 ? $packageCount + 1 : 5 }}" style="font-size: 11px;">{{ $serialNumber++ }}</td>
                 <td rowspan="{{$packageCount > 4 ? $packageCount : 4}}" style="font-size: 11px; vertical-align: top"> {{ $item[0]}} </td>
-                <td rowspan="1" style="border-bottom: 0; font-size: 11px; border-left:none;vertical-align: top">{{ $item[1]}}</td>
-                <td rowspan="1" style="border-bottom: 0; font-size: 11px; vertical-align: top; border-bottom: 0">{{ $item[5] }} </td>
+                <td rowspan="1" style="border-bottom: 0; font-size: 11px; border-left:none;vertical-align: top">{!! preg_replace('/^(.*?\/.*?)\//', '$1/<br>', $item[1]) !!}</td>
+                <td rowspan="1" style="border-bottom: 0; font-size: 11px; vertical-align: top; border-bottom: 0">{!! preg_replace('/^(.*?\/.*?)\//', '$1/<br>', $item[5]) !!} </td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-bottom: 0">{{ $item[9][0]['package_type'] }}</td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-bottom: 0; text-align: center">{{ $item[9][0]['quantity'] }}</td>
                 <td rowspan="1" style="font-size: 11px; vertical-align: top; border-bottom: 0; text-align: center"></td>
