@@ -169,6 +169,10 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
 
         $container = GetLoadedContainerById::run($container);
 
+        $filteredHbls = $container->hbls->filter(function ($hbl) {
+            return in_array($hbl->hbl_type, ['UPB', 'Gift']);
+        });
+
         // Initialize a new Dompdf instance with custom options
         $options = new Options;
         $options->set('isHtml5ParserEnabled', true);
@@ -194,7 +198,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             }
         }
 
-        foreach ($container->hbls as $hbl) {
+        foreach ($filteredHbls as $hbl) {
             // Render each HBL as HTML and append to combinedHtml
             $combinedHtml .= view('pdf.hbls.hbl', [
                 'hbl' => $hbl,
