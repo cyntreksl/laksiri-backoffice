@@ -45,6 +45,10 @@ const props = defineProps({
         default: () => {
         },
     },
+    shipments: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const baseUrl = ref("/finance/approved-hbl-list");
@@ -76,6 +80,7 @@ const filters = ref({
     is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
     user: {value: null, matchMode: FilterMatchMode.EQUALS},
     payments: {value: null, matchMode: FilterMatchMode.EQUALS},
+    shipment: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const menuModel = ref([
@@ -145,6 +150,7 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOr
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 createdBy: filters.value.user.value || "",
                 paymentStatus: filters.value.payments.value || [],
+                shipment: filters.value.shipment.value || "",
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
             }
@@ -198,6 +204,10 @@ watch(() => fromDate.value, (newValue) => {
 });
 
 watch(() => toDate.value, (newValue) => {
+    fetchHBLs(1, filters.value.global.value);
+});
+
+watch(() => filters.value.shipment.value, (newValue) => {
     fetchHBLs(1, filters.value.global.value);
 });
 
@@ -279,7 +289,7 @@ const clearFilter = () => {
         is_hold: { value: null, matchMode: FilterMatchMode.EQUALS },
         user: {value: null, matchMode: FilterMatchMode.EQUALS},
         payments: {value: null, matchMode: FilterMatchMode.EQUALS},
-        payment_status: {value: null, matchMode: FilterMatchMode.EQUALS},
+        shipment: {value: null, matchMode: FilterMatchMode.EQUALS},
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
@@ -464,6 +474,11 @@ const removeApprovalHBLs = () => {
                     <FloatLabel class="w-full" variant="in">
                         <Select v-model="filters.user.value" :options="users" :showClear="true" class="w-full" input-id="user" option-label="name" option-value="id" />
                         <label for="user">Created By</label>
+                    </FloatLabel>
+
+                    <FloatLabel class="w-full" variant="in">
+                        <Select v-model="filters.shipment.value" :options="props.shipments" :showClear="true" class="w-full" input-id="shipment" option-label="name" option-value="value" />
+                        <label for="shipment">Shipments</label>
                     </FloatLabel>
                 </div>
             </Panel>
