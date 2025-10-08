@@ -70,15 +70,94 @@ const formatFieldName = (key) => {
     return fieldLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 };
 
+// System status mappings from HBL model
+const systemStatusMappings = {
+    1.3: 'HBL Preparation by Driver',
+    2.1: 'HBL Preparation by Warehouse',
+    2.2: 'Cash Received by Accountant',
+    2.3: 'Manifest Preparation',
+    2.4: 'D2D Document Preparation',
+    2.5: 'Palletize Cargo',
+    3.0: 'HBL Created',
+    3.1: 'HBL Converted from Job',
+    4.0: 'Cash Collected',
+    4.1: 'Partial Loaded',
+    4.2: 'Fully Loaded',
+    4.3: 'Partial Unloaded',
+    4.4: 'Fully Unloaded',
+    4.5: 'Finance Approved',
+    6.0: 'Token Issued',
+    6.1: 'Reception Queue',
+    6.2: 'Document Verification Queue',
+    6.3: 'Cashier Queue',
+    6.4: 'Waiting for Package Receive from Bon Area Queue',
+    6.6: 'Examination Queue',
+    6.7: 'Gate Pass Issued',
+    6.8: 'Gate Pass Mark as Released'
+};
+
 // Format values to be more readable
-const formatValue = (value, key) => {
+const formatValue = (value, key, allProperties = null) => {
     if (value === null || value === undefined || value === '') {
         return 'Not Set';
+    }
+
+    // Handle system_status specifically
+    if (key === 'system_status' && typeof value === 'number') {
+        return systemStatusMappings[value] || `Unknown Status (${value})`;
     }
 
     // Boolean values
     if (typeof value === 'boolean') {
         return value ? 'Yes' : 'No';
+    }
+
+    // Handle foreign key relationships - look for related data
+    if (key && key.endsWith('_id') && !isNaN(value) && allProperties) {
+        const relationshipKey = key.replace('_id', '');
+        
+        // Common relationship mappings
+        const relationshipMappings = {
+            'branch': 'branch_name',
+            'pickup': 'pickup_number',
+            'container': 'container_number',
+            'user': 'user_name',
+            'driver': 'driver_name',
+            'customer': 'customer_name',
+            'sender': 'sender_name',
+            'receiver': 'receiver_name',
+            'created_by': 'created_by_name',
+            'updated_by': 'updated_by_name',
+            'assigned_to': 'assigned_to_name'
+        };
+
+        // Try to find the relationship name in the properties
+        const nameField = relationshipMappings[relationshipKey];
+        if (nameField && allProperties[nameField]) {
+            return `${allProperties[nameField]} (ID: ${value})`;
+        }
+
+        // Try alternative naming patterns
+        const alternativeFields = [
+            `${relationshipKey}_name`,
+            `${relationshipKey}_title`,
+            `${relationshipKey}_number`,
+            `${relationshipKey}_code`
+        ];
+
+        for (const field of alternativeFields) {
+            if (allProperties[field]) {
+                return `${allProperties[field]} (ID: ${value})`;
+            }
+        }
+
+        // If no relationship name found, still show a more user-friendly format
+        return `${relationshipKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} ID: ${value}`;
+    }
+
+    // Status values - make them more readable
+    if (key && key.includes('status') && typeof value === 'string') {
+        return value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
 
     // Numeric values with specific formatting
@@ -114,6 +193,11 @@ const formatValue = (value, key) => {
         }
     }
 
+    // Handle enum-like values (make them more readable)
+    if (typeof value === 'string' && value.includes('_')) {
+        return value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
     return value;
 };
 
@@ -130,8 +214,8 @@ const changes = computed(() => {
         changesList.push({
             field: key,
             fieldName: formatFieldName(key),
-            oldValue: formatValue(oldValue, key),
-            newValue: formatValue(newValue, key),
+            oldValue: formatValue(oldValue, key, props.oldProperties),
+            newValue: formatValue(newValue, key, props.properties),
             hasChanged: oldValue !== newValue,
             isNew: oldValue === null || oldValue === undefined,
             isRemoved: newValue === null || newValue === undefined
