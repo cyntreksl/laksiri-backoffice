@@ -106,7 +106,7 @@ const getStatusIcon = (status) => {
             return 'pi pi-refresh';
         case 'arrived':
         case 'container arrival':
-            return 'pi pi-map-marker';
+            return 'pi pi-home';
         case 'departed':
         case 'container shipped':
             return 'pi pi-send';
@@ -154,40 +154,42 @@ const getStatusColor = (status, index, total) => {
 
 const getUserFriendlyStatus = (status) => {
     const statusMap = {
-        'HBL Preparation by warehouse': 'Package being prepared at warehouse',
-        'HBL Preparation by driver': 'Package being prepared by driver',
-        'Cash Received by Accountant': 'Payment confirmed and processed',
-        'Container Loading': 'Package loaded into container',
-        'Container Shipped': 'Container departed from origin',
-        'Container Arrival': 'Container arrived at destination port',
+        'HBL Preparation by warehouse': 'Shipment Picked Up',
+        'HBL Preparation by driver': 'Shipment Picked Up',
+        'Cash Received by Accountant': 'Arrived',
+        'Container Loading': 'Under Process',
+        'Container Shipped': 'Departed',
+        'Container Arrival': 'Arrived',
         'Blocked By RTF': 'Shipment held for inspection',
-        'Revert To Cash Settlement': 'Payment method changed',
-        'Container Unloaded in Colombo': 'Container unloaded at Colombo port',
-        'Container Loading in Colombo': 'Container being loaded in Colombo',
-        'Container Unloaded in Nintavur': 'Container unloaded at Nintavur',
-        'Container In Transit': 'Package is on the way to you',
-        'Container Reached Destination': 'Package delivered successfully'
+        'Container Unloaded in Colombo': 'Transferred',
+        'Container Reached Destination': 'Delivered'
+        // All other statuses are hidden from display
+        // 'Revert To Cash Settlement': 'Payment method changed',
+        // 'Container Loading in Colombo': 'Container being loaded in Colombo',
+        // 'Container Unloaded in Nintavur': 'Container unloaded at Nintavur',
+        // 'Container In Transit': 'Package is on the way to you',
     };
-    return statusMap[status] || status;
+    return statusMap[status] || null; // Return null for unmapped statuses to hide them
 };
 
 const getStatusDescription = (status) => {
     const descriptions = {
-        'HBL Preparation by warehouse': 'Your package is being carefully prepared and documented at our warehouse facility.',
-        'HBL Preparation by driver': 'Our driver is preparing your package for pickup and transport.',
-        'Cash Received by Accountant': 'Your payment has been successfully received and verified by our accounting team.',
-        'Container Loading': 'Your package is being securely loaded into the shipping container.',
-        'Container Shipped': 'The container with your package has departed and is on its way.',
-        'Container Arrival': 'The container has safely arrived at the destination port.',
+        'HBL Preparation by warehouse': 'Your shipment has been picked up and is being processed for delivery.',
+        'HBL Preparation by driver': 'Your shipment has been picked up and is being processed for delivery.',
+        'Cash Received by Accountant': 'Your shipment has arrived at origin warehouse.',
+        'Container Loading': 'Your shipment is currently being processed and prepared for departure.',
+        'Container Shipped': 'Your shipment has departed to Sri Lanka and is on its way.',
+        'Container Arrival': 'Your shipment has arrived at the destination and is being processed.',
         'Blocked By RTF': 'Your shipment is temporarily held for routine customs inspection.',
-        'Revert To Cash Settlement': 'Payment method has been updated as per your request.',
-        'Container Unloaded in Colombo': 'Container has been unloaded at Colombo port for processing.',
-        'Container Loading in Colombo': 'Your package is being loaded for the next leg of its journey.',
-        'Container Unloaded in Nintavur': 'Container has been unloaded at the final destination.',
-        'Container In Transit': 'Your package is currently traveling to its destination.',
+        'Container Unloaded in Colombo': 'Your shipment has been transferred to the next stage of delivery.',
         'Container Reached Destination': 'Congratulations! Your package has been successfully delivered.'
+        // All other statuses are hidden from display
+        // 'Revert To Cash Settlement': 'Payment method has been updated as per your request.',
+        // 'Container Loading in Colombo': 'Your package is being loaded for the next leg of its journey.',
+        // 'Container Unloaded in Nintavur': 'Container has been unloaded at the final destination.',
+        // 'Container In Transit': 'Your package is currently traveling to its destination.',
     };
-    return descriptions[status] || 'Status update for your shipment.';
+    return descriptions[status] || null; // Return null for unmapped statuses to hide them
 };
 
 const getEstimatedTime = (status, index, total) => {
@@ -295,7 +297,7 @@ const getEstimatedTime = (status, index, total) => {
                                 <!-- Continuous Vertical Line -->
                                 <div class="timeline-vertical-line"></div>
 
-                                <div v-for="(log, index) in hblStatus.slice().reverse()" :key="index" class="timeline-item relative">
+                                <div v-for="(log, index) in hblStatus.slice().reverse().filter(log => getUserFriendlyStatus(log.status))" :key="index" class="timeline-item relative">
                                     <!-- Timeline Marker -->
                                     <div class="timeline-marker">
                                         <div class="relative">
