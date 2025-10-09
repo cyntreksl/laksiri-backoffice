@@ -269,7 +269,7 @@ const getEstimatedTime = (status, index, total) => {
 
             <!-- Main Content Grid -->
             <div class="bg-white rounded-b-lg shadow-lg overflow-hidden">
-                <div class="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
+                <div class="grid grid-cols-1 min-h-[600px]">
                     <!-- Timeline Section -->
                     <div class="p-6 border-r border-gray-200">
                         <!-- Progress Overview -->
@@ -420,16 +420,6 @@ const getEstimatedTime = (status, index, total) => {
                                         </div>
                                     </template>
                                 </Card>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Map Section -->
-                    <div class="bg-gray-100 relative">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="text-center">
-                                <img :src="DashboardMeet" alt="Track your shipment" class="w-64 mx-auto mb-8 dark:hidden" />
-                                <img :src="DashboardMeetDark" alt="Track your shipment" class="w-64 mx-auto mb-8 hidden dark:block" />
                             </div>
                         </div>
                     </div>
