@@ -637,22 +637,117 @@ onMounted(() => {
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="activity in logs"
-                        class="border border-transparent border-b-slate-200 dark:border-b-navy-500">
-                        <td class="whitespace-nowrap rounded-l-lg px-4 py-3 sm:px-5">
-                            {{ activity.description }}
+                    <tr v-for="(activity, index) in logs" :key="activity.id || index"
+                        class="group border border-transparent border-b-slate-200 dark:border-b-navy-500 hover:bg-slate-50 dark:hover:bg-navy-600/50 transition-colors duration-200">
+                        
+                        <!-- Activity Description -->
+                        <td class="whitespace-nowrap rounded-l-lg px-4 py-4 sm:px-5">
+                            <div class="flex items-center space-x-3">
+                                <!-- Activity Icon -->
+                                <div class="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                    <svg v-if="activity.description.toLowerCase().includes('created')" 
+                                         class="icon icon-tabler icons-tabler-outline icon-tabler-plus" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M12 5l0 14"/>
+                                        <path d="M5 12l14 0"/>
+                                    </svg>
+                                    <svg v-else-if="activity.description.toLowerCase().includes('updated')" 
+                                         class="icon icon-tabler icons-tabler-outline icon-tabler-edit" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
+                                        <path d="M16 5l3 3"/>
+                                    </svg>
+                                    <svg v-else-if="activity.description.toLowerCase().includes('deleted')" 
+                                         class="icon icon-tabler icons-tabler-outline icon-tabler-trash text-red-500" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M4 7l16 0"/>
+                                        <path d="M10 11l0 6"/>
+                                        <path d="M14 11l0 6"/>
+                                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+                                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+                                    </svg>
+                                    <svg v-else 
+                                         class="icon icon-tabler icons-tabler-outline icon-tabler-activity" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M3 12h4l3 8l4 -16l3 8h4"/>
+                                    </svg>
+                                </div>
+                                
+                                <!-- Activity Text -->
+                                <div>
+                                    <p class="font-medium text-slate-800 dark:text-navy-100 uppercase">
+                                        {{ activity.description }}
+                                    </p>
+                                </div>
+                            </div>
                         </td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ moment(activity.created_at).format('YYYY-MM-DD H:mm:ss') }}
+                        
+                        <!-- Date Time -->
+                        <td class="whitespace-nowrap px-4 py-4 sm:px-5">
+                            <div class="flex items-center space-x-2">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-clock text-slate-400" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                                    <path d="M12 7v5l3 3"/>
+                                </svg>
+                                <div>
+                                    <p class="text-sm font-medium text-slate-700 dark:text-navy-200">
+                                        {{ moment(activity.created_at).format('MMM DD, YYYY') }}
+                                    </p>
+                                    <p class="text-xs text-slate-500 dark:text-navy-300">
+                                        {{ moment(activity.created_at).format('h:mm A') }}
+                                    </p>
+                                </div>
+                            </div>
                         </td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ hbl.branch_name }}
+                        
+                        <!-- Branch -->
+                        <td class="whitespace-nowrap px-4 py-4 sm:px-5">
+                            <div class="flex items-center space-x-2">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-building text-slate-400" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                    <path d="M3 21l18 0"/>
+                                    <path d="M9 8l1 0"/>
+                                    <path d="M9 12l1 0"/>
+                                    <path d="M9 16l1 0"/>
+                                    <path d="M14 8l1 0"/>
+                                    <path d="M14 12l1 0"/>
+                                    <path d="M14 16l1 0"/>
+                                    <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16"/>
+                                </svg>
+                                <span class="text-sm font-medium text-slate-700 dark:text-navy-200">
+                                    {{ hbl.branch_name }}
+                                </span>
+                            </div>
                         </td>
-                        <td class="whitespace-nowrap px-4 py-3 sm:px-5">
-                            {{ activity.causer?.name }}
+                        
+                        <!-- User -->
+                        <td class="whitespace-nowrap px-4 py-4 sm:px-5">
+                            <div class="flex items-center space-x-2">
+                                <div class="flex size-8 items-center justify-center rounded-full bg-slate-100 dark:bg-navy-700">
+                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-user text-slate-600 dark:text-slate-300" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                        <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/>
+                                        <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-slate-700 dark:text-navy-200">
+                                        {{ activity.causer?.name || 'System' }}
+                                    </p>
+                                    <p v-if="activity.causer?.email" class="text-xs text-slate-500 dark:text-navy-300">
+                                        {{ activity.causer.email }}
+                                    </p>
+                                </div>
+                            </div>
                         </td>
-                        <td class="whitespace-nowrap px-4 py-3 rounded-r-lg sm:px-5">
-                            <AuditDetails :old-properties="activity.properties?.old" :properties="activity.properties?.attributes"/>
+                        
+                        <!-- Inspect -->
+                        <td class="whitespace-nowrap px-4 py-4 rounded-r-lg sm:px-5">
+                            <div class="flex items-center justify-center">
+                                <AuditDetails :old-properties="activity.properties?.old" :properties="activity.properties?.attributes"/>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
