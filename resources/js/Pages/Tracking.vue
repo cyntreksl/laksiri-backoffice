@@ -295,20 +295,20 @@ const getEstimatedTime = (status, index, total) => {
                                 <!-- Continuous Vertical Line -->
                                 <div class="timeline-vertical-line"></div>
 
-                                <div v-for="(log, index) in hblStatus" :key="index" class="timeline-item relative">
+                                <div v-for="(log, index) in hblStatus.slice().reverse()" :key="index" class="timeline-item relative">
                                     <!-- Timeline Marker -->
                                     <div class="timeline-marker">
                                         <div class="relative">
                                             <span
                                                 :class="{
-                                                    'bg-gradient-to-r from-green-500 to-green-600 animate-pulse': index === hblStatus.length - 1,
-                                                    'bg-gradient-to-r from-blue-500 to-blue-600': index !== hblStatus.length - 1
+                                                    'bg-gradient-to-r from-green-500 to-green-600 animate-pulse': index === 0,
+                                                    'bg-gradient-to-r from-blue-500 to-blue-600': index !== 0
                                                 }"
                                                 class="flex w-10 h-10 items-center justify-center text-white rounded-full z-20 shadow-lg border-3 border-white transition-all duration-300 hover:scale-110 relative"
                                             >
                                                 <i :class="getStatusIcon(log.status)" class="text-sm"></i>
                                             </span>
-                                            <div v-if="index === hblStatus.length - 1"
+                                            <div v-if="index === 0"
                                                  class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
                                         </div>
                                     </div>
@@ -316,8 +316,8 @@ const getEstimatedTime = (status, index, total) => {
                                     <!-- Content -->
                                     <div class="timeline-content">
                                         <Card :class="{
-                                                  'border-l-green-500 bg-green-50': index === hblStatus.length - 1,
-                                                  'border-l-blue-500 bg-blue-50': index !== hblStatus.length - 1
+                                                  'border-l-green-500 bg-green-50': index === 0,
+                                                  'border-l-blue-500 bg-blue-50': index !== 0
                                               }"
                                               class="shadow-md hover:shadow-lg transition-all duration-300 border-l-4">
                                             <template #content>
@@ -333,8 +333,8 @@ const getEstimatedTime = (status, index, total) => {
                                                             </p>
                                                         </div>
                                                         <Badge
-                                                            :severity="index === hblStatus.length - 1 ? 'success' : 'info'"
-                                                            :value="index === hblStatus.length - 1 ? 'Current' : 'Completed'"
+                                                            :severity="index === 0 ? 'success' : 'info'"
+                                                            :value="index === 0 ? 'Current' : 'Completed'"
                                                             class="ml-2 font-semibold"
                                                         />
                                                     </div>
@@ -369,13 +369,13 @@ const getEstimatedTime = (status, index, total) => {
                                                     </div>
 
                                                     <!-- Estimated Time (if available) -->
-                                                    <div v-if="getEstimatedTime(log.status, index, hblStatus.length)"
+                                                    <div v-if="getEstimatedTime(log.status, hblStatus.length - 1 - index, hblStatus.length)"
                                                          class="flex items-center space-x-2 bg-amber-50 rounded-lg p-2 border border-amber-200">
                                                         <i class="pi pi-hourglass text-amber-600"></i>
                                                         <div>
                                                             <p class="text-xs text-amber-600 font-medium">Estimated Duration</p>
                                                             <p class="text-sm font-semibold text-amber-800">
-                                                                {{ getEstimatedTime(log.status, index, hblStatus.length) }}
+                                                                {{ getEstimatedTime(log.status, hblStatus.length - 1 - index, hblStatus.length) }}
                                                             </p>
                                                         </div>
                                                     </div>
