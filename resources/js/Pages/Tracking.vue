@@ -275,21 +275,21 @@ const getEstimatedTime = (status, index, total) => {
                     <!-- Timeline Section -->
                     <div class="p-6 border-r border-gray-200">
                         <!-- Progress Overview -->
-                        <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-semibold text-gray-800 flex items-center">
-                                    <i class="pi pi-truck mr-2 text-blue-600"></i>
-                                    Shipment Progress
-                                </h3>
-                                <span class="text-sm text-blue-600 font-medium">
-                                    {{ hblStatus.length }} of {{ hblStatus.length + 1 }} steps completed
-                                </span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                                <div :style="{ width: ((hblStatus.length / (hblStatus.length + 1)) * 100) + '%' }"
-                                     class="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-500"></div>
-                            </div>
-                        </div>
+<!--                        <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">-->
+<!--                            <div class="flex items-center justify-between mb-3">-->
+<!--                                <h3 class="font-semibold text-gray-800 flex items-center">-->
+<!--                                    <i class="pi pi-truck mr-2 text-blue-600"></i>-->
+<!--                                    Shipment Progress-->
+<!--                                </h3>-->
+<!--                                <span class="text-sm text-blue-600 font-medium">-->
+<!--                                    {{ hblStatus.length }} of {{ hblStatus.length + 1 }} steps completed-->
+<!--                                </span>-->
+<!--                            </div>-->
+<!--                            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">-->
+<!--                                <div :style="{ width: ((hblStatus.length / (hblStatus.length + 1)) * 100) + '%' }"-->
+<!--                                     class="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-500"></div>-->
+<!--                            </div>-->
+<!--                        </div>-->
 
                         <div class="timeline-container">
                             <!-- Custom Left-Aligned Timeline -->
