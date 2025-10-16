@@ -26,6 +26,7 @@ use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use App\Models\HBLPackage;
+use App\Models\Container;
 use App\Models\Remark;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -61,6 +62,40 @@ class HBLController extends Controller
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
+        ]);
+    }
+
+    public function getContainerDetailsByReference(string $reference)
+    {
+        $hbl = HBL::withoutGlobalScope(BranchScope::class)
+            ->where('reference', $reference)
+            ->orWhere('hbl_number', $reference)
+            ->first();
+
+        if (! $hbl) {
+            return response()->json(['message' => 'HBL not found'], 404);
+        }
+
+        // Find a related container via HBL packages pivot
+        $container = Container::withoutGlobalScope(BranchScope::class)
+            ->whereHas('hbl_packages', function ($q) use ($hbl) {
+                $q->withoutGlobalScope(BranchScope::class)
+                    ->where('hbl_id', $hbl->id);
+            })
+            ->orderByDesc('estimated_time_of_departure')
+            ->first();
+
+        if (! $container) {
+            return response()->json(null);
+        }
+
+        $etd = $container->estimated_time_of_departure;
+        $isPast = $etd ? now()->greaterThan($etd) : false;
+
+        return response()->json([
+            'loading_started_at' => $container->loading_started_at,
+            'estimated_time_of_departure' => $etd,
+            'is_etd_past' => $isPast,
         ]);
     }
 

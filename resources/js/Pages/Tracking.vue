@@ -19,6 +19,7 @@ const errorMessage = ref('');
 const isLoading = ref(false);
 const hblStatus = ref([]);
 const hblDetails = ref(null);
+const containerDetails = ref(null);
 
 const handleSubmit = async () => {
     errorMessage.value = '';
@@ -64,6 +65,24 @@ const handleSubmit = async () => {
             }
         } catch (e) {
             hblDetails.value = null;
+        }
+
+        // Fetch Container details including loading start and ETD
+        try {
+            const contRes = await fetch(`/get-container-details-by-reference/${reference.value}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!contRes.ok) {
+                containerDetails.value = null;
+            } else {
+                containerDetails.value = await contRes.json();
+            }
+        } catch (e) {
+            containerDetails.value = null;
         }
 
     } catch (error) {
@@ -166,7 +185,6 @@ const getEstimatedTime = (status, index, total) => {
     const estimates = {
         'HBL Preparation by warehouse': '1-2 business days',
         'HBL Preparation by driver': '2-4 hours',
-        'Container Loading': '4-6 hours',
         'Container Shipped': '3-5 days',
         'Container In Transit': '1-2 days',
         'Container Arrival': '6-12 hours'
@@ -300,6 +318,7 @@ const getEstimatedTime = (status, index, total) => {
                                                                 {{ log.status.replace('Container', 'Shipment') }}
                                                             </p>
                                                         </div>
+
                                                         <Badge
                                                             :severity="index === 0 ? 'success' : 'info'"
                                                             :value="index === 0 ? 'Current' : 'Completed'"
@@ -312,6 +331,31 @@ const getEstimatedTime = (status, index, total) => {
                                                         <p class="text-sm text-gray-700 leading-relaxed">
                                                             {{ getStatusDescription(log.status) }}
                                                         </p>
+                                                    </div>
+
+                                                    <!-- Shipment export process (container) details within timeline -->
+                                                    <div v-if="getUserFriendlyStatus(log.status) === 'Shipment Export process' && containerDetails"
+                                                         class="grid grid-cols-1 gap-3">
+                                                        <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-green-100">
+                                                            <div>
+                                                                <i class="pi pi-calendar text-amber-600 mr-2" />
+                                                                <span class="text-sm font-medium text-gray-600">Schedule to Load</span>
+                                                            </div>
+                                                            <span class="text-sm font-bold text-gray-800">
+                                                                {{ containerDetails.loading_started_at ? moment(containerDetails.loading_started_at).format('MMM DD, YYYY') : '-' }}
+                                                                <span v-if="containerDetails.loading_started_at" class="text-xs text-gray-500 font-normal ml-2">({{ moment(containerDetails.loading_started_at).fromNow() }})</span>
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-amber-100">
+                                                            <div>
+                                                                <i class="pi pi-calendar text-amber-600 mr-2" />
+                                                                <span class="text-sm font-medium text-gray-600">{{ containerDetails?.is_etd_past ? 'Shipment Departed' : 'Estimated Departure' }}</span>
+                                                            </div>
+                                                            <span class="text-sm font-bold text-gray-800">
+                                                                {{ containerDetails?.estimated_time_of_departure ? moment(containerDetails.estimated_time_of_departure).format('MMM DD, YYYY') : '-' }}
+                                                                <span v-if="containerDetails?.estimated_time_of_departure" class="text-xs text-gray-500 font-normal ml-2">({{ moment(containerDetails.estimated_time_of_departure).fromNow() }})</span>
+                                                            </span>
+                                                        </div>
                                                     </div>
 
                                                     <!-- Shipment pickup details within timeline -->
