@@ -216,7 +216,7 @@ const getEstimatedTime = (status, index, total) => {
 
         <!-- Search Section -->
         <div class="bg-white shadow-sm border-b">
-            <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="max-w-3xl mx-auto px-4 py-6">
                 <div class="max-w-md mx-auto">
                     <h1 class="text-2xl font-bold text-center mb-4 text-gray-800">Track Your Shipment</h1>
 
@@ -234,17 +234,17 @@ const getEstimatedTime = (status, index, total) => {
                     </div>
 
                     <!-- Search Input -->
-                    <div class="flex space-x-2">
+                    <div class="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                         <input
                             v-model="reference"
-                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                            class="flex-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                             placeholder="Enter HBL number"
                             type="text"
                             @keyup.enter="handleSubmit"
                         />
                         <button
                             :disabled="isLoading"
-                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors w-full sm:w-auto"
                             @click="handleSubmit"
                         >
                             <svg v-if="isLoading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
@@ -261,7 +261,7 @@ const getEstimatedTime = (status, index, total) => {
         </div>
 
         <!-- Results Section -->
-        <div v-if="hblStatus.length > 0 && !isLoading" class="max-w-7xl mx-auto px-4 py-6">
+        <div v-if="hblStatus.length > 0 && !isLoading" class="max-w-2xl mx-auto px-4 py-6">
             <!-- Tracking Result Header -->
             <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg px-6 py-4">
                 <h2 class="text-lg font-semibold">
@@ -430,7 +430,7 @@ const getEstimatedTime = (status, index, total) => {
         </div>
 
         <!-- Loading State -->
-        <div v-if="isLoading" class="max-w-7xl mx-auto px-4 py-6">
+        <div v-if="isLoading" class="max-w-3xl mx-auto px-4 py-6">
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <div class="animate-pulse">
                     <div class="h-6 bg-gray-200 rounded mb-4 w-1/3"></div>
@@ -676,6 +676,22 @@ const getEstimatedTime = (status, index, total) => {
     .customized-timeline :deep(.p-timeline-event-marker) {
         width: 2rem;
         height: 2rem;
+    }
+
+    /* Adjust custom timeline for small screens */
+    .timeline-vertical-line {
+        left: 14px;
+        top: 24px;
+        bottom: 24px;
+    }
+
+    .timeline-marker {
+        margin-right: 0.75rem;
+    }
+
+    .timeline-marker .rounded-full {
+        width: 2.25rem;
+        height: 2.25rem;
     }
 }
 
