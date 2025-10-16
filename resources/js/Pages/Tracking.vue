@@ -276,42 +276,66 @@ const getEstimatedTime = (status, index, total) => {
 <!--                        </div>-->
 
                         <div class="timeline-container">
-                            <!-- Action Buttons -->
-                            <div class="mb-8 space-y-4">
+                            <Card class="mb-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+                                <template #content>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="font-semibold text-gray-800 flex items-center">
+                                                <i class="pi pi-info-circle mr-2 text-blue-600"></i>
+                                                Shipment Active
+                                            </h3>
+                                            <span class="text-xs text-blue-600 font-medium">
+                                                Last Updated: {{ hblStatus.length ? moment(hblStatus[hblStatus.length - 1]?.created_at).fromNow() : '-' }}
+                                            </span>
+                                        </div>
 
-                                <!-- Enhanced Shipment Details Card -->
-                                <Card class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
-                                    <template #content>
-                                        <div class="space-y-4">
-                                            <div class="text-center">
-                                                <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-                                                    <i class="pi pi-check-circle text-green-600 text-xl"></i>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div class="bg-white rounded-lg p-3 border border-blue-100">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-sm font-medium text-gray-600">Shipper name</span>
+                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails?.shipper_name || '-' }}</span>
                                                 </div>
-                                                <h4 class="font-bold text-gray-800 text-lg">Shipment Active</h4>
-                                                <p class="text-sm text-gray-600">Your package is being tracked</p>
                                             </div>
-
-                                            <div class="grid grid-cols-1 gap-3">
-                                                <div class="bg-white rounded-lg p-3 border border-blue-100">
-                                                    <div class="flex items-center justify-between">
-                                                        <span class="text-sm font-medium text-gray-600">HBL Number</span>
-                                                        <span class="text-sm font-bold text-blue-600">{{ reference }}</span>
-                                                    </div>
+                                            <div class="bg-white rounded-lg p-3 border border-blue-100">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-sm font-medium text-gray-600">Consignee name</span>
+                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails?.consignee_name || '-' }}</span>
                                                 </div>
-                                                <div class="bg-white rounded-lg p-3 border border-blue-100">
-                                                    <div class="flex items-center justify-between">
-                                                        <span class="text-sm font-medium text-gray-600">Last Updated</span>
-                                                        <span class="text-sm font-bold text-gray-800">
-                                                            {{ moment(hblStatus[hblStatus.length - 1]?.created_at).fromNow() }}
-                                                        </span>
-                                                    </div>
+                                            </div>
+                                            <div class="bg-white rounded-lg p-3 border border-blue-100">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-sm font-medium text-gray-600">No of packages</span>
+                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails?.packages_count ?? '-' }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-white rounded-lg p-3 border border-blue-100">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-sm font-medium text-gray-600">ETD</span>
+                                                    <span class="text-sm font-bold text-gray-800">
+                                                        {{ containerDetails?.estimated_time_of_departure ? moment(containerDetails.estimated_time_of_departure).format('MMM DD, YYYY') : '-' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-white rounded-lg p-3 border border-blue-100">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-sm font-medium text-gray-600">ETA</span>
+                                                    <span class="text-sm font-bold text-gray-800">
+                                                        {{ containerDetails?.estimated_time_of_arrival ? moment(containerDetails.estimated_time_of_arrival).format('MMM DD, YYYY') : '-' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="bg-white rounded-lg p-3 border border-blue-100">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-sm font-medium text-gray-600">Current Status</span>
+                                                    <span class="text-sm font-bold text-blue-700">
+                                                        {{ getUserFriendlyStatus(hblStatus[hblStatus.length - 1]?.status) || hblStatus[hblStatus.length - 1]?.status || '-' }}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-                                    </template>
-                                </Card>
-
-                            </div>
+                                    </div>
+                                </template>
+                            </Card>
 
                             <!-- Custom Left-Aligned Timeline -->
                             <div class="custom-timeline relative">
