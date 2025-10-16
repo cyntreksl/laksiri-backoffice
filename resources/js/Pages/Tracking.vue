@@ -18,6 +18,7 @@ const reference = ref(props.reference ?? null);
 const errorMessage = ref('');
 const isLoading = ref(false);
 const hblStatus = ref([]);
+const hblDetails = ref(null);
 
 const handleSubmit = async () => {
     errorMessage.value = '';
@@ -47,6 +48,24 @@ const handleSubmit = async () => {
             hblStatus.value = await response.json();
         }
 
+        // Fetch HBL details including pickup dates
+        try {
+            const detailsRes = await fetch(`/get-hbl-details-by-reference/${reference.value}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!detailsRes.ok) {
+                hblDetails.value = null;
+            } else {
+                hblDetails.value = await detailsRes.json();
+            }
+        } catch (e) {
+            hblDetails.value = null;
+        }
+
     } catch (error) {
         console.log(error);
     } finally {
@@ -59,38 +78,6 @@ onMounted(() => {
         handleSubmit();
     }
 });
-
-const hblStatusColor = (status) => {
-    switch (status) {
-        case 'HBL Preparation by warehouse':
-        case 'HBL Preparation by driver':
-            return 'bg-primary';
-        case 'Cash Received by Accountant':
-            return 'bg-secondary';
-        case 'Container Loading':
-            return 'bg-success';
-        case 'Container Shipped':
-            return 'bg-error';
-        case 'Container Arrival':
-            return 'bg-slate-500';
-        case 'Blocked By RTF':
-            return 'bg-red-500';
-        case 'Revert To Cash Settlement':
-            return 'bg-amber-400';
-        case 'Container Unloaded in Colombo':
-            return 'bg-gray-400';
-        case 'Container Loading in Colombo':
-            return 'bg-success';
-        case 'Container Unloaded in Nintavur':
-            return 'bg-red-600';
-        case 'Container In Transit':
-            return 'bg-cyan-600';
-        case 'Container Reached Destination ':
-            return 'bg-emerald-600';
-        default:
-            return 'bg-gray-400';
-    }
-};
 
 const getStatusIcon = (status) => {
     switch (status.toLowerCase()) {
@@ -131,33 +118,12 @@ const getStatusIcon = (status) => {
     }
 };
 
-const getStatusColor = (status, index, total) => {
-    if (index === total - 1) {
-        return 'success'; // Latest status
-    }
-
-    switch (status.toLowerCase()) {
-        case 'delivered':
-        case 'container reached destination':
-            return 'success';
-        case 'blocked by rtf':
-            return 'danger';
-        case 'revert to cash settlement':
-            return 'warning';
-        case 'container in transit':
-        case 'out for delivery':
-            return 'info';
-        default:
-            return 'primary';
-    }
-};
-
 const getUserFriendlyStatus = (status) => {
     const statusMap = {
-        'HBL Preparation by warehouse': 'Shipment Picked Up',
+        'HBL Preparation by warehouse': 'Shipment Pickup',
         'HBL Preparation by driver': 'Shipment Picked Up',
-        'Cash Received by Accountant': 'Arrived',
-        'Container Loading': 'Under Process',
+        // 'Cash Received by Accountant': 'Arrived',
+        'Container Loading': 'Shipment Export process',
         'Container Shipped': 'Departed',
         'Container Arrival': 'Arrived',
         'Blocked By RTF': 'Shipment held for inspection',
@@ -331,7 +297,7 @@ const getEstimatedTime = (status, index, total) => {
                                                                 {{ getUserFriendlyStatus(log.status) }}
                                                             </h3>
                                                             <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                                                                {{ log.status }}
+                                                                {{ log.status.replace('Container', 'Shipment') }}
                                                             </p>
                                                         </div>
                                                         <Badge
@@ -348,27 +314,53 @@ const getEstimatedTime = (status, index, total) => {
                                                         </p>
                                                     </div>
 
-                                                    <!-- Date and Time Info -->
-                                                    <div class="grid grid-cols-2 gap-3">
-                                                        <div class="flex items-center space-x-2 bg-white rounded-lg p-2 border border-gray-100">
-                                                            <i class="pi pi-calendar text-blue-500"></i>
+                                                    <!-- Shipment pickup details within timeline -->
+                                                    <div v-if="getUserFriendlyStatus(log.status) === 'Shipment Pickup' && hblDetails"
+                                                         class="grid grid-cols-1 gap-3">
+                                                        <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-green-100">
                                                             <div>
-                                                                <p class="text-xs text-gray-500 font-medium">Date</p>
-                                                                <p class="text-sm font-semibold text-gray-800">
-                                                                    {{ moment(log.created_at).format('MMM DD, YYYY') }}
-                                                                </p>
+                                                                <i class="pi pi-calendar text-blue-500 mr-2" />
+                                                                <span class="text-sm font-medium text-gray-600">Booking Received date</span>
                                                             </div>
+                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_received_date ? moment(hblDetails.booking_received_date).format('MMM DD, YYYY') : '' }}</span>
                                                         </div>
-                                                        <div class="flex items-center space-x-2 bg-white rounded-lg p-2 border border-gray-100">
-                                                            <i class="pi pi-clock text-green-500"></i>
+                                                        <div v-if="hblDetails.booking_assign_to_driver_date" class="flex items-center justify-between bg-white rounded-lg p-2 border border-green-100">
                                                             <div>
-                                                                <p class="text-xs text-gray-500 font-medium">Time</p>
-                                                                <p class="text-sm font-semibold text-gray-800">
-                                                                    {{ moment(log.created_at).format('hh:mm A') }}
-                                                                </p>
+                                                                <i class="pi pi-calendar text-blue-500 mr-2" />
+                                                                <span class="text-sm font-medium text-gray-600">Booking Assign to driver date</span>
                                                             </div>
+                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_assign_to_driver_date ? moment(hblDetails.booking_assign_to_driver_date).format('MMM DD, YYYY') : '' }}</span>
+                                                        </div>
+                                                        <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-green-100">
+                                                            <div>
+                                                                <i class="pi pi-calendar text-blue-500 mr-2" />
+                                                                <span class="text-sm font-medium text-gray-600">Cargo Received date</span>
+                                                            </div>
+                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.cargo_received_date ? moment(hblDetails.cargo_received_date).format('MMM DD, YYYY') : '' }}</span>
                                                         </div>
                                                     </div>
+
+                                                    <!-- Date and Time Info -->
+<!--                                                    <div class="grid grid-cols-2 gap-3">-->
+<!--                                                        <div class="flex items-center space-x-2 bg-white rounded-lg p-2 border border-gray-100">-->
+<!--                                                            <i class="pi pi-calendar text-blue-500"></i>-->
+<!--                                                            <div>-->
+<!--                                                                <p class="text-xs text-gray-500 font-medium">Date</p>-->
+<!--                                                                <p class="text-sm font-semibold text-gray-800">-->
+<!--                                                                    {{ moment(log.created_at).format('MMM DD, YYYY') }}-->
+<!--                                                                </p>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+<!--                                                        <div class="flex items-center space-x-2 bg-white rounded-lg p-2 border border-gray-100">-->
+<!--                                                            <i class="pi pi-clock text-green-500"></i>-->
+<!--                                                            <div>-->
+<!--                                                                <p class="text-xs text-gray-500 font-medium">Time</p>-->
+<!--                                                                <p class="text-sm font-semibold text-gray-800">-->
+<!--                                                                    {{ moment(log.created_at).format('hh:mm A') }}-->
+<!--                                                                </p>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+<!--                                                    </div>-->
 
                                                     <!-- Estimated Time (if available) -->
                                                     <div v-if="getEstimatedTime(log.status, hblStatus.length - 1 - index, hblStatus.length)"
@@ -422,6 +414,7 @@ const getEstimatedTime = (status, index, total) => {
                                         </div>
                                     </template>
                                 </Card>
+
                             </div>
                         </div>
                     </div>

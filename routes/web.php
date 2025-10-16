@@ -97,6 +97,8 @@ Route::middleware([
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);
 
+Route::get('get-hbl-details-by-reference/{reference}', [HBLController::class, 'getHBLDetailsByReference']);
+
 Route::post('/whatsapp/webhook', [WhatsappController::class, 'handleWebhook']);
 Route::get('/whatsapp/webhook', [WhatsappController::class, 'verifyWebhook']);
 

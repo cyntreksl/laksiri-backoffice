@@ -27,6 +27,7 @@ use App\Models\HBL;
 use App\Models\HBLDocument;
 use App\Models\HBLPackage;
 use App\Models\Remark;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -283,6 +284,29 @@ class HBLController extends Controller
     public function getHBLStatusByReference($reference = null)
     {
         return $this->HBLRepository->getHBLStatusByReference($reference);
+    }
+
+    public function getHBLDetailsByReference(string $reference)
+    {
+        $hbl = HBL::withoutGlobalScope(BranchScope::class)
+            ->with('pickup')
+            ->where('reference', $reference)
+            ->orWhere('hbl_number', $reference)
+            ->first();
+
+        if (! $hbl) {
+            return response()->json(['message' => 'HBL not found'], 404);
+        }
+
+        $pickup = $hbl->pickup;
+
+        $payload = [
+            'booking_received_date' => $pickup?->created_at ?? $hbl->created_at,
+            'booking_assign_to_driver_date' => $pickup?->driver_assigned_at,
+            'cargo_received_date' => $hbl->created_at,
+        ];
+
+        return response()->json($payload);
     }
 
     public function showTracking(Request $request)
