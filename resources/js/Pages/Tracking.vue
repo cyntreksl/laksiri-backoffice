@@ -146,7 +146,7 @@ const getUserFriendlyStatus = (status) => {
         // 'Container Shipped': 'Departed',
         'Container Arrival': 'Shipment Arrival process',
         'Blocked By RTF': 'Shipment held for inspection',
-        'Container Unloaded in Colombo': 'Transferred',
+        'Container Unloaded in Colombo': 'Shipment',
         'Container Reached Destination': 'Delivered'
         // All other statuses are hidden from display
         // 'Revert To Cash Settlement': 'Payment method changed',
@@ -166,7 +166,7 @@ const getStatusDescription = (status) => {
         'Container Shipped': 'Your shipment has departed to Sri Lanka and is on its way.',
         'Container Arrival': 'Your shipment has arrived at the destination and is being processed.',
         'Blocked By RTF': 'Your shipment is temporarily held for routine customs inspection.',
-        'Container Unloaded in Colombo': 'Your shipment has been transferred to the next stage of delivery.',
+        'Container Unloaded in Colombo': 'Please book an appointment for cargo collection.',
         'Container Reached Destination': 'Congratulations! Your package has been successfully delivered.'
         // All other statuses are hidden from display
         // 'Revert To Cash Settlement': 'Payment method has been updated as per your request.',
@@ -276,6 +276,43 @@ const getEstimatedTime = (status, index, total) => {
 <!--                        </div>-->
 
                         <div class="timeline-container">
+                            <!-- Action Buttons -->
+                            <div class="mb-8 space-y-4">
+
+                                <!-- Enhanced Shipment Details Card -->
+                                <Card class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+                                    <template #content>
+                                        <div class="space-y-4">
+                                            <div class="text-center">
+                                                <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+                                                    <i class="pi pi-check-circle text-green-600 text-xl"></i>
+                                                </div>
+                                                <h4 class="font-bold text-gray-800 text-lg">Shipment Active</h4>
+                                                <p class="text-sm text-gray-600">Your package is being tracked</p>
+                                            </div>
+
+                                            <div class="grid grid-cols-1 gap-3">
+                                                <div class="bg-white rounded-lg p-3 border border-blue-100">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-sm font-medium text-gray-600">HBL Number</span>
+                                                        <span class="text-sm font-bold text-blue-600">{{ reference }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-white rounded-lg p-3 border border-blue-100">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-sm font-medium text-gray-600">Last Updated</span>
+                                                        <span class="text-sm font-bold text-gray-800">
+                                                            {{ moment(hblStatus[hblStatus.length - 1]?.created_at).fromNow() }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </Card>
+
+                            </div>
+
                             <!-- Custom Left-Aligned Timeline -->
                             <div class="custom-timeline relative">
                                 <!-- Continuous Vertical Line -->
@@ -447,43 +484,6 @@ const getEstimatedTime = (status, index, total) => {
                                         </Card>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="mt-8 space-y-4">
-
-                                <!-- Enhanced Shipment Details Card -->
-                                <Card class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
-                                    <template #content>
-                                        <div class="space-y-4">
-                                            <div class="text-center">
-                                                <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-                                                    <i class="pi pi-check-circle text-green-600 text-xl"></i>
-                                                </div>
-                                                <h4 class="font-bold text-gray-800 text-lg">Shipment Active</h4>
-                                                <p class="text-sm text-gray-600">Your package is being tracked</p>
-                                            </div>
-
-                                            <div class="grid grid-cols-1 gap-3">
-                                                <div class="bg-white rounded-lg p-3 border border-blue-100">
-                                                    <div class="flex items-center justify-between">
-                                                        <span class="text-sm font-medium text-gray-600">HBL Number</span>
-                                                        <span class="text-sm font-bold text-blue-600">{{ reference }}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="bg-white rounded-lg p-3 border border-blue-100">
-                                                    <div class="flex items-center justify-between">
-                                                        <span class="text-sm font-medium text-gray-600">Last Updated</span>
-                                                        <span class="text-sm font-bold text-gray-800">
-                                                            {{ moment(hblStatus[hblStatus.length - 1]?.created_at).fromNow() }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </Card>
-
                             </div>
                         </div>
                     </div>
