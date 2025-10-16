@@ -143,8 +143,8 @@ const getUserFriendlyStatus = (status) => {
         'HBL Preparation by driver': 'Shipment Picked Up',
         // 'Cash Received by Accountant': 'Arrived',
         'Container Loading': 'Shipment Export process',
-        'Container Shipped': 'Departed',
-        'Container Arrival': 'Arrived',
+        // 'Container Shipped': 'Departed',
+        'Container Arrival': 'Shipment Arrival process',
         'Blocked By RTF': 'Shipment held for inspection',
         'Container Unloaded in Colombo': 'Transferred',
         'Container Reached Destination': 'Delivered'
@@ -354,6 +354,31 @@ const getEstimatedTime = (status, index, total) => {
                                                             <span class="text-sm font-bold text-gray-800">
                                                                 {{ containerDetails?.estimated_time_of_departure ? moment(containerDetails.estimated_time_of_departure).format('MMM DD, YYYY') : '-' }}
                                                                 <span v-if="containerDetails?.estimated_time_of_departure" class="text-xs text-gray-500 font-normal ml-2">({{ moment(containerDetails.estimated_time_of_departure).fromNow() }})</span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Shipment arrival process (container) details within timeline -->
+                                                    <div v-if="getUserFriendlyStatus(log.status) === 'Shipment Arrival process' && containerDetails"
+                                                         class="grid grid-cols-1 gap-3">
+                                                        <!-- ETA to destination port -->
+                                                        <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-emerald-100">
+                                                            <div>
+                                                                <i class="pi pi-calendar text-emerald-600 mr-2" />
+                                                                <span class="text-sm font-medium text-gray-600">ETA to Destination Port</span>
+                                                            </div>
+                                                            <span class="text-sm font-bold text-gray-800">
+                                                                {{ containerDetails?.estimated_time_of_arrival ? moment(containerDetails.estimated_time_of_arrival).format('MMM DD, YYYY') : '-' }}
+                                                            </span>
+                                                        </div>
+                                                        <!-- Shipment Arrived to destination port – date (only when ETA expired) -->
+                                                        <div v-if="containerDetails?.is_eta_past" class="flex items-center justify-between bg-white rounded-lg p-2 border border-emerald-100">
+                                                            <div>
+                                                                <i class="pi pi-flag-fill text-emerald-600 mr-2" />
+                                                                <span class="text-sm font-medium text-gray-600">Destination Port<span v-if="containerDetails?.port_of_discharge"> – {{ containerDetails.port_of_discharge }}</span></span>
+                                                            </div>
+                                                            <span class="text-sm font-bold text-gray-800">
+                                                                {{ containerDetails?.reached_date ? moment(containerDetails.reached_date).format('MMM DD, YYYY') : '-' }}
                                                             </span>
                                                         </div>
                                                     </div>

@@ -90,12 +90,19 @@ class HBLController extends Controller
         }
 
         $etd = $container->estimated_time_of_departure;
+        $eta = $container->estimated_time_of_arrival;
         $isPast = $etd ? now()->greaterThan($etd) : false;
+        $isEtaPast = $eta ? now()->greaterThan($eta) : false;
 
         return response()->json([
             'loading_started_at' => $container->loading_started_at,
             'estimated_time_of_departure' => $etd,
             'is_etd_past' => $isPast,
+            'estimated_time_of_arrival' => $eta,
+            'is_eta_past' => $isEtaPast,
+            'port_of_discharge' => $container->port_of_discharge,
+            'reached_date' => $container->reached_date,
+            'arrived_at_primary_warehouse' => $container->arrived_at_primary_warehouse,
         ]);
     }
 
