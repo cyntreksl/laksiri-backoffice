@@ -14,6 +14,10 @@ class GetHBLsWithUnloadedPackagesByReference
         $hbl = HBL::where('reference', $reference)
             ->where('cargo_type', $cargo_type)
             ->orWhere('hbl_number', $reference)
+            ->whereNotIn('system_status', [
+                HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_DRIVER,
+                HBL::SYSTEM_STATUS_HBL_PREPARATION_BY_WAREHOUSE,
+            ])
             ->with(['packages' => function ($query) {
                 $query->where('is_loaded', false);
             }])->first();
