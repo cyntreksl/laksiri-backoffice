@@ -452,21 +452,21 @@ const getEstimatedTime = (status, index, total) => {
                                                                 <i class="pi pi-calendar text-blue-500 mr-2" />
                                                                 <span class="text-sm font-medium text-gray-600">Booking Received date</span>
                                                             </div>
-                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_received_date ? moment(hblDetails.booking_received_date).format('MMM DD, YYYY') : '' }}</span>
+                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_received_date ? moment(hblDetails.booking_received_date).format('MMM DD, YYYY') : '-' }}</span>
                                                         </div>
                                                         <div v-if="hblDetails.booking_assign_to_driver_date" class="flex items-center justify-between bg-white rounded-lg p-2 border border-green-100">
                                                             <div>
                                                                 <i class="pi pi-calendar text-blue-500 mr-2" />
                                                                 <span class="text-sm font-medium text-gray-600">Booking Assign to driver date</span>
                                                             </div>
-                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_assign_to_driver_date ? moment(hblDetails.booking_assign_to_driver_date).format('MMM DD, YYYY') : '' }}</span>
+                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_assign_to_driver_date ? moment(hblDetails.booking_assign_to_driver_date).format('MMM DD, YYYY') : '-' }}</span>
                                                         </div>
                                                         <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-green-100">
                                                             <div>
                                                                 <i class="pi pi-calendar text-blue-500 mr-2" />
                                                                 <span class="text-sm font-medium text-gray-600">Cargo Received date</span>
                                                             </div>
-                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.cargo_received_date ? moment(hblDetails.cargo_received_date).format('MMM DD, YYYY') : '' }}</span>
+                                                            <span class="text-sm font-bold text-gray-800">{{ hblDetails.cargo_received_date ? moment(hblDetails.cargo_received_date).format('MMM DD, YYYY') : '-' }}</span>
                                                         </div>
                                                     </div>
 
