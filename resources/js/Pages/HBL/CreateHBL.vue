@@ -1344,19 +1344,6 @@ const totalChargeableWeight = computed(() => {
                                             </div>
                                         </li>
 
-                                        <li v-if="form.cargo_type === 'Air Cargo'" class="flex py-3">
-                                            <div class="flex flex-1 flex-col">
-                                                <div>
-                                                    <div class="flex justify-between text-base font-medium text-gray-900 dark:text-white">
-                                                        <h3>
-                                                            Chargeable Weight
-                                                        </h3>
-                                                        <p class="ml-4">{{ totalChargeableWeight.toFixed(2) }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-
                                         <li class="flex py-3">
                                             <div class="flex flex-1 flex-col">
                                                 <div>
