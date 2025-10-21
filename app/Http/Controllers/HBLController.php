@@ -26,7 +26,9 @@ use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\HBLDocument;
 use App\Models\HBLPackage;
+use App\Models\Container;
 use App\Models\Remark;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -60,6 +62,47 @@ class HBLController extends Controller
             'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
+        ]);
+    }
+
+    public function getContainerDetailsByReference(string $reference)
+    {
+        $hbl = HBL::withoutGlobalScope(BranchScope::class)
+            ->where('reference', $reference)
+            ->orWhere('hbl_number', $reference)
+            ->first();
+
+        if (! $hbl) {
+            return response()->json(['message' => 'HBL not found'], 404);
+        }
+
+        // Find a related container via HBL packages pivot
+        $container = Container::withoutGlobalScope(BranchScope::class)
+            ->whereHas('hbl_packages', function ($q) use ($hbl) {
+                $q->withoutGlobalScope(BranchScope::class)
+                    ->where('hbl_id', $hbl->id);
+            })
+            ->orderByDesc('estimated_time_of_departure')
+            ->first();
+
+        if (! $container) {
+            return response()->json(null);
+        }
+
+        $etd = $container->estimated_time_of_departure;
+        $eta = $container->estimated_time_of_arrival;
+        $isPast = $etd ? now()->greaterThan($etd) : false;
+        $isEtaPast = $eta ? now()->greaterThan($eta) : false;
+
+        return response()->json([
+            'loading_started_at' => $container->loading_started_at,
+            'estimated_time_of_departure' => $etd,
+            'is_etd_past' => $isPast,
+            'estimated_time_of_arrival' => $eta,
+            'is_eta_past' => $isEtaPast,
+            'port_of_discharge' => $container->port_of_discharge,
+            'reached_date' => $container->reached_date,
+            'arrived_at_primary_warehouse' => $container->arrived_at_primary_warehouse,
         ]);
     }
 
@@ -283,6 +326,32 @@ class HBLController extends Controller
     public function getHBLStatusByReference($reference = null)
     {
         return $this->HBLRepository->getHBLStatusByReference($reference);
+    }
+
+    public function getHBLDetailsByReference(string $reference)
+    {
+        $hbl = HBL::withoutGlobalScope(BranchScope::class)
+            ->with(['pickup', 'shipper', 'consignee', 'packages'])
+            ->where('reference', $reference)
+            ->orWhere('hbl_number', $reference)
+            ->first();
+
+        if (! $hbl) {
+            return response()->json(['message' => 'HBL not found'], 404);
+        }
+
+        $pickup = $hbl->pickup;
+
+        $payload = [
+            'booking_received_date' => $pickup?->created_at ?? $hbl->created_at,
+            'booking_assign_to_driver_date' => $pickup?->driver_assigned_at,
+            'cargo_received_date' => $hbl->created_at,
+            'shipper_name' => $hbl->shipper?->name,
+            'consignee_name' => $hbl->consignee?->name,
+            'packages_count' => $hbl->packages?->count() ?? 0,
+        ];
+
+        return response()->json($payload);
     }
 
     public function showTracking(Request $request)
