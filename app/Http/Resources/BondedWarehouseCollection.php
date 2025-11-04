@@ -14,7 +14,7 @@ class BondedWarehouseCollection extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $totalWeight = $this->unloadedPackagesWithoutGlobalScope()->sum('weight');
+        $totalWeight = $this->unloadedPackagesWithoutGlobalScope()->sum('actual_weight');
         $totalVolume = $this->unloadedPackagesWithoutGlobalScope()->sum('volume');
         $totalQuantity = $this->unloadedPackagesWithoutGlobalScope()->sum('quantity');
 

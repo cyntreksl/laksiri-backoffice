@@ -15,7 +15,7 @@ class CashSettlementCollection extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $totalWeight = $this->packages()->sum('weight');
+        $totalWeight = $this->packages()->sum('actual_weight');
         $totalVolume = $this->packages()->sum('volume');
 
         return [
