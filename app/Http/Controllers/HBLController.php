@@ -346,8 +346,8 @@ class HBLController extends Controller
             'booking_received_date' => $pickup?->created_at ?? $hbl->created_at,
             'booking_assign_to_driver_date' => $pickup?->driver_assigned_at,
             'cargo_received_date' => $hbl->created_at,
-            'shipper_name' => $hbl->shipper?->name,
-            'consignee_name' => $hbl->consignee?->name,
+            'shipper_name' => $hbl->hbl_name,
+            'consignee_name' => $hbl->consignee_name,
             'packages_count' => $hbl->packages?->count() ?? 0,
         ];
 
