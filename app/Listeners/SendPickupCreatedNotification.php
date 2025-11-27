@@ -22,8 +22,11 @@ class SendPickupCreatedNotification
     public function handle(PickupCreated $event): void
     {
         $pickUp = $event->pickUp;
-        $whatsapp_number = $pickUp->whatsapp_number;
-
-        Notification::send($whatsapp_number, new ConfirmPickupNotification($pickUp));
+        
+        // Only send WhatsApp notifications for Qatar branch
+        if ($pickUp->isFromQatarBranch()) {
+            $whatsapp_number = $pickUp->whatsapp_number;
+            Notification::send($whatsapp_number, new ConfirmPickupNotification($pickUp));
+        }
     }
 }
