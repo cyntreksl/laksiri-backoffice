@@ -24,7 +24,7 @@ class SendPickupCreatedNotification
         $pickUp = $event->pickUp;
         
         // Only send WhatsApp notifications for Qatar branch
-        if ($pickUp->branch && strtolower($pickUp->branch->country) === 'qatar') {
+        if ($pickUp->isFromQatarBranch()) {
             $whatsapp_number = $pickUp->whatsapp_number;
             Notification::send($whatsapp_number, new ConfirmPickupNotification($pickUp));
         }

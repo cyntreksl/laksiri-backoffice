@@ -24,7 +24,7 @@ class SendShipmentDeparturedNotification
         $hbl = $event->HBL;
         
         // Only send WhatsApp notifications for Qatar branch
-        if ($hbl->branch && strtolower($hbl->branch->country) === 'qatar') {
+        if ($hbl->isFromQatarBranch()) {
             $whatsapp_number = $hbl->whatsapp_number;
             Notification::send($whatsapp_number, new ShipmentDepartureNotification($hbl));
         }

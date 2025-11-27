@@ -6,6 +6,7 @@ use App\Models\Scopes\BranchScope;
 use App\Observers\HBLObserver;
 use App\Traits\HasQueueLogs;
 use App\Traits\HasStatusLogs;
+use App\Traits\IsFromQatarBranch;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,6 +31,7 @@ class HBL extends Model
     use HasFactory;
     use HasQueueLogs;
     use HasStatusLogs;
+    use IsFromQatarBranch;
     use LogsActivity;
     use SoftDeletes;
 
