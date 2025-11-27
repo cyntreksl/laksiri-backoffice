@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Scopes\BranchScope;
 use App\Observers\PickupObserver;
 use App\Traits\HasStatusLogs;
+use App\Traits\IsFromQatarBranch;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,6 +24,7 @@ class PickUp extends Model
 {
     use HasFactory;
     use HasStatusLogs;
+    use IsFromQatarBranch;
     use LogsActivity;
     use SoftDeletes;
 
@@ -94,5 +96,10 @@ class PickUp extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
     }
 }
