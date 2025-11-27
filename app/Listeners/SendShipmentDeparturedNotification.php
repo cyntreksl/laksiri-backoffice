@@ -22,8 +22,11 @@ class SendShipmentDeparturedNotification
     public function handle(ShipmentDepartured $event): void
     {
         $hbl = $event->HBL;
-        $whatsapp_number = $hbl->whatsapp_number;
-
-        Notification::send($whatsapp_number, new ShipmentDepartureNotification($hbl));
+        
+        // Only send WhatsApp notifications for Qatar branch
+        if ($hbl->branch && strtolower($hbl->branch->country) === 'qatar') {
+            $whatsapp_number = $hbl->whatsapp_number;
+            Notification::send($whatsapp_number, new ShipmentDepartureNotification($hbl));
+        }
     }
 }
