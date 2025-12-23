@@ -331,7 +331,16 @@ class HBLController extends Controller
     public function getHBLDetailsByReference(string $reference)
     {
         $hbl = HBL::withoutGlobalScope(BranchScope::class)
-            ->with(['pickup', 'shipper', 'consignee', 'packages'])
+            ->with([
+                'pickup' => function ($query) {
+                    $query->withoutGlobalScope(BranchScope::class);
+                },
+                'shipper',
+                'consignee',
+                'packages' => function ($query) {
+                    $query->withoutGlobalScope(BranchScope::class);
+                },
+            ])
             ->where('reference', $reference)
             ->orWhere('hbl_number', $reference)
             ->first();
