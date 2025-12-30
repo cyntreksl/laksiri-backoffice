@@ -75,7 +75,6 @@ class ContainerController extends Controller
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
             'containerStatus' => ContainerStatus::cases(),
-            'containers' => $this->containerRepository->getLoadedContainers(),
         ]);
     }
 
@@ -245,7 +244,6 @@ class ContainerController extends Controller
 
         return Inertia::render('Arrival/ShipmentsArrivalsList', [
             'cargoTypes' => CargoType::cases(),
-            'containers' => $this->containerRepository->getLoadedContainers(),
             'containerTypes' => ContainerType::cases(),
             'containerStatus' => ContainerStatus::cases(),
             'branches' => GetBranches::run(),

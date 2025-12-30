@@ -112,6 +112,14 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         // apply filters
         FilterFactory::apply($query, $filters);
 
+        // Eager load relationships to prevent N+1 queries
+        $query->with([
+            'branch:id,name',
+            'latestDetainRecord' => function ($query) {
+                $query->select('detain_records.id', 'detain_records.rtfable_id', 'detain_records.rtfable_type', 'detain_records.is_rtf', 'detain_records.detain_type');
+            },
+        ]);
+
         $loaded_containers = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
         return response()->json([

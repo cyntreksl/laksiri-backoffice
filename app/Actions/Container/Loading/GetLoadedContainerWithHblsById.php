@@ -16,6 +16,8 @@ class GetLoadedContainerWithHblsById
         $containersWithLoadedHBLs = Container::withoutGlobalScope(BranchScope::class)
             ->where('id', $id)
             ->with([
+                'branch',
+                'warehouse',
                 'hbl_packages' => function ($query) {
                     $query->withoutGlobalScope(BranchScope::class)
                         ->with(['hbl' => function ($hblQuery) {
