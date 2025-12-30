@@ -59,7 +59,6 @@ class HBLController extends Controller
 
         return Inertia::render('HBL/HBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
-            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
         ]);
