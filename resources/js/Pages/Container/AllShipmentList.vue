@@ -45,11 +45,6 @@ const props = defineProps({
         type: Array,
         required: true,
     },
-    containers: {
-        type: Object,
-        default: () => {
-        },
-    },
 });
 
 const baseUrl = ref("/all-shipments-list");
@@ -134,38 +129,38 @@ watch(() => filters.value.global.value, (newValue) => {
     }
 });
 
-watch(() => filters.value.cargo_type.value, (newValue) => {
+watch(() => filters.value.cargo_type.value, () => {
     fetchContainers(1, filters.value.global.value);
 });
 
-watch(() => fromDate.value, (newValue) => {
+watch(() => fromDate.value, () => {
     fetchContainers(1, filters.value.global.value);
 });
 
-watch(() => filters.value.container_type.value, (newValue) => {
+watch(() => filters.value.container_type.value, () => {
     fetchContainers(1, filters.value.global.value);
 });
 
-watch(() => filters.value.status.value, (newValue) => {
+watch(() => filters.value.status.value, () => {
     fetchContainers(1, filters.value.global.value);
 });
 
-watch(() => toDate.value, (newValue) => {
+watch(() => toDate.value, () => {
     fetchContainers(1, filters.value.global.value);
 });
 
-watch(() => etdStartDate.value, (newValue) => {
+watch(() => etdStartDate.value, () => {
     fetchContainers(1, filters.value.global.value);
 });
 
-watch(() => etdEndDate.value, (newValue) => {
+watch(() => etdEndDate.value, () => {
     fetchContainers(1, filters.value.global.value);
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchContainers(currentPage.value);
+    fetchContainers(currentPage.value, filters.value.global.value);
 };
 
 const onSort = (event) => {
@@ -191,11 +186,11 @@ const clearFilter = () => {
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     etdStartDate.value = '';
     etdEndDate.value = '';
-    fetchContainers(currentPage.value);
+    fetchContainers(1);
 };
 
 const confirmViewLoadedShipment = (id) => {
-    loadedShipment.value = props.containers.find(
+    loadedShipment.value = containers.value.find(
         (container) => container.id === id
     );
     showConfirmLoadedShipmentModal.value = true;

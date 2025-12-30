@@ -75,7 +75,6 @@ class ContainerController extends Controller
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
             'containerStatus' => ContainerStatus::cases(),
-            'containers' => $this->containerRepository->getLoadedContainers(),
         ]);
     }
 
