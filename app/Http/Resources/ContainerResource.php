@@ -18,7 +18,9 @@ class ContainerResource extends JsonResource
         return [
             'id' => $this->id,
             'cargo_type' => $this->cargo_type,
-            'branch' => $this->branch->name,
+            'branch' => $this->whenLoaded('branch', function () {
+                return $this->branch->name;
+            }, $this->branch?->name),
             'container_type' => $this->container_type,
             'reference' => $this->reference,
             'bl_number' => $this->bl_number,
@@ -65,8 +67,12 @@ class ContainerResource extends JsonResource
             'warehouse_dwell_time' => ($this->arrived_at_primary_warehouse && $this->departed_at_primary_warehouse)
                 ? $this->formatDwellTime($this->arrived_at_primary_warehouse, $this->departed_at_primary_warehouse)
                 : null,
-            'is_rtf' => $this->latestDetainRecord?->is_rtf ?? false,
-            'detain_type' => $this->latestDetainRecord?->detain_type ?? null,
+            'is_rtf' => $this->whenLoaded('latestDetainRecord', function () {
+                return $this->latestDetainRecord?->is_rtf ?? false;
+            }, false),
+            'detain_type' => $this->whenLoaded('latestDetainRecord', function () {
+                return $this->latestDetainRecord?->detain_type;
+            }),
         ];
     }
 

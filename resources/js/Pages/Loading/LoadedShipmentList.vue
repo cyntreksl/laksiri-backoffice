@@ -33,11 +33,6 @@ const props = defineProps({
         default: () => {
         },
     },
-    containers: {
-        type: Object,
-        default: () => {
-        },
-    },
     containerStatus: {
         type: Array,
         default: () => [],
@@ -148,38 +143,38 @@ watch(() => filters.value.global.value, (newValue) => {
     }
 });
 
-watch(() => filters.value.cargo_type.value, (newValue) => {
+watch(() => filters.value.cargo_type.value, () => {
     fetchLoadedShipments(1, filters.value.global.value);
 });
 
-watch(() => fromDate.value, (newValue) => {
+watch(() => fromDate.value, () => {
     fetchLoadedShipments(1, filters.value.global.value);
 });
 
-watch(() => filters.value.container_type.value, (newValue) => {
+watch(() => filters.value.container_type.value, () => {
     fetchLoadedShipments(1, filters.value.global.value);
 });
 
-watch(() => filters.value.status.value, (newValue) => {
+watch(() => filters.value.status.value, () => {
     fetchLoadedShipments(1, filters.value.global.value);
 });
 
-watch(() => toDate.value, (newValue) => {
+watch(() => toDate.value, () => {
     fetchLoadedShipments(1, filters.value.global.value);
 });
 
-watch(() => etdStartDate.value, (newValue) => {
+watch(() => etdStartDate.value, () => {
     fetchLoadedShipments(1, filters.value.global.value);
 });
 
-watch(() => etdEndDate.value, (newValue) => {
+watch(() => etdEndDate.value, () => {
     fetchLoadedShipments(1, filters.value.global.value);
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchLoadedShipments(currentPage.value);
+    fetchLoadedShipments(currentPage.value, filters.value.global.value);
 };
 
 const onSort = (event) => {
@@ -205,7 +200,7 @@ const clearFilter = () => {
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     etdStartDate.value = '';
     etdEndDate.value = '';
-    fetchLoadedShipments(currentPage.value);
+    fetchLoadedShipments(1);
 };
 
 const resolveCargoType = (container) => {
@@ -277,11 +272,15 @@ const resolveContainerStatus = (container) => {
     }
 };
 
-const confirmViewLoadedShipment = (id) => {
-    loadedShipment.value = props.containers.find(
-        (container) => container.id === id
-    );
-    showConfirmLoadedShipmentModal.value = true;
+const confirmViewLoadedShipment = async (id) => {
+    try {
+        const response = await axios.get(`/loaded-containers/get-container/${id}`);
+        // The API returns an array, get the first element
+        loadedShipment.value = response.data[0];
+        showConfirmLoadedShipmentModal.value = true;
+    } catch (error) {
+        console.error("Error fetching container details:", error);
+    }
 };
 
 const closeModal = () => {

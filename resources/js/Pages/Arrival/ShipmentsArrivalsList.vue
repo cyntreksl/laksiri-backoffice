@@ -35,11 +35,6 @@ const props = defineProps({
         default: () => {
         },
     },
-    containers: {
-        type: Object,
-        default: () => {
-        },
-    },
     containerStatus: {
         type: Array,
         default: () => [],
@@ -324,16 +319,14 @@ const exportCSV = () => {
     dt.value.exportCSV();
 };
 
-const confirmViewLoadedShipment = (id) => {
-    const container = props.containers.find(
-        (container) => container.id === id
-    );
-
-    if (container) {
-        selectedContainer.value = container;
+const confirmViewLoadedShipment = async (id) => {
+    try {
+        const response = await axios.get(`/loaded-containers/get-container/${id}`);
+        // The API returns an array, get the first element
+        selectedContainer.value = response.data[0];
         showConfirmLoadedShipmentModal.value = true;
-    } else {
-        console.error('Container not found with id:', id);
+    } catch (error) {
+        console.error('Error fetching container details:', error);
     }
 };
 
