@@ -189,11 +189,15 @@ const clearFilter = () => {
     fetchContainers(1);
 };
 
-const confirmViewLoadedShipment = (id) => {
-    loadedShipment.value = containers.value.find(
-        (container) => container.id === id
-    );
-    showConfirmLoadedShipmentModal.value = true;
+const confirmViewLoadedShipment = async (id) => {
+    try {
+        const response = await axios.get(`/loaded-containers/get-container/${id}`);
+        // The API returns an array, get the first element
+        loadedShipment.value = response.data[0];
+        showConfirmLoadedShipmentModal.value = true;
+    } catch (error) {
+        console.error("Error fetching container details:", error);
+    }
 };
 
 const closeModal = () => {
