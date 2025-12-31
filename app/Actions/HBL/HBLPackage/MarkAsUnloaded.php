@@ -15,10 +15,14 @@ class MarkAsUnloaded
         if (Auth::user()->hasRole('boned area')) {
             $hbl_package = HBLPackage::find($hbl_package_id);
             $hbl_package->is_de_loaded = false;
+            $hbl_package->unloaded_at = now();
+            $hbl_package->unloaded_by = auth()->id();
             $hbl_package->save();
         } else {
             $hbl_package = HBLPackage::find($hbl_package_id);
             $hbl_package->is_loaded = false;
+            $hbl_package->unloaded_at = now();
+            $hbl_package->unloaded_by = auth()->id();
             $hbl_package->save();
         }
     }
