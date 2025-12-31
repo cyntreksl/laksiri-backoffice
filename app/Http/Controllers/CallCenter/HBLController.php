@@ -57,7 +57,6 @@ class HBLController extends Controller
 
         return Inertia::render('CallCenter/HBL/HBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
-            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
             'shipments' => $shipments,
@@ -85,7 +84,6 @@ class HBLController extends Controller
 
         return Inertia::render('CallCenter/HBL/CallCenterHBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
-            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
             'shipments' => $shipments,
