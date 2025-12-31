@@ -304,6 +304,10 @@ const closeRemarksDialog = () => {
 
                             <InfoDisplay :value="`${item.volume.toFixed(3) ?? 0} M.CU`" label="Volume"/>
 
+                            <InfoDisplay v-if="item.loaded_at" :value="formatDate(item.loaded_at)" label="Loading Date & Time"/>
+
+                            <InfoDisplay v-if="item.unloaded_at" :value="formatDate(item.unloaded_at)" label="Unloading Date & Time"/>
+
                             <div class="col-span-2">
                                 <InfoDisplay :value="item.remarks ?? '-'" label="Remarks"/>
                             </div>
