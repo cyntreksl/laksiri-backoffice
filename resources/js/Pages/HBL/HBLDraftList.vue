@@ -31,11 +31,6 @@ const props = defineProps({
         default: () => {
         },
     },
-    hbls: {
-        type: Object,
-        default: () => {
-        },
-    },
     paymentStatus: {
         type: Object,
         default: () => {
@@ -122,34 +117,34 @@ watch(() => filters.value.global.value, (newValue) => {
     }
 });
 
-watch(() => filters.value.warehouse.value, (newValue) => {
+watch(() => filters.value.warehouse.value, () => {
     fetchDraftHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.hbl_type.value, (newValue) => {
+watch(() => filters.value.hbl_type.value, () => {
     fetchDraftHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.cargo_type.value, (newValue) => {
+watch(() => filters.value.cargo_type.value, () => {
     fetchDraftHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.is_hold.value, (newValue) => {
+watch(() => filters.value.is_hold.value, () => {
     fetchDraftHBLs(1, filters.value.global.value);
 });
 
-watch(() => fromDate.value, (newValue) => {
+watch(() => fromDate.value, () => {
     fetchDraftHBLs(1, filters.value.global.value);
 });
 
-watch(() => toDate.value, (newValue) => {
+watch(() => toDate.value, () => {
     fetchDraftHBLs(1, filters.value.global.value);
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchDraftHBLs(currentPage.value);
+    fetchDraftHBLs(currentPage.value, filters.value.global.value);
 };
 
 const onSort = (event) => {
@@ -225,7 +220,7 @@ const clearFilter = () => {
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
-    fetchDraftHBLs(currentPage.value);
+    fetchDraftHBLs(1);
 };
 
 const confirmHBLDelete = (hbl) => {
