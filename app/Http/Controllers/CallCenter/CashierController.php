@@ -67,13 +67,7 @@ class CashierController extends Controller
 
     public function showPaidList()
     {
-        $customers = User::role('customer')->get();
-        $users = User::role('call center')->get();
-
-        return Inertia::render('CallCenter/Cashier/PaidList', [
-            'customers' => $customers,
-            'users' => $users,
-        ]);
+        return Inertia::render('CallCenter/Cashier/PaidList');
     }
 
     public function getPaidList(Request $request)
@@ -92,5 +86,35 @@ class CashierController extends Controller
         ];
 
         return $this->cashierRepository->dataset($limit, $page, $order, $dir, $search, $filters);
+    }
+
+    public function searchCustomers(Request $request)
+    {
+        $search = $request->input('search', '');
+        
+        $customers = User::role('customer')
+            ->select('id', 'name')
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->limit(50)
+            ->get();
+        
+        return response()->json($customers);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $search = $request->input('search', '');
+        
+        $users = User::role('call center')
+            ->select('id', 'name')
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->limit(50)
+            ->get();
+        
+        return response()->json($users);
     }
 }

@@ -17,22 +17,37 @@ class PaidCollection extends JsonResource
     {
         return [
             'id' => $this->id,
-            'token' => optional($this->token)->token,
-            'package_count' => optional($this->token)->package_count,
-            'reference' => optional($this->token)->reference,
-            'customer' => optional(optional($this->token)->customer)->name,
-            'reception' => optional(optional($this->token)->reception)->name,
-            'is_paid' => optional($this->token)?->isPaid() ?? false,
-            'verified_by' => optional($this->cashierHBLPayment?->verifiedBy)->name ?? '',
-            'paid_amount' => optional($this->cashierHBLPayment)->paid_amount,
-            'note' => optional($this->cashierHBLPayment)->note,
-            'paid_at' => optional($this->cashierHBLPayment?->created_at)?->format('Y-m-d H:i:s'),
-            'hbl' => optional(
-                optional($this->token)?->hbl()
-                    ->withoutGlobalScope(BranchScope::class)
-                    ->latest()
-                    ->first()
-            )?->hbl_number,
+            'token' => $this->whenLoaded('token', fn() => $this->token->token),
+            'package_count' => $this->whenLoaded('token', fn() => $this->token->package_count),
+            'reference' => $this->whenLoaded('token', fn() => $this->token->reference),
+            'customer' => $this->whenLoaded('token', function () {
+                return $this->token->relationLoaded('customer') ? $this->token->customer->name : null;
+            }),
+            'reception' => $this->whenLoaded('token', function () {
+                return $this->token->relationLoaded('reception') ? $this->token->reception->name : null;
+            }),
+            'is_paid' => $this->whenLoaded('token', fn() => $this->token->isPaid(), false),
+            'verified_by' => $this->whenLoaded('token', function () {
+                if ($this->token->relationLoaded('cashierPayment') && $this->token->cashierPayment) {
+                    return $this->token->cashierPayment->relationLoaded('verifiedBy') 
+                        ? $this->token->cashierPayment->verifiedBy->name 
+                        : '';
+                }
+                return '';
+            }, ''),
+            'paid_amount' => $this->whenLoaded('token', function () {
+                return $this->token->relationLoaded('cashierPayment') ? $this->token->cashierPayment->paid_amount : null;
+            }),
+            'note' => $this->whenLoaded('token', function () {
+                return $this->token->relationLoaded('cashierPayment') ? $this->token->cashierPayment->note : null;
+            }),
+            'paid_at' => $this->whenLoaded('token', function () {
+                if ($this->token->relationLoaded('cashierPayment') && $this->token->cashierPayment) {
+                    return $this->token->cashierPayment->created_at?->format('Y-m-d H:i:s');
+                }
+                return null;
+            }),
+            'hbl' => null, // HBL number not needed in list view
         ];
     }
 }

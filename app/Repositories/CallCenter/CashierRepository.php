@@ -210,7 +210,14 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
     {
         $query = CustomerQueue::query()
             ->cashierQueue()
-            ->has('token.cashierPayment');
+            ->has('token.cashierPayment')
+            ->with([
+                'token:id,token,package_count,reference,customer_id,receptionist_id',
+                'token.customer:id,name',
+                'token.reception:id,name',
+                'token.cashierPayment:id,token_id,paid_amount,created_at,verified_by',
+                'token.cashierPayment.verifiedBy:id,name',
+            ]);
 
         // Apply customer filter
         if (! empty($filters['customer'])) {
