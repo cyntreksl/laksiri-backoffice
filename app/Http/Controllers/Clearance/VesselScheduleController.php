@@ -21,8 +21,46 @@ class VesselScheduleController extends Controller
 
     public function index()
     {
-        return Inertia::render('Clearance/VesselSchedule/VesselScheduleList', [
-            'vesselSchedules' => $this->vesselScheduleRepository->getAllVesselSchedules(),
+        return Inertia::render('Clearance/VesselSchedule/VesselScheduleList');
+    }
+
+    public function getVesselSchedulesData(Request $request)
+    {
+        $perPage = $request->get('per_page', 10);
+        $page = $request->get('page', 1);
+        $fromDate = $request->get('fromDate');
+        $toDate = $request->get('toDate');
+
+        $query = VesselSchedule::with([
+            'clearanceContainers' => function ($query) {
+                $query->select('containers.id', 'reference', 'container_number');
+            }
+        ]);
+
+        // Apply date filters
+        if ($fromDate && $toDate) {
+            $query->where(function ($q) use ($fromDate, $toDate) {
+                $q->whereBetween('start_date', [$fromDate, $toDate])
+                    ->orWhereBetween('end_date', [$fromDate, $toDate])
+                    ->orWhere(function ($q) use ($fromDate, $toDate) {
+                        $q->where('start_date', '<=', $fromDate)
+                            ->where('end_date', '>=', $toDate);
+                    });
+            });
+        }
+
+        $vesselSchedules = $query->latest()->paginate($perPage);
+
+        return response()->json([
+            'data' => $vesselSchedules->items(),
+            'meta' => [
+                'current_page' => $vesselSchedules->currentPage(),
+                'last_page' => $vesselSchedules->lastPage(),
+                'per_page' => $vesselSchedules->perPage(),
+                'total' => $vesselSchedules->total(),
+                'from' => $vesselSchedules->firstItem(),
+                'to' => $vesselSchedules->lastItem(),
+            ],
         ]);
     }
 
