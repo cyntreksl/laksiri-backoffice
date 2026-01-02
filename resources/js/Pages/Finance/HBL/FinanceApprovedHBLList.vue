@@ -31,11 +31,6 @@ const props = defineProps({
         default: () => {
         },
     },
-    hbls: {
-        type: Object,
-        default: () => {
-        },
-    },
     paymentStatus: {
         type: Array,
         default: () => [],
@@ -169,52 +164,52 @@ const debouncedFetchHBLs = debounce((searchValue) => {
     fetchHBLs(1, searchValue);
 }, 1000);
 
-watch(() => filters.value.global.value, (newValue) => {
-    if (newValue !== null) {
-        debouncedFetchHBLs(newValue);
+watch(() => filters.value.global.value, () => {
+    if (filters.value.global.value !== null) {
+        debouncedFetchHBLs(filters.value.global.value);
     }
 });
 
-watch(() => filters.value.warehouse.value, (newValue) => {
+watch(() => filters.value.warehouse.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.hbl_type.value, (newValue) => {
+watch(() => filters.value.hbl_type.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.cargo_type.value, (newValue) => {
+watch(() => filters.value.cargo_type.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.is_hold.value, (newValue) => {
+watch(() => filters.value.is_hold.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.user.value, (newValue) => {
+watch(() => filters.value.user.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.payments.value, (newValue) => {
+watch(() => filters.value.payments.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => fromDate.value, (newValue) => {
+watch(() => fromDate.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => toDate.value, (newValue) => {
+watch(() => toDate.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
-watch(() => filters.value.shipment.value, (newValue) => {
+watch(() => filters.value.shipment.value, () => {
     fetchHBLs(1, filters.value.global.value);
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchHBLs(currentPage.value);
+    fetchHBLs(currentPage.value, filters.value.global.value);
 };
 
 const onSort = (event) => {
@@ -293,7 +288,7 @@ const clearFilter = () => {
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
-    fetchHBLs(currentPage.value);
+    fetchHBLs(1);
 };
 
 const confirmHBLDelete = (hbl) => {
