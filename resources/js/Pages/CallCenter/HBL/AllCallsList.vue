@@ -34,10 +34,6 @@ const props = defineProps({
         type: Object,
         default: () => {},
     },
-    hbls: {
-        type: Object,
-        default: () => {},
-    },
     paymentStatus: {
         type: Object,
         default: () => {},
@@ -201,56 +197,56 @@ const debouncedFetchAllCalls = debounce((searchValue) => {
     fetchAllCalls(1, searchValue);
 }, 1000);
 
-watch(() => filters.value.global.value, (newValue) => {
-    if (newValue !== null) {
-        debouncedFetchAllCalls(newValue);
+watch(() => filters.value.global.value, () => {
+    if (filters.value.global.value !== null) {
+        debouncedFetchAllCalls(filters.value.global.value);
     }
 });
 
-watch(() => filters.value.warehouse.value, (newValue) => {
+watch(() => filters.value.warehouse.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => filters.value.hbl_type.value, (newValue) => {
+watch(() => filters.value.hbl_type.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => filters.value.cargo_type.value, (newValue) => {
+watch(() => filters.value.cargo_type.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => filters.value.is_hold.value, (newValue) => {
+watch(() => filters.value.is_hold.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => filters.value.user.value, (newValue) => {
+watch(() => filters.value.user.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => filters.value.payments.value, (newValue) => {
+watch(() => filters.value.payments.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => filters.value.call_outcome.value, (newValue) => {
+watch(() => filters.value.call_outcome.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => filters.value.agent.value, (newValue) => {
+watch(() => filters.value.agent.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => fromDate.value, (newValue) => {
+watch(() => fromDate.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
-watch(() => toDate.value, (newValue) => {
+watch(() => toDate.value, () => {
     fetchAllCalls(1, filters.value.global.value);
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchAllCalls(currentPage.value);
+    fetchAllCalls(currentPage.value, filters.value.global.value);
 };
 
 const onSort = (event) => {
@@ -338,7 +334,7 @@ const clearFilter = () => {
     };
     fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
-    fetchAllCalls(currentPage.value);
+    fetchAllCalls(1);
 };
 
 const confirmViewCallFlagModal = (callFlag) => {

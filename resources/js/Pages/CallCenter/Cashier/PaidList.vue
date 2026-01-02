@@ -13,15 +13,8 @@ import Select from "primevue/select";
 import DatePicker from "primevue/datepicker";
 import moment from "moment";
 
-defineProps({
-    users: {
-        type: Array,
-        default: () => [],
-    },
-    customers: {
-        type: Array,
-        default: () => [],
-    }
+const props = defineProps({
+    // Remove customers and users from props - will load via API
 })
 
 const baseUrl = ref("/call-center/cashier/paid/list");
@@ -31,6 +24,10 @@ const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 const dt = ref();
+const customers = ref([]);
+const users = ref([]);
+const loadingCustomers = ref(false);
+const loadingUsers = ref(false);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -84,22 +81,63 @@ const debouncedFetchTokens = debounce((searchValue) => {
     fetchTokens(1, searchValue);
 }, 1000);
 
-watch(
-    filters,
-    (newFilters, oldFilters) => {
-        fetchTokens(
-            1,
-            filters.value.global.value,
-            'created_at',
-            0,
-            filters.value.customer.value,
-            filters.value.reception.value,
-            filters.value.verified_by.value,
-            filters.value.paid_at.value
-        );
-    },
-    { deep: true }
-);
+watch(() => filters.value.global.value, () => {
+    if (filters.value.global.value !== null) {
+        debouncedFetchTokens(filters.value.global.value);
+    }
+});
+
+watch(() => filters.value.customer.value, () => {
+    fetchTokens(
+        1,
+        filters.value.global.value,
+        'created_at',
+        0,
+        filters.value.customer.value,
+        filters.value.reception.value,
+        filters.value.verified_by.value,
+        filters.value.paid_at.value
+    );
+});
+
+watch(() => filters.value.reception.value, () => {
+    fetchTokens(
+        1,
+        filters.value.global.value,
+        'created_at',
+        0,
+        filters.value.customer.value,
+        filters.value.reception.value,
+        filters.value.verified_by.value,
+        filters.value.paid_at.value
+    );
+});
+
+watch(() => filters.value.verified_by.value, () => {
+    fetchTokens(
+        1,
+        filters.value.global.value,
+        'created_at',
+        0,
+        filters.value.customer.value,
+        filters.value.reception.value,
+        filters.value.verified_by.value,
+        filters.value.paid_at.value
+    );
+});
+
+watch(() => filters.value.paid_at.value, () => {
+    fetchTokens(
+        1,
+        filters.value.global.value,
+        'created_at',
+        0,
+        filters.value.customer.value,
+        filters.value.reception.value,
+        filters.value.verified_by.value,
+        filters.value.paid_at.value
+    );
+});
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
@@ -131,7 +169,37 @@ const onSort = (event) => {
 
 onMounted(() => {
     fetchTokens();
+    loadCustomers();
+    loadUsers();
 });
+
+const loadCustomers = async (search = '') => {
+    loadingCustomers.value = true;
+    try {
+        const response = await axios.get('/call-center/cashier/search-customers', {
+            params: { search }
+        });
+        customers.value = response.data;
+    } catch (error) {
+        console.error("Error loading customers:", error);
+    } finally {
+        loadingCustomers.value = false;
+    }
+};
+
+const loadUsers = async (search = '') => {
+    loadingUsers.value = true;
+    try {
+        const response = await axios.get('/call-center/cashier/search-users', {
+            params: { search }
+        });
+        users.value = response.data;
+    } catch (error) {
+        console.error("Error loading users:", error);
+    } finally {
+        loadingUsers.value = false;
+    }
+};
 
 const exportCSV = () => {
     dt.value.exportCSV();
@@ -200,10 +268,12 @@ const exportCSV = () => {
                                 <Select
                                     v-model="filterModel.value"
                                     :options="customers"
+                                    :loading="loadingCustomers"
                                     filter
                                     option-label="name"
                                     option-value="name"
                                     placeholder="Select Customer"
+                                    @filter="(event) => loadCustomers(event.value)"
                                 />
                             </template>
                         </Column>
@@ -213,10 +283,12 @@ const exportCSV = () => {
                                 <Select
                                     v-model="filterModel.value"
                                     :options="users"
+                                    :loading="loadingUsers"
                                     filter
                                     option-label="name"
                                     option-value="name"
-                                    placeholder="Select Customer"
+                                    placeholder="Select Reception"
+                                    @filter="(event) => loadUsers(event.value)"
                                 />
                             </template>
                         </Column>
@@ -259,10 +331,12 @@ const exportCSV = () => {
                                 <Select
                                     v-model="filterModel.value"
                                     :options="users"
+                                    :loading="loadingUsers"
                                     filter
                                     option-label="name"
                                     option-value="name"
-                                    placeholder="Select Customer"
+                                    placeholder="Select User"
+                                    @filter="(event) => loadUsers(event.value)"
                                 />
                             </template>
                         </Column>
