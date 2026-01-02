@@ -7,6 +7,9 @@ Route::prefix('vessel-schedule')->name('vessel-schedule.')->group(function () {
     Route::get('/', [VesselScheduleController::class, 'index'])
         ->name('index');
 
+    Route::get('/vessel-schedules-data', [VesselScheduleController::class, 'getVesselSchedulesData'])
+        ->name('data');
+
     Route::get('/{vessel_schedule}', [VesselScheduleController::class, 'show'])
         ->name('show');
 

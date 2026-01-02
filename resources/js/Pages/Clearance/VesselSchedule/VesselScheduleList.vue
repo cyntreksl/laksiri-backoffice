@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Card from 'primevue/card';
@@ -11,36 +11,69 @@ import Column from "primevue/column";
 import moment from "moment";
 import Panel from "primevue/panel";
 import FloatLabel from "primevue/floatlabel";
+import axios from "axios";
+import {debounce} from "lodash";
 
-const props = defineProps({
-    vesselSchedules: {
-        type: Object,
-        default: () => ({}),
-    },
-});
-
+const dt = ref();
+const loading = ref(true);
+const vesselSchedules = ref([]);
+const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 
 const fromDate = ref(moment(new Date()).subtract(12, "months").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).add(2, "weeks").toISOString().split("T")[0]);
 
-// Filtered schedules based on fromDate and toDate
-const filteredSchedules = computed(() => {
-    return Object.values(props.vesselSchedules).filter(item => {
-        return moment(item.start_date).isSameOrAfter(fromDate.value) && moment(item.end_date).isSameOrBefore(toDate.value);
-    });
+const fetchVesselSchedules = async (page = 1) => {
+    loading.value = true;
+    try {
+        const response = await axios.get('/clearance/vessel-schedule/vessel-schedules-data', {
+            params: {
+                page,
+                per_page: perPage.value,
+                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+                toDate: moment(toDate.value).format("YYYY-MM-DD"),
+            }
+        });
+
+        vesselSchedules.value = response.data.data;
+        totalRecords.value = response.data.meta?.total || 0;
+        currentPage.value = response.data.meta?.current_page || 1;
+    } catch (error) {
+        console.error("Error fetching vessel schedules:", error);
+        vesselSchedules.value = [];
+        totalRecords.value = 0;
+    } finally {
+        loading.value = false;
+    }
+};
+
+const debouncedFetch = debounce(() => {
+    fetchVesselSchedules(1);
+}, 500);
+
+watch(() => fromDate.value, () => {
+    debouncedFetch();
+});
+
+watch(() => toDate.value, () => {
+    debouncedFetch();
+});
+
+onMounted(() => {
+    fetchVesselSchedules();
 });
 
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
+    fetchVesselSchedules(currentPage.value);
 };
 
 const latestRecordId = computed(() => {
-    if (!filteredSchedules.value.length) return null;
+    if (!vesselSchedules.value.length) return null;
 
-    return filteredSchedules.value.reduce((latest, item) => {
+    return vesselSchedules.value.reduce((latest, item) => {
         return new Date(item.created_at) > new Date(latest.created_at) ? item : latest;
     }).id;
 });
@@ -52,8 +85,9 @@ const rowClass = (data) => {
 }
 
 const clearFilter = () => {
-    fromDate.value = moment(new Date()).subtract(7, "days").toISOString().split("T")[0];
-    toDate.value = moment(new Date()).toISOString().split("T")[0];
+    fromDate.value = moment(new Date()).subtract(12, "months").toISOString().split("T")[0];
+    toDate.value = moment(new Date()).add(2, "weeks").toISOString().split("T")[0];
+    fetchVesselSchedules(1);
 };
 
 const exportCSV = () => {
@@ -85,11 +119,13 @@ const exportCSV = () => {
             <Card class="my-5">
                 <template #content>
                     <DataTable
+                        ref="dt"
+                        :loading="loading"
                         :row-class="rowClass"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
-                        :totalRecords="Object.keys(filteredSchedules).length"
-                        :value="filteredSchedules"
+                        :totalRecords="totalRecords"
+                        :value="vesselSchedules"
                         data-key="id"
                         filter-display="menu"
                         lazy
@@ -161,7 +197,7 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <template #footer> In total there are {{ vesselSchedules ? Object.keys(filteredSchedules).length : 0 }} vessel schedules. </template>
+                        <template #footer> In total there are {{ totalRecords }} vessel schedules. </template>
                     </DataTable>
                 </template>
             </Card>
