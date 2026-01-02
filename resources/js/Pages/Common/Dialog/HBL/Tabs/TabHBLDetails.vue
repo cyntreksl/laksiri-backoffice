@@ -219,6 +219,8 @@ const closeRemarksDialog = () => {
 
                         <InfoDisplay :value="hbl?.hbl_number" label="HBL Number"/>
 
+                        <InfoDisplay v-if="hbl?.mhbl?.hbl_number" :value="hbl?.mhbl?.hbl_number" label="MHBL Number"/>
+
                         <InfoDisplay :value="hbl?.cr_number" label="CR Number"/>
 
                         <InfoDisplay :value="hbl?.hbl_type" label="Delivery Type"/>
