@@ -34,10 +34,6 @@ const props = defineProps({
         type: Object,
         default: () => {},
     },
-    hbls: {
-        type: Object,
-        default: () => {},
-    },
     paymentStatus: {
         type: Object,
         default: () => {},

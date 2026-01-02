@@ -114,7 +114,6 @@ class HBLController extends Controller
 
         return Inertia::render('CallCenter/HBL/AppointmentList', [
             'users' => $this->userRepository->getUsers(['customer']),
-            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
         ]);
@@ -129,7 +128,6 @@ class HBLController extends Controller
 
         return Inertia::render('CallCenter/HBL/FollowupList', [
             'users' => $this->userRepository->getUsers(['customer']),
-            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
         ]);
@@ -207,7 +205,7 @@ class HBLController extends Controller
                     $hblQuery->where('cargo_type', $request->cargoMode);
                 }
                 if ($request->filled('paymentStatus')) {
-                    $hblQuery->where('payment_status', $request->paymentStatus);
+                    $this->applyPaymentStatusFilter($hblQuery, $request->paymentStatus);
                 }
                 if ($request->filled('createdBy')) {
                     $hblQuery->where('created_by', $request->createdBy);
@@ -304,7 +302,7 @@ class HBLController extends Controller
                     $hblQuery->where('cargo_type', $request->cargoMode);
                 }
                 if ($request->filled('paymentStatus')) {
-                    $hblQuery->where('payment_status', $request->paymentStatus);
+                    $this->applyPaymentStatusFilter($hblQuery, $request->paymentStatus);
                 }
                 if ($request->filled('createdBy')) {
                     $hblQuery->where('created_by', $request->createdBy);
@@ -396,7 +394,7 @@ class HBLController extends Controller
                     $hblQuery->where('cargo_type', $request->cargoMode);
                 }
                 if ($request->filled('paymentStatus')) {
-                    $hblQuery->where('payment_status', $request->paymentStatus);
+                    $this->applyPaymentStatusFilter($hblQuery, $request->paymentStatus);
                 }
                 if ($request->filled('createdBy')) {
                     $hblQuery->where('created_by', $request->createdBy);
@@ -525,3 +523,4 @@ class HBLController extends Controller
         return $this->HBLRepository->generateTokenPDF($tokenId, 'print');
     }
 }
+
