@@ -650,16 +650,16 @@ const exportCSV = () => {
 
                         <Column field="hbl_name" header="HBL Name">
                             <template #body="slotProps">
-                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
-                                   class="hover:underline" target="_blank">
+                                <a :href="`/hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
+                                   class="inline-flex items-center hover:underline" target="_blank">
                                     <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
-                                    {{ slotProps.data.hbl_name }}
+                                    <span>{{ slotProps.data.hbl_name }}</span>
                                 </a>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.email}}</div>
-                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.contact_number}`"
-                                   class="text-gray-500 hover:underline text-sm" target="_blank">
+                                <a :href="`/hbls/get-hbls-by-user/${slotProps.data.contact_number}`"
+                                   class="inline-flex items-center text-gray-500 hover:underline text-sm" target="_blank">
                                     <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
-                                    {{ slotProps.data.contact_number }}
+                                    <span>{{ slotProps.data.contact_number }}</span>
                                 </a>
                             </template>
                         </Column>

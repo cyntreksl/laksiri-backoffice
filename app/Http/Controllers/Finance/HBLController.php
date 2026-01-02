@@ -56,7 +56,6 @@ class HBLController extends Controller
 
         return Inertia::render('Finance/HBL/FinanceHBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
-            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
             'shipments' => $shipments,
@@ -72,7 +71,6 @@ class HBLController extends Controller
 
         return Inertia::render('Finance/HBL/FinanceApprovedHBLList', [
             'users' => $this->userRepository->getUsers(['customer']),
-            'hbls' => $this->HBLRepository->getHBLsWithPackages(),
             'paymentStatus' => HBLPaymentStatus::cases(),
             'warehouses' => GetDestinationBranches::run(),
             'shipments' => $shipments,
