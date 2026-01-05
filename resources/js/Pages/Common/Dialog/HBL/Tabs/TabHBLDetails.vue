@@ -200,7 +200,7 @@ const closeRemarksDialog = () => {
                 <template #content>
                     <div class="flex items-center space-x-5">
                         <div class="flex space-x-2">
-                            <i v-if="hbl?.latest_rtf_record?.is_rtf" v-tooltip.left="`Detained by ${hbl?.latest_rtf_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                            <i v-if="hbl?.latest_detain_record?.is_rtf" v-tooltip.left="`Detained by ${hbl?.latest_detain_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
                             <i v-if="hbl?.is_short_load" v-tooltip.left="'Short Load'" class="ti ti-truck-loading text-2xl text-orange-500"></i>
                             <i v-if="hbl?.is_unmanifest" v-tooltip.left="'Unmanifest'" class="ti ti-file-x text-2xl text-purple-500"></i>
                             <i v-if="hbl?.is_overland" v-tooltip.left="'Overland'" class="ti ti-road text-2xl text-blue-500"></i>
@@ -268,15 +268,15 @@ const closeRemarksDialog = () => {
                             <span>This Package is on hold</span>
                         </div>
 
-                        <div v-if="item.is_rtf || item?.latest_rtf_record?.is_rtf" class="flex items-center text-xs text-orange-800">
+                        <div v-if="item.is_rtf || item?.latest_detain_record?.is_rtf" class="flex items-center text-xs text-orange-800">
                             <i class="pi pi-exclamation-triangle mr-1"></i>
-                            <span>This Package is detained by {{ item?.latest_rtf_record?.detain_type || 'RTF' }}</span>
+                            <span>This Package is detained by {{ item?.latest_detain_record?.detain_type || 'RTF' }}</span>
                         </div>
 
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="flex items-center space-x-2">
-                                    <i v-if="item?.latest_rtf_record?.is_rtf" v-tooltip.left="`Detained by ${item?.latest_rtf_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <i v-if="item?.latest_detain_record?.is_rtf" v-tooltip.left="`Detained by ${item?.latest_detain_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
                                     <i class="ti ti-package text-xl"></i>
                                     <p class="text-xl uppercase font-normal">
                                         {{ item.package_type ?? '-' }}
@@ -310,16 +310,16 @@ const closeRemarksDialog = () => {
 
                             <InfoDisplay v-if="item.unloaded_at" :value="formatDate(item.unloaded_at)" label="Unloading Date & Time"/>
 
+                            <InfoDisplay :value="item.bond_storage_number ?? 'N/A'" label="Bond Storage Number"/>
+
                             <div class="col-span-2">
                                 <InfoDisplay :value="item.remarks ?? '-'" label="Remarks"/>
                             </div>
-
-                            <InfoDisplay v-if="item.bond_storage_number" :value="item?.bond_storage_number" label="Bond Storage Number"/>
                         </div>
 
                         <div class="mt-3">
                             <template v-if="$page.props.user.permissions.includes('set_rtf')">
-                                <div v-if="!item?.latest_rtf_record?.is_rtf" class="flex items-center gap-2">
+                                <div v-if="!item?.latest_detain_record?.is_rtf" class="flex items-center gap-2">
                                     <Dropdown
                                         v-model="selectedDetainBy"
                                         :options="detainByOptions"
@@ -341,7 +341,7 @@ const closeRemarksDialog = () => {
                             </template>
 
                             <template v-if="$page.props.user.permissions.includes('lift_rtf')">
-                                <Button v-if="item?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift Detain"
+                                <Button v-if="item?.latest_detain_record?.is_rtf" icon="pi pi-unlock" label="Lift Detain"
                                         severity="warn" size="small" variant="outlined" @click.prevent="handleLiftDetainPackage(item.id)" />
                             </template>
                         </div>
