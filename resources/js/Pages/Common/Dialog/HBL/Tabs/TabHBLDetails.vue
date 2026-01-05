@@ -310,11 +310,11 @@ const closeRemarksDialog = () => {
 
                             <InfoDisplay v-if="item.unloaded_at" :value="formatDate(item.unloaded_at)" label="Unloading Date & Time"/>
 
+                            <InfoDisplay :value="item.bond_storage_number ?? 'N/A'" label="Bond Storage Number"/>
+
                             <div class="col-span-2">
                                 <InfoDisplay :value="item.remarks ?? '-'" label="Remarks"/>
                             </div>
-
-                            <InfoDisplay v-if="item.bond_storage_number" :value="item?.bond_storage_number" label="Bond Storage Number"/>
                         </div>
 
                         <div class="mt-3">
