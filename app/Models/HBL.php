@@ -297,6 +297,12 @@ class HBL extends Model
             ->withTimestamps();
     }
 
+    public function mhbls(): BelongsToMany
+    {
+        return $this->belongsToMany(MHBL::class, 'mhbls_hbl', 'hbl_id', 'mhbl_id')
+            ->withTimestamps();
+    }
+
     public function rtfRecords(): MorphMany
     {
         return $this->morphMany(DetainRecord::class, 'rtfable');

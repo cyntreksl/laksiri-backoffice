@@ -44,7 +44,15 @@ Route::name('arrival.')->group(function () {
     Route::get('unloading-issues', [UnloadingIssueController::class, 'index'])
         ->name('unloading-issues.index');
 
+    Route::get('unloading-issues/create', [UnloadingIssueController::class, 'create'])
+        ->name('unloading-issues.create');
+
+    Route::post('unloading-issues', [UnloadingIssueController::class, 'store'])
+        ->name('unloading-issues.store');
+
     Route::get('unloading-issues-list', [UnloadingIssueController::class, 'list']);
+
+    Route::get('search-hbl-packages', [UnloadingIssueController::class, 'searchHBLPackages']);
 
     Route::get('/get-unloading-issues-by-hbl/{hbl}', [UnloadingIssueController::class, 'getUnloadingIssuesByHbl']);
 
