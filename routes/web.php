@@ -94,6 +94,12 @@ Route::middleware([
     Route::post('third-party-shipments/save-shipment/v2', [ThirdPartyShipmentController::class, 'saveShipmentV2'])
         ->name('third-party-shipments.save-shipment.v2');
 
+    Route::post('third-party-shipments/create-container', [ThirdPartyShipmentController::class, 'createContainer'])
+        ->name('third-party-shipments.create-container');
+
+    Route::get('third-party-shipments/generate-container-reference', [ThirdPartyShipmentController::class, 'generateContainerReference'])
+        ->name('third-party-shipments.generate-container-reference');
+
 });
 
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);
