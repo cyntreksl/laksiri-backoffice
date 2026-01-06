@@ -335,6 +335,7 @@ const confirmHBLHold = (hbl) => {
 };
 
 const confirmViewCallFlagModal = (hbl) => {
+    selectedHBL.value = hbl.value;
     selectedHBLID.value = hbl.value.id;
     hblName.value = hbl.value.hbl_name;
     showConfirmViewCallFlagModal.value = true;
@@ -342,6 +343,7 @@ const confirmViewCallFlagModal = (hbl) => {
 
 const closeCallFlagModal = () => {
     showConfirmViewCallFlagModal.value = false;
+    selectedHBL.value = null;
     selectedHBLID.value = null;
     hblName.value = "";
 };
@@ -611,6 +613,7 @@ const exportCSV = () => {
     <CallFlagModal
         :caller-name="hblName"
         :hbl-id="selectedHBLID"
+        :hbl-data="selectedHBL"
         :visible="showConfirmViewCallFlagModal"
         @close="closeCallFlagModal"
         @update:visible="showConfirmViewCallFlagModal = $event"/>

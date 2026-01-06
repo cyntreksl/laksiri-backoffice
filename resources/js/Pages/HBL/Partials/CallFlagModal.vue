@@ -3,7 +3,7 @@ import {useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import {watch, computed, ref} from "vue";
+import {watch, computed, ref, onMounted} from "vue";
 import moment from "moment";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
@@ -13,6 +13,7 @@ import DatePicker from 'primevue/datepicker';
 import Divider from "primevue/divider";
 import Checkbox from "primevue/checkbox";
 import Message from "primevue/message";
+import axios from "axios";
 
 const props = defineProps({
     visible: {
@@ -36,6 +37,8 @@ const props = defineProps({
 const emit = defineEmits(['close', 'call-flag-created']);
 
 const needsFollowUp = ref(false);
+const pricingSummary = ref(null);
+const loadingPricing = ref(false);
 
 const form = useForm({
     caller: "",
@@ -52,6 +55,63 @@ const receiverName = computed(() => {
     return props.hblData?.consignee_name || props.callerName || "";
 });
 
+// Function to calculate default follow-up date
+const getDefaultFollowUpDate = () => {
+    const today = moment(); // Create a new moment instance
+    const dayOfWeek = today.day(); // 0 = Sunday, 5 = Friday
+
+    if (dayOfWeek === 5) {
+        // If today is Friday, add 3 days to get Monday
+        return moment().add(3, 'days').toDate();
+    } else {
+        // Otherwise, add 1 day for tomorrow
+        return moment().add(1, 'days').toDate();
+    }
+};
+
+// Function to fetch pricing summary
+const fetchPricingSummary = async () => {
+    if (!props.hblId) return;
+
+    loadingPricing.value = true;
+
+    try {
+        // Use hblData from props first
+        const hblDetails = props.hblData;
+
+        if (!hblDetails) {
+            pricingSummary.value = null;
+            loadingPricing.value = false;
+            return;
+        }
+
+        // Fetch payments
+        const paymentsResponse = await axios.get(`/hbls/${props.hblId}/payments`);
+        const payments = paymentsResponse.data;
+
+        // Calculate summary from payments (LKR only)
+        const lkrPayments = payments.filter(p => !p.is_cancelled && p.base_currency_code === 'LKR');
+        const totalPaid = lkrPayments.reduce((sum, p) => sum + parseFloat(p.paid_amount || 0), 0);
+
+        const grandTotal = parseFloat(hblDetails.grand_total || 0);
+        const discount = parseFloat(hblDetails.discount || 0);
+        const outstanding = grandTotal - totalPaid;
+
+        pricingSummary.value = {
+            grandTotal: grandTotal,
+            paidAmount: totalPaid,
+            outstanding: outstanding,
+            discount: discount,
+            currency: 'LKR'
+        };
+    } catch (error) {
+        console.error('Error fetching pricing summary:', error);
+        pricingSummary.value = null;
+    } finally {
+        loadingPricing.value = false;
+    }
+};
+
 watch(() => props.visible, (newVal) => {
     if (newVal) {
         // Reset form when modal opens
@@ -59,12 +119,27 @@ watch(() => props.visible, (newVal) => {
         form.caller = receiverName.value;
         form.date = new Date();
         needsFollowUp.value = false;
+        pricingSummary.value = null;
+
+        // Fetch pricing summary
+        fetchPricingSummary();
     }
 });
 
 watch(() => receiverName.value, (newVal) => {
     if (newVal) {
         form.caller = newVal;
+    }
+});
+
+// Watch for needsFollowUp changes to set default date
+watch(() => needsFollowUp.value, (newVal) => {
+    if (newVal) {
+        // Always set the default date when checkbox is checked
+        form.followup_date = getDefaultFollowUpDate();
+    } else {
+        // Clear the date when checkbox is unchecked
+        form.followup_date = "";
     }
 });
 
@@ -125,6 +200,60 @@ const callOutcomeOptions = [
                     <div class="text-gray-600">{{ hblData.hbl_name }} → {{ hblData.consignee_name }}</div>
                 </div>
             </Message>
+
+            <!-- Pricing & Invoice Summary -->
+            <div v-if="loadingPricing" class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-center">
+                    <i class="pi pi-spin pi-spinner text-2xl text-gray-400"></i>
+                    <span class="ml-2 text-gray-600">Loading pricing information...</span>
+                </div>
+            </div>
+
+            <div v-else-if="pricingSummary" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-start justify-between mb-3">
+                    <h3 class="font-semibold text-gray-800 flex items-center">
+                        <i class="pi pi-money-bill mr-2 text-blue-600"></i>
+                        Pricing & Invoice Summary (LKR)
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <span class="text-gray-600">Grand Total:</span>
+                        <div class="font-semibold text-gray-900">
+                            {{ pricingSummary.grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} LKR
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-gray-600">Paid Amount:</span>
+                        <div class="font-semibold text-green-600">
+                            {{ pricingSummary.paidAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} LKR
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-gray-600">Outstanding:</span>
+                        <div :class="pricingSummary.outstanding > 0 ? 'text-red-600' : 'text-green-600'" class="font-semibold">
+                            {{ pricingSummary.outstanding.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} LKR
+                        </div>
+                    </div>
+
+                    <div v-if="pricingSummary.discount > 0">
+                        <span class="text-gray-600">Discount:</span>
+                        <div class="font-semibold text-blue-600">
+                            {{ pricingSummary.discount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} LKR
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-blue-200">
+                    <p class="text-xs text-gray-600 italic">
+                        <i class="pi pi-info-circle mr-1"></i>
+                        Note: This pricing is based on Sri Lanka payments only and may vary.
+                    </p>
+                </div>
+            </div>
 
             <!-- Caller Name -->
             <div>
