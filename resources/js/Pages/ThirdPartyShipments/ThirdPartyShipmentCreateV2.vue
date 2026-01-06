@@ -6,6 +6,7 @@ import {computed, reactive, ref, watch} from "vue";
 import InputError from "@/Components/InputError.vue";
 import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
+import moment from "moment";
 import hblImage from "../../../../resources/images/illustrations/hblimage.png";
 import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -24,6 +25,7 @@ import Column from 'primevue/column';
 import InputNumber from 'primevue/inputnumber';
 import Dialog from 'primevue/dialog';
 import Message from 'primevue/message';
+import DatePicker from 'primevue/datepicker';
 
 const props = defineProps({
     hblTypes: {
@@ -59,10 +61,156 @@ const props = defineProps({
         default: () => {
         },
     },
+    containerTypes: {
+        type: Array,
+        default: () => [],
+    },
+    seaContainerOptions: {
+        type: Array,
+        default: () => [],
+    },
+    airContainerOptions: {
+        type: Array,
+        default: () => [],
+    },
+    warehouses: {
+        type: Object,
+        default: () => {},
+    },
+    airLinesList: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const measureTypes = ref(['cm', 'm', 'in', 'ft']);
 const confirm = useConfirm();
+
+// Container creation modal
+const showCreateContainerDialog = ref(false);
+const containerForm = useForm({
+    cargo_type: "Sea Cargo",
+    container_type: "",
+    reference: "",
+    bl_number: "",
+    awb_number: "",
+    estimated_time_of_departure: "",
+    estimated_time_of_arrival: "",
+    container_number: "",
+    seal_number: "",
+    vessel_name: "",
+    voyage_number: "",
+    shipping_line: "",
+    port_of_loading: "",
+    port_of_discharge: "",
+    flight_number: "",
+    air_line_id: "",
+    airline_name: "",
+    airport_of_departure: "",
+    airport_of_arrival: "",
+    target_warehouse: "",
+});
+
+const containerTypesForModal = ref(props.seaContainerOptions);
+
+watch(() => containerForm.cargo_type, (newVal) => {
+    if (newVal === "Sea Cargo") {
+        containerTypesForModal.value = props.seaContainerOptions;
+    } else {
+        containerTypesForModal.value = props.airContainerOptions;
+        containerForm.container_type = "Custom";
+    }
+});
+
+const openCreateContainerDialog = () => {
+    // Set cargo type from main form if available
+    if (form.cargo_type) {
+        containerForm.cargo_type = form.cargo_type;
+    }
+    // Generate reference number
+    generateContainerReference();
+    showCreateContainerDialog.value = true;
+};
+
+const closeCreateContainerDialog = () => {
+    showCreateContainerDialog.value = false;
+    containerForm.reset();
+};
+
+const generateContainerReference = async () => {
+    try {
+        const response = await fetch(route('third-party-shipments.generate-container-reference'), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            containerForm.reference = data.reference;
+        }
+    } catch (error) {
+        console.log('Failed to generate reference:', error);
+        // Fallback: generate a simple reference
+        containerForm.reference = `CNT-${Date.now()}`;
+    }
+};
+
+const handleCreateContainer = async () => {
+    // Format dates
+    if (containerForm.estimated_time_of_departure && containerForm.estimated_time_of_departure !== 'Invalid date') {
+        containerForm.estimated_time_of_departure = moment(containerForm.estimated_time_of_departure).format("YYYY-MM-DD");
+    } else {
+        containerForm.estimated_time_of_departure = null;
+    }
+
+    if (containerForm.estimated_time_of_arrival && containerForm.estimated_time_of_arrival !== 'Invalid date') {
+        containerForm.estimated_time_of_arrival = moment(containerForm.estimated_time_of_arrival).format("YYYY-MM-DD");
+    } else {
+        containerForm.estimated_time_of_arrival = null;
+    }
+
+    // Set airline ID if airline name is selected
+    const selectedAirline = props.airLinesList.find(airline => airline.name === containerForm.airline_name);
+    if (selectedAirline) {
+        containerForm.air_line_id = selectedAirline.id;
+    }
+
+    try {
+        const response = await fetch(route("third-party-shipments.create-container"), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+            body: JSON.stringify(containerForm.data()),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            // Refresh the page to get updated shipments list
+            router.reload({
+                only: ['shipments'],
+                onSuccess: () => {
+                    // Auto-select the newly created container
+                    if (result.container) {
+                        form.shipment = result.container.id;
+                    }
+                    push.success('Container created successfully!');
+                    closeCreateContainerDialog();
+                }
+            });
+        } else {
+            push.error(result.message || 'Failed to create container');
+        }
+    } catch (error) {
+        console.log("Container creation error:", error);
+        push.error('Failed to create container. Please try again.');
+    }
+};
 
 //branch set
 const currentBranch = usePage().props?.auth.user.active_branch_name;
@@ -749,7 +897,10 @@ watch(() => form.cargo_type, (newVal) => {
                             </Fieldset>
 
                             <div class="col-span-4 py-3">
-                                <InputLabel class="mb-1" value="Select Container"/>
+                                <div class="flex justify-between items-center mb-1">
+                                    <InputLabel value="Select Container"/>
+                                    <Button icon="pi pi-plus" label="New Container" severity="help" size="small" type="button" variant="text" @click.prevent="openCreateContainerDialog" />
+                                </div>
                                 <Select
                                     v-model="form.shipment"
                                     :option-label="(option) => option.reference"
@@ -1182,6 +1333,173 @@ watch(() => form.cargo_type, (newVal) => {
                 <Button label="Cancel" severity="secondary" type="button" @click="closeCopyFromHBLToPackageModal"></Button>
                 <Button label="Copy" severity="help" type="button" @click.prevent="handleCopyFromHBLToPackage"></Button>
             </div>
+        </Dialog>
+
+        <!-- Container Creation Modal -->
+        <Dialog v-model:visible="showCreateContainerDialog" :style="{ width: '70rem' }" block-scroll header="Create New Container" maximizable modal position="center" @hide="onDialogHide" @show="onDialogShow">
+            <div class="grid grid-cols-1 gap-4">
+                <Card>
+                    <template #title>Cargo Type</template>
+                    <template #content>
+                        <SelectButton v-model="containerForm.cargo_type" :options="cargoTypes" name="Cargo Type">
+                            <template #option="slotProps">
+                                <div class="flex items-center">
+                                    <i v-if="slotProps.option === 'Sea Cargo'" class="ti ti-ship mr-2"></i>
+                                    <i v-else class="ti ti-plane mr-2"></i>
+                                    <span>{{ slotProps.option }}</span>
+                                </div>
+                            </template>
+                        </SelectButton>
+                        <InputError :message="containerForm.errors.cargo_type" />
+                    </template>
+                </Card>
+
+                <Card>
+                    <template #title>Target Warehouse</template>
+                    <template #content>
+                        <SelectButton v-model="containerForm.target_warehouse" :options="warehouses" name="target_warehouse" option-label="name" option-value="id"/>
+                        <InputError :message="containerForm.errors.target_warehouse" />
+                    </template>
+                </Card>
+
+                <Card>
+                    <template #title>Container Specs</template>
+                    <template #content>
+                        <SelectButton v-model="containerForm.container_type" :disabled="containerForm.cargo_type === 'Air Cargo'" :options="containerTypesForModal" name="container_type"/>
+                        <InputError :message="containerForm.errors.container_type" />
+                    </template>
+                </Card>
+
+                <Card>
+                    <template #title>Container Details</template>
+                    <template #content>
+                        <div class="grid grid-cols-4 gap-5 mt-3">
+                            <div class="col-span-2">
+                                <InputLabel value="Reference"/>
+                                <InputText v-model="containerForm.reference" class="w-full" placeholder="Enter Container Reference"/>
+                                <InputError :message="containerForm.errors.reference" />
+                            </div>
+
+                            <div v-if="containerForm.cargo_type === 'Sea Cargo'" class="col-span-2">
+                                <InputLabel value="Container Number"/>
+                                <InputText v-model="containerForm.container_number" class="w-full" placeholder="Enter Container Number"/>
+                                <InputError :message="containerForm.errors.container_number" />
+                            </div>
+
+                            <div v-if="containerForm.cargo_type === 'Sea Cargo'" class="col-span-2">
+                                <InputLabel value="Seal Number"/>
+                                <InputText v-model="containerForm.seal_number" class="w-full" placeholder="Enter Seal Number"/>
+                                <InputError :message="containerForm.errors.seal_number" />
+                            </div>
+
+                            <div v-if="containerForm.cargo_type === 'Sea Cargo'" class="col-span-2">
+                                <InputLabel value="BL Number"/>
+                                <InputText v-model="containerForm.bl_number" class="w-full" placeholder="Enter BL Number"/>
+                                <InputError :message="containerForm.errors.bl_number" />
+                            </div>
+
+                            <div v-else class="col-span-2">
+                                <InputLabel value="AWB Number"/>
+                                <InputText v-model="containerForm.awb_number" class="w-full" placeholder="Enter AWB Number"/>
+                                <InputError :message="containerForm.errors.awb_number" />
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Estimated Departure Date"/>
+                                <DatePicker v-model="containerForm.estimated_time_of_departure" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Estimated Departure Date" show-icon/>
+                                <InputError :message="containerForm.errors.estimated_time_of_departure" />
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Estimated Arrival Date"/>
+                                <DatePicker v-model="containerForm.estimated_time_of_arrival" class="w-full mt-1" date-format="yy-mm-dd" icon-display="input" placeholder="Set Estimated Arrival Date" show-icon/>
+                                <InputError :message="containerForm.errors.estimated_time_of_arrival" />
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+
+                <Card v-if="containerForm.cargo_type === 'Sea Cargo'">
+                    <template #title>Vessel Details</template>
+                    <template #content>
+                        <div class="grid grid-cols-4 gap-5 mt-3">
+                            <div class="col-span-2">
+                                <InputLabel value="Vessel Name"/>
+                                <InputText v-model="containerForm.vessel_name" class="w-full" placeholder="Enter Vessel Name"/>
+                                <InputError :message="containerForm.errors.vessel_name" />
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Voyage Number"/>
+                                <InputText v-model="containerForm.voyage_number" class="w-full" placeholder="Enter Voyage Number"/>
+                                <InputError :message="containerForm.errors.voyage_number" />
+                            </div>
+
+                            <div class="col-span-4">
+                                <InputLabel value="Shipping Line"/>
+                                <InputText v-model="containerForm.shipping_line" class="w-full" placeholder="Enter Shipping Line"/>
+                                <InputError :message="containerForm.errors.shipping_line" />
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Port of Loading"/>
+                                <InputText v-model="containerForm.port_of_loading" class="w-full" placeholder="Enter Port of Loading"/>
+                                <InputError :message="containerForm.errors.port_of_loading" />
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Port of Discharge"/>
+                                <InputText v-model="containerForm.port_of_discharge" class="w-full" placeholder="Enter Port of Discharge"/>
+                                <InputError :message="containerForm.errors.port_of_discharge" />
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+
+                <Card v-else>
+                    <template #title>Flight Details</template>
+                    <template #content>
+                        <div class="grid grid-cols-4 gap-5 mt-3">
+                            <div class="col-span-1">
+                                <InputLabel value="Flight Number"/>
+                                <InputText v-model="containerForm.flight_number" class="w-full" placeholder="Enter Flight Number"/>
+                                <InputError :message="containerForm.errors.flight_number" />
+                            </div>
+
+                            <div class="col-span-3">
+                                <InputLabel value="Airline Name"/>
+                                <Select
+                                    v-model="containerForm.airline_name"
+                                    :options="airLinesList"
+                                    class="w-full"
+                                    filter
+                                    option-label="name"
+                                    option-value="name"
+                                    placeholder="Select Air Line"
+                                />
+                                <InputError :message="containerForm.errors.airline_name"/>
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Airport of Departure"/>
+                                <InputText v-model="containerForm.airport_of_departure" class="w-full" placeholder="Enter Airport of Departure"/>
+                                <InputError :message="containerForm.errors.airport_of_departure" />
+                            </div>
+
+                            <div class="col-span-2">
+                                <InputLabel value="Airport of Arrival"/>
+                                <InputText v-model="containerForm.airport_of_arrival" class="w-full" placeholder="Enter Airport of Arrival"/>
+                                <InputError :message="containerForm.errors.airport_of_arrival" />
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+            </div>
+
+            <template #footer>
+                <Button label="Cancel" severity="secondary" text @click="closeCreateContainerDialog" />
+                <Button :class="{ 'opacity-50': containerForm.processing }" :disabled="containerForm.processing" label="Create Container" severity="help" @click="handleCreateContainer" />
+            </template>
         </Dialog>
     </AppLayout>
 </template>

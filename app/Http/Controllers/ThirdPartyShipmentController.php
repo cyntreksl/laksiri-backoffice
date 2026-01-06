@@ -6,12 +6,18 @@ use App\Actions\ThirdPartyShipment\GetTmpHblsBySession;
 use App\Actions\ThirdPartyShipment\ImportHblFromCsv;
 use App\Actions\ThirdPartyShipment\SaveThirdPartyShipment;
 use App\Actions\ThirdPartyShipment\SaveThirdPartyShipmentV2;
+use App\Actions\Container\CreateContainer;
+use App\Actions\Container\GenerateContainerReferenceNumber;
+use App\Actions\Branch\GetDestinationBranches;
 use App\Enum\CargoType;
+use App\Enum\ContainerType;
 use App\Enum\HBLType;
 use App\Http\Requests\StoreHBLRequest;
+use App\Http\Requests\StoreContainerRequest;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
+use App\Interfaces\AirLineRepositoryInterface;
 use App\Models\AirLine;
 use App\Models\Branch;
 use App\Models\Container;
@@ -25,6 +31,7 @@ class ThirdPartyShipmentController extends Controller
         private readonly CountryRepositoryInterface $countryRepository,
         private readonly PackageTypeRepositoryInterface $packageTypeRepository,
         private readonly HBLRepositoryInterface $HBLRepository,
+        private readonly AirLineRepositoryInterface $airLineRepository,
     ) {}
 
     /**
@@ -59,9 +66,14 @@ class ThirdPartyShipmentController extends Controller
         $shipments = Container::whereStatus('CONTAINER ORDERED')->get();
         $airLines = AirLine::pluck('name', 'id');
         $countryCodes = $this->countryRepository->getAllPhoneCodes();
+        $containerTypes = ContainerType::getDropdownOptions();
+        $seaContainerOptions = ContainerType::getSeaCargoOptions();
+        $airContainerOptions = ContainerType::getAirCargoOptions();
+        $warehouses = GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other');
+        $airLinesList = $this->airLineRepository->getAirLines();
 
         return Inertia::render('ThirdPartyShipments/ThirdPartyShipmentCreateV2',
-            compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines', 'countryCodes'));
+            compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines', 'countryCodes', 'containerTypes', 'seaContainerOptions', 'airContainerOptions', 'warehouses', 'airLinesList'));
     }
 
     /**
@@ -216,5 +228,44 @@ class ThirdPartyShipmentController extends Controller
     public function saveShipmentV2(StoreHBLRequest $request)
     {
         SaveThirdPartyShipmentV2::run($request->all());
+    }
+
+    public function createContainer(StoreContainerRequest $request): JsonResponse
+    {
+        try {
+            $container = CreateContainer::run($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Container created successfully',
+                'container' => [
+                    'id' => $container->id,
+                    'reference' => $container->reference,
+                    'cargo_type' => $container->cargo_type,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create container: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function generateContainerReference(): JsonResponse
+    {
+        try {
+            $reference = GenerateContainerReferenceNumber::run();
+
+            return response()->json([
+                'success' => true,
+                'reference' => $reference,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate reference: '.$e->getMessage(),
+            ], 500);
+        }
     }
 }

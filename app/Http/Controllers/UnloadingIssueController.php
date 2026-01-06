@@ -59,6 +59,25 @@ class UnloadingIssueController extends Controller
         ]);
 
         try {
+            // Check for existing issues
+            $packagesWithIssues = UnloadingIssue::whereIn('hbl_package_id', $validated['selected_packages'])
+                ->pluck('hbl_package_id')
+                ->toArray();
+
+            if (!empty($packagesWithIssues)) {
+                $errorMessage = 'Some packages already have unloading issues and cannot be processed again.';
+                
+                if ($request->boolean('create_another')) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $errorMessage
+                    ], 422);
+                }
+                
+                return back()->withErrors(['selected_packages' => $errorMessage]);
+            }
+
+            // Create issues for packages without existing issues
             foreach ($validated['selected_packages'] as $packageId) {
                 UnloadingIssue::create([
                     'hbl_package_id' => $packageId,
@@ -125,6 +144,25 @@ class UnloadingIssueController extends Controller
         return $this->ContainerRepository->downloadSingleUnloadingIssueFile($id);
     }
 
+    public function destroy(UnloadingIssue $unloadingIssue)
+    {
+        $this->authorize('issues.index');
+
+        try {
+            $unloadingIssue->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Unloading issue deleted successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete unloading issue: ' . $e->getMessage()
+            ], 422);
+        }
+    }
+
     public function searchHBLPackages(Request $request)
     {
         $hblNumber = $request->input('hbl_number');
@@ -135,7 +173,7 @@ class UnloadingIssueController extends Controller
         }
 
         $query = \App\Models\HBLPackage::query()
-            ->with(['hbl:id,hbl_number,hbl_name'])
+            ->with(['hbl:id,hbl_number,hbl_name', 'unloadingIssue'])
             ->whereHas('hbl', function ($q) use ($hblNumber, $shipmentId) {
                 $q->where('hbl_number', 'like', "%{$hblNumber}%");
                 
@@ -147,6 +185,8 @@ class UnloadingIssueController extends Controller
             });
 
         $packages = $query->get()->map(function ($package) {
+            $existingIssue = $package->unloadingIssue->first();
+            
             return [
                 'id' => $package->id,
                 'hbl_number' => $package->hbl->hbl_number ?? '',
@@ -154,6 +194,8 @@ class UnloadingIssueController extends Controller
                 'package_number' => $package->package_number,
                 'weight' => $package->weight,
                 'volume' => $package->volume,
+                'has_unloading_issue' => $package->unloadingIssue->isNotEmpty(),
+                'existing_issue_type' => $existingIssue ? $existingIssue->type : null,
             ];
         });
 
