@@ -740,6 +740,17 @@ const setMenu = (menu) => {
                 );
             }
 
+            if (can("bond-storage.index") && currentBranchIs('Destination')) {
+                arrivalMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "Bond Storage Number",
+                        route: "bond-storage.index",
+                    }
+                );
+            }
+
             if (can("issues.index")) {
                 arrivalMenu.splice(
                     2,

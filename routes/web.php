@@ -47,6 +47,7 @@ Route::middleware([
     require_once __DIR__.'/web/gate-control.php';
     require_once __DIR__.'/web/whatsapp.php';
     require_once __DIR__.'/web/remarks.php';
+    require_once __DIR__.'/web/bond_storage.php';
 
     // call center routes
     Route::name('call-center.')->prefix('call-center')->group(function () {
