@@ -189,6 +189,38 @@ const closeRemarksDialog = () => {
     remarks.value = [];
     newRemark.value = '';
 };
+
+const getIssueBadgeClass = (issueText) => {
+    if (!issueText) return 'bg-gray-100 text-gray-700 border-gray-300';
+    
+    const text = issueText.toLowerCase();
+    
+    if (text.includes('damage') || text.includes('broken') || text.includes('crashed')) {
+        return 'bg-red-100 text-red-700 border-red-300';
+    }
+    if (text.includes('missing') || text.includes('short')) {
+        return 'bg-orange-100 text-orange-700 border-orange-300';
+    }
+    if (text.includes('delay') || text.includes('overland')) {
+        return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+    }
+    if (text.includes('wrong') || text.includes('mismatch') || text.includes('unmanifest')) {
+        return 'bg-purple-100 text-purple-700 border-purple-300';
+    }
+    
+    return 'bg-blue-100 text-blue-700 border-blue-300';
+};
+
+const getIssueLabel = (issueText) => {
+    if (!issueText) return 'Issue';
+    
+    // Truncate long text
+    if (issueText.length > 15) {
+        return issueText.substring(0, 15) + '...';
+    }
+    
+    return issueText;
+};
 </script>
 
 <template>
@@ -260,7 +292,11 @@ const closeRemarksDialog = () => {
                 <Card
                     v-for="item in hbl.packages"
                     v-if="hbl && hbl.packages && hbl.packages.length > 0" :key="item.id"
-                    :class="[item.is_hold ? '!bg-orange-100' : '!bg-white', '!border !border-neutral-300 !shadow-md !rounded-md']"
+                    :class="[
+                        item.is_hold ? '!bg-orange-100' : '!bg-white',
+                        item.unloading_issue && item.unloading_issue.length > 0 ? '!border-2 !border-dashed !border-yellow-500' : '!border !border-neutral-300',
+                        '!shadow-md !rounded-md'
+                    ]"
                 >
                     <template #content>
                         <div v-if="item.is_hold" class="flex items-center text-xs text-orange-800">
@@ -287,7 +323,21 @@ const closeRemarksDialog = () => {
                                     ></i>
                                 </div>
                             </div>
-                            <div>
+                            <div class="flex items-center gap-2">
+                                <!-- Unloading Issue Badges -->
+                                <div v-if="item.unloading_issue && item.unloading_issue.length > 0" class="flex flex-wrap items-center gap-1">
+                                    <span
+                                        v-for="(issue, idx) in item.unloading_issue"
+                                        :key="idx"
+                                        v-tooltip.left="issue.issue || issue.type"
+                                        :class="getIssueBadgeClass(issue.issue || issue.type)"
+                                        class="px-2 py-1 text-xs font-semibold rounded-full border flex items-center gap-1"
+                                    >
+                                        <i class="pi pi-exclamation-circle text-xs"></i>
+                                        <span>{{ getIssueLabel(issue.issue || issue.type) }}</span>
+                                    </span>
+                                </div>
+                                
                                 <i v-tooltip="'Remarks'" class="pi pi-comments text-xl hover:cursor-pointer hover:text-success"
                                    @click.prevent="openRemarksDialog(item)"></i>
                             </div>
