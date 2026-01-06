@@ -11,9 +11,9 @@ class GetShipmentPackages
 
     public function handle(int $containerId): array
     {
+        // First, try to get packages with draft-unload status (packages in warehouse waiting for bond numbers)
         $container = Container::with([
             'hbl_packages' => function ($query) {
-                // Get packages that are in draft-unload status (unloaded to warehouse)
                 $query->wherePivot('status', 'draft-unload')
                     ->where(function ($q) {
                         $q->whereNull('bond_storage_number')
@@ -23,22 +23,28 @@ class GetShipmentPackages
             'hbl_packages.hbl.mhbl',
         ])->findOrFail($containerId);
 
-        // If no packages with draft-unload, try to get all unloaded packages
+        // If no draft-unload packages, get all packages from this container without bond numbers
+        // This handles the case where unloading is complete but bond numbers haven't been generated
         if ($container->hbl_packages->isEmpty()) {
             $container = Container::with([
                 'hbl_packages' => function ($query) {
-                    $query->where('is_unloaded', true)
-                        ->where(function ($q) {
-                            $q->whereNull('bond_storage_number')
-                              ->orWhere('bond_storage_number', '');
-                        });
+                    // Get all packages regardless of pivot status, but filter by bond number
+                    $query->where(function ($q) {
+                        $q->whereNull('bond_storage_number')
+                          ->orWhere('bond_storage_number', '');
+                    });
                 },
                 'hbl_packages.hbl.mhbl',
             ])->findOrFail($containerId);
         }
 
+        // Filter out packages that have bond numbers (in case the query didn't filter properly)
+        $filteredPackages = $container->hbl_packages->filter(function ($package) {
+            return empty($package->bond_storage_number);
+        });
+
         // Group packages by HBL
-        $groupedPackages = $container->hbl_packages->groupBy('hbl_id')->map(function ($packages, $hblId) {
+        $groupedPackages = $filteredPackages->groupBy('hbl_id')->map(function ($packages, $hblId) {
             $firstPackage = $packages->first();
             $hbl = $firstPackage->hbl;
 
@@ -71,7 +77,7 @@ class GetShipmentPackages
                 'container_type' => $container->container_type,
             ],
             'hbl_groups' => $groupedPackages,
-            'total_packages' => $container->hbl_packages->count(),
+            'total_packages' => $filteredPackages->count(),
         ];
     }
 }

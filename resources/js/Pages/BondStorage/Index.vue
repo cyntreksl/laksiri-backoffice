@@ -215,6 +215,14 @@ const formatDate = (date) => {
                 <Column field="cargo_type" header="Cargo Type" sortable />
                 <Column field="container_type" header="Container Type" sortable />
                 <Column field="status" header="Status" sortable />
+                <Column field="total_packages" header="Total Packages" sortable />
+                <Column field="packages_without_bond" header="Without Bond #" sortable>
+                    <template #body="{ data }">
+                        <span :class="data.packages_without_bond > 0 ? 'text-success font-semibold' : 'text-gray-400'">
+                            {{ data.packages_without_bond }}
+                        </span>
+                    </template>
+                </Column>
                 <Column field="estimated_time_of_arrival" header="ETA" sortable>
                     <template #body="{ data }">
                         {{ data.estimated_time_of_arrival ? formatDate(data.estimated_time_of_arrival) : 'N/A' }}
@@ -223,6 +231,7 @@ const formatDate = (date) => {
                 <Column header="Actions">
                     <template #body="{ data }">
                         <Button
+                            :disabled="data.packages_without_bond === 0"
                             icon="pi pi-play"
                             label="Generate"
                             severity="success"

@@ -21,6 +21,11 @@ class BondStorageNumberController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($container) {
+                $packageCount = $container->hbl_packages->count();
+                $packagesWithoutBond = $container->hbl_packages->filter(function($pkg) {
+                    return empty($pkg->bond_storage_number);
+                })->count();
+                
                 return [
                     'id' => $container->id,
                     'reference' => $container->reference,
@@ -28,6 +33,8 @@ class BondStorageNumberController extends Controller
                     'container_type' => $container->container_type,
                     'status' => $container->status,
                     'estimated_time_of_arrival' => $container->estimated_time_of_arrival,
+                    'total_packages' => $packageCount,
+                    'packages_without_bond' => $packagesWithoutBond,
                 ];
             });
 
