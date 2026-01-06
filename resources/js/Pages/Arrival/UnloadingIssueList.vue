@@ -3,7 +3,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
-import {usePage} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import ImageViewModal from "@/Pages/Arrival/Partials/ImageView.vue";
 import Button from "primevue/button";
 import IconField from "primevue/iconfield";
@@ -166,6 +166,14 @@ const closeImageModal = () => {
                                 <!-- Button Group -->
                                 <div class="flex flex-col sm:flex-row gap-2">
                                     <Button
+                                        icon="pi pi-plus"
+                                        label="Create New Issue"
+                                        severity="success"
+                                        size="small"
+                                        @click="router.visit(route('arrival.unloading-issues.create'))"
+                                    />
+
+                                    <Button
                                         icon="pi pi-filter-slash"
                                         label="Clear Filters"
                                         outlined
@@ -326,6 +334,14 @@ pi-paperclip" rounded severity="contrast" size="small" @click="handleOpenImageMo
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
                                 <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        icon="pi pi-plus"
+                                        label="Create New Issue"
+                                        severity="success"
+                                        size="small"
+                                        @click="goToCreatePage"
+                                    />
+
                                     <Button
                                         icon="pi pi-filter-slash"
                                         label="Clear Filters"
