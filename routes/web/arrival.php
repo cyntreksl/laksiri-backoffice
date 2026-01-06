@@ -50,6 +50,9 @@ Route::name('arrival.')->group(function () {
     Route::post('unloading-issues', [UnloadingIssueController::class, 'store'])
         ->name('unloading-issues.store');
 
+    Route::delete('unloading-issues/{unloadingIssue}', [UnloadingIssueController::class, 'destroy'])
+        ->name('unloading-issues.destroy');
+
     Route::get('unloading-issues-list', [UnloadingIssueController::class, 'list']);
 
     Route::get('search-hbl-packages', [UnloadingIssueController::class, 'searchHBLPackages']);
