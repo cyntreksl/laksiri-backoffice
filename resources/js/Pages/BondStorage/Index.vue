@@ -46,11 +46,28 @@ const selectShipment = async (container) => {
             container_id: container.id
         });
 
-        packagesData.value = response.data;
-        showGenerateDialog.value = true;
+        console.log('Response:', response.data);
+        
+        if (response.data.success) {
+            packagesData.value = response.data.data;
+            
+            // Debug information
+            if (response.data.debug) {
+                console.log('Debug Info:', response.data.debug);
+            }
+            
+            // Check if we have any HBL groups
+            if (!packagesData.value.hbl_groups || packagesData.value.hbl_groups.length === 0) {
+                push.warning('No packages without bond storage numbers found for this shipment');
+            }
+            
+            showGenerateDialog.value = true;
+        } else {
+            push.error(response.data.message || 'Failed to load shipment packages');
+        }
     } catch (error) {
-        push.error('Failed to load shipment packages');
-        console.error(error);
+        console.error('Error loading packages:', error);
+        push.error(error.response?.data?.message || 'Failed to load shipment packages');
     } finally {
         loading.value = false;
     }
@@ -277,6 +294,21 @@ const formatDate = (date) => {
                 <!-- Existing HBLs -->
                 <div class="border rounded-lg p-4 max-h-96 overflow-y-auto">
                     <h4 class="font-semibold mb-3">Packages by HBL</h4>
+                    
+                    <!-- Empty state -->
+                    <div v-if="!packagesData.hbl_groups || packagesData.hbl_groups.length === 0" class="text-center py-8">
+                        <i class="pi pi-inbox text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-600 font-medium">No packages available for bond storage number generation</p>
+                        <p class="text-sm text-gray-500 mt-2">
+                            All packages in this shipment may already have bond storage numbers,<br>
+                            or the shipment may not have been unloaded yet.
+                        </p>
+                        <p class="text-sm text-gray-500 mt-2">
+                            You can still add manual HBLs using the search above.
+                        </p>
+                    </div>
+                    
+                    <!-- HBL Groups -->
                     <div v-for="group in packagesData.hbl_groups" :key="group.hbl_id" class="mb-4">
                         <div class="bg-slate-100 p-3 rounded-lg">
                             <div class="flex justify-between items-center mb-2">

@@ -13,11 +13,29 @@ class GetShipmentPackages
     {
         $container = Container::with([
             'hbl_packages' => function ($query) {
-                $query->whereNull('bond_storage_number')
-                    ->orWhere('bond_storage_number', '');
+                // Get packages that are in draft-unload status (unloaded to warehouse)
+                $query->wherePivot('status', 'draft-unload')
+                    ->where(function ($q) {
+                        $q->whereNull('bond_storage_number')
+                          ->orWhere('bond_storage_number', '');
+                    });
             },
             'hbl_packages.hbl.mhbl',
         ])->findOrFail($containerId);
+
+        // If no packages with draft-unload, try to get all unloaded packages
+        if ($container->hbl_packages->isEmpty()) {
+            $container = Container::with([
+                'hbl_packages' => function ($query) {
+                    $query->where('is_unloaded', true)
+                        ->where(function ($q) {
+                            $q->whereNull('bond_storage_number')
+                              ->orWhere('bond_storage_number', '');
+                        });
+                },
+                'hbl_packages.hbl.mhbl',
+            ])->findOrFail($containerId);
+        }
 
         // Group packages by HBL
         $groupedPackages = $container->hbl_packages->groupBy('hbl_id')->map(function ($packages, $hblId) {
@@ -39,6 +57,7 @@ class GetShipmentPackages
                         'weight' => $package->weight,
                         'volume' => $package->volume,
                         'created_at' => $package->created_at,
+                        'bond_storage_number' => $package->bond_storage_number,
                     ];
                 })->values()->all(),
             ];
@@ -52,6 +71,7 @@ class GetShipmentPackages
                 'container_type' => $container->container_type,
             ],
             'hbl_groups' => $groupedPackages,
+            'total_packages' => $container->hbl_packages->count(),
         ];
     }
 }

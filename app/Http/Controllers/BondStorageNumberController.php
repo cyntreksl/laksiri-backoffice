@@ -49,9 +49,29 @@ class BondStorageNumberController extends Controller
             'container_id' => 'required|exists:containers,id',
         ]);
 
-        $packages = GetShipmentPackages::run($validated['container_id']);
+        try {
+            $packages = GetShipmentPackages::run($validated['container_id']);
 
-        return response()->json($packages);
+            return response()->json([
+                'success' => true,
+                'data' => $packages,
+                'debug' => [
+                    'total_packages' => $packages['total_packages'] ?? 0,
+                    'total_hbl_groups' => count($packages['hbl_groups'] ?? []),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to get shipment packages', [
+                'container_id' => $validated['container_id'],
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load shipment packages: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function generate(Request $request)
@@ -60,7 +80,7 @@ class BondStorageNumberController extends Controller
             'container_id' => 'required|exists:containers,id',
             'packages' => 'required|array',
             'packages.*.id' => 'required|exists:hbl_packages,id',
-            'packages.*.hbl_id' => 'required|exists:hbls,id',
+            'packages.*.hbl_id' => 'required|exists:hbl,id',
             'manual_hbls' => 'nullable|array',
             'manual_hbls.*.hbl_number' => 'required|string',
             'manual_hbls.*.packages' => 'required|array',
