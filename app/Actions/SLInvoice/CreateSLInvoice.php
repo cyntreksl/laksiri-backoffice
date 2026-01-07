@@ -17,7 +17,7 @@ class CreateSLInvoice
         $container = $this->getContainer($hbl);
         $arrivalDatesCount = $this->calculateArrivalDatesCount($container);
 
-        $service = new GatePassChargesService($hbl['cargo_type']);
+        $service = new GatePassChargesService($hbl->cargo_type);
 
         $grandVolume = $hbl->packages()->withoutGlobalScopes()->sum('volume');
         $grandWeight = $hbl->packages()->withoutGlobalScopes()->sum('weight');
@@ -51,10 +51,18 @@ class CreateSLInvoice
 
     private function prepareInvoiceData($hbl, $container, float $grandVolume, float $grandWeight, array $charges): array
     {
-        $totalAmount = $charges['port_charge']['amount']
-            + $charges['handling_charge']['amount']
-            + $charges['storage_charge']['amount']
-            + $charges['dmg_charge']['amount'];
+        // If destination payment is done, exclude destination charges from invoice
+        $isDestinationChargesPaid = $hbl->is_destination_charges_paid ?? false;
+
+        $portChargeAmount = $isDestinationChargesPaid ? 0.00 : $charges['port_charge']['amount'];
+        $handlingChargeAmount = $isDestinationChargesPaid ? 0.00 : $charges['handling_charge']['amount'];
+        $storageChargeAmount = $isDestinationChargesPaid ? 0.00 : $charges['storage_charge']['amount'];
+        $dmgChargeAmount = $isDestinationChargesPaid ? 0.00 : $charges['dmg_charge']['amount'];
+
+        $totalAmount = $portChargeAmount
+            + $handlingChargeAmount
+            + $storageChargeAmount
+            + $dmgChargeAmount;
 
         return [
             'clearing_time' => now()->format('H:i:s'),
@@ -62,14 +70,14 @@ class CreateSLInvoice
             'container_id' => $container->id ?? null,
             'grand_volume' => $grandVolume,
             'grand_weight' => $grandWeight,
-            'port_charge_rate' => $charges['port_charge']['rate'],
-            'port_charge_amount' => $charges['port_charge']['amount'],
-            'handling_charge_rate' => $charges['handling_charge']['rate'],
-            'handling_charge_amount' => $charges['handling_charge']['amount'],
-            'storage_charge_rate' => $charges['storage_charge']['rate'],
-            'storage_charge_amount' => $charges['storage_charge']['amount'],
-            'dmg_charge_rate' => $charges['dmg_charge']['rate'],
-            'dmg_charge_amount' => $charges['dmg_charge']['amount'],
+            'port_charge_rate' => $isDestinationChargesPaid ? 0.00 : $charges['port_charge']['rate'],
+            'port_charge_amount' => $portChargeAmount,
+            'handling_charge_rate' => $isDestinationChargesPaid ? 0.00 : $charges['handling_charge']['rate'],
+            'handling_charge_amount' => $handlingChargeAmount,
+            'storage_charge_rate' => $isDestinationChargesPaid ? 0.00 : $charges['storage_charge']['rate'],
+            'storage_charge_amount' => $storageChargeAmount,
+            'dmg_charge_rate' => $isDestinationChargesPaid ? 0.00 : $charges['dmg_charge']['rate'],
+            'dmg_charge_amount' => $dmgChargeAmount,
             'total' => $totalAmount,
             'do_charge' => $hbl->do_charge,
             'stamp_charge' => $totalAmount > 25000 ? 25.00 : 0.00,
