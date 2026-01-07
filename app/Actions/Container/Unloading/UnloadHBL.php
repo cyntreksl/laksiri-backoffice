@@ -34,9 +34,12 @@ class UnloadHBL
 
             $container->hbl_packages()->detach($hblPackageIds);
 
-            $container->duplicate_hbl_packages()->detach($hblPackageIds);
-
+            // Update status to 'unloaded' instead of detaching to preserve history
             foreach ($hblPackageIds as $hblPackageId) {
+                $container->duplicate_hbl_packages()->updateExistingPivot($hblPackageId, [
+                    'status' => 'unloaded',
+                    'unloaded_by' => auth()->id(),
+                ]);
                 MarkAsUnloaded::run($hblPackageId);
             }
 

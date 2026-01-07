@@ -66,17 +66,29 @@ const closeShowHBLModal = () => {
             <template #empty>No MHBLs found.</template>
             <Column class="font-bold" field="mhbl" header="MHBL">
                 <template #body="{data}">
-                    {{ data.mhbl.hbl_number || data.mhbl.reference || '-' }}
+                    <div class="flex items-center gap-2">
+                        <span :class="{'text-gray-400 line-through': data.mhbl?.is_fully_unloaded}">
+                            {{ data.mhbl.hbl_number || data.mhbl.reference || '-' }}
+                        </span>
+                        <span v-if="data.mhbl?.is_fully_unloaded"
+                              class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                            Unloaded
+                        </span>
+                        <span v-else-if="data.mhbl?.has_unloaded_packages"
+                              class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">
+                            Partially Unloaded
+                        </span>
+                    </div>
                 </template>
             </Column>
             <Column field="hbl_number" header="HBL">
                 <template #body="{data}">
-                    {{ data.hbl_number || '-' }}
+                    <span :class="{'text-gray-400': data.mhbl?.is_fully_unloaded}">{{ data.hbl_number || '-' }}</span>
                 </template>
             </Column>
             <Column field="packages_count" header="Packages">
                 <template #body="{data}">
-                    <div class="flex items-center">
+                    <div :class="{'text-gray-400': data.mhbl?.is_fully_unloaded}" class="flex items-center">
                         <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
                         {{ data.packages_count }}
                     </div>
@@ -84,20 +96,20 @@ const closeShowHBLModal = () => {
             </Column>
             <Column field="hbl_name" header="Name">
                 <template #body="slotProps">
-                    <div>{{ slotProps.data.hbl_name }}</div>
-                    <div class="text-gray-500 text-sm">{{slotProps.data.nic}}</div>
-                    <div class="text-gray-500 text-sm">{{slotProps.data.address}}</div>
+                    <div :class="{'text-gray-400': slotProps.data.mhbl?.is_fully_unloaded}">{{ slotProps.data.hbl_name }}</div>
+                    <div :class="{'text-gray-300': slotProps.data.mhbl?.is_fully_unloaded}" class="text-gray-500 text-sm">{{slotProps.data.nic}}</div>
+                    <div :class="{'text-gray-300': slotProps.data.mhbl?.is_fully_unloaded}" class="text-gray-500 text-sm">{{slotProps.data.address}}</div>
                 </template>
             </Column>
             <Column field="contact_number" header="Contact">
                 <template #body="{data}">
-                    {{ data.contact_number || '-' }}
+                    <span :class="{'text-gray-400': data.mhbl?.is_fully_unloaded}">{{ data.contact_number || '-' }}</span>
                 </template>
             </Column>
             <Column field="consignee_name" header="Consignee">
                 <template #body="slotProps">
-                    <div>{{ slotProps.data.consignee_name }}</div>
-                    <div class="text-gray-500 text-sm">{{slotProps.data.consignee_address}}</div>
+                    <div :class="{'text-gray-400': slotProps.data.mhbl?.is_fully_unloaded}">{{ slotProps.data.consignee_name }}</div>
+                    <div :class="{'text-gray-300': slotProps.data.mhbl?.is_fully_unloaded}" class="text-gray-500 text-sm">{{slotProps.data.consignee_address}}</div>
                 </template>
             </Column>
             <Column field="" header="Actions" style="width: 10%">
