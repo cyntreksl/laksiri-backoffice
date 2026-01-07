@@ -68,6 +68,7 @@ class Token extends Model
 
     public function isPaid(): bool
     {
+        return false;
         $hbl = HBL::withoutGlobalScopes()
             ->where('reference', $this->reference)->firstOrFail();
 

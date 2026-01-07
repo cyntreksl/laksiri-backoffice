@@ -74,50 +74,61 @@ const isAnyDocumentVerified = computed(() => {
     return Object.keys(form.is_checked).length > 0 && Object.values(form.is_checked).some(checked => checked);
 });
 
-const tokenTimeline = computed(() => [
-    {
-        id: 1,
-        label: 'Reception Queue',
-        icon: 'pi pi-users',
-        description: 'Customer arrival and document verification',
-        status: areAllDocumentsVerified.value ? 'completed' : 'next'
-    },
-    {
-        id: 2,
-        label: 'Document Verification Queue',
-        icon: 'pi pi-file-check',
-        description: 'Document verification and approval',
-        status: areAllDocumentsVerified.value ? 'next' : 'pending'
-    },
-    {
-        id: 3,
-        label: 'Cashier Queue',
-        icon: 'pi pi-wallet',
-        description: 'Payment processing and collection',
-        status: 'pending'
-    },
-    {
-        id: 4,
-        label: 'Waiting for Package Receive',
-        icon: 'pi pi-box',
-        description: 'Package collection from bond area',
-        status: 'pending'
-    },
-    {
-        id: 5,
-        label: 'Examination Queue',
-        icon: 'pi pi-search',
-        description: 'Gate pass creation and examination',
-        status: 'pending'
-    },
-    {
-        id: 6,
-        label: 'Done',
-        icon: 'pi pi-check-circle',
-        description: 'Gate pass released - Process complete',
-        status: 'pending'
-    }
-]);
+const tokenTimeline = computed(() => {
+    const isPaid = paymentStatus.value === 'Paid';
+    const allDocsVerified = areAllDocumentsVerified.value;
+    
+    return [
+        {
+            id: 1,
+            label: 'Reception Queue',
+            icon: 'pi pi-users',
+            description: 'Customer arrival and document verification',
+            status: allDocsVerified ? 'completed' : 'next',
+            skipped: false
+        },
+        {
+            id: 2,
+            label: 'Document Verification Queue',
+            icon: 'pi pi-file-check',
+            description: 'Document verification and approval',
+            status: allDocsVerified ? 'skipped' : (allDocsVerified ? 'completed' : 'pending'),
+            skipped: allDocsVerified
+        },
+        {
+            id: 3,
+            label: 'Cashier Queue',
+            icon: 'pi pi-wallet',
+            description: 'Payment processing and collection',
+            status: (allDocsVerified && isPaid) ? 'skipped' : (isPaid ? 'completed' : 'pending'),
+            skipped: allDocsVerified && isPaid
+        },
+        {
+            id: 4,
+            label: 'Waiting for Package Receive',
+            icon: 'pi pi-box',
+            description: 'Package collection from bond area',
+            status: 'pending',
+            skipped: false
+        },
+        {
+            id: 5,
+            label: 'Examination Queue',
+            icon: 'pi pi-search',
+            description: 'Gate pass creation and examination',
+            status: (allDocsVerified && isPaid) ? 'next' : 'pending',
+            skipped: false
+        },
+        {
+            id: 6,
+            label: 'Done',
+            icon: 'pi pi-check-circle',
+            description: 'Gate pass released - Process complete',
+            status: 'pending',
+            skipped: false
+        }
+    ];
+});
 
 const updateChecked = (doc, isChecked) => {
     form.is_checked = { ...form.is_checked, [doc]: isChecked };
@@ -178,9 +189,21 @@ const handleIssueToken = () => {
                     tokenData.value = data;
 
                     // Show appropriate success message based on queue placement
-                    const queueMessage = data.token.all_documents_verified
-                        ? 'Token issued and placed in Document Verification Queue - All documents verified!'
-                        : 'Token issued and placed in Reception Queue - Please complete document verification.';
+                    let queueMessage = '';
+                    
+                    if (data.token.skipped_cashier && data.token.skipped_document_verification) {
+                        // Fully paid and all docs verified - went directly to examination
+                        queueMessage = 'Token issued and placed in Examination Queue - All documents verified and payment completed!';
+                    } else if (data.token.skipped_document_verification && !data.token.skipped_cashier) {
+                        // All docs verified but not paid - went to cashier
+                        queueMessage = 'Token issued and placed in Cashier Queue - All documents verified!';
+                    } else if (data.token.all_documents_verified) {
+                        // All docs verified - went to document verification (shouldn't happen with new logic, but keep for backward compatibility)
+                        queueMessage = 'Token issued and placed in Document Verification Queue - All documents verified!';
+                    } else {
+                        // Documents not fully verified - went to reception queue
+                        queueMessage = 'Token issued and placed in Reception Queue - Please complete document verification.';
+                    }
 
                     push.success(queueMessage);
 
@@ -328,6 +351,7 @@ watch(() => props.visible, (newVal) => {
                                     'border-green-200 bg-green-50': step.status === 'completed',
                                     'border-blue-200 bg-blue-50': step.status === 'current',
                                     'border-orange-200 bg-orange-50': step.status === 'next',
+                                    'border-purple-200 bg-purple-50': step.status === 'skipped',
                                     'border-gray-200 bg-gray-50': step.status === 'pending'
                                 }"
                             >
@@ -338,11 +362,12 @@ watch(() => props.visible, (newVal) => {
                                             'bg-green-500 text-white': step.status === 'completed',
                                             'bg-blue-500 text-white': step.status === 'current',
                                             'bg-orange-500 text-white': step.status === 'next',
+                                            'bg-purple-500 text-white': step.status === 'skipped',
                                             'bg-gray-200 text-gray-600': step.status === 'pending'
                                         }"
                                     >
                                         <i
-                                            :class="step.status === 'completed' ? 'pi pi-check' : step.icon"
+                                            :class="step.status === 'completed' ? 'pi pi-check' : step.status === 'skipped' ? 'pi pi-forward' : step.icon"
                                             class="text-sm"
                                         ></i>
                                     </div>
@@ -355,10 +380,12 @@ watch(() => props.visible, (newVal) => {
                                                 'text-green-800': step.status === 'completed',
                                                 'text-blue-800': step.status === 'current',
                                                 'text-orange-800': step.status === 'next',
+                                                'text-purple-800': step.status === 'skipped',
                                                 'text-gray-600': step.status === 'pending'
                                             }"
                                         >
                                             {{ step.label }}
+                                            <span v-if="step.skipped" class="text-xs text-purple-600 ml-2">(Skipped)</span>
                                         </h4>
                                         <div class="flex items-center gap-2">
                                             <span
@@ -367,10 +394,11 @@ watch(() => props.visible, (newVal) => {
                                                     'bg-green-100 text-green-700': step.status === 'completed',
                                                     'bg-blue-100 text-blue-700': step.status === 'current',
                                                     'bg-orange-100 text-orange-700': step.status === 'next',
+                                                    'bg-purple-100 text-purple-700': step.status === 'skipped',
                                                     'bg-gray-100 text-gray-600': step.status === 'pending'
                                                 }"
                                             >
-                                                {{ step.status === 'completed' ? 'Completed' : step.status === 'current' ? 'Current' : step.status === 'next' ? 'Next' : 'Pending' }}
+                                                {{ step.status === 'completed' ? 'Completed' : step.status === 'current' ? 'Current' : step.status === 'next' ? 'Next' : step.status === 'skipped' ? 'Skipped' : 'Pending' }}
                                             </span>
                                             <span class="text-sm font-medium text-gray-500">Step {{ step.id }}</span>
                                         </div>

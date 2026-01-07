@@ -27,6 +27,7 @@ const layout = ref('list');
 const options = ref(['list', 'grid']);
 
 const filteredCashierQueue = computed(() => {
+    return true;
     return props.cashierQueue.filter(q => {
         return q.is_verified === true && q.is_paid === false
     });
