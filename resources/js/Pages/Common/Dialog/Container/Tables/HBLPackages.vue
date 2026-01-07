@@ -234,8 +234,8 @@ const mergedHBLData = computed(() => {
             contact_number: mhbl.shipper?.mobile_number,
             consignee_name: mhbl.consignee?.name,
             consignee_address: mhbl.consignee?.address,
-            is_fully_unloaded: false,
-            has_unloaded_packages: false,
+            is_fully_unloaded: mhbl.is_fully_unloaded || false,
+            has_unloaded_packages: mhbl.has_unloaded_packages || false,
         }))
     ];
 })

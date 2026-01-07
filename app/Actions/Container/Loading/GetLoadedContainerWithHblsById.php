@@ -78,9 +78,45 @@ class GetLoadedContainerWithHblsById
                             // Check if any package for this HBL is unloaded
                             $hbl->has_unloaded_packages = $hblPackages->some(fn($pkg) => $pkg->pivot->status === 'unloaded');
                             $hbl->is_fully_unloaded = $hblPackages->every(fn($pkg) => $pkg->pivot->status === 'unloaded');
+                            
+                            // If this HBL has an MHBL, propagate the unloaded status to the MHBL
+                            if ($hbl->mhbl) {
+                                $hbl->mhbl->has_unloaded_packages = $hbl->has_unloaded_packages;
+                                $hbl->mhbl->is_fully_unloaded = $hbl->is_fully_unloaded;
+                            }
                         }
                     }
                 });
+            
+            // Calculate MHBL-level unloaded status by checking all HBLs under each MHBL
+            $mhblStatuses = [];
+            foreach ($container->hbls as $hbl) {
+                if ($hbl->mhbl) {
+                    $mhblId = $hbl->mhbl->id;
+                    if (!isset($mhblStatuses[$mhblId])) {
+                        $mhblStatuses[$mhblId] = [
+                            'has_any_unloaded' => false,
+                            'all_unloaded' => true,
+                        ];
+                    }
+                    
+                    if ($hbl->has_unloaded_packages || $hbl->is_fully_unloaded) {
+                        $mhblStatuses[$mhblId]['has_any_unloaded'] = true;
+                    }
+                    
+                    if (!$hbl->is_fully_unloaded) {
+                        $mhblStatuses[$mhblId]['all_unloaded'] = false;
+                    }
+                }
+            }
+            
+            // Apply MHBL statuses
+            foreach ($container->hbls as $hbl) {
+                if ($hbl->mhbl && isset($mhblStatuses[$hbl->mhbl->id])) {
+                    $hbl->mhbl->has_unloaded_packages = $mhblStatuses[$hbl->mhbl->id]['has_any_unloaded'];
+                    $hbl->mhbl->is_fully_unloaded = $mhblStatuses[$hbl->mhbl->id]['all_unloaded'];
+                }
+            }
         });
 
         return $containersWithLoadedHBLs;
