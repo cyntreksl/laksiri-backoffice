@@ -520,7 +520,7 @@ const formatDate = (dateString) => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ hbl.hbl_number }}</span>
+                                        <span>{{ hbl.hbl_number }} ({{ hbl.packages.length }} {{ hbl.packages.length === 1 ? 'package' : 'packages' }})</span>
                                     </div>
                                     <ul v-show="hbl.expanded" class="pl-4">
                                         <draggable v-model="hbl.packages"
@@ -710,7 +710,7 @@ const formatDate = (dateString) => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ pkg.packages[0].hbl.mhbl.hbl_number || pkg.mhblReference }}</span>
+                                        <span>{{ pkg.packages[0].hbl.mhbl.hbl_number || pkg.mhblReference }} ({{ pkg.packages.length }} {{ pkg.packages.length === 1 ? 'package' : 'packages' }})</span>
                                     </div>
                                     <ul v-show="pkg.expanded" class="pl-4">
                                         <div :packages="pkg.packages"
@@ -1053,7 +1053,7 @@ const formatDate = (dateString) => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}</span>
+                                        <span>{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }} ({{ mhbl.packages.length }} {{ mhbl.packages.length === 1 ? 'package' : 'packages' }})</span>
                                     </div>
                                     <ul v-show="mhbl.expanded" class="pl-4">
                                         <div :packages="mhbl.packages"
