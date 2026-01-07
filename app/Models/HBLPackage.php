@@ -86,7 +86,7 @@ class HBLPackage extends Model
     public function duplicate_containers(): BelongsToMany
     {
         return $this->belongsToMany(Container::class, 'duplicate_container_hbl_package', 'hbl_package_id', 'container_id')
-            ->withPivot('status', 'loaded_by')
+            ->withPivot('status', 'loaded_by', 'unloaded_by')
             ->withTimestamps();
     }
 

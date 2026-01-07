@@ -220,6 +220,8 @@ const mergedHBLData = computed(() => {
             is_short_load: hbl.is_short_load,
             is_unmanifest: hbl.is_unmanifest,
             is_overland: hbl.is_overland,
+            is_fully_unloaded: hbl.is_fully_unloaded || false,
+            has_unloaded_packages: hbl.has_unloaded_packages || false,
         })),
         ...containerMHBLS.map(mhbl => ({
             type: 'MHBL',
@@ -232,6 +234,8 @@ const mergedHBLData = computed(() => {
             contact_number: mhbl.shipper?.mobile_number,
             consignee_name: mhbl.consignee?.name,
             consignee_address: mhbl.consignee?.address,
+            is_fully_unloaded: false,
+            has_unloaded_packages: false,
         }))
     ];
 })
@@ -245,12 +249,22 @@ const mergedHBLData = computed(() => {
             <Column class="font-bold" field="hbl_number" header="HBL">
                 <template #body="slotProps">
                     <div class="flex items-center gap-2">
-                        <span>{{ slotProps.data.hbl_number }}</span>
+                        <span :class="{'text-gray-400 line-through': slotProps.data.is_fully_unloaded}">
+                            {{ slotProps.data.hbl_number }}
+                        </span>
                         <div v-if="slotProps.data.type === 'HBL'" class="flex gap-1">
                             <i v-if="slotProps.data.is_short_load" v-tooltip="'Short Load'" class="ti ti-truck-loading text-orange-500"></i>
                             <i v-if="slotProps.data.is_unmanifest" v-tooltip="'Unmanifest'" class="ti ti-file-x text-purple-500"></i>
                             <i v-if="slotProps.data.is_overland" v-tooltip="'Overland'" class="ti ti-road text-blue-500"></i>
                         </div>
+                        <span v-if="slotProps.data.is_fully_unloaded"
+                              class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                            Unloaded
+                        </span>
+                        <span v-else-if="slotProps.data.has_unloaded_packages"
+                              class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-700">
+                            Partially Unloaded
+                        </span>
                     </div>
                 </template>
             </Column>
@@ -264,16 +278,20 @@ const mergedHBLData = computed(() => {
             </Column>
             <Column field="hbl_name" header="HBL Name">
                 <template #body="slotProps">
-                    <div>{{ slotProps.data.hbl_name }}</div>
-                    <div class="text-gray-500 text-sm">{{slotProps.data.nic}}</div>
-                    <div class="text-gray-500 text-sm">{{slotProps.data.address}}</div>
+                    <div :class="{'text-gray-400': slotProps.data.is_fully_unloaded}">{{ slotProps.data.hbl_name }}</div>
+                    <div :class="{'text-gray-300': slotProps.data.is_fully_unloaded}" class="text-gray-500 text-sm">{{slotProps.data.nic}}</div>
+                    <div :class="{'text-gray-300': slotProps.data.is_fully_unloaded}" class="text-gray-500 text-sm">{{slotProps.data.address}}</div>
                 </template>
             </Column>
-            <Column field="contact_number" header="Contact"></Column>
+            <Column field="contact_number" header="Contact">
+                <template #body="slotProps">
+                    <span :class="{'text-gray-400': slotProps.data.is_fully_unloaded}">{{ slotProps.data.contact_number }}</span>
+                </template>
+            </Column>
             <Column field="consignee_name" header="Consignee">
                 <template #body="slotProps">
-                    <div>{{ slotProps.data.consignee_name }}</div>
-                    <div class="text-gray-500 text-sm">{{slotProps.data.consignee_address}}</div>
+                    <div :class="{'text-gray-400': slotProps.data.is_fully_unloaded}">{{ slotProps.data.consignee_name }}</div>
+                    <div :class="{'text-gray-300': slotProps.data.is_fully_unloaded}" class="text-gray-500 text-sm">{{slotProps.data.consignee_address}}</div>
                 </template>
             </Column>
             <Column field="" header="Actions" style="width: 10%">
@@ -288,6 +306,7 @@ const mergedHBLData = computed(() => {
                             @click.prevent="data.type === 'HBL' ? confirmViewHBL(data.id) : confirmViewMHBL(data.id)"
                         />
                         <Button
+                            v-if="!data.is_fully_unloaded"
                             v-tooltip="'Remove From Shipment'"
                             icon="pi pi-trash"
                             outlined

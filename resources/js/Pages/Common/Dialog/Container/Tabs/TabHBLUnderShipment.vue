@@ -64,7 +64,9 @@ const hbls = () => {
 
     const filteredHblIds = filteredHBLS.value.map(hbl => hbl.id);
 
-    const filteredHblPackages = props.container.hbl_packages.filter(pkg =>
+    // Use all packages from container (including historical/unloaded ones)
+    const allPackages = props.container.hbl_packages || [];
+    const filteredHblPackages = allPackages.filter(pkg =>
         filteredHblIds.includes(pkg.hbl_id)
     );
 
@@ -105,7 +107,10 @@ const mhbls = () => {
     filteredMHBLsLHBL.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
 
     const filteredMHblsHBLIds = filteredMHBLsLHBL.value.map(hbl => hbl.id);
-    const filteredMHblsHBLPackages = props.container.hbl_packages.filter(pkg =>
+    
+    // Use all packages from container (including historical/unloaded ones)
+    const allPackages = props.container.hbl_packages || [];
+    const filteredMHblsHBLPackages = allPackages.filter(pkg =>
         filteredMHblsHBLIds.includes(pkg.hbl_id)
     );
 
