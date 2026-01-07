@@ -120,41 +120,39 @@ const fetchContainers = async (page = 1, search = "", sortField = 'created_at', 
 };
 
 const debouncedFetchContainers = debounce((searchValue) => {
-    fetchContainers(1, searchValue);
+    fetchContainers(1, searchValue || "");
 }, 1000);
 
 watch(() => filters.value.global.value, (newValue) => {
-    if (newValue !== null) {
-        debouncedFetchContainers(newValue);
-    }
+    debouncedFetchContainers(newValue);
 });
 
 watch(() => filters.value.cargo_type.value, () => {
-    fetchContainers(1, filters.value.global.value);
+    fetchContainers(1, filters.value.global.value || "");
 });
 
 watch(() => fromDate.value, () => {
-    fetchContainers(1, filters.value.global.value);
+    fetchContainers(1, filters.value.global.value || "");
 });
 
 watch(() => filters.value.container_type.value, () => {
-    fetchContainers(1, filters.value.global.value);
+    fetchContainers(1, filters.value.global.value || "");
 });
 
 watch(() => filters.value.status.value, () => {
-    fetchContainers(1, filters.value.global.value);
+    fetchContainers(1, filters.value.global.value || "");
 });
 
 watch(() => toDate.value, () => {
-    fetchContainers(1, filters.value.global.value);
+    fetchContainers(1, filters.value.global.value || "");
 });
 
 watch(() => etdStartDate.value, () => {
-    fetchContainers(1, filters.value.global.value);
+    fetchContainers(1, filters.value.global.value || "");
 });
 
 watch(() => etdEndDate.value, () => {
-    fetchContainers(1, filters.value.global.value);
+    fetchContainers(1, filters.value.global.value || "");
 });
 
 const onPageChange = (event) => {
