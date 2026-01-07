@@ -105,38 +105,68 @@ const allContainerHBLs = computed(() => {
     const seen = new Set();
     const hbls = [];
     
-    // Combine all original packages from container
-    const allPackages = [
-        ...(props.packagesWithoutMhbl || []),
-        ...(props.packagesWithMhbl || [])
-    ];
-    
-    // Get unique HBLs from all packages
-    allPackages.forEach(pkg => {
-        const hblId = pkg.hbl?.id;
-        if (hblId && !seen.has(hblId)) {
-            seen.add(hblId);
-            hbls.push({
-                id: hblId,
-                hbl_number: pkg.hbl.hbl_number,
-            });
-        }
-    });
+    // Get unique HBLs from packages without MHBL
+    if (props.packagesWithoutMhbl && props.packagesWithoutMhbl.length > 0) {
+        props.packagesWithoutMhbl.forEach(pkg => {
+            const hblId = pkg.hbl?.id;
+            if (hblId && !seen.has(hblId)) {
+                seen.add(hblId);
+                hbls.push({
+                    id: hblId,
+                    hbl_number: pkg.hbl.hbl_number,
+                    type: 'hbl'
+                });
+            }
+        });
+    }
     
     return hbls;
 });
 
-// Calculate unloaded vs remaining HBLs
+// Get all unique MHBLs from container (original packages loaded in container)
+const allContainerMHBLs = computed(() => {
+    const seen = new Set();
+    const mhbls = [];
+    
+    // Get unique MHBLs from packages with MHBL
+    if (props.packagesWithMhbl && props.packagesWithMhbl.length > 0) {
+        props.packagesWithMhbl.forEach(pkg => {
+            const mhblReference = pkg.hbl?.mhbl?.reference || pkg.hbl?.mhbl?.hbl_number;
+            if (mhblReference && !seen.has(mhblReference)) {
+                seen.add(mhblReference);
+                mhbls.push({
+                    reference: mhblReference,
+                    hbl_number: pkg.hbl?.mhbl?.hbl_number || mhblReference,
+                    type: 'mhbl'
+                });
+            }
+        });
+    }
+    
+    return mhbls;
+});
+
+// Calculate unloaded vs remaining HBLs and MHBLs
 const unloadProgress = computed(() => {
     const totalHBLs = allContainerHBLs.value.length;
+    const totalMHBLs = allContainerMHBLs.value.length;
+    const total = totalHBLs + totalMHBLs;
+    
     const unloadedHBLs = uniqueContainerArray.value.length;
-    const remainingHBLs = totalHBLs - unloadedHBLs;
+    const unloadedMHBLs = props.warehouseMHBLs.length;
+    const unloaded = unloadedHBLs + unloadedMHBLs;
+    
+    const remaining = total - unloaded;
     
     return {
-        total: totalHBLs,
-        unloaded: unloadedHBLs,
-        remaining: remainingHBLs,
-        hasRemaining: remainingHBLs > 0
+        total,
+        unloaded,
+        remaining,
+        totalHBLs,
+        totalMHBLs,
+        unloadedHBLs,
+        unloadedMHBLs,
+        hasRemaining: remaining > 0
     };
 });
 
@@ -144,6 +174,12 @@ const unloadProgress = computed(() => {
 const remainingHBLs = computed(() => {
     const unloadedHBLIds = new Set(uniqueContainerArray.value.map(item => item.hbl.id));
     return allContainerHBLs.value.filter(hbl => !unloadedHBLIds.has(hbl.id));
+});
+
+// Get remaining MHBLs (not unloaded)
+const remainingMHBLs = computed(() => {
+    const unloadedMHBLReferences = new Set(props.warehouseMHBLs.map(mhbl => mhbl.mhblReference));
+    return allContainerMHBLs.value.filter(mhbl => !unloadedMHBLReferences.has(mhbl.reference));
 });
 
 // Summary statistics
@@ -173,6 +209,7 @@ const form = useForm({
     container_id: route().params.container,
     packages: [],
     remaining_hbl_ids: [],
+    remaining_mhbl_references: [],
 });
 
 const handleFinishUnloading = () => {
@@ -186,13 +223,24 @@ const handleFinishUnloading = () => {
         form.packages.push(pkg);
     });
 
-    // Add remaining HBL IDs to mark as shortlanded
+    // Add remaining HBL IDs and MHBL references to mark as shortlanded
     form.remaining_hbl_ids = remainingHBLs.value.map(hbl => hbl.id);
+    form.remaining_mhbl_references = remainingMHBLs.value.map(mhbl => mhbl.reference);
 
     form.post(route("arrival.unload-container.unload"), {
         onSuccess: () => {
             if (unloadProgress.value.hasRemaining) {
-                push.warning(`Unloading completed! ${unloadProgress.value.remaining} HBL(s) marked as shortlanded.`);
+                const hblCount = remainingHBLs.value.length;
+                const mhblCount = remainingMHBLs.value.length;
+                let message = `Unloading completed! `;
+                if (hblCount > 0 && mhblCount > 0) {
+                    message += `${hblCount} HBL(s) and ${mhblCount} MHBL(s) marked as shortlanded.`;
+                } else if (hblCount > 0) {
+                    message += `${hblCount} HBL(s) marked as shortlanded.`;
+                } else if (mhblCount > 0) {
+                    message += `${mhblCount} MHBL(s) marked as shortlanded.`;
+                }
+                push.warning(message);
             } else {
                 push.success('Unloading successfully!');
             }
@@ -262,7 +310,7 @@ const submitReport = async () => {
                     <div>
                         <div class="text-sm font-medium text-slate-600 dark:text-navy-300">Unloading Progress</div>
                         <div class="text-lg font-bold text-slate-800 dark:text-navy-100">
-                            Unloaded HBL {{ unloadProgress.unloaded }}/{{ unloadProgress.total }}
+                            Unloaded {{ unloadProgress.unloaded }}/{{ unloadProgress.total }} (HBL: {{ unloadProgress.unloadedHBLs }}/{{ unloadProgress.totalHBLs }}, MHBL: {{ unloadProgress.unloadedMHBLs }}/{{ unloadProgress.totalMHBLs }})
                         </div>
                     </div>
                 </div>
@@ -277,22 +325,25 @@ const submitReport = async () => {
                 <div 
                     class="h-2 rounded-full transition-all duration-300"
                     :class="unloadProgress.hasRemaining ? 'bg-warning' : 'bg-success'"
-                    :style="{ width: `${(unloadProgress.unloaded / unloadProgress.total) * 100}%` }"
+                    :style="{ width: `${unloadProgress.total > 0 ? (unloadProgress.unloaded / unloadProgress.total) * 100 : 0}%` }"
                 ></div>
             </div>
         </div>
 
-        <!-- Warning for Remaining HBLs -->
+        <!-- Warning for Remaining HBLs/MHBLs -->
         <div v-if="unloadProgress.hasRemaining" class="mb-4 p-4 bg-warning/10 border border-warning/30 rounded-lg">
             <div class="flex items-start gap-3">
                 <i class="ti ti-alert-triangle text-warning text-xl mt-0.5"></i>
                 <div class="flex-1">
-                    <div class="font-semibold text-warning mb-1">Shortlanded HBLs Detected</div>
+                    <div class="font-semibold text-warning mb-1">Shortlanded HBLs/MHBLs Detected</div>
                     <div class="text-sm text-slate-700 dark:text-navy-200">
-                        There are <strong>{{ unloadProgress.remaining }} HBL(s)</strong> remaining in the container that will be automatically marked as <strong>shortlanded</strong> when you finish the unload process.
+                        There are <strong>{{ unloadProgress.remaining }} item(s)</strong> remaining in the container ({{ remainingHBLs.length }} HBL(s), {{ remainingMHBLs.length }} MHBL(s)) that will be automatically marked as <strong>shortlanded</strong> when you finish the unload process.
                     </div>
                     <div v-if="remainingHBLs.length > 0" class="mt-2 text-xs text-slate-600 dark:text-navy-300">
                         <strong>Remaining HBLs:</strong> {{ remainingHBLs.map(h => h.hbl_number).join(', ') }}
+                    </div>
+                    <div v-if="remainingMHBLs.length > 0" class="mt-1 text-xs text-slate-600 dark:text-navy-300">
+                        <strong>Remaining MHBLs:</strong> {{ remainingMHBLs.map(m => m.hbl_number).join(', ') }}
                     </div>
                 </div>
             </div>
