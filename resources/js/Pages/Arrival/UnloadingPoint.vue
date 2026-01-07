@@ -142,23 +142,58 @@ const handleUnloadToWarehouse = (groupIndex, packageIndex) => {
     }
 }
 
-const handleUnloadMHBLToWarehouse = (unloadMhblReference) => {
-    const mhblToUnload = mhblContainerArr.value.find(mhbl => mhbl.mhblReference === unloadMhblReference);
-    mhblToUnload.packages.forEach(pkg => {
-        handleCreateDraftUnload([pkg]);
-    });
-    mhblContainerArr.value = mhblContainerArr.value.filter(mhbl => mhbl.mhblReference !== mhblToUnload.mhblReference);
-    console.log(mhblContainerArr.value);
-    warehouseMHBLArr.value.push(mhblToUnload);
+const handleUnloadMHBLToWarehouse = (groupIndex, packageIndex) => {
+    if (groupIndex !== -1 && packageIndex !== -1) {
+        const packageToMove = mhblContainerArr.value[groupIndex].packages.splice(packageIndex, 1)[0];
+        
+        // Find or create MHBL group in warehouse
+        const mhblReference = packageToMove.hbl.mhbl.reference;
+        let warehouseMHBLGroup = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
+        
+        if (warehouseMHBLGroup) {
+            warehouseMHBLGroup.packages.push(packageToMove);
+        } else {
+            warehouseMHBLArr.value.push({
+                mhblReference: mhblReference,
+                expanded: true,
+                packages: [packageToMove]
+            });
+        }
+        
+        // If the group is empty after removal, remove the group
+        if (mhblContainerArr.value[groupIndex].packages.length === 0) {
+            mhblContainerArr.value.splice(groupIndex, 1);
+        }
+        
+        handleCreateDraftUnload([packageToMove]);
+    }
 }
 
-const handleReloadMHBLToContainer = (loadMhblReference) => {
-    const mhblToReload = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === loadMhblReference);
-    mhblToReload.packages.forEach(pkg => {
-        handleRemoveDraftUnload([pkg]);
-    });
-    mhblContainerArr.value.push(mhblToReload);
-    warehouseMHBLArr.value = warehouseMHBLArr.value.filter(mhbl => mhbl.mhblReference !== mhblToReload.mhblReference);
+const handleReloadMHBLToContainer = (groupIndex, packageIndex) => {
+    if (groupIndex !== -1 && packageIndex !== -1) {
+        const packageToMove = warehouseMHBLArr.value[groupIndex].packages.splice(packageIndex, 1)[0];
+        const mhblReference = packageToMove.hbl.mhbl.reference;
+        
+        // Find or create MHBL group in container
+        let containerMHBLGroup = mhblContainerArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
+        
+        if (containerMHBLGroup) {
+            containerMHBLGroup.packages.push(packageToMove);
+        } else {
+            mhblContainerArr.value.push({
+                mhblReference: mhblReference,
+                expanded: true,
+                packages: [packageToMove]
+            });
+        }
+        
+        // If the warehouse group is empty after removal, remove the group
+        if (warehouseMHBLArr.value[groupIndex].packages.length === 0) {
+            warehouseMHBLArr.value.splice(groupIndex, 1);
+        }
+        
+        handleRemoveDraftUnload([packageToMove]);
+    }
 }
 const handleReLoadToContainer = (index) => {
     if (index !== -1) {
@@ -675,23 +710,6 @@ const formatDate = (dateString) => {
                                             ></path>
                                         </svg>
                                         <span>{{ pkg.packages[0].hbl.mhbl.hbl_number || pkg.mhblReference }}</span>
-                                        <div class="px-2.5">
-                                            <svg
-                                                class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
-                                                fill="none" height="24" stroke="currentColor"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round" stroke-width="2"
-                                                viewBox="0 0 24 24"
-                                                width="24"
-                                                x-tooltip.placement.top.success="'Click to Unload'"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                @click.prevent="handleUnloadMHBLToWarehouse(pkg.mhblReference)">
-                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
-                                                <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
-                                            </svg>
-                                        </div>
-
                                     </div>
                                     <ul v-show="pkg.expanded" class="pl-4">
                                         <div :packages="pkg.packages"
@@ -792,6 +810,20 @@ const formatDate = (dateString) => {
                                                         </div>
                                                         <div class="px-2.5 flex items-center space-x-2">
                                                             <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
+                                                            <svg
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
+                                                                fill="none" height="24" stroke="currentColor"
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round" stroke-width="2"
+                                                                viewBox="0 0 24 24"
+                                                                width="24"
+                                                                x-tooltip.placement.top.success="'Click to Unload'"
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                @click.prevent="handleUnloadMHBLToWarehouse(groupIndex, index)">
+                                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
+                                                                <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
+                                                                <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
+                                                            </svg>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1021,21 +1053,6 @@ const formatDate = (dateString) => {
                                             ></path>
                                         </svg>
                                         <span>{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}</span>
-                                        <div class="px-2.5">
-                                            <svg
-                                                class=" hover:text-error icon icon-tabler icons-tabler-outline icon-tabler-corner-up-left-double"
-                                                fill="none" height="24" stroke="currentColor" stroke-linecap="round"
-                                                stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                width="24"
-                                                x-tooltip.placement.top.error="'Click to Re-Load'"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                @click.prevent="handleReloadMHBLToContainer(mhbl.mhblReference)">
-                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                <path d="M19 18v-6a3 3 0 0 0 -3 -3h-7"/>
-                                                <path d="M13 13l-4 -4l4 -4m-5 8l-4 -4l4 -4"/>
-                                            </svg>
-                                        </div>
-
                                     </div>
                                     <ul v-show="mhbl.expanded" class="pl-4">
                                         <div :packages="mhbl.packages"
@@ -1141,6 +1158,10 @@ const formatDate = (dateString) => {
                                                                     severity="warn" size="small"
                                                                     @click.prevent="confirmShowMHBLCreateIssueModal(element.id)"/>
                                                             <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
+                                                            <Button v-tooltip.left="'Click to Re-Load'" aria-label="Filter"
+                                                                    icon="ti ti-corner-up-left-double text-2xl" rounded
+                                                                    severity="danger" text
+                                                                    @click.prevent="handleReloadMHBLToContainer(groupIndex, index)"/>
                                                         </div>
                                                     </div>
                                                 </div>
