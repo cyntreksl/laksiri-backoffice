@@ -53,8 +53,8 @@ const searchHBL = debounce(async (page = 1) => {
             params: {
                 hbl_number: form.hbl_search,
                 page: page,
-                per_page: perPage.value
-                container_id: form.container_id
+                per_page: perPage.value,
+                container_id: form.container_id,
             }
         });
         searchResults.value = response.data.data.map(pkg => ({
@@ -284,7 +284,7 @@ const cancel = () => {
                                                 {{ slotProps.data.volume ? slotProps.data.volume.toFixed(3) : '-' }}
                                             </template>
                                         </Column>
-                                        
+
                                         <template #footer>
                                             In total there are {{ totalRecords }} packages found.
                                         </template>
