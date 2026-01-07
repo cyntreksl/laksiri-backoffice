@@ -31,13 +31,14 @@ class UnloadingIssueController extends Controller
     {
         $this->authorize('issues.index');
 
-        // Get shipments (MHBLs) for selection
-        $shipments = \App\Models\MHBL::select('id', 'reference', 'hbl_number')
+        // Get containers for selection
+        $containers = \App\Models\Container::select('id', 'container_number')
+            ->whereNotNull('container_number')
             ->orderBy('created_at', 'desc')
             ->get();
 
         return Inertia::render('Arrival/CreateUnloadingIssue', [
-            'shipments' => $shipments,
+            'containers' => $containers,
             'breadcrumbs' => [
                 ['title' => 'Home', 'url' => route('dashboard')],
                 ['title' => 'Unloading Issues', 'url' => route('arrival.unloading-issues.index')],
@@ -51,7 +52,7 @@ class UnloadingIssueController extends Controller
         $this->authorize('issues.index');
 
         $validated = $request->validate([
-            'shipment_id' => 'required|exists:mhbls,id',
+            'container_id' => 'required|exists:containers,id',
             'issue_type' => 'required|in:Unmanifest,Overland,Shortland',
             'selected_packages' => 'required|array|min:1',
             'selected_packages.*' => 'exists:hbl_packages,id',
@@ -168,6 +169,7 @@ class UnloadingIssueController extends Controller
         $hblNumber = $request->input('hbl_number');
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
+        $containerId = $request->input('container_id');
 
         if (!$hblNumber || strlen($hblNumber) < 3) {
             return response()->json([
@@ -186,6 +188,12 @@ class UnloadingIssueController extends Controller
             ->whereHas('hbl', function ($q) use ($hblNumber) {
                 $q->where('hbl_number', 'like', "%{$hblNumber}%");
             });
+
+        if ($containerId) {
+            $query->whereHas('containers', function ($cq) use ($containerId) {
+                $cq->where('container_id', $containerId);
+            });
+        }
 
         $packages = $query->paginate($perPage, ['*'], 'page', $page);
 

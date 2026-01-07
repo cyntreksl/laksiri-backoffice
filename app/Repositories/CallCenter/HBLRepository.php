@@ -4,6 +4,7 @@ namespace App\Repositories\CallCenter;
 
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
+use App\Actions\HBL\HBLPayment\GetPaymentByReference;
 use App\Enum\HBLType;
 use App\Factory\HBL\FilterFactory;
 use App\Http\Resources\CallCenter\HBLDeliverResource;
@@ -12,6 +13,7 @@ use App\Interfaces\CallCenter\HBLRepositoryInterface;
 use App\Interfaces\GridJsInterface;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
+use App\Models\PackageQueue;
 use App\Models\Scopes\BranchScope;
 use App\Models\Token;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -155,13 +157,11 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                                       return isset($checkedDocs[$doc]) && $checkedDocs[$doc] === true;
                                   });
 
-            // Determine next queue based on verification status
-            $queueType = $allDocumentsVerified
-                ? CustomerQueue::DOCUMENT_VERIFICATION_QUEUE
-                : CustomerQueue::RECEPTION_VERIFICATION_QUEUE;
+            // Determine next queue based on verification and payment status
+            $queueResult = $this->determineNextQueue($hbl, $token, $allDocumentsVerified);
 
             $customerQueue = $token->customerQueue()->create([
-                'type' => $queueType,
+                'type' => $queueResult['queue_type'],
             ]);
 
             // Store the reception verification data
@@ -173,9 +173,20 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 'all_documents_verified' => $allDocumentsVerified,
             ]);
 
-            // set queue status log based on verification status
+            // If skipping to examination queue, create package queue
+            if ($queueResult['queue_type'] === CustomerQueue::EXAMINATION_QUEUE) {
+                PackageQueue::create([
+                    'token_id' => $token->id,
+                    'hbl_id' => $hbl->id,
+                    'auth_id' => auth()->id(),
+                    'reference' => $token->reference,
+                    'package_count' => $token->package_count,
+                ]);
+            }
+
+            // set queue status log
             $hbl->addQueueStatus(
-                $queueType,
+                $queueResult['queue_type'],
                 $hbl->consignee_id,
                 $token->id,
                 date('Y-m-d H:i:s', (time() - 60)),
@@ -202,13 +213,72 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                     'id' => $token->id,
                     'token_number' => $token->token,
                     'reference' => $token->reference,
-                    'queue_type' => $queueType,
+                    'queue_type' => $queueResult['queue_type'],
                     'all_documents_verified' => $allDocumentsVerified,
+                    'is_paid' => $queueResult['is_paid'],
+                    'skipped_document_verification' => $queueResult['skipped_document_verification'],
+                    'skipped_cashier' => $queueResult['skipped_cashier'],
                 ],
             ]);
         }
 
         return response()->json(['success' => false, 'message' => 'HBL has no consignee'], 400);
+    }
+
+    /**
+     * Determine the next queue based on verification and payment status
+     *
+     * @param HBL $hbl
+     * @param Token $token
+     * @param bool $allDocumentsVerified
+     * @return array
+     */
+    private function determineNextQueue(HBL $hbl, Token $token, bool $allDocumentsVerified): array
+    {
+        $skippedDocumentVerification = false;
+        $skippedCashier = false;
+        $isPaid = false;
+
+        // If all documents verified at reception, skip document verification queue
+        if ($allDocumentsVerified) {
+            $skippedDocumentVerification = true;
+
+            // Check payment status
+            $payment = GetPaymentByReference::run($token->reference);
+            $paymentData = (array) $payment->getData();
+
+            if (! empty($paymentData)) {
+                $paymentObj = $payment->getData();
+                $isPaid = $hbl->paid_amount >= $paymentObj->grand_total;
+
+                if ($isPaid) {
+                    // Fully paid - go directly to examination queue
+                    $skippedCashier = true;
+                    return [
+                        'queue_type' => CustomerQueue::EXAMINATION_QUEUE,
+                        'is_paid' => true,
+                        'skipped_document_verification' => true,
+                        'skipped_cashier' => true,
+                    ];
+                }
+            }
+
+            // Not paid - go to cashier queue
+            return [
+                'queue_type' => CustomerQueue::CASHIER_QUEUE,
+                'is_paid' => false,
+                'skipped_document_verification' => true,
+                'skipped_cashier' => false,
+            ];
+        }
+
+        // Documents not verified - go to reception verification queue
+        return [
+            'queue_type' => CustomerQueue::RECEPTION_VERIFICATION_QUEUE,
+            'is_paid' => false,
+            'skipped_document_verification' => false,
+            'skipped_cashier' => false,
+        ];
     }
 
     public function generateTokenPDF($tokenId, $type = 'download')

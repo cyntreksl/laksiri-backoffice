@@ -16,13 +16,13 @@ import {useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
 
 const props = defineProps({
-    shipments: Array,
+    containers: Array,
 });
 
 const page = usePage();
 
 const form = useForm({
-    shipment_id: null,
+    container_id: null,
     hbl_search: '',
     issue_type: null,
     selected_packages: [],
@@ -54,6 +54,7 @@ const searchHBL = debounce(async (page = 1) => {
                 hbl_number: form.hbl_search,
                 page: page,
                 per_page: perPage.value
+                container_id: form.container_id
             }
         });
         searchResults.value = response.data.data.map(pkg => ({
@@ -100,14 +101,14 @@ const togglePackageSelection = (pkg) => {
 
 const submitAndCreateNew = () => {
     // Validate before submitting
-    if (!form.shipment_id || !form.issue_type || form.selected_packages.length === 0) {
+    if (!form.container_id || !form.issue_type || form.selected_packages.length === 0) {
         push.error('Please fill all required fields and select at least one package.');
         return;
     }
 
     // Use axios for create another to avoid Inertia redirect
     const formData = {
-        shipment_id: form.shipment_id,
+        container_id: form.container_id,
         issue_type: form.issue_type,
         selected_packages: form.selected_packages,
         create_another: true
@@ -185,21 +186,21 @@ const cancel = () => {
 
                 <template #content>
                     <form class="space-y-6" @submit.prevent="submitAndRedirect">
-                        <!-- Select Shipment -->
+                        <!-- Select Container -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FloatLabel variant="on">
                                 <Select
-                                    v-model="form.shipment_id"
-                                    :class="{'p-invalid': form.errors.shipment_id}"
-                                    :options="shipments"
+                                    v-model="form.container_id"
+                                    :class="{'p-invalid': form.errors.container_id}"
+                                    :options="containers"
                                     class="w-full"
-                                    input-id="shipment"
-                                    optionLabel="reference"
+                                    input-id="container"
+                                    optionLabel="container_number"
                                     optionValue="id"
-                                    placeholder="Select Shipment"
+                                    placeholder="Select Container"
                                 />
                             </FloatLabel>
-                            <small v-if="form.errors.shipment_id" class="text-red-500">{{ form.errors.shipment_id }}</small>
+                            <small v-if="form.errors.container_id" class="text-red-500">{{ form.errors.container_id }}</small>
 
                             <!-- Issue Type -->
                             <FloatLabel variant="on">
