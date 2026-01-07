@@ -621,6 +621,7 @@ const formatDate = (dateString) => {
                                                             </p>
                                                         </div>
                                                         <div class="px-2.5 flex items-center space-x-2">
+                                                            <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
                                                             <svg
                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
                                                                 fill="none" height="24" stroke="currentColor"
