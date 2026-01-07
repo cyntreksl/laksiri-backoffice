@@ -826,7 +826,7 @@ onUnmounted(() => {
                                 </h3>
                             </div>
                         </div>
-                        <div class="flex-1 overflow-y-auto kanban-scrollbar pr-2">
+                        <div class="flex-1 min-h-0 pr-2">
                             <ul v-if="Object.keys(filteredPackages).length > 0"
                                 class="space-y-1 font-inter font-medium">
                                 <li v-for="(hbl, groupIndex) in filteredPackages" :key="hbl.id">
@@ -973,7 +973,7 @@ onUnmounted(() => {
                             </div>
                         </div>
 
-                        <div class="flex-1 overflow-y-auto kanban-scrollbar pr-2">
+                        <div class="flex-1 min-h-0 pr-2">
                             <ul v-if="Object.keys(filteredMHBLPackages).length > 0"
                                 class="space-y-1 font-inter font-medium">
                                 <li v-for="(pkg, groupIndex) in filteredMHBLPackages" :key="pkg.mhblReference">
@@ -1132,7 +1132,7 @@ onUnmounted(() => {
                                 </h3>
                             </div>
                         </div>
-                        <div class="flex-1 overflow-y-auto kanban-scrollbar pr-2 space-y-2">
+                        <div class="flex-1 min-h-0 pr-2 space-y-2">
                             <draggable
                                 v-if="warehouseArr.length > 0"
                                 v-model="warehouseArr"
@@ -1433,7 +1433,7 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Chat messages -->
-                <div class="flex-1 overflow-y-auto space-y-4 px-4 relative">
+                <div class="flex-1 space-y-4 px-4 relative">
                     <!-- Empty state -->
                     <div
                         v-if="!fetching && remarks.length === 0"
