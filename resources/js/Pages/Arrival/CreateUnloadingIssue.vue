@@ -31,6 +31,7 @@ const form = useForm({
 const issueTypes = ref([
     {label: 'Unmanifest', value: 'Unmanifest'},
     {label: 'Overland', value: 'Overland'},
+    {label: 'Shortland', value: 'Shortland'},
 ]);
 
 const searchResults = ref([]);

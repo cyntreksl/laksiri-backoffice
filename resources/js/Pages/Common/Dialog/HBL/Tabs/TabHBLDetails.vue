@@ -228,8 +228,39 @@ const getIssueLabel = (issueText) => {
         <div class="col-span-12 lg:col-span-6 md:col-span-12 sm:col-span-12 space-y-4">
             <PostSkeleton v-if="isLoading"/>
 
-            <Card v-else class="!bg-emerald-50 !border !border-emerald-200 !shadow-none">
+            <Card v-else 
+                :class="[
+                    hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland 
+                        ? '!border-2 !border-dashed !border-orange-400 !bg-orange-50' 
+                        : '!bg-emerald-50 !border !border-emerald-200',
+                    '!shadow-md'
+                ]">
                 <template #content>
+                    <!-- Status Badges Section - Always visible at top -->
+                    <div v-if="hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland" class="mb-4 pb-4 border-b-2 border-dashed border-orange-300">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-sm font-semibold text-orange-800 mr-2">HBL Status:</span>
+                            
+                            <span v-if="hbl?.is_short_load" 
+                                class="px-3 py-1.5 bg-orange-100 text-orange-800 border-2 border-orange-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
+                                <i class="ti ti-truck-loading text-lg"></i>
+                                <span>SHORTLAND</span>
+                            </span>
+                            
+                            <span v-if="hbl?.is_unmanifest" 
+                                class="px-3 py-1.5 bg-purple-100 text-purple-800 border-2 border-purple-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
+                                <i class="ti ti-file-x text-lg"></i>
+                                <span>UNMANIFEST</span>
+                            </span>
+                            
+                            <span v-if="hbl?.is_overland" 
+                                class="px-3 py-1.5 bg-blue-100 text-blue-800 border-2 border-blue-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
+                                <i class="ti ti-road text-lg"></i>
+                                <span>OVERLAND</span>
+                            </span>
+                        </div>
+                    </div>
+
                     <div class="flex items-center space-x-5">
                         <div class="flex space-x-2">
                             <i v-if="hbl?.latest_detain_record?.is_rtf" v-tooltip.left="`Detained by ${hbl?.latest_detain_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>

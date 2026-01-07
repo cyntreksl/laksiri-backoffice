@@ -52,7 +52,7 @@ class UnloadingIssueController extends Controller
 
         $validated = $request->validate([
             'shipment_id' => 'required|exists:mhbls,id',
-            'issue_type' => 'required|in:Unmanifest,Overland',
+            'issue_type' => 'required|in:Unmanifest,Overland,Shortland',
             'selected_packages' => 'required|array|min:1',
             'selected_packages.*' => 'exists:hbl_packages,id',
             'create_another' => 'nullable|boolean',
@@ -66,14 +66,14 @@ class UnloadingIssueController extends Controller
 
             if (!empty($packagesWithIssues)) {
                 $errorMessage = 'Some packages already have unloading issues and cannot be processed again.';
-                
+
                 if ($request->boolean('create_another')) {
                     return response()->json([
                         'success' => false,
                         'message' => $errorMessage
                     ], 422);
                 }
-                
+
                 return back()->withErrors(['selected_packages' => $errorMessage]);
             }
 
@@ -88,7 +88,7 @@ class UnloadingIssueController extends Controller
                     'is_fixed' => false,
                 ]);
             }
-            
+
             // If create_another is true, return JSON response (no redirect)
             if ($request->boolean('create_another')) {
                 return response()->json([
@@ -176,7 +176,7 @@ class UnloadingIssueController extends Controller
             ->with(['hbl:id,hbl_number,hbl_name', 'unloadingIssue'])
             ->whereHas('hbl', function ($q) use ($hblNumber, $shipmentId) {
                 $q->where('hbl_number', 'like', "%{$hblNumber}%");
-                
+
                 if ($shipmentId) {
                     $q->whereHas('mhbls', function ($mq) use ($shipmentId) {
                         $mq->where('mhbl_id', $shipmentId);
@@ -186,7 +186,7 @@ class UnloadingIssueController extends Controller
 
         $packages = $query->get()->map(function ($package) {
             $existingIssue = $package->unloadingIssue->first();
-            
+
             return [
                 'id' => $package->id,
                 'hbl_number' => $package->hbl->hbl_number ?? '',
