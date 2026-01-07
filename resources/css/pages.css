@@ -15,7 +15,11 @@
 
 @supports selector(::-webkit-scrollbar) {
   .kanban-scrollbar::-webkit-scrollbar {
-    @apply h-1.5;
+    @apply h-1.5 w-1.5;
+  }
+
+  .kanban-scrollbar::-webkit-scrollbar-track {
+    @apply bg-slate-100/50 dark:bg-navy-800/50 rounded-full;
   }
 
   .kanban-scrollbar::-webkit-scrollbar-thumb{

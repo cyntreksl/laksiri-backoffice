@@ -54,7 +54,7 @@ const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 const cm = ref();
-const selectedContainer = ref([]);
+const selectedContainer = ref(null);
 const dt = ref();
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const fromDate = ref(moment(new Date()).subtract(12, "months").toISOString().split("T")[0]);
@@ -170,7 +170,11 @@ onMounted(() => {
 });
 
 const onRowContextMenu = (event) => {
-    cm.value.show(event.originalEvent);
+    event.originalEvent.preventDefault();
+    selectedContainer.value = event.data;
+    if (cm.value) {
+        cm.value.show(event.originalEvent);
+    }
 };
 
 const clearFilter = () => {
@@ -309,7 +313,7 @@ const exportCSV = () => {
 
             <Card class="my-5">
                 <template #content>
-                    <ContextMenu ref="cm" :hidden="selectedContainer.length < 1 || selectedContainer.status === 'IN TRANSIT'" :model="menuModel"/>
+                    <ContextMenu ref="cm" :hidden="!selectedContainer" :model="menuModel"/>
                     <DataTable
                         ref="dt"
                         v-model:contextMenuSelection="selectedContainer"
