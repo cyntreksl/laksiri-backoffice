@@ -3,6 +3,7 @@
 namespace App\Actions\Container\Unloading;
 
 use App\Models\HBLPackage;
+use App\Models\Setting;
 use Illuminate\Support\Collection;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -12,6 +13,12 @@ class AssignBondStorageNumber
 
     public function handle(Collection|array $hblGroups): void
     {
+        // Check if auto-generation is enabled
+        $settings = Setting::first();
+        if (!$settings || !$settings->auto_bond_generation_enabled) {
+            return; // Skip automatic generation if disabled
+        }
+
         $year = now()->format('y');
         $month = now()->format('m');
         $prefix = "{$year}{$month}";

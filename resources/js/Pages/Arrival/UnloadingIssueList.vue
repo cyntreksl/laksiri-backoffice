@@ -3,9 +3,12 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import {onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
-import {router, usePage} from "@inertiajs/vue3";
+import {useForm, usePage, router} from "@inertiajs/vue3";
 import ImageViewModal from "@/Pages/Arrival/Partials/ImageView.vue";
+import {useConfirm} from "primevue/useconfirm";
+import {push} from "notivue";
 import Button from "primevue/button";
+import ConfirmDialog from "primevue/confirmdialog";
 import IconField from "primevue/iconfield";
 import Panel from "primevue/panel";
 import Card from "primevue/card";
@@ -27,6 +30,7 @@ const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 const dt = ref();
+const confirm = useConfirm();
 const fromDate = ref(moment(new Date()).subtract(365, "days").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const isShowImageModal = ref(false);
@@ -113,9 +117,41 @@ const closeImageModal = () => {
     isShowImageModal.value = false;
     unloadingIssueId.value = null;
 }
+
+const deleteUnloadingIssue = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to delete this unloading issue?',
+        header: 'Delete Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectLabel: 'Cancel',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: async () => {
+            try {
+                await axios.delete(route('arrival.unloading-issues.destroy', id));
+                push.success('Unloading issue deleted successfully!');
+                fetchUnloadingIssues(currentPage.value, filters.value.global.value);
+            } catch (error) {
+                console.error('Error deleting unloading issue:', error);
+                push.error(error.response?.data?.message || 'Failed to delete unloading issue.');
+            }
+        },
+        reject: () => {
+            // Dialog will close automatically
+        }
+    });
+};
 </script>
 <template>
-    <AppLayout v-if="usePage().props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Unloading Issues">
+    <div>
+        <AppLayout v-if="usePage().props.currentBranch.type === 'Destination' && $page.props.user.roles.includes('boned area')" title="Unloading Issues">
         <template #header>Unloading Issues</template>
 
         <Breadcrumb/>
@@ -270,10 +306,26 @@ const closeImageModal = () => {
                             </template>
                         </Column>
 
-                        <Column :exportable="false">
+                        <Column :exportable="false" header="Actions">
                             <template #body="slotProps">
-                                <Button v-tooltip.left="'Show Attachments'" icon="pi
-pi-paperclip" rounded severity="contrast" size="small" @click="handleOpenImageModal(slotProps.data.id)"/>
+                                <div class="flex gap-2">
+                                    <Button
+                                        v-tooltip.left="'Show Attachments'"
+                                        icon="pi pi-paperclip"
+                                        rounded
+                                        severity="contrast"
+                                        size="small"
+                                        @click="handleOpenImageModal(slotProps.data.id)"
+                                    />
+                                    <Button
+                                        v-tooltip.left="'Delete Issue'"
+                                        icon="pi pi-trash"
+                                        rounded
+                                        severity="danger"
+                                        size="small"
+                                        @click="deleteUnloadingIssue(slotProps.data.id)"
+                                    />
+                                </div>
                             </template>
                         </Column>
 
@@ -439,10 +491,26 @@ pi-paperclip" rounded severity="contrast" size="small" @click="handleOpenImageMo
                             </template>
                         </Column>
 
-                        <Column :exportable="false">
+                        <Column :exportable="false" header="Actions">
                             <template #body="slotProps">
-                                <Button v-tooltip.left="'Show Attachments'" icon="pi
-pi-paperclip" rounded severity="contrast" size="small" @click="handleOpenImageModal(slotProps.data.id)"/>
+                                <div class="flex gap-2">
+                                    <Button
+                                        v-tooltip.left="'Show Attachments'"
+                                        icon="pi pi-paperclip"
+                                        rounded
+                                        severity="contrast"
+                                        size="small"
+                                        @click="handleOpenImageModal(slotProps.data.id)"
+                                    />
+                                    <Button
+                                        v-tooltip.left="'Delete Issue'"
+                                        icon="pi pi-trash"
+                                        rounded
+                                        severity="danger"
+                                        size="small"
+                                        @click="deleteUnloadingIssue(slotProps.data.id)"
+                                    />
+                                </div>
                             </template>
                         </Column>
 
@@ -457,4 +525,5 @@ pi-paperclip" rounded severity="contrast" size="small" @click="handleOpenImageMo
                     :unloadingIssueID="unloadingIssueId"
                     @close="closeImageModal"
                     @update:visible="isShowImageModal = $event" />
+    </div>
 </template>

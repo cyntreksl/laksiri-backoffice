@@ -52,7 +52,9 @@ const searchHBL = debounce(async () => {
         });
         searchResults.value = response.data.map(pkg => ({
             ...pkg,
-            selected: false
+            selected: false,
+            has_issue: pkg.has_unloading_issue || false,
+            issue_type: pkg.existing_issue_type || null
         }));
     } catch (error) {
         console.error("Error searching HBL:", error);
@@ -67,11 +69,15 @@ watch(() => form.hbl_search, () => {
 
 const updateSelectedPackages = () => {
     form.selected_packages = searchResults.value
-        .filter(pkg => pkg.selected)
+        .filter(pkg => pkg.selected && !pkg.has_issue)
         .map(pkg => pkg.id);
 };
 
-const togglePackageSelection = () => {
+const togglePackageSelection = (pkg) => {
+    if (pkg.has_issue && pkg.selected) {
+        pkg.selected = false;
+        push.warning(`This package already has an ${pkg.issue_type} issue.`);
+    }
     updateSelectedPackages();
 };
 
@@ -97,7 +103,7 @@ const submitAndCreateNew = () => {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+            'X-CSRF-TOKEN': usePage().props.csrf
         }
     })
         .then(response => {
@@ -226,8 +232,18 @@ const cancel = () => {
                                                 <Checkbox
                                                     v-model="slotProps.data.selected"
                                                     :binary="true"
-                                                    @update:modelValue="togglePackageSelection"
+                                                    :disabled="slotProps.data.has_issue"
+                                                    @update:modelValue="togglePackageSelection(slotProps.data)"
                                                 />
+                                            </template>
+                                        </Column>
+
+                                        <Column header="Status" style="width: 8rem">
+                                            <template #body="slotProps">
+                                                <span v-if="slotProps.data.has_issue" class="text-red-600 text-sm font-semibold">
+                                                    {{ slotProps.data.issue_type }} Issue
+                                                </span>
+                                                <span v-else class="text-green-600 text-sm">Available</span>
                                             </template>
                                         </Column>
 

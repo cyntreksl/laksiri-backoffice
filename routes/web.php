@@ -47,6 +47,7 @@ Route::middleware([
     require_once __DIR__.'/web/gate-control.php';
     require_once __DIR__.'/web/whatsapp.php';
     require_once __DIR__.'/web/remarks.php';
+    require_once __DIR__.'/web/bond_storage.php';
 
     // call center routes
     Route::name('call-center.')->prefix('call-center')->group(function () {
@@ -92,6 +93,12 @@ Route::middleware([
 
     Route::post('third-party-shipments/save-shipment/v2', [ThirdPartyShipmentController::class, 'saveShipmentV2'])
         ->name('third-party-shipments.save-shipment.v2');
+
+    Route::post('third-party-shipments/create-container', [ThirdPartyShipmentController::class, 'createContainer'])
+        ->name('third-party-shipments.create-container');
+
+    Route::get('third-party-shipments/generate-container-reference', [ThirdPartyShipmentController::class, 'generateContainerReference'])
+        ->name('third-party-shipments.generate-container-reference');
 
 });
 
