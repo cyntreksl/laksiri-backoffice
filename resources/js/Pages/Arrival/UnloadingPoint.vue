@@ -125,7 +125,19 @@ const filteredMHBLPackages = computed(() => {
         return mhblContainerArr.value;
     }
     return mhblContainerArr.value.filter(packageData => {
-        return packageData?.hbl_number.toLowerCase().includes(searchQuery.value.toLowerCase());
+        const searchLower = searchQuery.value.toLowerCase();
+        
+        // Search in MHBL number
+        const mhblNumber = packageData?.packages?.[0]?.hbl?.mhbl?.hbl_number || packageData?.mhblReference || '';
+        if (mhblNumber.toLowerCase().includes(searchLower)) {
+            return true;
+        }
+        
+        // Search in individual package HBL numbers
+        return packageData?.packages?.some(pkg => {
+            const hblNumber = pkg?.hbl?.hbl_number || '';
+            return hblNumber.toLowerCase().includes(searchLower);
+        });
     });
 })
 
