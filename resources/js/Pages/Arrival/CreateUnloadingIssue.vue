@@ -36,10 +36,14 @@ const issueTypes = ref([
 
 const searchResults = ref([]);
 const loading = ref(false);
+const totalRecords = ref(0);
+const perPage = ref(10);
+const currentPage = ref(1);
 
-const searchHBL = debounce(async () => {
+const searchHBL = debounce(async (page = 1) => {
     if (!form.hbl_search || form.hbl_search.length < 3) {
         searchResults.value = [];
+        totalRecords.value = 0;
         return;
     }
 
@@ -48,25 +52,38 @@ const searchHBL = debounce(async () => {
         const response = await axios.get('/search-hbl-packages', {
             params: {
                 hbl_number: form.hbl_search,
-                container_id: form.container_id
+                page: page,
+                per_page: perPage.value,
+                container_id: form.container_id,
             }
         });
-        searchResults.value = response.data.map(pkg => ({
+        searchResults.value = response.data.data.map(pkg => ({
             ...pkg,
             selected: false,
             has_issue: pkg.has_unloading_issue || false,
             issue_type: pkg.existing_issue_type || null
         }));
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
     } catch (error) {
         console.error("Error searching HBL:", error);
+        searchResults.value = [];
+        totalRecords.value = 0;
     } finally {
         loading.value = false;
     }
 }, 500);
 
 watch(() => form.hbl_search, () => {
-    searchHBL();
+    currentPage.value = 1;
+    searchHBL(1);
 });
+
+const onPageChange = (event) => {
+    perPage.value = event.rows;
+    currentPage.value = event.page + 1;
+    searchHBL(currentPage.value);
+};
 
 const updateSelectedPackages = () => {
     form.selected_packages = searchResults.value
@@ -113,6 +130,8 @@ const submitAndCreateNew = () => {
             form.hbl_search = '';
             form.selected_packages = [];
             searchResults.value = [];
+            totalRecords.value = 0;
+            currentPage.value = 1;
         })
         .catch(error => {
             console.error('Full error:', error);
@@ -204,13 +223,12 @@ const cancel = () => {
                             <FloatLabel variant="on">
                                 <InputText
                                     v-model="form.hbl_search"
-                                    :disabled="!form.container_id"
                                     class="w-full"
                                     input-id="hbl-search"
                                     placeholder="Search by HBL Number"
                                 />
                             </FloatLabel>
-                            <small class="text-gray-500">Enter at least 3 characters to search</small>
+                            <small class="text-gray-500">Enter at least 3 characters to search all HBLs</small>
                         </div>
 
                         <!-- HBL Packages Results -->
@@ -226,7 +244,13 @@ const cancel = () => {
                                     <DataTable
                                         :loading="loading"
                                         :value="searchResults"
+                                        :rows="perPage"
+                                        :rowsPerPageOptions="[5, 10, 20, 50]"
+                                        :totalRecords="totalRecords"
+                                        lazy
+                                        paginator
                                         tableStyle="min-width: 50rem"
+                                        @page="onPageChange"
                                     >
                                         <Column header="Select" style="width: 5rem">
                                             <template #body="slotProps">
@@ -260,6 +284,10 @@ const cancel = () => {
                                                 {{ slotProps.data.volume ? slotProps.data.volume.toFixed(3) : '-' }}
                                             </template>
                                         </Column>
+
+                                        <template #footer>
+                                            In total there are {{ totalRecords }} packages found.
+                                        </template>
                                     </DataTable>
                                 </template>
                             </Card>

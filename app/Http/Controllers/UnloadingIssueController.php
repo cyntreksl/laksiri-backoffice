@@ -167,10 +167,20 @@ class UnloadingIssueController extends Controller
     public function searchHBLPackages(Request $request)
     {
         $hblNumber = $request->input('hbl_number');
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
         $containerId = $request->input('container_id');
 
         if (!$hblNumber || strlen($hblNumber) < 3) {
-            return response()->json([]);
+            return response()->json([
+                'data' => [],
+                'meta' => [
+                    'total' => 0,
+                    'current_page' => 1,
+                    'per_page' => $perPage,
+                    'last_page' => 1,
+                ]
+            ]);
         }
 
         $query = \App\Models\HBLPackage::query()
@@ -185,7 +195,9 @@ class UnloadingIssueController extends Controller
             });
         }
 
-        $packages = $query->get()->map(function ($package) {
+        $packages = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $data = $packages->map(function ($package) {
             $existingIssue = $package->unloadingIssue->first();
 
             return [
@@ -200,6 +212,14 @@ class UnloadingIssueController extends Controller
             ];
         });
 
-        return response()->json($packages);
+        return response()->json([
+            'data' => $data,
+            'meta' => [
+                'total' => $packages->total(),
+                'current_page' => $packages->currentPage(),
+                'per_page' => $packages->perPage(),
+                'last_page' => $packages->lastPage(),
+            ]
+        ]);
     }
 }
