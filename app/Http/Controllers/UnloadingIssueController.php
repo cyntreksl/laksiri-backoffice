@@ -166,25 +166,30 @@ class UnloadingIssueController extends Controller
     public function searchHBLPackages(Request $request)
     {
         $hblNumber = $request->input('hbl_number');
-        $shipmentId = $request->input('shipment_id');
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
 
         if (!$hblNumber || strlen($hblNumber) < 3) {
-            return response()->json([]);
+            return response()->json([
+                'data' => [],
+                'meta' => [
+                    'total' => 0,
+                    'current_page' => 1,
+                    'per_page' => $perPage,
+                    'last_page' => 1,
+                ]
+            ]);
         }
 
         $query = \App\Models\HBLPackage::query()
             ->with(['hbl:id,hbl_number,hbl_name', 'unloadingIssue'])
-            ->whereHas('hbl', function ($q) use ($hblNumber, $shipmentId) {
+            ->whereHas('hbl', function ($q) use ($hblNumber) {
                 $q->where('hbl_number', 'like', "%{$hblNumber}%");
-
-                if ($shipmentId) {
-                    $q->whereHas('mhbls', function ($mq) use ($shipmentId) {
-                        $mq->where('mhbl_id', $shipmentId);
-                    });
-                }
             });
 
-        $packages = $query->get()->map(function ($package) {
+        $packages = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $data = $packages->map(function ($package) {
             $existingIssue = $package->unloadingIssue->first();
 
             return [
@@ -199,6 +204,14 @@ class UnloadingIssueController extends Controller
             ];
         });
 
-        return response()->json($packages);
+        return response()->json([
+            'data' => $data,
+            'meta' => [
+                'total' => $packages->total(),
+                'current_page' => $packages->currentPage(),
+                'per_page' => $packages->perPage(),
+                'last_page' => $packages->lastPage(),
+            ]
+        ]);
     }
 }
