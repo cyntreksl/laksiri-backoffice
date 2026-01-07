@@ -154,6 +154,45 @@ const handleUnloadToWarehouse = (groupIndex, packageIndex) => {
     }
 }
 
+const handleUnloadHBLGroupToWarehouse = (groupIndex) => {
+    if (groupIndex !== -1 && containerArr.value[groupIndex]) {
+        const hblGroup = containerArr.value[groupIndex];
+        const packagesToMove = [...hblGroup.packages];
+        
+        confirm.require({
+            message: `Are you sure you want to unload all ${packagesToMove.length} package(s) from HBL ${hblGroup.hbl_number}?`,
+            header: 'Unload All Packages',
+            icon: 'pi pi-exclamation-triangle',
+            rejectLabel: 'Cancel',
+            rejectProps: {
+                label: 'Cancel',
+                severity: 'secondary',
+                outlined: true
+            },
+            acceptProps: {
+                label: 'Yes, Unload All',
+                severity: 'success'
+            },
+            accept: () => {
+                // Move all packages to warehouse
+                packagesToMove.forEach(pkg => {
+                    warehouseArr.value.push(pkg);
+                });
+                
+                // Remove the group from container
+                containerArr.value.splice(groupIndex, 1);
+                
+                // Create draft unload for all packages
+                handleCreateDraftUnload(packagesToMove);
+                
+                push.success(`Successfully unloaded ${packagesToMove.length} package(s) from HBL ${hblGroup.hbl_number}`);
+            },
+            reject: () => {
+            }
+        });
+    }
+}
+
 const handleUnloadMHBLToWarehouse = (groupIndex, packageIndex) => {
     if (groupIndex !== -1 && packageIndex !== -1) {
         const packageToMove = mhblContainerArr.value[groupIndex].packages.splice(packageIndex, 1)[0];
@@ -178,6 +217,55 @@ const handleUnloadMHBLToWarehouse = (groupIndex, packageIndex) => {
         }
         
         handleCreateDraftUnload([packageToMove]);
+    }
+}
+
+const handleUnloadMHBLGroupToWarehouse = (groupIndex) => {
+    if (groupIndex !== -1 && mhblContainerArr.value[groupIndex]) {
+        const mhblGroup = mhblContainerArr.value[groupIndex];
+        const packagesToMove = [...mhblGroup.packages];
+        const mhblReference = mhblGroup.mhblReference;
+        const mhblNumber = packagesToMove[0]?.hbl?.mhbl?.hbl_number || mhblReference;
+        
+        confirm.require({
+            message: `Are you sure you want to unload all ${packagesToMove.length} package(s) from MHBL ${mhblNumber}?`,
+            header: 'Unload All Packages',
+            icon: 'pi pi-exclamation-triangle',
+            rejectLabel: 'Cancel',
+            rejectProps: {
+                label: 'Cancel',
+                severity: 'secondary',
+                outlined: true
+            },
+            acceptProps: {
+                label: 'Yes, Unload All',
+                severity: 'success'
+            },
+            accept: () => {
+                // Find or create MHBL group in warehouse
+                let warehouseMHBLGroup = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
+                
+                if (warehouseMHBLGroup) {
+                    warehouseMHBLGroup.packages.push(...packagesToMove);
+                } else {
+                    warehouseMHBLArr.value.push({
+                        mhblReference: mhblReference,
+                        expanded: true,
+                        packages: packagesToMove
+                    });
+                }
+                
+                // Remove the group from container
+                mhblContainerArr.value.splice(groupIndex, 1);
+                
+                // Create draft unload for all packages
+                handleCreateDraftUnload(packagesToMove);
+                
+                push.success(`Successfully unloaded ${packagesToMove.length} package(s) from MHBL ${mhblNumber}`);
+            },
+            reject: () => {
+            }
+        });
     }
 }
 
@@ -286,9 +374,28 @@ const detainByOptions = [
     { label: 'ICT', value: 'ICT' }
 ];
 
+const showDetainModal = ref(false);
+const selectedPackageForDetain = ref(null);
 const selectedDetainBy = ref(null);
 
-const handleDetainPackage = (packageId, detainType) => {
+const openDetainModal = (packageItem) => {
+    selectedPackageForDetain.value = packageItem;
+    selectedDetainBy.value = null;
+    showDetainModal.value = true;
+}
+
+const closeDetainModal = () => {
+    showDetainModal.value = false;
+    selectedPackageForDetain.value = null;
+    selectedDetainBy.value = null;
+}
+
+const handleDetainPackage = () => {
+    if (!selectedPackageForDetain.value || !selectedDetainBy.value) return;
+    
+    const packageId = selectedPackageForDetain.value.id;
+    const detainType = selectedDetainBy.value;
+    
     confirm.require({
         message: `Would you like to detain this package by ${detainType}?`,
         header: `Detain Package by ${detainType}?`,
@@ -308,6 +415,7 @@ const handleDetainPackage = (packageId, detainType) => {
                 preserveScroll: true,
                 onSuccess: () => {
                     push.success(`Package detained by ${detainType}`);
+                    closeDetainModal();
                     window.location.reload();
                 },
                 onError: () => {
@@ -318,6 +426,24 @@ const handleDetainPackage = (packageId, detainType) => {
         reject: () => {
         }
     })
+}
+
+const isPackageDetained = (packageItem) => {
+    if (!packageItem) return false;
+    
+    // Check latest detain record (Laravel serializes relationships to snake_case in JSON)
+    const latestRecord = packageItem.latest_detain_record || packageItem.latestDetainRecord;
+    
+    // Package is detained if latest record exists and is_rtf is true
+    return latestRecord && latestRecord.is_rtf === true;
+}
+
+const isHBLGroupDetained = (hblGroup) => {
+    return hblGroup?.packages?.some(pkg => isPackageDetained(pkg));
+}
+
+const isMHBLGroupDetained = (mhblGroup) => {
+    return mhblGroup?.packages?.some(pkg => isPackageDetained(pkg));
 }
 
 const confirmShowCreateIssueModal = (index) => {
@@ -459,8 +585,8 @@ const formatDate = (dateString) => {
 
             <div class="flex h-[calc(100vh-8.5rem)] flex-grow flex-col">
                 <div
-                    class="kanban-scrollbar grid grid-cols-1 sm:grid-cols-2 space-x-4 overflow-x-auto overflow-y-auto px-[var(--margin-x)] transition-all duration-[.25s]">
-                    <div class="relative flex max-h-full shrink-0 flex-col">
+                    class="grid grid-cols-1 sm:grid-cols-2 space-x-4 px-[var(--margin-x)] transition-all duration-[.25s]">
+                    <div class="relative flex flex-col h-full overflow-hidden">
                         <div class="board-draggable-handler flex items-center justify-between px-0.5 pb-3">
                             <div class="flex items-center space-x-2">
                                 <div
@@ -495,22 +621,28 @@ const formatDate = (dateString) => {
                                 </h3>
                             </div>
                         </div>
-                        <div>
+                        <div class="flex-1 overflow-y-auto kanban-scrollbar pr-2">
                             <ul v-if="Object.keys(filteredPackages).length > 0"
                                 class="space-y-1 font-inter font-medium">
                                 <li v-for="(hbl, groupIndex) in filteredPackages" :key="hbl.id">
                                     <div
                                         v-if="Object.keys(hbl.packages).length > 0"
-                                        class="flex cursor-pointer items-center rounded px-2 py-1 tracking-wide text-slate-800 outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:text-navy-100 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100"
-                                        tabindex="0"
+                                        :class="[
+                                            'mb-2 rounded-lg border p-2.5 shadow-sm transition-all',
+                                            isHBLGroupDetained(hbl)
+                                                ? 'border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30'
+                                                : 'border-slate-200 bg-white hover:border-success/40 hover:shadow dark:border-navy-600 dark:bg-navy-800'
+                                        ]"
                                     >
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-2 flex-1 min-w-0">
                                         <button
-                                            class="btn mr-1 size-5 rounded-lg p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                                    class="flex-shrink-0 size-6 rounded p-0.5 hover:bg-slate-100 dark:hover:bg-navy-700 transition-colors"
                                             @click="hbl.expanded = !hbl.expanded"
                                         >
                                             <svg
                                                 :class="hbl.expanded && 'rotate-90'"
-                                                class="size-7 transition-transform"
+                                                        class="size-4 text-slate-600 dark:text-navy-300 transition-transform duration-200"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -523,7 +655,7 @@ const formatDate = (dateString) => {
                                             </svg>
                                         </button>
                                         <svg
-                                            class="mr-3 size-9 text-primary"
+                                                    class="flex-shrink-0 size-6 text-primary"
                                             fill="currentColor"
                                             viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg"
@@ -532,123 +664,74 @@ const formatDate = (dateString) => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ hbl.hbl_number }} ({{ hbl.packages.length }} {{ hbl.packages.length === 1 ? 'package' : 'packages' }})</span>
+                                                <span class="font-semibold text-sm text-slate-700 dark:text-navy-100 truncate">{{ hbl.hbl_number }}</span>
+                                                <span v-if="isHBLGroupDetained(hbl)" class="flex-shrink-0">
+                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-xs"></i>
+                                                </span>
+                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
+                                                    {{ hbl.packages.length }} {{ hbl.packages.length === 1 ? 'pkg' : 'pkgs' }}
+                                                </span>
                                     </div>
-                                    <ul v-show="hbl.expanded" class="pl-4">
+                                            <Button
+                                                icon="pi pi-arrow-right"
+                                                label="Unload All"
+                                                severity="success"
+                                                size="small"
+                                                class="flex-shrink-0"
+                                                @click.stop.prevent="handleUnloadHBLGroupToWarehouse(groupIndex)"
+                                            />
+                                        </div>
+                                    </div>
+                                    <ul v-show="hbl.expanded" class="mt-1.5 space-y-1.5 pl-1">
                                         <draggable v-model="hbl.packages"
-                                                   class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                                                   class="space-y-1.5"
                                                    group="people"
                                                    item-key="id"
                                                    @change="handlePackageChange">
                                             <template #item="{element, index}">
-                                                <div class="card cursor-pointer shadow-sm">
-                                                    <div class="flex justify-between items-center">
-                                                        <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
-                                                            <div>
-                                                                <div class="flex justify-between">
-                                                                    <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="flex flex-wrap gap-1">
-                                                                <div
-                                                                    class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                                    <svg class="size-3.5" fill="none"
-                                                                         stroke="currentColor"
-                                                                         viewBox="0 0 24 24"
-                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path
-                                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round"
-                                                                            stroke-width="2"/>
-                                                                    </svg>
-                                                                    <span>{{
-                                                                            moment(element.created_at).format('YYYY-MM-DD')
-                                                                        }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
-                                                                        fill="none"
-                                                                        stroke="currentColor" stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        width="24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path d="M7 20l10 0"/>
-                                                                        <path d="M6 6l6 -1l6 1"/>
-                                                                        <path d="M12 3l0 17"/>
-                                                                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                                    </svg>
-                                                                    <span>Volume {{ element.volume }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
-                                                                        fill="none" height="24" stroke="currentColor"
-                                                                        stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        width="24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path
-                                                                            d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                                                        <path
-                                                                            d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                                                                    </svg>
-                                                                    <span>Weight {{ element.weight }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash"
-                                                                        fill="none" stroke="currentColor"
-                                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path d="M5 9l14 0"/>
-                                                                        <path d="M5 15l14 0"/>
-                                                                        <path d="M11 4l-4 16"/>
-                                                                        <path d="M17 4l-4 16"/>
-                                                                    </svg>
-                                                                    <span>Quantity {{ element.quantity }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
+                                                <div :class="[
+                                                    'flex items-center justify-between rounded-md border p-2 transition-colors',
+                                                    isPackageDetained(element)
+                                                        ? 'border-red-300 bg-red-50 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30'
+                                                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-navy-600 dark:bg-navy-700/50 dark:hover:bg-navy-700'
+                                                ]">
+                                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                        <div v-if="isPackageDetained(element)" class="flex-shrink-0">
+                                                            <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-xs font-medium text-slate-600 dark:text-navy-300 mb-1">
                                                                 {{ element.package_type }}
                                                             </p>
+                                                            <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-navy-400">
+                                                                <span>Vol: {{ element.volume }}</span>
+                                                                <span>•</span>
+                                                                <span>Wt: {{ element.weight }}</span>
+                                                                <span>•</span>
+                                                                <span>Qty: {{ element.quantity }}</span>
+                                                            </div>
                                                         </div>
-                                                        <div class="px-2.5 flex items-center space-x-2">
-                                                            <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
-                                                            <svg
-                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
-                                                                fill="none" height="24" stroke="currentColor"
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round" stroke-width="2"
-                                                                viewBox="0 0 24 24"
-                                                                width="24"
-                                                                x-tooltip.placement.top.success="'Click to Unload'"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                @click.prevent="handleUnloadToWarehouse(groupIndex, index)">
-                                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                                <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
-                                                                <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
-                                                            </svg>
-                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                                                        <Button 
+                                                            icon="pi pi-comment" 
+                                                            severity="secondary" 
+                                                            size="small"
+                                                            text 
+                                                            rounded
+                                                            class="!p-1.5"
+                                                            @click="openRemarksDialog(element)" 
+                                                        />
+                                                        <Button
+                                                            icon="pi pi-arrow-right"
+                                                            severity="success"
+                                                            size="small"
+                                                            text
+                                                            rounded
+                                                            class="!p-1.5"
+                                                            v-tooltip.top="'Unload Package'"
+                                                            @click.prevent="handleUnloadToWarehouse(groupIndex, index)"
+                                                        />
                                                     </div>
                                                 </div>
                                             </template>
@@ -685,22 +768,28 @@ const formatDate = (dateString) => {
                             </div>
                         </div>
 
-                        <div>
+                        <div class="flex-1 overflow-y-auto kanban-scrollbar pr-2">
                             <ul v-if="Object.keys(filteredMHBLPackages).length > 0"
                                 class="space-y-1 font-inter font-medium">
                                 <li v-for="(pkg, groupIndex) in filteredMHBLPackages" :key="pkg.mhblReference">
                                     <div
                                         v-if="Object.keys(pkg.packages).length > 0"
-                                        class="flex cursor-pointer items-center rounded px-2 py-1 tracking-wide text-slate-800 outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:text-navy-100 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100"
-                                        tabindex="0"
+                                        :class="[
+                                            'mb-2 rounded-lg border p-2.5 shadow-sm transition-all',
+                                            isMHBLGroupDetained(pkg)
+                                                ? 'border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30'
+                                                : 'border-slate-200 bg-white hover:border-info/40 hover:shadow dark:border-navy-600 dark:bg-navy-800'
+                                        ]"
                                     >
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-2 flex-1 min-w-0">
                                         <button
-                                            class="btn mr-1 size-5 rounded-lg p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                                    class="flex-shrink-0 size-6 rounded p-0.5 hover:bg-slate-100 dark:hover:bg-navy-700 transition-colors"
                                             @click="pkg.expanded = !pkg.expanded"
                                         >
                                             <svg
                                                 :class="pkg.expanded && 'rotate-90'"
-                                                class="size-7 transition-transform"
+                                                        class="size-4 text-slate-600 dark:text-navy-300 transition-transform duration-200"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -713,7 +802,7 @@ const formatDate = (dateString) => {
                                             </svg>
                                         </button>
                                         <svg
-                                            class="mr-3 size-9 text-primary"
+                                                    class="flex-shrink-0 size-6 text-info"
                                             fill="currentColor"
                                             viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg"
@@ -722,123 +811,69 @@ const formatDate = (dateString) => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ pkg.packages[0].hbl.mhbl.hbl_number || pkg.mhblReference }} ({{ pkg.packages.length }} {{ pkg.packages.length === 1 ? 'package' : 'packages' }})</span>
+                                                <span class="font-semibold text-sm text-slate-700 dark:text-navy-100 truncate">{{ pkg.packages[0].hbl.mhbl.hbl_number || pkg.mhblReference }}</span>
+                                                <span v-if="isMHBLGroupDetained(pkg)" class="flex-shrink-0">
+                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-xs"></i>
+                                                </span>
+                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
+                                                    {{ pkg.packages.length }} {{ pkg.packages.length === 1 ? 'pkg' : 'pkgs' }}
+                                                </span>
                                     </div>
-                                    <ul v-show="pkg.expanded" class="pl-4">
-                                        <div :packages="pkg.packages"
-                                             class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
-                                        >
-                                            <div v-for="(element, index) in pkg.packages" :key="element.id">
-                                                <div class="card cursor-pointer shadow-sm">
-                                                    <div class="flex justify-between items-center">
-                                                        <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
-                                                            <div>
-                                                                <div class="flex justify-between">
-                                                                    <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ element.hbl.hbl_number }}
-                                                                    </p>
+                                            <Button
+                                                icon="pi pi-arrow-right"
+                                                label="Unload All"
+                                                severity="success"
+                                                size="small"
+                                                class="flex-shrink-0"
+                                                @click.stop.prevent="handleUnloadMHBLGroupToWarehouse(groupIndex)"
+                                            />
                                                                 </div>
                                                             </div>
-                                                            <div class="flex flex-wrap gap-1">
-                                                                <div
-                                                                    class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                                    <svg class="size-3.5" fill="none"
-                                                                         stroke="currentColor"
-                                                                         viewBox="0 0 24 24"
-                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path
-                                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round"
-                                                                            stroke-width="2"/>
-                                                                    </svg>
-                                                                    <span>{{
-                                                                            moment(element.created_at).format('YYYY-MM-DD')
-                                                                        }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
-                                                                        fill="none"
-                                                                        stroke="currentColor" stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        width="24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path d="M7 20l10 0"/>
-                                                                        <path d="M6 6l6 -1l6 1"/>
-                                                                        <path d="M12 3l0 17"/>
-                                                                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                                    </svg>
-                                                                    <span>Volume {{ element.volume }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
-                                                                        fill="none" height="24" stroke="currentColor"
-                                                                        stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        width="24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path
-                                                                            d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                                                        <path
-                                                                            d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                                                                    </svg>
-                                                                    <span>Weight {{ element.weight }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash"
-                                                                        fill="none" stroke="currentColor"
-                                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path d="M5 9l14 0"/>
-                                                                        <path d="M5 15l14 0"/>
-                                                                        <path d="M11 4l-4 16"/>
-                                                                        <path d="M17 4l-4 16"/>
-                                                                    </svg>
-                                                                    <span>Quantity {{ element.quantity }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
-                                                                {{ element.package_type }}
-                                                            </p>
-                                                        </div>
-                                                        <div class="px-2.5 flex items-center space-x-2">
-                                                            <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
-                                                            <svg
-                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-corner-up-right-double hover:text-success"
-                                                                fill="none" height="24" stroke="currentColor"
-                                                                stroke-linecap="round"
-                                                                stroke-linejoin="round" stroke-width="2"
-                                                                viewBox="0 0 24 24"
-                                                                width="24"
-                                                                x-tooltip.placement.top.success="'Click to Unload'"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                @click.prevent="handleUnloadMHBLToWarehouse(groupIndex, index)">
-                                                                <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                                <path d="M4 18v-6a3 3 0 0 1 3 -3h7"/>
-                                                                <path d="M10 13l4 -4l-4 -4m5 8l4 -4l-4 -4"/>
-                                                            </svg>
+                                    <ul v-show="pkg.expanded" class="mt-1.5 space-y-1.5 pl-1">
+                                        <div v-for="(element, index) in pkg.packages" :key="element.id">
+                                            <div :class="[
+                                                'flex items-center justify-between rounded-md border p-2 transition-colors',
+                                                isPackageDetained(element)
+                                                    ? 'border-red-300 bg-red-50 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30'
+                                                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-navy-600 dark:bg-navy-700/50 dark:hover:bg-navy-700'
+                                            ]">
+                                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                    <div v-if="isPackageDetained(element)" class="flex-shrink-0">
+                                                        <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-xs font-medium text-slate-600 dark:text-navy-300 mb-1">
+                                                            {{ element.hbl.hbl_number }} • {{ element.package_type }}
+                                                        </p>
+                                                        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-navy-400">
+                                                            <span>Vol: {{ element.volume }}</span>
+                                                            <span>•</span>
+                                                            <span>Wt: {{ element.weight }}</span>
+                                                            <span>•</span>
+                                                            <span>Qty: {{ element.quantity }}</span>
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 flex-shrink-0">
+                                                    <Button 
+                                                        icon="pi pi-comment" 
+                                                        severity="secondary" 
+                                                        size="small"
+                                                        text 
+                                                        rounded
+                                                        class="!p-1.5"
+                                                        @click="openRemarksDialog(element)" 
+                                                    />
+                                                    <Button
+                                                        icon="pi pi-arrow-right"
+                                                        severity="success"
+                                                        size="small"
+                                                        text
+                                                        rounded
+                                                        class="!p-1.5"
+                                                        v-tooltip.top="'Unload Package'"
+                                                        @click.prevent="handleUnloadMHBLToWarehouse(groupIndex, index)"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -864,7 +899,7 @@ const formatDate = (dateString) => {
                         </div>
                     </div>
 
-                    <div class="board-draggable relative flex max-h-full shrink-0 flex-col">
+                    <div class="relative flex flex-col h-full overflow-hidden">
                         <div class="board-draggable-handler flex items-center justify-between px-0.5 pb-3">
                             <div class="flex items-center space-x-2">
                                 <div
@@ -892,158 +927,98 @@ const formatDate = (dateString) => {
                                 </h3>
                             </div>
                         </div>
-                        <div class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5">
+                        <div class="flex-1 overflow-y-auto kanban-scrollbar pr-2 space-y-2">
                             <draggable
                                 v-if="warehouseArr.length > 0"
                                 v-model="warehouseArr"
-                                class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
+                                class="space-y-1.5"
                                 group="people"
                                 item-key="id"
                                 @change="handlePackageChange"
                             >
                                 <template #item="{element, index}">
-                                    <div class="card cursor-pointer shadow-sm">
-                                        <div class="flex justify-between items-center">
-                                            <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
-                                                <div>
-                                                    <div class="flex items-center">
-                                                        <svg v-show="element.unloading_issue.length > 0"
-                                                             class="icon icon-tabler icons-tabler-outline icon-tabler-alert-triangle text-warning mr-2"
-                                                             fill="none" height="24"
-                                                             stroke="currentColor" stroke-linecap="round"
-                                                             stroke-linejoin="round"
-                                                             stroke-width="2" viewBox="0 0 24 24" width="24"
-                                                             xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                            <path d="M12 9v4"/>
-                                                            <path
-                                                                d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
-                                                            <path d="M12 16h.01"/>
-                                                        </svg>
-
-                                                        <p class="font-medium text-lg tracking-wide text-slate-600 dark:text-navy-100">
-                                                            {{ element.hbl?.hbl_number }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div class="flex flex-wrap gap-1">
-                                                    <div
-                                                        class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                        <svg class="size-3.5" fill="none" stroke="currentColor"
-                                                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                            <path
-                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"/>
-                                                        </svg>
-                                                        <span>{{
-                                                                moment(element.created_at).format('YYYY-MM-DD')
-                                                            }}</span>
-                                                    </div>
-
-                                                    <div
-                                                        class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
-                                                        <svg
-                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
-                                                            fill="none"
-                                                            stroke="currentColor" stroke-linecap="round"
-                                                            stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                            width="24"
-                                                            xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                            <path d="M7 20l10 0"/>
-                                                            <path d="M6 6l6 -1l6 1"/>
-                                                            <path d="M12 3l0 17"/>
-                                                            <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                            <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                        </svg>
-                                                        <span>Volume {{ element.volume }}</span>
-                                                    </div>
-
-                                                    <div
-                                                        class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
-                                                        <svg
-                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
-                                                            fill="none" height="24" stroke="currentColor"
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
-                                                            width="24"
-                                                            xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                            <path d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                                            <path
-                                                                d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                                                        </svg>
-                                                        <span>Weight {{ element.weight }}</span>
-                                                    </div>
-
-                                                    <div
-                                                        class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
-                                                        <svg
-                                                            class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash"
-                                                            fill="none" stroke="currentColor"
-                                                            stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            viewBox="0 0 24 24"
-                                                            xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
-                                                            <path d="M5 9l14 0"/>
-                                                            <path d="M5 15l14 0"/>
-                                                            <path d="M11 4l-4 16"/>
-                                                            <path d="M17 4l-4 16"/>
-                                                        </svg>
-                                                        <span>Quantity {{ element.quantity }}</span>
-                                                    </div>
-                                                </div>
-                                                <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
-                                                    {{ element.package_type }}
+                                    <div :class="[
+                                        'flex items-center justify-between rounded-md border p-2 transition-colors',
+                                        isPackageDetained(element) 
+                                            ? 'border-red-300 bg-red-50 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30' 
+                                            : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-navy-600 dark:bg-navy-700/50 dark:hover:bg-navy-700'
+                                    ]">
+                                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                                            <div v-if="element.unloading_issue.length > 0" class="flex-shrink-0">
+                                                <i class="pi pi-exclamation-triangle text-warning text-sm"></i>
+                                            </div>
+                                            <div v-if="isPackageDetained(element)" class="flex-shrink-0">
+                                                <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-xs font-medium text-slate-600 dark:text-navy-300 mb-1">
+                                                    {{ element.hbl?.hbl_number }} • {{ element.package_type }}
                                                 </p>
-                                            </div>
-                                            <div class="flex items-center space-x-2 px-2.5">
-                                                <div v-if="element.unloading_issue.length === 0" class="flex items-center gap-2">
-                                                    <Dropdown
-                                                        v-model="selectedDetainBy"
-                                                        :options="detainByOptions"
-                                                        class="w-40"
-                                                        optionLabel="label"
-                                                        optionValue="value"
-                                                        placeholder="Select Detain By"
-                                                    />
-                                                    <Button
-                                                        :disabled="!selectedDetainBy"
-                                                        icon="pi pi-lock"
-                                                        label="Detain Package"
-                                                        severity="warn"
-                                                        size="small"
-                                                        variant="outlined"
-                                                        @click.prevent="handleDetainPackage(element.id, selectedDetainBy)"
-                                                    />
+                                                <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-navy-400">
+                                                    <span>Vol: {{ element.volume }}</span>
+                                                    <span>•</span>
+                                                    <span>Wt: {{ element.weight }}</span>
+                                                    <span>•</span>
+                                                    <span>Qty: {{ element.quantity }}</span>
                                                 </div>
-                                                <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
-                                                <Button v-tooltip.left="'Click to Re-Load'" aria-label="Filter"
-                                                        icon="ti ti-corner-up-left-double text-2xl" rounded
-                                                        severity="danger" text
-                                                        @click.prevent="handleReLoadToContainer(index)"/>
                                             </div>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                                            <Button
+                                                v-if="element.unloading_issue.length === 0"
+                                                icon="pi pi-lock"
+                                                severity="warn"
+                                                size="small"
+                                                text
+                                                rounded
+                                                class="!p-1.5"
+                                                v-tooltip.top="'Detain Package'"
+                                                @click.prevent="openDetainModal(element)"
+                                            />
+                                            <Button 
+                                                icon="pi pi-comment" 
+                                                severity="secondary" 
+                                                size="small"
+                                                text 
+                                                rounded
+                                                class="!p-1.5"
+                                                @click="openRemarksDialog(element)" 
+                                            />
+                                            <Button 
+                                                icon="pi pi-arrow-left"
+                                                severity="danger"
+                                                size="small"
+                                                text
+                                                rounded
+                                                class="!p-1.5"
+                                                v-tooltip.top="'Reload to Container'"
+                                                @click.prevent="handleReLoadToContainer(index)"
+                                            />
                                         </div>
                                     </div>
                                 </template>
                             </draggable>
 
-                            <ul v-if="warehouseMHBLArr.length > 0" class="space-y-1 font-inter font-medium">
+                            <ul v-if="warehouseMHBLArr.length > 0" class="space-y-1.5 font-inter font-medium">
                                 <li v-for="(mhbl, groupIndex) in warehouseMHBLArr" :key="mhbl.mhblReference">
                                     <div
                                         v-if="mhbl.packages.length > 0"
-                                        class="flex cursor-pointer items-center rounded px-2 py-1 tracking-wide text-slate-800 outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:text-navy-100 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100"
-                                        tabindex="0"
+                                        :class="[
+                                            'mb-2 rounded-lg border p-2.5 shadow-sm transition-all',
+                                            isMHBLGroupDetained(mhbl)
+                                                ? 'border-red-300 bg-red-50 hover:bg-red-100 hover:border-red-400 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30'
+                                                : 'border-slate-200 bg-white hover:border-info/40 hover:shadow dark:border-navy-600 dark:bg-navy-800'
+                                        ]"
                                     >
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-2 flex-1 min-w-0">
                                         <button
-                                            class="btn mr-1 size-5 rounded-lg p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
+                                                    class="flex-shrink-0 size-6 rounded p-0.5 hover:bg-slate-100 dark:hover:bg-navy-700 transition-colors"
                                             @click="mhbl.expanded = !mhbl.expanded"
                                         >
                                             <svg
                                                 :class="mhbl.expanded && 'rotate-90'"
-                                                class="size-7 transition-transform"
+                                                        class="size-4 text-slate-600 dark:text-navy-300 transition-transform duration-200"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -1056,7 +1031,7 @@ const formatDate = (dateString) => {
                                             </svg>
                                         </button>
                                         <svg
-                                            class="mr-3 size-9 text-primary"
+                                                    class="flex-shrink-0 size-6 text-info"
                                             fill="currentColor"
                                             viewBox="0 0 20 20"
                                             xmlns="http://www.w3.org/2000/svg"
@@ -1065,118 +1040,84 @@ const formatDate = (dateString) => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                        <span>{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }} ({{ mhbl.packages.length }} {{ mhbl.packages.length === 1 ? 'package' : 'packages' }})</span>
+                                                <span class="font-semibold text-sm text-slate-700 dark:text-navy-100 truncate">{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}</span>
+                                                <span v-if="isMHBLGroupDetained(mhbl)" class="flex-shrink-0">
+                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-xs"></i>
+                                                </span>
+                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
+                                                    {{ mhbl.packages.length }} {{ mhbl.packages.length === 1 ? 'pkg' : 'pkgs' }}
+                                                </span>
                                     </div>
-                                    <ul v-show="mhbl.expanded" class="pl-4">
-                                        <div :packages="mhbl.packages"
-                                             class="is-scrollbar-hidden relative space-y-2.5 overflow-y-auto p-0.5"
-                                        >
-                                            <div v-for="(element, index) in mhbl.packages" :key="element.id">
-                                                <div class="card cursor-pointer shadow-sm">
-                                                    <div class="flex justify-between items-center">
-                                                        <div class="space-y-3 rounded-lg px-2.5 pb-2 pt-1.5">
-                                                            <div>
-                                                                <div class="flex justify-between">
-                                                                    <p class="font-medium tracking-wide text-lg text-slate-600 dark:text-navy-100">
-                                                                        {{ element.hbl.hbl_number }}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="flex flex-wrap gap-1">
-                                                                <div
-                                                                    class="badge space-x-1 bg-slate-150 py-1 px-1.5 text-slate-800 dark:bg-navy-500 dark:text-navy-100">
-                                                                    <svg class="size-3.5" fill="none"
-                                                                         stroke="currentColor"
-                                                                         viewBox="0 0 24 24"
-                                                                         xmlns="http://www.w3.org/2000/svg">
-                                                                        <path
-                                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round"
-                                                                            stroke-width="2"/>
-                                                                    </svg>
-                                                                    <span>{{
-                                                                            moment(element.created_at).format('YYYY-MM-DD')
-                                                                        }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-warning/10 py-1 px-1.5 text-warning dark:bg-warning/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-scale"
-                                                                        fill="none"
-                                                                        stroke="currentColor" stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        width="24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path d="M7 20l10 0"/>
-                                                                        <path d="M6 6l6 -1l6 1"/>
-                                                                        <path d="M12 3l0 17"/>
-                                                                        <path d="M9 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                                        <path d="M21 12l-3 -6l-3 6a3 3 0 0 0 6 0"/>
-                                                                    </svg>
-                                                                    <span>Volume {{ element.volume }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-error/10 py-1 px-1.5 text-error dark:bg-error/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-weight"
-                                                                        fill="none" height="24" stroke="currentColor"
-                                                                        stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        width="24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path
-                                                                            d="M12 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
-                                                                        <path
-                                                                            d="M6.835 9h10.33a1 1 0 0 1 .984 .821l1.637 9a1 1 0 0 1 -.984 1.179h-13.604a1 1 0 0 1 -.984 -1.179l1.637 -9a1 1 0 0 1 .984 -.821z"/>
-                                                                    </svg>
-                                                                    <span>Weight {{ element.weight }}</span>
-                                                                </div>
-
-                                                                <div
-                                                                    class="badge space-x-1 bg-success/10 py-1 px-1.5 text-success dark:bg-success/15">
-                                                                    <svg
-                                                                        class="size-4 icon icon-tabler icons-tabler-outline icon-tabler-hash"
-                                                                        fill="none" stroke="currentColor"
-                                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        viewBox="0 0 24 24"
-                                                                        xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M0 0h24v24H0z" fill="none"
-                                                                              stroke="none"/>
-                                                                        <path d="M5 9l14 0"/>
-                                                                        <path d="M5 15l14 0"/>
-                                                                        <path d="M11 4l-4 16"/>
-                                                                        <path d="M17 4l-4 16"/>
-                                                                    </svg>
-                                                                    <span>Quantity {{ element.quantity }}</span>
-                                                                </div>
-                                                            </div>
-                                                            <p class="mt-px font-medium text-slate-400 dark:text-navy-300">
-                                                                {{ element.package_type }}
-                                                            </p>
-                                                        </div>
-                                                        <div class="flex items-center space-x-2 px-2.5">
-                                                            <Button :disabled="element.unloading_issue.length > 0"
-                                                                    icon="pi pi-exclamation-triangle"
-                                                                    label="Create Unloading Issue"
-                                                                    severity="warn" size="small"
-                                                                    @click.prevent="confirmShowMHBLCreateIssueModal(element.id)"/>
-                                                            <Button icon="pi pi-comment" severity="info" text @click="openRemarksDialog(element)" />
-                                                            <Button v-tooltip.left="'Click to Re-Load'" aria-label="Filter"
-                                                                    icon="ti ti-corner-up-left-double text-2xl" rounded
-                                                                    severity="danger" text
-                                                                    @click.prevent="handleReloadMHBLToContainer(groupIndex, index)"/>
+                                        </div>
+                                    </div>
+                                    <ul v-show="mhbl.expanded" class="mt-1.5 space-y-1.5 pl-1">
+                                        <div v-for="(element, index) in mhbl.packages" :key="element.id">
+                                            <div :class="[
+                                                'flex items-center justify-between rounded-md border p-2 transition-colors',
+                                                isPackageDetained(element) 
+                                                    ? 'border-red-300 bg-red-50 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30' 
+                                                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-navy-600 dark:bg-navy-700/50 dark:hover:bg-navy-700'
+                                            ]">
+                                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                    <div v-if="isPackageDetained(element)" class="flex-shrink-0">
+                                                        <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-xs font-medium text-slate-600 dark:text-navy-300 mb-1">
+                                                            {{ element.hbl.hbl_number }} • {{ element.package_type }}
+                                                        </p>
+                                                        <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-navy-400">
+                                                            <span>Vol: {{ element.volume }}</span>
+                                                            <span>•</span>
+                                                            <span>Wt: {{ element.weight }}</span>
+                                                            <span>•</span>
+                                                            <span>Qty: {{ element.quantity }}</span>
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 flex-shrink-0">
+                                                    <Button 
+                                                        v-if="element.unloading_issue.length === 0"
+                                                        icon="pi pi-exclamation-triangle"
+                                                        severity="warn"
+                                                        size="small"
+                                                        text
+                                                        rounded
+                                                        class="!p-1.5"
+                                                        v-tooltip.top="'Create Unloading Issue'"
+                                                        @click.prevent="confirmShowMHBLCreateIssueModal(element.id)"
+                                                    />
+                                                    <i v-else class="pi pi-exclamation-triangle text-warning text-sm"></i>
+                                                    <Button
+                                                        v-if="element.unloading_issue.length === 0"
+                                                        icon="pi pi-lock"
+                                                        severity="warn"
+                                                        size="small"
+                                                        text
+                                                        rounded
+                                                        class="!p-1.5"
+                                                        v-tooltip.top="'Detain Package'"
+                                                        @click.prevent="openDetainModal(element)"
+                                                    />
+                                                    <Button 
+                                                        icon="pi pi-comment" 
+                                                        severity="secondary" 
+                                                        size="small"
+                                                        text 
+                                                        rounded
+                                                        class="!p-1.5"
+                                                        @click="openRemarksDialog(element)" 
+                                                    />
+                                                    <Button
+                                                        icon="pi pi-arrow-left"
+                                                        severity="danger"
+                                                        size="small"
+                                                        text
+                                                        rounded
+                                                        class="!p-1.5"
+                                                        v-tooltip.top="'Reload to Container'"
+                                                        @click.prevent="handleReloadMHBLToContainer(groupIndex, index)"
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
@@ -1217,6 +1158,50 @@ const formatDate = (dateString) => {
         <CreateUnloadingIssueModal :hbl-package-id="hblPackageId" :visible="showUnloadingIssueModal"
                                    @close="showUnloadingIssueModal = false"
                                    @update:visible="showUnloadingIssueModal = $event"/>
+
+        <Dialog
+            v-model:visible="showDetainModal"
+            :style="{ width: '32rem' }"
+            header="Detain Package"
+            modal
+            @hide="closeDetainModal"
+        >
+            <div v-if="selectedPackageForDetain" class="space-y-4">
+                <div class="p-3 bg-slate-50 dark:bg-navy-700 rounded-lg">
+                    <p class="font-semibold text-sm text-slate-700 dark:text-navy-100">{{ selectedPackageForDetain.package_type }}</p>
+                    <p class="text-xs text-slate-500 dark:text-navy-400 mt-1">{{ selectedPackageForDetain.hbl?.hbl_number }}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-navy-100">
+                        Select Detain Type
+                    </label>
+                    <Dropdown
+                        v-model="selectedDetainBy"
+                        :options="detainByOptions"
+                        class="w-full"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Select Detain By"
+                    />
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <Button
+                        label="Cancel"
+                        severity="secondary"
+                        outlined
+                        @click="closeDetainModal"
+                    />
+                    <Button
+                        label="Detain Package"
+                        severity="warn"
+                        :disabled="!selectedDetainBy"
+                        @click="handleDetainPackage"
+                    />
+                </div>
+            </div>
+        </Dialog>
 
         <Dialog
             v-model:visible="isRemarkVisible"
