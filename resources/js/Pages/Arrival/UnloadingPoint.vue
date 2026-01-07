@@ -824,7 +824,7 @@ onUnmounted(() => {
                                 </h3>
                             </div>
                         </div>
-                        <div class="flex-1 pr-2">
+                        <div class=" pr-2 pb-4">
                             <ul v-if="Object.keys(filteredPackages).length > 0"
                                 class="space-y-1 font-inter font-medium">
                                 <li v-for="(hbl, groupIndex) in filteredPackages" :key="hbl.id">
@@ -960,7 +960,7 @@ onUnmounted(() => {
                             </div>
                         </div>
 
-                        <div class="board-draggable-handler flex items-center justify-between px-0.5 pb-3">
+                        <div class="board-draggable-handler flex items-center justify-between px-0.5 pt-0 pb-3">
                             <div class="flex items-center space-x-2">
                                 <div class="flex size-8 items-center justify-center rounded-lg bg-info/10 text-info">
                                     <i class="fa fa-boxes-packing text-base"></i>
