@@ -47,6 +47,7 @@
         "primeicons": "^7.0.0",
         "primevue": "^4.3.2",
         "puppeteer": "^24.9.0",
+        "pusher-js": "^8.4.0",
         "quill": "^1.3.7",
         "simplebar": "^6.2.5",
         "sortablejs": "^1.15.2",

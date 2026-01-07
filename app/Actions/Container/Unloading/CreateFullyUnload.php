@@ -64,6 +64,42 @@ class CreateFullyUnload
                 $hbl->addStatus('Container Unloaded in '.session('current_branch_name'));
             }
 
+            // Mark remaining HBLs as shortlanded if any
+            if (isset($data['remaining_hbl_ids']) && !empty($data['remaining_hbl_ids'])) {
+                foreach ($data['remaining_hbl_ids'] as $hblId) {
+                    $remainingHBL = HBL::withoutGlobalScope(BranchScope::class)->find($hblId);
+                    if ($remainingHBL) {
+                        $remainingHBL->update([
+                            'is_short_load' => true,
+                        ]);
+                        $remainingHBL->addStatus('Marked as Shortlanded - Not fully unloaded from container');
+                    }
+                }
+            }
+
+            // Mark remaining MHBLs' HBLs as shortlanded if any
+            if (isset($data['remaining_mhbl_references']) && !empty($data['remaining_mhbl_references'])) {
+                foreach ($data['remaining_mhbl_references'] as $mhblReference) {
+                    $remainingMHBL = MHBL::withoutGlobalScope(BranchScope::class)
+                        ->where(function($query) use ($mhblReference) {
+                            $query->where('reference', $mhblReference)
+                                  ->orWhere('hbl_number', $mhblReference);
+                        })
+                        ->with('hbls')
+                        ->first();
+                    
+                    if ($remainingMHBL && $remainingMHBL->hbls) {
+                        // Mark all HBLs under this MHBL as shortlanded
+                        foreach ($remainingMHBL->hbls as $hbl) {
+                            $hbl->update([
+                                'is_short_load' => true,
+                            ]);
+                            $hbl->addStatus('Marked as Shortlanded - MHBL not fully unloaded from container');
+                        }
+                    }
+                }
+            }
+
             UpdateContainerStatus::run($container, ContainerStatus::UNLOADED->value);
 
             $container->addStatus('Container cleared');

@@ -22,6 +22,7 @@ class GetContainerWithoutGlobalScopesById
                                 ->with('mhbl');
                         },
                         'unloadingIssue',
+                        'latestDetainRecord',
                     ]);
                 },
             ])
