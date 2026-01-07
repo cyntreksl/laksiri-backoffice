@@ -4,8 +4,10 @@ namespace App\Actions\Container\Unloading;
 
 use App\Actions\Container\UpdateContainer;
 use App\Actions\HBL\UpdateHBLSystemStatus;
+use App\Events\PackageUnloaded;
 use App\Models\Container;
 use App\Models\HBL;
+use App\Models\HBLPackage;
 use App\Models\Scopes\BranchScope;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -24,30 +26,47 @@ class CreateDraftUnload
 
             DB::beginTransaction();
 
-            foreach ($data['packages'] as $package) {
-
-                $container->hbl_packages()->updateExistingPivot($package['id'], [
+            foreach ($data['packages'] as $packageData) {
+                $container->hbl_packages()->updateExistingPivot($packageData['id'], [
                     'status' => 'draft-unload',
                     'unloaded_by' => auth()->id(),
                 ]);
 
-                $container->duplicate_hbl_packages()->updateExistingPivot($package['id'], [
+                $container->duplicate_hbl_packages()->updateExistingPivot($packageData['id'], [
                     'status' => 'draft-unload',
                     'unloaded_by' => auth()->id(),
                 ]);
 
-                $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($package['hbl_id']);
+                $hbl = HBL::withoutGlobalScope(BranchScope::class)->find($packageData['hbl_id']);
 
                 UpdateHBLSystemStatus::run($hbl, 4.3);
+
+                // Get fresh package data with relationships for broadcasting
+                $package = HBLPackage::withoutGlobalScope(BranchScope::class)
+                    ->with(['hbl.mhbl', 'unloadingIssue', 'latestDetainRecord'])
+                    ->find($packageData['id']);
+
+                if ($package) {
+                    // Broadcast the unload event
+                    $user = auth()->user();
+                    $userName = !empty($user->name) ? $user->name : ($user->username ?? 'Unknown User');
+                    broadcast(new PackageUnloaded(
+                        $container->id,
+                        $package->toArray(),
+                        'unload',
+                        auth()->id(),
+                        $userName
+                    ));
+                }
             }
 
             // update container loading start datetime and who loaded by
-            $data = [
+            $updateData = [
                 'unloading_started_at' => now(),
                 'unloading_started_by' => auth()->id(),
             ];
 
-            UpdateContainer::run($container, $data);
+            UpdateContainer::run($container, $updateData);
 
             DB::commit();
         } catch (\Exception $e) {

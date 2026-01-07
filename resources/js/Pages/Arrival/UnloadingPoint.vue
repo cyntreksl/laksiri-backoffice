@@ -2,8 +2,8 @@
 import moment from "moment";
 import draggable from 'vuedraggable'
 import ActionMessage from "@/Components/ActionMessage.vue";
-import {computed, ref} from "vue";
-import {router} from "@inertiajs/vue3";
+import {computed, ref, onMounted, onUnmounted} from "vue";
+import {router, usePage} from "@inertiajs/vue3";
 import ReviewModal from "@/Pages/Arrival/Partials/ReviewModal.vue";
 import CreateUnloadingIssueModal from "@/Pages/Arrival/Partials/CreateUnloadingIssueModal.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
@@ -14,6 +14,7 @@ import InputText from 'primevue/inputtext';
 import Dropdown from "primevue/dropdown";
 import {useConfirm} from "primevue/useconfirm";
 import axios from 'axios';
+import Pusher from 'pusher-js';
 
 const props = defineProps({
     container: {
@@ -530,6 +531,210 @@ const formatDate = (dateString) => {
         return dateString;
     }
 };
+
+// Pusher real-time updates
+let pusher = null;
+let channel = null;
+
+const page = usePage();
+
+const initializePusher = () => {
+    const pusherConfig = page.props.pusher;
+    
+    if (!pusherConfig || !pusherConfig.key) {
+        console.warn('Pusher not configured');
+        return;
+    }
+
+    pusher = new Pusher(pusherConfig.key, {
+        cluster: pusherConfig.cluster,
+        forceTLS: pusherConfig.forceTLS,
+    });
+
+    channel = pusher.subscribe(`container.${props.container.id}`);
+
+    // Listen for package unload events
+    channel.bind('package.unload', (data) => {
+        // Skip if this is our own action (we already updated the UI)
+        if (data.user_id === page.props.auth.user.id) {
+            return;
+        }
+
+        // Debug: log the received data
+        console.log('Package unload event data:', {
+            user_id: data.user_id,
+            user_name: data.user_name,
+            action: data.action
+        });
+
+        handleRealTimeUnload(data.package, data.user_name);
+    });
+
+    // Listen for package reload events
+    channel.bind('package.reload', (data) => {
+        // Skip if this is our own action (we already updated the UI)
+        if (data.user_id === page.props.auth.user.id) {
+            return;
+        }
+
+        handleRealTimeReload(data.package, data.user_name);
+    });
+};
+
+const handleRealTimeUnload = (packageData, userName) => {
+    const packageId = packageData.id;
+    const hblNumber = packageData.hbl?.hbl_number;
+    const mhblReference = packageData.hbl?.mhbl?.reference;
+
+    // Handle regular HBL packages
+    if (!mhblReference) {
+        // Find and remove from container
+        let found = false;
+        for (let i = 0; i < containerArr.value.length; i++) {
+            const group = containerArr.value[i];
+            const packageIndex = group.packages.findIndex(p => p.id === packageId);
+            
+            if (packageIndex !== -1) {
+                const packageToMove = group.packages.splice(packageIndex, 1)[0];
+                warehouseArr.value.push(packageToMove);
+                
+                // Remove group if empty
+                if (group.packages.length === 0) {
+                    containerArr.value.splice(i, 1);
+                }
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            // Package might be in a different state, refresh the data
+            router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+        }
+    } else {
+        // Handle MHBL packages
+        let found = false;
+        for (let i = 0; i < mhblContainerArr.value.length; i++) {
+            const group = mhblContainerArr.value[i];
+            const packageIndex = group.packages.findIndex(p => p.id === packageId);
+            
+            if (packageIndex !== -1) {
+                const packageToMove = group.packages.splice(packageIndex, 1)[0];
+                
+                // Find or create MHBL group in warehouse
+                let warehouseMHBLGroup = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
+                
+                if (warehouseMHBLGroup) {
+                    warehouseMHBLGroup.packages.push(packageToMove);
+                } else {
+                    warehouseMHBLArr.value.push({
+                        mhblReference: mhblReference,
+                        expanded: true,
+                        packages: [packageToMove]
+                    });
+                }
+                
+                // Remove group if empty
+                if (group.packages.length === 0) {
+                    mhblContainerArr.value.splice(i, 1);
+                }
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            // Package might be in a different state, refresh the data
+            router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+        }
+    }
+
+    const displayName = userName && userName.trim() ? userName : 'another user';
+    push.info(`Package unloaded by ${displayName}`);
+};
+
+const handleRealTimeReload = (packageData, userName) => {
+    const packageId = packageData.id;
+    const hblNumber = packageData.hbl?.hbl_number;
+    const mhblReference = packageData.hbl?.mhbl?.reference;
+
+    // Handle regular HBL packages
+    if (!mhblReference) {
+        // Find and remove from warehouse
+        const warehouseIndex = warehouseArr.value.findIndex(p => p.id === packageId);
+        
+        if (warehouseIndex !== -1) {
+            const packageToMove = warehouseArr.value.splice(warehouseIndex, 1)[0];
+            const group = containerArr.value.find(g => g.hbl_number === hblNumber);
+            
+            if (group) {
+                group.packages.push(packageToMove);
+            } else {
+                containerArr.value.push({
+                    hbl_number: hblNumber,
+                    expanded: true,
+                    packages: [packageToMove]
+                });
+            }
+        } else {
+            // Package might be in a different state, refresh the data
+            router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+        }
+    } else {
+        // Handle MHBL packages
+        let found = false;
+        for (let i = 0; i < warehouseMHBLArr.value.length; i++) {
+            const group = warehouseMHBLArr.value[i];
+            const packageIndex = group.packages.findIndex(p => p.id === packageId);
+            
+            if (packageIndex !== -1) {
+                const packageToMove = group.packages.splice(packageIndex, 1)[0];
+                
+                // Find or create MHBL group in container
+                let containerMHBLGroup = mhblContainerArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
+                
+                if (containerMHBLGroup) {
+                    containerMHBLGroup.packages.push(packageToMove);
+                } else {
+                    mhblContainerArr.value.push({
+                        mhblReference: mhblReference,
+                        expanded: true,
+                        packages: [packageToMove]
+                    });
+                }
+                
+                // Remove group if empty
+                if (group.packages.length === 0) {
+                    warehouseMHBLArr.value.splice(i, 1);
+                }
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            // Package might be in a different state, refresh the data
+            router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+        }
+    }
+
+    const displayName = userName && userName.trim() ? userName : 'another user';
+    push.info(`Package reloaded to container by ${displayName}`);
+};
+
+onMounted(() => {
+    initializePusher();
+});
+
+onUnmounted(() => {
+    if (channel) {
+        channel.unbind_all();
+        pusher?.unsubscribe(`container.${props.container.id}`);
+    }
+    if (pusher) {
+        pusher.disconnect();
+    }
+});
 
 </script>
 
