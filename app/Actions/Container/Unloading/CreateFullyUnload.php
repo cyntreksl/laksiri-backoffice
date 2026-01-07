@@ -64,6 +64,19 @@ class CreateFullyUnload
                 $hbl->addStatus('Container Unloaded in '.session('current_branch_name'));
             }
 
+            // Mark remaining HBLs as shortlanded if any
+            if (isset($data['remaining_hbl_ids']) && !empty($data['remaining_hbl_ids'])) {
+                foreach ($data['remaining_hbl_ids'] as $hblId) {
+                    $remainingHBL = HBL::withoutGlobalScope(BranchScope::class)->find($hblId);
+                    if ($remainingHBL) {
+                        $remainingHBL->update([
+                            'is_short_load' => true,
+                        ]);
+                        $remainingHBL->addStatus('Marked as Shortlanded - Not fully unloaded from container');
+                    }
+                }
+            }
+
             UpdateContainerStatus::run($container, ContainerStatus::UNLOADED->value);
 
             $container->addStatus('Container cleared');

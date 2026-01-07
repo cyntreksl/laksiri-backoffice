@@ -322,41 +322,39 @@ const handlePackageChange = () => {
 
 const draftTextEnabled = ref(false);
 
-const handleCreateDraftUnload = (packages) => {
-    router.post(route("arrival.unload-container.unload"), {
+const handleCreateDraftUnload = async (packages) => {
+    try {
+        await axios.post(route("arrival.unload-container.unload"), {
             container_id: route().params.container,
             packages,
             is_draft: true,
-        },
-        {
-            onSuccess: () => {
-                draftTextEnabled.value = true;
-                setTimeout(() => draftTextEnabled.value = false, 3000);
-            },
-            onError: () => {
-                console.error('Something went to wrong!');
-            },
-            preserveScroll: true,
-            preserveState: true,
         });
+        
+        draftTextEnabled.value = true;
+        setTimeout(() => draftTextEnabled.value = false, 3000);
+    } catch (error) {
+        console.error('Something went to wrong!', error);
+        push.error('Failed to unload package');
+        // Revert UI changes on error
+        router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+    }
 }
 
-const handleRemoveDraftUnload = (packages) => {
-    router.post(route("arrival.unload-container.reload"), {
+const handleRemoveDraftUnload = async (packages) => {
+    try {
+        await axios.post(route("arrival.unload-container.reload"), {
             container_id: route().params.container,
             package_id: packages[0].id,
-        },
-        {
-            onSuccess: () => {
-                draftTextEnabled.value = true;
-                setTimeout(() => draftTextEnabled.value = false, 3000);
-            },
-            onError: () => {
-                console.error('Something went to wrong!');
-            },
-            preserveScroll: true,
-            preserveState: true,
         });
+        
+        draftTextEnabled.value = true;
+        setTimeout(() => draftTextEnabled.value = false, 3000);
+    } catch (error) {
+        console.error('Something went to wrong!', error);
+        push.error('Failed to reload package');
+        // Revert UI changes on error
+        router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+    }
 }
 
 const showUnloadingIssueModal = ref(false);
@@ -608,8 +606,8 @@ const handleRealTimeUnload = (packageData, userName) => {
         }
 
         if (!found) {
-            // Package might be in a different state, refresh the data
-            router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+            // Package might be in a different state, but don't refresh - let Pusher handle it
+            console.warn('Package not found in container array for real-time update');
         }
     } else {
         // Handle MHBL packages
@@ -644,8 +642,8 @@ const handleRealTimeUnload = (packageData, userName) => {
         }
 
         if (!found) {
-            // Package might be in a different state, refresh the data
-            router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+            // Package might be in a different state, but don't refresh - let Pusher handle it
+            console.warn('Package not found in MHBL container array for real-time update');
         }
     }
 
@@ -677,8 +675,8 @@ const handleRealTimeReload = (packageData, userName) => {
                 });
             }
         } else {
-            // Package might be in a different state, refresh the data
-            router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+            // Package might be in a different state, but don't refresh - let Pusher handle it
+            console.warn('Package not found in warehouse array for real-time reload');
         }
     } else {
         // Handle MHBL packages
@@ -713,8 +711,8 @@ const handleRealTimeReload = (packageData, userName) => {
         }
 
         if (!found) {
-            // Package might be in a different state, refresh the data
-            router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+            // Package might be in a different state, but don't refresh - let Pusher handle it
+            console.warn('Package not found in MHBL warehouse array for real-time reload');
         }
     }
 
@@ -826,7 +824,7 @@ onUnmounted(() => {
                                 </h3>
                             </div>
                         </div>
-                        <div class="flex-1 min-h-0 pr-2">
+                        <div class="flex-1 pr-2">
                             <ul v-if="Object.keys(filteredPackages).length > 0"
                                 class="space-y-1 font-inter font-medium">
                                 <li v-for="(hbl, groupIndex) in filteredPackages" :key="hbl.id">
@@ -973,7 +971,7 @@ onUnmounted(() => {
                             </div>
                         </div>
 
-                        <div class="flex-1 min-h-0 pr-2">
+                        <div class="flex-1  pr-2">
                             <ul v-if="Object.keys(filteredMHBLPackages).length > 0"
                                 class="space-y-1 font-inter font-medium">
                                 <li v-for="(pkg, groupIndex) in filteredMHBLPackages" :key="pkg.mhblReference">
@@ -1132,7 +1130,7 @@ onUnmounted(() => {
                                 </h3>
                             </div>
                         </div>
-                        <div class="flex-1 min-h-0 pr-2 space-y-2">
+                        <div class="flex-1 pr-2 space-y-2">
                             <draggable
                                 v-if="warehouseArr.length > 0"
                                 v-model="warehouseArr"
@@ -1354,8 +1352,11 @@ onUnmounted(() => {
 
         <ReviewModal
             :visible="showReviewModal"
+            :container="container"
             :warehouse-array="warehouseArr"
             :warehouseMHBLs="warehouseMHBLArr"
+            :packages-without-mhbl="packagesWithoutMhbl"
+            :packages-with-mhbl="packagesWithMhbl"
             @close="showReviewModal = false"
             @update:visible="showReviewModal = $event"
         />
