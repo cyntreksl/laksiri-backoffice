@@ -32,7 +32,7 @@ const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
 
-const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sortOrder = 0) => {
+const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sortOrder = -1) => {
     loading.value = true;
     try {
         const response = await axios.get(baseUrl.value, {
@@ -69,7 +69,7 @@ watch(() => filters.value.global.value, (newValue) => {
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
-    fetchTokens(currentPage.value);
+    fetchTokens(currentPage.value, filters.value.global.value);
 };
 
 const onSort = (event) => {
@@ -110,6 +110,8 @@ const clearFilter = () => {
                            paginator
                            removable-sort
                            row-hover
+                           :sortOrder="-1"
+                           sortField="created_at"
                            tableStyle="min-width: 50rem"
                            @page="onPageChange"
                            @sort="onSort"
@@ -177,7 +179,7 @@ const clearFilter = () => {
                         </template>
                     </Column>
 
-                    <Column field="created_at" header="Created At"></Column>
+                    <Column :sortField="'created_at'" field="created_at" header="Created At" sortable></Column>
 
                     <Column field="" style="width: 10%">
                         <template #body="{ data }">

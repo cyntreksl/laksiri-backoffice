@@ -453,7 +453,7 @@ const exportCSV = () => {
 
                     <FloatLabel class="w-full" variant="in">
                         <Select v-model="filters.shipment.value" :options="props.shipments" :showClear="true"
-                                class="w-full" input-id="shipment" option-label="name" option-value="value"/>
+                                class="w-full" filter input-id="shipment" option-label="name" option-value="value" />
                         <label for="shipment">Shipments</label>
                     </FloatLabel>
                 </div>

@@ -59,10 +59,23 @@ Breadcrumbs::for('call-center.reception.create', function (BreadcrumbTrail $trai
 });
 
 // HBLs
+Breadcrumbs::for('call-center.hbls.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Call Center');
+    $trail->push('HBL List', route('call-center.hbls.index'));
+});
+
 Breadcrumbs::for('call-center.hbls.door-to-door-list', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('HBLs', route('call-center.hbls.index'));
     $trail->push('Door to Door HBLs', route('call-center.hbls.door-to-door-list'));
+});
+
+Breadcrumbs::for('call-center.hbls.baggage-receipts', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Call Center');
+    $trail->push('HBL List', route('call-center.hbls.index'));
+    $trail->push('Baggage Receipt Generation', route('call-center.hbls.baggage-receipts'));
 });
 
 // Verification

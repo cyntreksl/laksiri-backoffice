@@ -522,5 +522,109 @@ class HBLController extends Controller
     {
         return $this->HBLRepository->generateTokenPDF($tokenId, 'print');
     }
+
+    /**
+     * Display baggage receipt generation page
+     */
+    public function baggageReceiptIndex()
+    {
+        $this->authorize('hbls.baggage-receipt');
+
+        return Inertia::render('CallCenter/HBL/BaggageReceiptGenerate');
+    }
+
+    /**
+     * Get shipments (containers) that have arrived at warehouse
+     */
+    public function getBaggageReceiptShipments(Request $request)
+    {
+        $this->authorize('hbls.baggage-receipt');
+
+        $limit = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $order = $request->input('sort_field', 'arrived_at_primary_warehouse');
+        $dir = $request->input('sort_order', 'desc');
+        $search = $request->input('search', null);
+        $fromDate = $request->input('fromDate', null);
+        $toDate = $request->input('toDate', null);
+
+        $query = Container::where('status', ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value)
+            ->orWhereNotNull('arrived_at_primary_warehouse');
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('reference', 'like', '%' . $search . '%')
+                    ->orWhere('bl_number', 'like', '%' . $search . '%')
+                    ->orWhere('vessel_name', 'like', '%' . $search . '%')
+                    ->orWhere('port_of_discharge', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Apply date range filter
+        if ($fromDate && $toDate) {
+            $query->whereBetween('arrived_at_primary_warehouse', [$fromDate, $toDate]);
+        }
+
+        // Get paginated results with HBL count
+        $shipments = $query->withCount('hbl_packages as hbl_count')
+            ->orderBy($order, $dir)
+            ->paginate($limit, [
+                'id',
+                'reference',
+                'bl_number',
+                'awb_number',
+                'container_number',
+                'container_type',
+                'cargo_type',
+                'vessel_name',
+                'port_of_discharge',
+                'arrived_at_primary_warehouse',
+                'estimated_time_of_arrival',
+                'estimated_time_of_departure',
+            ], 'page', $page);
+
+        return response()->json([
+            'data' => $shipments->items(),
+            'meta' => [
+                'total' => $shipments->total(),
+                'current_page' => $shipments->currentPage(),
+                'per_page' => $shipments->perPage(),
+                'last_page' => $shipments->lastPage(),
+                'from' => $shipments->firstItem(),
+                'to' => $shipments->lastItem(),
+            ],
+        ]);
+    }
+
+    /**
+     * Generate all baggage receipts for a container as single PDF
+     */
+    public function generateAllBaggageReceipts(Container $container)
+    {
+        $this->authorize('hbls.baggage-receipt');
+
+        return $this->HBLRepository->generateAllBaggageReceipts($container);
+    }
+
+    /**
+     * Stream all baggage receipts for printing
+     */
+    public function streamAllBaggageReceipts(Container $container)
+    {
+        $this->authorize('hbls.baggage-receipt');
+
+        return $this->HBLRepository->streamAllBaggageReceipts($container);
+    }
+
+    /**
+     * Generate ZIP file with individual PDFs for each HBL
+     */
+    public function generateBaggageReceiptsZip(Container $container)
+    {
+        $this->authorize('hbls.baggage-receipt');
+
+        return $this->HBLRepository->generateBaggageReceiptsZip($container);
+    }
 }
 
