@@ -374,16 +374,27 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         }
 
         $settings = \App\Actions\Setting\GetSettings::run();
-        $logoPath = $settings['logo_url'] ?? null;
+        $logoPath = asset('images/app-logo.png') ?? null;
 
-        $pdf = Pdf::loadView('exports.baggage-bulk', [
+        $template = view('exports.baggage-bulk', [
             'hbls' => $hbls,
             'container' => $container,
             'settings' => $settings,
             'logoPath' => $logoPath,
-        ])->setPaper('a4');
+        ])->render();
 
-        return $pdf->stream('baggage-receipts-'.$container->reference.'.pdf');
+        $filename = 'baggage-receipts-'.$container->reference.'.pdf';
+        $filePath = storage_path("app/public/{$filename}");
+
+        BrowsershotLambda::html($template)
+            ->showBackground()
+            ->format('A4')
+            ->save($filePath);
+
+        return response()->file($filePath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"'
+        ])->deleteFileAfterSend(true);
     }
 
     public function generateBaggageReceiptsZip($container)

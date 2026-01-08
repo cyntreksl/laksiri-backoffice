@@ -28,7 +28,6 @@ const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
 const selectedShipment = ref(null);
-const processingAction = ref(null);
 const cm = ref();
 const dt = ref();
 const fromDate = ref(moment(new Date()).subtract(12, "months").toISOString().split("T")[0]);
@@ -51,12 +50,12 @@ const menuModel = ref([
     {
         label: 'Print All',
         icon: 'pi pi-print',
-        command: () => handleStreamAll(selectedShipment.value),
+        url: () => route("call-center.hbls.stream-all-baggage-receipts", selectedShipment.value.id),
     },
     {
         label: 'Download ZIP',
         icon: 'pi pi-file-export',
-        command: () => handleGenerateZip(selectedShipment.value),
+        url: () => route("call-center.hbls.generate-baggage-receipts-zip", selectedShipment.value.id),
     },
 ]);
 
@@ -142,54 +141,6 @@ const clearFilter = () => {
 onMounted(() => {
     fetchShipments();
 });
-
-const handleStreamAll = async (shipment) => {
-    processingAction.value = `stream-${shipment.id}`;
-    try {
-        const response = await axios.post(`/call-center/baggage-receipts/stream-all/${shipment.id}`, {}, {
-            responseType: 'blob'
-        });
-
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
-
-        push.success("Baggage receipts opened for printing!");
-    } catch (error) {
-        console.error("Error streaming receipts:", error);
-        push.error("Failed to stream baggage receipts");
-    } finally {
-        processingAction.value = null;
-    }
-};
-
-const handleGenerateZip = async (shipment) => {
-    processingAction.value = `zip-${shipment.id}`;
-    try {
-        const response = await axios.post(`/call-center/baggage-receipts/generate-zip/${shipment.id}`, {}, {
-            responseType: 'blob'
-        });
-
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `baggage-receipts-${shipment.reference}.zip`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-
-        push.success("Baggage receipts ZIP generated successfully!");
-    } catch (error) {
-        console.error("Error generating ZIP:", error);
-        push.error("Failed to generate ZIP file");
-    } finally {
-        processingAction.value = null;
-    }
-};
-
-const isProcessing = (action, shipmentId) => {
-    return processingAction.value === `${action}-${shipmentId}`;
-};
 
 const exportCSV = () => {
     dt.value.exportCSV();
