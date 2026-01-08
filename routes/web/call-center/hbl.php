@@ -44,5 +44,5 @@ Route::get('baggage-receipts/generate-all/{container}', [HBLController::class, '
 Route::get('baggage-receipts/stream-all/{container}', [HBLController::class, 'streamAllBaggageReceipts'])
     ->name('hbls.stream-all-baggage-receipts');
 
-Route::get('baggage-receipts/generate/zip/{container}', [HBLController::class, 'generateBaggageReceiptsZip'])
+Route::get('baggage-receipts/generate-zip/{container}', [HBLController::class, 'generateBaggageReceiptsZip'])
     ->name('hbls.generate-baggage-receipts-zip');
