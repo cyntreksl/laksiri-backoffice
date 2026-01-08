@@ -2,6 +2,7 @@
 
 namespace App\Repositories\CallCenter;
 
+use App\Actions\HBL\DownloadAllBaggageReceipts;
 use App\Actions\HBL\GetHBLs;
 use App\Actions\HBL\GetHBLsWithPackages;
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
@@ -18,6 +19,7 @@ use App\Models\Scopes\BranchScope;
 use App\Models\Token;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Wnx\SidecarBrowsershot\BrowsershotLambda;
 
 class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 {
@@ -350,5 +352,85 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 'lastPage' => $hbls->lastPage(),
             ],
         ]);
+    }
+
+    public function generateAllBaggageReceipts($container)
+    {
+        return DownloadAllBaggageReceipts::run($container);
+    }
+
+    public function streamAllBaggageReceipts($container)
+    {
+        // Get HBL IDs from the container's packages
+        $hblIds = $container->hbl_packages()->pluck('hbl_id')->unique();
+
+        // Get HBLs with their packages and containers
+        $hbls = HBL::whereIn('id', $hblIds)
+            ->with(['packages', 'containers'])
+            ->get();
+
+        if ($hbls->isEmpty()) {
+            abort(404, 'No HBLs found for this container');
+        }
+
+        $settings = \App\Actions\Setting\GetSettings::run();
+        $logoPath = $settings['logo_url'] ?? null;
+
+        $pdf = Pdf::loadView('exports.baggage-bulk', [
+            'hbls' => $hbls,
+            'container' => $container,
+            'settings' => $settings,
+            'logoPath' => $logoPath,
+        ])->setPaper('a4');
+
+        return $pdf->stream('baggage-receipts-'.$container->reference.'.pdf');
+    }
+
+    public function generateBaggageReceiptsZip($container)
+    {
+        // Get HBL IDs from the container's packages
+        $hblIds = $container->hbl_packages()->pluck('hbl_id')->unique();
+
+        // Get HBLs with their packages and containers
+        $hbls = HBL::whereIn('id', $hblIds)
+            ->with(['packages', 'containers'])
+            ->get();
+
+        if ($hbls->isEmpty()) {
+            abort(404, 'No HBLs found for this container');
+        }
+
+        $settings = \App\Actions\Setting\GetSettings::run();
+        $logoPath = $settings['logo_url'] ?? null;
+
+        $zip = new \ZipArchive();
+        $zipFileName = 'baggage-receipts-'.$container->reference.'.zip';
+        $zipPath = storage_path('app/temp/'.$zipFileName);
+
+        // Ensure temp directory exists
+        if (! file_exists(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0755, true);
+        }
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+            foreach ($hbls as $hbl) {
+                $pdf = Pdf::loadView('exports.baggage', [
+                    'hbl' => $hbl,
+                    'containers' => $hbl->containers->first(),
+                    'settings' => $settings,
+                    'logoPath' => $logoPath,
+                ])->setPaper('a4');
+
+                $pdfContent = $pdf->output();
+                $pdfFileName = 'baggage-receipt-'.$hbl->hbl_number.'.pdf';
+                $zip->addFromString($pdfFileName, $pdfContent);
+            }
+
+            $zip->close();
+
+            return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
+        }
+
+        abort(500, 'Failed to create ZIP file');
     }
 }

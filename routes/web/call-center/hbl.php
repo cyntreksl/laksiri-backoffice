@@ -31,3 +31,16 @@ Route::get('hbls/show/door-to-door', [HBLController::class, 'showDoorToDoorList'
     ->name('hbls.door-to-door-list');
 
 Route::get('hbl-door-to-door-list', [HBLController::class, 'getDoorToDoorList']);
+
+// Baggage Receipt Generation Routes
+Route::get('baggage-receipts', [HBLController::class, 'baggageReceiptIndex'])
+    ->name('hbls.baggage-receipts');
+
+Route::get('baggage-receipts/shipments', [HBLController::class, 'getBaggageReceiptShipments']);
+
+Route::get('baggage-receipts/generate-all/{container}', [HBLController::class, 'generateAllBaggageReceipts'])
+    ->name('hbls.generate-all-baggage-receipts');
+
+Route::post('baggage-receipts/stream-all/{container}', [HBLController::class, 'streamAllBaggageReceipts']);
+
+Route::post('baggage-receipts/generate-zip/{container}', [HBLController::class, 'generateBaggageReceiptsZip']);

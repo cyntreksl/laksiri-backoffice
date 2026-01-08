@@ -188,7 +188,7 @@ const fetchHBLs = async (page = 1, search = "", sortField = 'created_at', sortOr
         hbls.value = response.data.data;
         totalRecords.value = response.data.meta.total;
         currentPage.value = response.data.meta.current_page;
-        
+
     } catch (error) {
         console.error("Error fetching HBLs:", error);
     } finally {
@@ -572,9 +572,21 @@ const exportCSV = () => {
                                 <div class="text-lg font-medium">
                                     {{route().current() === "call-center.hbls.index" ? 'All HBLs' : 'Issue Tokens For HBLs'}}
                                 </div>
-                                <Button v-if="$page.props.user.permissions.includes('hbls.create')" icon="pi pi-arrow-right"
-                                        icon-pos="right"
-                                        label="Create New HBL" size="small" @click="router.visit(route('hbls.create'))"/>
+                                <div class="flex gap-2">
+                                    <Button v-if="$page.props.user.permissions.includes('hbls.baggage-receipt')" 
+                                            icon="pi pi-file-pdf"
+                                            icon-pos="left"
+                                            label="Baggage Receipts" 
+                                            severity="secondary"
+                                            size="small" 
+                                            @click="router.visit(route('call-center.hbls.baggage-receipts'))"/>
+                                    <Button v-if="$page.props.user.permissions.includes('hbls.create')" 
+                                            icon="pi pi-arrow-right"
+                                            icon-pos="right"
+                                            label="Create New HBL" 
+                                            size="small" 
+                                            @click="router.visit(route('hbls.create'))"/>
+                                </div>
                             </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
                                 <!-- Button Group -->
