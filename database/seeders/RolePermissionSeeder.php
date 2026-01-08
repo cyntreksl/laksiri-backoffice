@@ -183,6 +183,7 @@ class RolePermissionSeeder extends Seeder
             'hbls.show',
             'hbls.issue token',
             'hbls.call flag',
+            'hbls.baggage-receipt',
             'bonded.index',
             'bonded.show',
             'bonded.mark as short loading',
@@ -496,6 +497,7 @@ class RolePermissionSeeder extends Seeder
                     'hbls.finance approved hbl list',
                     'hbls.create finance approval',
                     'hbls.call flag',
+                    'hbls.baggage-receipt',
                 ],
             ],
 

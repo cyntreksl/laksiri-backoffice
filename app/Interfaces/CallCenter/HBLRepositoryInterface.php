@@ -19,4 +19,10 @@ interface HBLRepositoryInterface
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
 
     public function getHBLsWithPackages();
+
+    public function generateAllBaggageReceipts($container);
+
+    public function streamAllBaggageReceipts($container);
+
+    public function generateBaggageReceiptsZip($container);
 }
