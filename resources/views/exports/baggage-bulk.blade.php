@@ -67,71 +67,96 @@
     @if($index > 0)
         <div class="page-break"></div>
     @endif
-    
+
     <div class="header">
+
         <div>
-            <div style="align-items: center"></div>
-            <div></div>
+            <div style="align-items: center">                  </div>
+            <div>                </div>
         </div>
+
     </div>
+
+
 
     <table class="details-table">
         <tr>
-            <td class="label">MHBL Number:</td>
-            <td>{{ $container->bl_number ?? '' }}</td>
+            <td class="label">     </td>
+            <td>          MF0125455 </td>
         </tr>
         <tr>
-            <td class="label">HBL Number:</td>
-            <td>{{ $hbl->hbl_number ?? '' }}</td>
+            <td class="label">     </td>
+            <td>     </td>
+        <tr>
+        <tr>
+            <td class="label">     </td>
+            <td>     </td>
+        <tr>
+
+        <tr>
+            <td class="label">     </td>
+            <td><?php echo date('d/m/Y'); ?> </td>
         </tr>
         <tr>
-            <td class="label">Reference:</td>
-            <td>{{ $hbl->reference ?? '' }}</td>
+            <td class="label">     </td>
+            <td>     </td>
+        <tr>
+        <tr>
+            <td class="label">     </td>
+            <td>     </td>
+        <tr>
+
+        <tr>
+            <td class="label">     </td>
+            <td>01/2554-2554</td>
         </tr>
         <tr>
-            <td class="label">Date:</td>
-            <td><?php echo date('d/m/Y'); ?></td>
+            <td class="label">     </td>
+            <td>APU097099</td>
         </tr>
         <tr>
-            <td class="label">Shipper Name:</td>
-            <td>{{ $hbl->hbl_name ?? '' }}</td>
+            <td class="label">     </td>
+            <td>{{$containers->bl_number ?? ''}}</td>
         </tr>
         <tr>
-            <td class="label">Shipper Contact:</td>
-            <td>{{ $hbl->contact_number ?? '' }}</td>
+            <td class="label">     </td>
+            <td>     </td>
+        <tr>
+            <td class="label">     </td>
+            <td>{{$hbl->consignee_name ?? ''}}</td>
         </tr>
         <tr>
-            <td class="label">Package Count:</td>
-            <td>{{ $hbl->packages->count() ?? 0 }}</td>
+            <td class="label">     </td>
+            <td>P/E</td>
         </tr>
         <tr>
-            <td class="label">BL Number:</td>
-            <td>{{ $container->bl_number ?? '' }}</td>
+            <td class="label">     </td>
+            <td>{{$containers->port_of_discharge ?? ''}}</td>
         </tr>
         <tr>
-            <td class="label">Consignee Name:</td>
-            <td>{{ $hbl->consignee_name ?? '' }}</td>
+            <td class="label">     </td>
+            <td>     </td>
+        <tr>
+        <tr>
+            <td class="label">     </td>
+            <td>{{$containers->vessel_name ?? ''}}</td>
         </tr>
         <tr>
-            <td class="label">Cargo Type:</td>
-            <td>{{ $hbl->cargo_type ?? 'P/E' }}</td>
+            <td class="label">     </td>
+            <td>{{$settings->invoice_header_title ?? ''}}</td>
         </tr>
         <tr>
-            <td class="label">Port of Discharge:</td>
-            <td>{{ $container->port_of_discharge ?? '' }}</td>
-        </tr>
+            <td class="label">     </td>
+            <td>     </td>
         <tr>
-            <td class="label">Warehouse:</td>
-            <td>{{ $hbl->warehouse ?? '' }}</td>
-        </tr>
         <tr>
-            <td class="label">Vessel Name:</td>
-            <td>{{ $container->vessel_name ?? '' }}</td>
-        </tr>
+            <td class="label">     </td>
+            <td>     </td>
         <tr>
-            <td class="label">Company:</td>
-            <td>{{ $settings['invoice_header_title'] ?? '' }}</td>
-        </tr>
+        <tr>
+            <td class="label">     </td>
+            <td>          chef</td>
+        <tr>
     </table>
 @endforeach
 </body>
