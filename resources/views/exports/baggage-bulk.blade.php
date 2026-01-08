@@ -116,7 +116,7 @@
         </tr>
         <tr>
             <td class="label">     </td>
-            <td>{{$containers->bl_number ?? ''}}</td>
+            <td>{{$container->bl_number ?? ''}}</td>
         </tr>
         <tr>
             <td class="label">     </td>
@@ -131,7 +131,7 @@
         </tr>
         <tr>
             <td class="label">     </td>
-            <td>{{$containers->port_of_discharge ?? ''}}</td>
+            <td>{{$container->port_of_discharge ?? ''}}</td>
         </tr>
         <tr>
             <td class="label">     </td>
@@ -139,7 +139,7 @@
         <tr>
         <tr>
             <td class="label">     </td>
-            <td>{{$containers->vessel_name ?? ''}}</td>
+            <td>{{$container->vessel_name ?? ''}}</td>
         </tr>
         <tr>
             <td class="label">     </td>
