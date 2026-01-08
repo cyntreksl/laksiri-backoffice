@@ -744,7 +744,7 @@ onUnmounted(() => {
             <div
                 class="flex items-center justify-between space-x-2 px-[var(--margin-x)] py-5 transition-all duration-[.25s]">
                 <div class="flex items-center space-x-1">
-                    <h3 class="text-lg font-medium text-slate-700 line-clamp-1 dark:text-navy-50">
+                    <h3 class="text-xl font-medium text-slate-700 line-clamp-1 dark:text-navy-50">
                         Unloading Point
                     </h3>
                 </div>
@@ -773,7 +773,7 @@ onUnmounted(() => {
                 <label class="relative hidden w-full max-w-[16rem] sm:flex">
                     <input
                         v-model="searchQuery"
-                        class="form-input peer h-8 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 text-xs+ placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 dark:border-navy-450 dark:hover:border-navy-400 focus:ring-0 disabled:pointer-events-none disabled:select-none disabled:border-none disabled:bg-zinc-100"
+                        class="form-input peer h-8 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 pl-9 text-sm placeholder:text-slate-400/70 hover:z-10 hover:border-slate-400 dark:border-navy-450 dark:hover:border-navy-400 focus:ring-0 disabled:pointer-events-none disabled:select-none disabled:border-none disabled:bg-zinc-100"
                         placeholder="Search on HBL Packages" type="text"/>
                     <span
                         class="pointer-events-none absolute flex h-full w-9 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent">
@@ -814,12 +814,12 @@ onUnmounted(() => {
                                         <path d="M3 17l0 -5l9 0"/>
                                     </svg>
                                 </div>
-                                <h3 class="text-base text-slate-700 dark:text-navy-100">
+                                <h3 class="text-lg text-slate-700 dark:text-navy-100">
                                     {{ container.cargo_type }} Container ({{ container?.reference }})
                                 </h3>
                             </div>
                             <div>
-                                <h3 class="text-base text-slate-700 dark:text-navy-100">
+                                <h3 class="text-lg text-slate-700 dark:text-navy-100">
                                     {{ container.container_type }}
                                 </h3>
                             </div>
@@ -867,11 +867,11 @@ onUnmounted(() => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                                <span class="font-semibold text-sm text-slate-700 dark:text-navy-100 truncate">{{ hbl.hbl_number }}</span>
+                                                <span class="font-semibold text-base text-slate-700 dark:text-navy-100 truncate">{{ hbl.hbl_number }}</span>
                                                 <span v-if="isHBLGroupDetained(hbl)" class="flex-shrink-0">
-                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-xs"></i>
+                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
                                                 </span>
-                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
+                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-sm font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
                                                     {{ hbl.packages.length }} {{ hbl.packages.length === 1 ? 'pkg' : 'pkgs' }}
                                                 </span>
                                     </div>
@@ -903,10 +903,10 @@ onUnmounted(() => {
                                                             <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
                                                         </div>
                                                         <div class="flex-1 min-w-0">
-                                                            <p class="text-xs font-medium text-slate-600 dark:text-navy-300 mb-1">
+                                                            <p class="text-sm font-medium text-slate-600 dark:text-navy-300 mb-1">
                                                                 {{ element.package_type }}
                                                             </p>
-                                                            <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-navy-400">
+                                                            <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-navy-400">
                                                                 <span>Vol: {{ element.volume }}</span>
                                                                 <span>•</span>
                                                                 <span>Wt: {{ element.weight }}</span>
@@ -948,11 +948,11 @@ onUnmounted(() => {
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">
                                         <p
-                                            class="font-medium text-lg tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
+                                            class="font-medium text-xl tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
                                             Sorry! Not Found HBL Packages.
                                         </p>
 
-                                        <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
+                                        <p class="mt-px text-sm text-slate-400 dark:text-navy-300">
                                             Please add HBL records first.
                                         </p>
                                     </div>
@@ -965,7 +965,7 @@ onUnmounted(() => {
                                 <div class="flex size-8 items-center justify-center rounded-lg bg-info/10 text-info">
                                     <i class="fa fa-boxes-packing text-base"></i>
                                 </div>
-                                <h3 class="text-base text-slate-700 dark:text-navy-100">
+                                <h3 class="text-lg text-slate-700 dark:text-navy-100">
                                     MHBL Packages
                                 </h3>
                             </div>
@@ -1014,11 +1014,11 @@ onUnmounted(() => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                                <span class="font-semibold text-sm text-slate-700 dark:text-navy-100 truncate">{{ pkg.packages[0].hbl.mhbl.hbl_number || pkg.mhblReference }}</span>
+                                                <span class="font-semibold text-base text-slate-700 dark:text-navy-100 truncate">{{ pkg.packages[0].hbl.mhbl.hbl_number || pkg.mhblReference }}</span>
                                                 <span v-if="isMHBLGroupDetained(pkg)" class="flex-shrink-0">
-                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-xs"></i>
+                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
                                                 </span>
-                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
+                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-sm font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
                                                     {{ pkg.packages.length }} {{ pkg.packages.length === 1 ? 'pkg' : 'pkgs' }}
                                                 </span>
                                     </div>
@@ -1089,11 +1089,11 @@ onUnmounted(() => {
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">
                                         <p
-                                            class="font-medium text-lg tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
+                                            class="font-medium text-xl tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
                                             Sorry! Not Found MHBL Packages.
                                         </p>
 
-                                        <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
+                                        <p class="mt-px text-sm text-slate-400 dark:text-navy-300">
                                             Please add HBL records first.
                                         </p>
                                     </div>
@@ -1125,7 +1125,7 @@ onUnmounted(() => {
                                         <path d="M13 21v-9a1 1 0 0 0 -1 -1h-2a1 1 0 0 0 -1 1v3"/>
                                     </svg>
                                 </div>
-                                <h3 class="text-base text-slate-700 dark:text-navy-100">
+                                <h3 class="text-lg text-slate-700 dark:text-navy-100">
                                     Warehouse
                                 </h3>
                             </div>
@@ -1154,10 +1154,10 @@ onUnmounted(() => {
                                                 <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
                                             </div>
                                             <div class="flex-1 min-w-0">
-                                                <p class="text-xs font-medium text-slate-600 dark:text-navy-300 mb-1">
+                                                <p class="text-sm font-medium text-slate-600 dark:text-navy-300 mb-1">
                                                     {{ element.hbl?.hbl_number }} • {{ element.package_type }}
                                                 </p>
-                                                <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-navy-400">
+                                                <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-navy-400">
                                                     <span>Vol: {{ element.volume }}</span>
                                                     <span>•</span>
                                                     <span>Wt: {{ element.weight }}</span>
@@ -1243,11 +1243,11 @@ onUnmounted(() => {
                                                 d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
                                             ></path>
                                         </svg>
-                                                <span class="font-semibold text-sm text-slate-700 dark:text-navy-100 truncate">{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}</span>
+                                                <span class="font-semibold text-base text-slate-700 dark:text-navy-100 truncate">{{ mhbl.packages[0].hbl.mhbl.hbl_number || mhbl.mhblReference }}</span>
                                                 <span v-if="isMHBLGroupDetained(mhbl)" class="flex-shrink-0">
-                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-xs"></i>
+                                                    <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
                                                 </span>
-                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
+                                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-sm font-medium text-slate-600 dark:bg-navy-700 dark:text-navy-300">
                                                     {{ mhbl.packages.length }} {{ mhbl.packages.length === 1 ? 'pkg' : 'pkgs' }}
                                                 </span>
                                     </div>
@@ -1333,11 +1333,11 @@ onUnmounted(() => {
                                 <div class="flex justify-center items-center space-x-3 px-2.5 pb-2 pt-1.5 h-24">
                                     <div class="text-center">
                                         <p
-                                            class="font-medium text-lg tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
+                                            class="font-medium text-xl tracking-wide text-slate-400 line-clamp-2 dark:text-navy-100">
                                             Warehouse
                                         </p>
 
-                                        <p class="mt-px text-xs text-slate-400 dark:text-navy-300">
+                                        <p class="mt-px text-sm text-slate-400 dark:text-navy-300">
                                             Active to unloading process
                                         </p>
                                     </div>
@@ -1374,12 +1374,12 @@ onUnmounted(() => {
         >
             <div v-if="selectedPackageForDetain" class="space-y-4">
                 <div class="p-3 bg-slate-50 dark:bg-navy-700 rounded-lg">
-                    <p class="font-semibold text-sm text-slate-700 dark:text-navy-100">{{ selectedPackageForDetain.package_type }}</p>
-                    <p class="text-xs text-slate-500 dark:text-navy-400 mt-1">{{ selectedPackageForDetain.hbl?.hbl_number }}</p>
+                    <p class="font-semibold text-base text-slate-700 dark:text-navy-100">{{ selectedPackageForDetain.package_type }}</p>
+                    <p class="text-sm text-slate-500 dark:text-navy-400 mt-1">{{ selectedPackageForDetain.hbl?.hbl_number }}</p>
                 </div>
 
                 <div class="space-y-2">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-navy-100">
+                    <label class="block text-base font-medium text-slate-700 dark:text-navy-100">
                         Select Detain Type
                     </label>
                     <Dropdown
@@ -1418,7 +1418,7 @@ onUnmounted(() => {
         >
             <div v-if="selectedPackage" class="mb-4 p-3 bg-blue-50 rounded-lg">
                 <p class="font-semibold">{{ selectedPackage.package_type }}</p>
-                <p class="text-sm text-gray-600">{{ selectedPackage.hbl?.hbl_number }}</p>
+                <p class="text-base text-gray-600">{{ selectedPackage.hbl?.hbl_number }}</p>
             </div>
 
             <div class="flex flex-col h-[400px] border rounded-lg p-4 bg-gray-50">
@@ -1443,7 +1443,7 @@ onUnmounted(() => {
                         <div class="text-center">
                             <i class="pi pi-comments text-4xl mb-2"></i>
                             <p>No remarks yet</p>
-                            <p class="text-sm">Be the first to add a remark</p>
+                            <p class="text-base">Be the first to add a remark</p>
                         </div>
                     </div>
 
@@ -1458,9 +1458,9 @@ onUnmounted(() => {
                             :class="item?.user?.id === $page.props.auth.user.id ? 'bg-success text-white' : 'bg-white text-gray-700'"
                             class="max-w-xs rounded-lg p-3 shadow-md"
                         >
-                            <p class="text-sm font-semibold">{{ item?.user?.name }}</p>
+                            <p class="text-base font-semibold">{{ item?.user?.name }}</p>
                             <p class="break-words">{{ item.body }}</p>
-                            <small class="block text-xs mt-1 opacity-70">
+                            <small class="block text-sm mt-1 opacity-70">
                                 {{ formatDate(item.created_at) }}
                             </small>
                         </div>
