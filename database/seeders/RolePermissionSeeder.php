@@ -40,7 +40,7 @@ class RolePermissionSeeder extends Seeder
 
         $this->command->info('Default Roles added with hierarchy.');
 
-        // $this->assignPermissions();
+        $this->assignPermissions();
 
         $this->createPermissionIfNotExsists();
 
@@ -83,6 +83,7 @@ class RolePermissionSeeder extends Seeder
             'Courier Agents',
             'Settings',
             'Third Party Shipment',
+            'Token',
         ];
 
         $excludedAdminPermissions = [
@@ -206,6 +207,7 @@ class RolePermissionSeeder extends Seeder
             'customer-queue.show gate ist',
             'customer-queue.show examination calling screen',
             'manage_tokens',
+            'tokens.cancel',
             'call-center.hbl-list',
             'call-center.followups',
             'call-center.appointments',
@@ -697,6 +699,7 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'Token',
                 'permissions' => [
                     'manage_tokens',
+                    'tokens.cancel',
                 ],
             ],
 
