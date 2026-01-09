@@ -573,18 +573,18 @@ const exportCSV = () => {
                                     {{route().current() === "call-center.hbls.index" ? 'All HBLs' : 'Issue Tokens For HBLs'}}
                                 </div>
                                 <div class="flex gap-2">
-                                    <Button v-if="$page.props.user.permissions.includes('hbls.baggage-receipt')" 
+                                    <Button v-if="$page.props.user.permissions.includes('hbls.baggage-receipt')"
                                             icon="pi pi-file-pdf"
                                             icon-pos="left"
-                                            label="Baggage Receipts" 
+                                            label="Baggage Receipts"
                                             severity="secondary"
-                                            size="small" 
+                                            size="small"
                                             @click="router.visit(route('call-center.hbls.baggage-receipts'))"/>
-                                    <Button v-if="$page.props.user.permissions.includes('hbls.create')" 
+                                    <Button v-if="$page.props.user.permissions.includes('hbls.create')"
                                             icon="pi pi-arrow-right"
                                             icon-pos="right"
-                                            label="Create New HBL" 
-                                            size="small" 
+                                            label="Create New HBL"
+                                            size="small"
                                             @click="router.visit(route('hbls.create'))"/>
                                 </div>
                             </div>
@@ -688,17 +688,33 @@ const exportCSV = () => {
 
                         <Column field="tokens.queue_type" header="Queue Type">
                             <template #body="slotProps">
-                                <Tag v-if="slotProps.data.tokens" :value="slotProps.data.tokens.queue_type" severity="info" class="text-sm whitespace-nowrap"></Tag>
+                                <Tag v-if="slotProps.data.tokens && slotProps.data.tokens.is_cancelled"
+                                     class="text-sm whitespace-nowrap"
+                                     severity="danger"
+                                     value="Cancelled" />
+                                <Tag v-else-if="slotProps.data.tokens"
+                                     :value="slotProps.data.tokens.queue_type"
+                                     class="text-sm whitespace-nowrap"
+                                     severity="info" />
                                 <span v-else class="text-gray-400">-</span>
                             </template>
                         </Column>
 
                         <Column field="tokens.token_number" header="Token Number">
                             <template #body="slotProps">
-                                <span v-if="slotProps.data.tokens"
-                                      class="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-blue-500 rounded-full">
-                                    {{ slotProps.data.tokens.token_number }}
-                                </span>
+                                <div v-if="slotProps.data.tokens" class="flex flex-col items-center gap-1">
+                                    <span
+                                        :class="slotProps.data.tokens.is_cancelled
+                                            ? 'inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-red-500 rounded-full line-through'
+                                            : 'inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-blue-500 rounded-full'">
+                                        {{ slotProps.data.tokens.token_number }}
+                                    </span>
+                                    <Tag v-if="slotProps.data.tokens.is_cancelled"
+                                         class="text-xs"
+                                         severity="danger"
+                                         size="small"
+                                         value="Cancelled" />
+                                </div>
                                 <span v-else class="text-gray-400">-</span>
                             </template>
                         </Column>

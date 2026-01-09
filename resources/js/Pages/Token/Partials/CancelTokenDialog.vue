@@ -110,28 +110,46 @@ const handleSubmit = () => {
 };
 
 // Confirm and execute cancellation
-const confirmCancellation = () => {
+const confirmCancellation = async () => {
     if (!validateForm()) {
         return;
     }
 
-    form.post(route('call-center.tokens.cancel', props.token.id), {
-        onSuccess: (page) => {
-            push.success('Token cancelled successfully');
+    form.processing = true;
+
+    try {
+        const response = await axios.post(
+            route('call-center.tokens.cancel', props.token.id),
+            {
+                cancellation_reason: form.cancellation_reason,
+                acknowledged_warnings: form.acknowledged_warnings
+            }
+        );
+
+        if (response.data.success) {
+            push.success(response.data.message || 'Token cancelled successfully');
             dialogVisible.value = false;
             emit('token-cancelled', props.token);
-        },
-        onError: (serverErrors) => {
-            // Handle server-side validation errors
-            if (serverErrors.cancellation_reason) {
-                errors.value.cancellation_reason = serverErrors.cancellation_reason;
-            }
-
-            // Show general error notification
-            const errorMessage = serverErrors.message || 'Failed to cancel token';
-            push.error(errorMessage);
+        } else {
+            push.error(response.data.message || 'Failed to cancel token');
         }
-    });
+    } catch (error) {
+        console.error('Error cancelling token:', error);
+        
+        // Handle validation errors
+        if (error.response?.status === 422 && error.response?.data?.errors) {
+            const serverErrors = error.response.data.errors;
+            if (serverErrors.cancellation_reason) {
+                errors.value.cancellation_reason = serverErrors.cancellation_reason[0];
+            }
+        }
+        
+        // Show error notification
+        const errorMessage = error.response?.data?.message || 'Failed to cancel token';
+        push.error(errorMessage);
+    } finally {
+        form.processing = false;
+    }
 };
 
 // Cancel dialog
@@ -149,6 +167,24 @@ const goBackToEdit = () => {
 const acknowledgeWarnings = () => {
     form.acknowledged_warnings = true;
     showConfirmation.value = true;
+};
+
+// Format token status to human-readable text
+const formatTokenStatus = (status) => {
+    if (!status) return 'Unknown';
+
+    const statusMap = {
+        'in_progress': 'In Progress',
+        'completed': 'Completed',
+        'pending': 'Pending',
+        'cancelled': 'Cancelled',
+        'departed': 'Departed',
+        'not_completed': 'Not Completed'
+    };
+
+    return statusMap[status] || status.split('_').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
 };
 </script>
 
@@ -185,7 +221,7 @@ const acknowledgeWarnings = () => {
         <!-- Main form - not in confirmation mode -->
         <div v-else-if="!showConfirmation && eligibilityData">
             <div class="mb-6">
-                <Message :closable="false" class="mb-4" severity="warn">
+                <Message :closable="false" class="my-4" severity="warn">
                     <div class="font-semibold">Warning: This action cannot be undone</div>
                 </Message>
 
@@ -203,7 +239,7 @@ const acknowledgeWarnings = () => {
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600 dark:text-gray-400">Status:</span>
-                            <Tag :value="eligibilityData.token_status" severity="info" />
+                            <Tag :value="formatTokenStatus(eligibilityData.token_status)" severity="info" />
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600 dark:text-gray-400">Package Count:</span>
@@ -287,7 +323,7 @@ const acknowledgeWarnings = () => {
         <!-- Confirmation step -->
         <div v-else-if="showConfirmation">
             <div class="mb-6">
-                <Message :closable="false" class="mb-4" severity="error">
+                <Message :closable="false" class="my-4" severity="error">
                     <div class="font-semibold text-lg">Final Confirmation Required</div>
                 </Message>
 
