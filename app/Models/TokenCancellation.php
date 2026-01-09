@@ -30,6 +30,27 @@ class TokenCancellation extends Model
         'hbl_package_status' => 'array',
     ];
 
+    /**
+     * Boot the model and register immutability protection.
+     * Audit logs are read-only once created and cannot be modified or deleted.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Prevent updates to audit log records
+        static::updating(function ($model) {
+            // Return false to prevent the update
+            return false;
+        });
+
+        // Prevent deletion of audit log records
+        static::deleting(function ($model) {
+            // Return false to prevent the deletion
+            return false;
+        });
+    }
+
     public function token(): BelongsTo
     {
         return $this->belongsTo(Token::class);
