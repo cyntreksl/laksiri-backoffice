@@ -35,6 +35,8 @@ class ContainerUnloadingAuditLog extends Model
         'updated_at' => 'datetime',
     ];
 
+    protected $appends = ['description'];
+
     /**
      * Get the container that this audit log belongs to
      */
