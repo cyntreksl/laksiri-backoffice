@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\TokenCancelled;
 use App\Models\Token;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -44,6 +45,9 @@ class TokenCancellationService
         // Execute cancellation in transaction
         try {
             $auditLog = $this->executeInTransaction($token, $cancellationReason, $cancelledBy);
+
+            // Broadcast the token cancellation event for real-time updates
+            broadcast(new TokenCancelled($token))->toOthers();
 
             return new TokenCancellationResult(
                 success: true,
