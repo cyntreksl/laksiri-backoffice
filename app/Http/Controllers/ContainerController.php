@@ -262,6 +262,16 @@ class ContainerController extends Controller
         $this->containerRepository->reloadContainer($request->all());
     }
 
+    public function unloadHBLGroup(Request $request)
+    {
+        $this->containerRepository->unloadHBLGroup($request->all());
+    }
+
+    public function unloadMHBLGroup(Request $request)
+    {
+        $this->containerRepository->unloadMHBLGroup($request->all());
+    }
+
     public function storeUnloadingIssue(StoreUnloadingIssue $request)
     {
         $this->containerRepository->createUnloadingIssue($request->all());

@@ -9,6 +9,7 @@ use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HBLPackage;
 use App\Models\Scopes\BranchScope;
+use App\Services\UnloadingAuditService;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -23,6 +24,7 @@ class CreateDraftUnload
     {
         try {
             $container = Container::withoutGlobalScope(BranchScope::class)->find($data['container_id']);
+            $auditService = app(UnloadingAuditService::class);
 
             DB::beginTransaction();
 
@@ -47,6 +49,9 @@ class CreateDraftUnload
                     ->find($packageData['id']);
 
                 if ($package) {
+                    // Log the unload action
+                    $auditService->logPackageAction($container, $package, 'unload');
+
                     // Broadcast the unload event
                     $user = auth()->user();
                     $userName = !empty($user->name) ? $user->name : ($user->username ?? 'Unknown User');

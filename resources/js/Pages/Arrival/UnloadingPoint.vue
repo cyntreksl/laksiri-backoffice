@@ -127,13 +127,13 @@ const filteredMHBLPackages = computed(() => {
     }
     return mhblContainerArr.value.filter(packageData => {
         const searchLower = searchQuery.value.toLowerCase();
-        
+
         // Search in MHBL number
         const mhblNumber = packageData?.packages?.[0]?.hbl?.mhbl?.hbl_number || packageData?.mhblReference || '';
         if (mhblNumber.toLowerCase().includes(searchLower)) {
             return true;
         }
-        
+
         // Search in individual package HBL numbers
         return packageData?.packages?.some(pkg => {
             const hblNumber = pkg?.hbl?.hbl_number || '';
@@ -159,7 +159,7 @@ const handleUnloadHBLGroupToWarehouse = (groupIndex) => {
     if (groupIndex !== -1 && containerArr.value[groupIndex]) {
         const hblGroup = containerArr.value[groupIndex];
         const packagesToMove = [...hblGroup.packages];
-        
+
         confirm.require({
             message: `Are you sure you want to unload all ${packagesToMove.length} package(s) from HBL ${hblGroup.hbl_number}?`,
             header: 'Unload All Packages',
@@ -174,19 +174,33 @@ const handleUnloadHBLGroupToWarehouse = (groupIndex) => {
                 label: 'Yes, Unload All',
                 severity: 'success'
             },
-            accept: () => {
-                // Move all packages to warehouse
-                packagesToMove.forEach(pkg => {
-                    warehouseArr.value.push(pkg);
-                });
-                
-                // Remove the group from container
-                containerArr.value.splice(groupIndex, 1);
-                
-                // Create draft unload for all packages
-                handleCreateDraftUnload(packagesToMove);
-                
-                push.success(`Successfully unloaded ${packagesToMove.length} package(s) from HBL ${hblGroup.hbl_number}`);
+            accept: async () => {
+                try {
+                    // Get HBL ID from first package
+                    const hblId = packagesToMove[0]?.hbl_id;
+                    const packageIds = packagesToMove.map(pkg => pkg.id);
+
+                    await axios.post(route("arrival.unload-container.unload-hbl-group"), {
+                        container_id: route().params.container,
+                        hbl_id: hblId,
+                        package_ids: packageIds,
+                    });
+
+                    // Move all packages to warehouse
+                    packagesToMove.forEach(pkg => {
+                        warehouseArr.value.push(pkg);
+                    });
+
+                    // Remove the group from container
+                    containerArr.value.splice(groupIndex, 1);
+
+                    push.success(`Successfully unloaded ${packagesToMove.length} package(s) from HBL ${hblGroup.hbl_number}`);
+                } catch (error) {
+                    console.error('Failed to unload HBL group:', error);
+                    push.error('Failed to unload HBL group');
+                    // Revert UI changes on error
+                    router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
+                }
             },
             reject: () => {
             }
@@ -197,11 +211,11 @@ const handleUnloadHBLGroupToWarehouse = (groupIndex) => {
 const handleUnloadMHBLToWarehouse = (groupIndex, packageIndex) => {
     if (groupIndex !== -1 && packageIndex !== -1) {
         const packageToMove = mhblContainerArr.value[groupIndex].packages.splice(packageIndex, 1)[0];
-        
+
         // Find or create MHBL group in warehouse
         const mhblReference = packageToMove.hbl.mhbl.reference;
         let warehouseMHBLGroup = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
-        
+
         if (warehouseMHBLGroup) {
             warehouseMHBLGroup.packages.push(packageToMove);
         } else {
@@ -211,12 +225,12 @@ const handleUnloadMHBLToWarehouse = (groupIndex, packageIndex) => {
                 packages: [packageToMove]
             });
         }
-        
+
         // If the group is empty after removal, remove the group
         if (mhblContainerArr.value[groupIndex].packages.length === 0) {
             mhblContainerArr.value.splice(groupIndex, 1);
         }
-        
+
         handleCreateDraftUnload([packageToMove]);
     }
 }
@@ -227,7 +241,7 @@ const handleUnloadMHBLGroupToWarehouse = (groupIndex) => {
         const packagesToMove = [...mhblGroup.packages];
         const mhblReference = mhblGroup.mhblReference;
         const mhblNumber = packagesToMove[0]?.hbl?.mhbl?.hbl_number || mhblReference;
-        
+
         confirm.require({
             message: `Are you sure you want to unload all ${packagesToMove.length} package(s) from MHBL ${mhblNumber}?`,
             header: 'Unload All Packages',
@@ -242,27 +256,41 @@ const handleUnloadMHBLGroupToWarehouse = (groupIndex) => {
                 label: 'Yes, Unload All',
                 severity: 'success'
             },
-            accept: () => {
-                // Find or create MHBL group in warehouse
-                let warehouseMHBLGroup = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
-                
-                if (warehouseMHBLGroup) {
-                    warehouseMHBLGroup.packages.push(...packagesToMove);
-                } else {
-                    warehouseMHBLArr.value.push({
-                        mhblReference: mhblReference,
-                        expanded: true,
-                        packages: packagesToMove
+            accept: async () => {
+                try {
+                    // Get MHBL ID from first package
+                    const mhblId = packagesToMove[0]?.hbl?.mhbl_id;
+                    const packageIds = packagesToMove.map(pkg => pkg.id);
+
+                    await axios.post(route("arrival.unload-container.unload-mhbl-group"), {
+                        container_id: route().params.container,
+                        mhbl_id: mhblId,
+                        package_ids: packageIds,
                     });
+
+                    // Find or create MHBL group in warehouse
+                    let warehouseMHBLGroup = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
+
+                    if (warehouseMHBLGroup) {
+                        warehouseMHBLGroup.packages.push(...packagesToMove);
+                    } else {
+                        warehouseMHBLArr.value.push({
+                            mhblReference: mhblReference,
+                            expanded: true,
+                            packages: packagesToMove
+                        });
+                    }
+
+                    // Remove the group from container
+                    mhblContainerArr.value.splice(groupIndex, 1);
+
+                    push.success(`Successfully unloaded ${packagesToMove.length} package(s) from MHBL ${mhblNumber}`);
+                } catch (error) {
+                    console.error('Failed to unload MHBL group:', error);
+                    push.error('Failed to unload MHBL group');
+                    // Revert UI changes on error
+                    router.reload({ only: ['packagesWithoutMhbl', 'packagesWithMhbl'] });
                 }
-                
-                // Remove the group from container
-                mhblContainerArr.value.splice(groupIndex, 1);
-                
-                // Create draft unload for all packages
-                handleCreateDraftUnload(packagesToMove);
-                
-                push.success(`Successfully unloaded ${packagesToMove.length} package(s) from MHBL ${mhblNumber}`);
             },
             reject: () => {
             }
@@ -274,10 +302,10 @@ const handleReloadMHBLToContainer = (groupIndex, packageIndex) => {
     if (groupIndex !== -1 && packageIndex !== -1) {
         const packageToMove = warehouseMHBLArr.value[groupIndex].packages.splice(packageIndex, 1)[0];
         const mhblReference = packageToMove.hbl.mhbl.reference;
-        
+
         // Find or create MHBL group in container
         let containerMHBLGroup = mhblContainerArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
-        
+
         if (containerMHBLGroup) {
             containerMHBLGroup.packages.push(packageToMove);
         } else {
@@ -287,12 +315,12 @@ const handleReloadMHBLToContainer = (groupIndex, packageIndex) => {
                 packages: [packageToMove]
             });
         }
-        
+
         // If the warehouse group is empty after removal, remove the group
         if (warehouseMHBLArr.value[groupIndex].packages.length === 0) {
             warehouseMHBLArr.value.splice(groupIndex, 1);
         }
-        
+
         handleRemoveDraftUnload([packageToMove]);
     }
 }
@@ -329,7 +357,7 @@ const handleCreateDraftUnload = async (packages) => {
             packages,
             is_draft: true,
         });
-        
+
         draftTextEnabled.value = true;
         setTimeout(() => draftTextEnabled.value = false, 3000);
     } catch (error) {
@@ -346,7 +374,7 @@ const handleRemoveDraftUnload = async (packages) => {
             container_id: route().params.container,
             package_id: packages[0].id,
         });
-        
+
         draftTextEnabled.value = true;
         setTimeout(() => draftTextEnabled.value = false, 3000);
     } catch (error) {
@@ -391,10 +419,10 @@ const closeDetainModal = () => {
 
 const handleDetainPackage = () => {
     if (!selectedPackageForDetain.value || !selectedDetainBy.value) return;
-    
+
     const packageId = selectedPackageForDetain.value.id;
     const detainType = selectedDetainBy.value;
-    
+
     confirm.require({
         message: `Would you like to detain this package by ${detainType}?`,
         header: `Detain Package by ${detainType}?`,
@@ -429,10 +457,10 @@ const handleDetainPackage = () => {
 
 const isPackageDetained = (packageItem) => {
     if (!packageItem) return false;
-    
+
     // Check latest detain record (Laravel serializes relationships to snake_case in JSON)
     const latestRecord = packageItem.latest_detain_record || packageItem.latestDetainRecord;
-    
+
     // Package is detained if latest record exists and is_rtf is true
     return latestRecord && latestRecord.is_rtf === true;
 }
@@ -538,7 +566,7 @@ const page = usePage();
 
 const initializePusher = () => {
     const pusherConfig = page.props.pusher;
-    
+
     if (!pusherConfig || !pusherConfig.key) {
         console.warn('Pusher not configured');
         return;
@@ -591,11 +619,11 @@ const handleRealTimeUnload = (packageData, userName) => {
         for (let i = 0; i < containerArr.value.length; i++) {
             const group = containerArr.value[i];
             const packageIndex = group.packages.findIndex(p => p.id === packageId);
-            
+
             if (packageIndex !== -1) {
                 const packageToMove = group.packages.splice(packageIndex, 1)[0];
                 warehouseArr.value.push(packageToMove);
-                
+
                 // Remove group if empty
                 if (group.packages.length === 0) {
                     containerArr.value.splice(i, 1);
@@ -615,13 +643,13 @@ const handleRealTimeUnload = (packageData, userName) => {
         for (let i = 0; i < mhblContainerArr.value.length; i++) {
             const group = mhblContainerArr.value[i];
             const packageIndex = group.packages.findIndex(p => p.id === packageId);
-            
+
             if (packageIndex !== -1) {
                 const packageToMove = group.packages.splice(packageIndex, 1)[0];
-                
+
                 // Find or create MHBL group in warehouse
                 let warehouseMHBLGroup = warehouseMHBLArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
-                
+
                 if (warehouseMHBLGroup) {
                     warehouseMHBLGroup.packages.push(packageToMove);
                 } else {
@@ -631,7 +659,7 @@ const handleRealTimeUnload = (packageData, userName) => {
                         packages: [packageToMove]
                     });
                 }
-                
+
                 // Remove group if empty
                 if (group.packages.length === 0) {
                     mhblContainerArr.value.splice(i, 1);
@@ -660,11 +688,11 @@ const handleRealTimeReload = (packageData, userName) => {
     if (!mhblReference) {
         // Find and remove from warehouse
         const warehouseIndex = warehouseArr.value.findIndex(p => p.id === packageId);
-        
+
         if (warehouseIndex !== -1) {
             const packageToMove = warehouseArr.value.splice(warehouseIndex, 1)[0];
             const group = containerArr.value.find(g => g.hbl_number === hblNumber);
-            
+
             if (group) {
                 group.packages.push(packageToMove);
             } else {
@@ -684,13 +712,13 @@ const handleRealTimeReload = (packageData, userName) => {
         for (let i = 0; i < warehouseMHBLArr.value.length; i++) {
             const group = warehouseMHBLArr.value[i];
             const packageIndex = group.packages.findIndex(p => p.id === packageId);
-            
+
             if (packageIndex !== -1) {
                 const packageToMove = group.packages.splice(packageIndex, 1)[0];
-                
+
                 // Find or create MHBL group in container
                 let containerMHBLGroup = mhblContainerArr.value.find(mhbl => mhbl.mhblReference === mhblReference);
-                
+
                 if (containerMHBLGroup) {
                     containerMHBLGroup.packages.push(packageToMove);
                 } else {
@@ -700,7 +728,7 @@ const handleRealTimeReload = (packageData, userName) => {
                         packages: [packageToMove]
                     });
                 }
-                
+
                 // Remove group if empty
                 if (group.packages.length === 0) {
                     warehouseMHBLArr.value.splice(i, 1);
@@ -763,6 +791,14 @@ onUnmounted(() => {
                             Saved as draft.
                         </div>
                     </ActionMessage>
+                    <Button
+                        icon="pi pi-history"
+                        label="View Audit Logs"
+                        outlined
+                        severity="secondary"
+                        size="small"
+                        @click.prevent="() => $inertia.visit(route('arrival.containers.audit-logs.index', container.id))"
+                    />
                     <Button :disabled="warehouseArr.length === 0 && warehouseMHBLArr.length === 0 "
                             icon="pi pi-arrow-right" icon-pos="right" label="Proceed to Review"
                             size="small" @click.prevent="reviewContainer"/>
@@ -916,14 +952,14 @@ onUnmounted(() => {
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center gap-1.5 flex-shrink-0">
-                                                        <Button 
-                                                            icon="pi pi-comment" 
-                                                            severity="secondary" 
+                                                        <Button
+                                                            icon="pi pi-comment"
+                                                            severity="secondary"
                                                             size="small"
-                                                            text 
+                                                            text
                                                             rounded
                                                             class="!p-1.5"
-                                                            @click="openRemarksDialog(element)" 
+                                                            @click="openRemarksDialog(element)"
                                                         />
                                                         <Button
                                                             icon="pi pi-arrow-right"
@@ -1058,14 +1094,14 @@ onUnmounted(() => {
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center gap-1.5 flex-shrink-0">
-                                                    <Button 
-                                                        icon="pi pi-comment" 
-                                                        severity="secondary" 
+                                                    <Button
+                                                        icon="pi pi-comment"
+                                                        severity="secondary"
                                                         size="small"
-                                                        text 
+                                                        text
                                                         rounded
                                                         class="!p-1.5"
-                                                        @click="openRemarksDialog(element)" 
+                                                        @click="openRemarksDialog(element)"
                                                     />
                                                     <Button
                                                         icon="pi pi-arrow-right"
@@ -1142,8 +1178,8 @@ onUnmounted(() => {
                                 <template #item="{element, index}">
                                     <div :class="[
                                         'flex items-center justify-between rounded-md border p-2 transition-colors',
-                                        isPackageDetained(element) 
-                                            ? 'border-red-300 bg-red-50 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30' 
+                                        isPackageDetained(element)
+                                            ? 'border-red-300 bg-red-50 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30'
                                             : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-navy-600 dark:bg-navy-700/50 dark:hover:bg-navy-700'
                                     ]">
                                         <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -1178,16 +1214,16 @@ onUnmounted(() => {
                                                 v-tooltip.top="'Detain Package'"
                                                 @click.prevent="openDetainModal(element)"
                                             />
-                                            <Button 
-                                                icon="pi pi-comment" 
-                                                severity="secondary" 
+                                            <Button
+                                                icon="pi pi-comment"
+                                                severity="secondary"
                                                 size="small"
-                                                text 
+                                                text
                                                 rounded
                                                 class="!p-1.5"
-                                                @click="openRemarksDialog(element)" 
+                                                @click="openRemarksDialog(element)"
                                             />
-                                            <Button 
+                                            <Button
                                                 icon="pi pi-arrow-left"
                                                 severity="danger"
                                                 size="small"
@@ -1257,8 +1293,8 @@ onUnmounted(() => {
                                         <div v-for="(element, index) in mhbl.packages" :key="element.id">
                                             <div :class="[
                                                 'flex items-center justify-between rounded-md border p-2 transition-colors',
-                                                isPackageDetained(element) 
-                                                    ? 'border-red-300 bg-red-50 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30' 
+                                                isPackageDetained(element)
+                                                    ? 'border-red-300 bg-red-50 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/20 dark:hover:bg-red-900/30'
                                                     : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-navy-600 dark:bg-navy-700/50 dark:hover:bg-navy-700'
                                             ]">
                                                 <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -1279,7 +1315,7 @@ onUnmounted(() => {
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center gap-1.5 flex-shrink-0">
-                                                    <Button 
+                                                    <Button
                                                         v-if="element.unloading_issue.length === 0"
                                                         icon="pi pi-exclamation-triangle"
                                                         severity="warn"
@@ -1302,14 +1338,14 @@ onUnmounted(() => {
                                                         v-tooltip.top="'Detain Package'"
                                                         @click.prevent="openDetainModal(element)"
                                                     />
-                                                    <Button 
-                                                        icon="pi pi-comment" 
-                                                        severity="secondary" 
+                                                    <Button
+                                                        icon="pi pi-comment"
+                                                        severity="secondary"
                                                         size="small"
-                                                        text 
+                                                        text
                                                         rounded
                                                         class="!p-1.5"
-                                                        @click="openRemarksDialog(element)" 
+                                                        @click="openRemarksDialog(element)"
                                                     />
                                                     <Button
                                                         icon="pi pi-arrow-left"
