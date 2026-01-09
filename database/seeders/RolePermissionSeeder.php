@@ -40,7 +40,7 @@ class RolePermissionSeeder extends Seeder
 
         $this->command->info('Default Roles added with hierarchy.');
 
-        $this->assignPermissions();
+        // $this->assignPermissions();
 
         $this->createPermissionIfNotExsists();
 
