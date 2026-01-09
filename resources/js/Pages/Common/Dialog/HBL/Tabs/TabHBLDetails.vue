@@ -226,38 +226,29 @@ const getIssueLabel = (issueText) => {
 };
 
 const handleIssueClick = async (issue, packageData) => {
-    // Fetch full issue details from API
+    // Use the data we already have from the HBL props
     try {
-        const response = await axios.get(`/get-unloading-issues-by-hbl/${packageData.hbl_id}`);
-        const issues = response.data;
-
-        // Find the specific issue
-        const fullIssue = issues.find(i => i.id === issue.id);
-
-        if (fullIssue) {
-            // Transform to match the expected format
-            selectedIssueForDetail.value = {
-                id: fullIssue.id,
-                hbl: fullIssue.hbl_package?.hbl?.hbl_number || '-',
-                branch: fullIssue.hbl_package?.hbl?.branch?.name || '-',
-                hbl_name: fullIssue.hbl_package?.hbl?.hbl_name || '-',
-                consignee_name: fullIssue.hbl_package?.hbl?.consignee_name || '-',
-                created_at: fullIssue.created_at,
-                weight: fullIssue.hbl_package?.weight,
-                volume: fullIssue.hbl_package?.volume,
-                quantity: fullIssue.hbl_package?.quantity,
-                issue: fullIssue.issue,
-                type: fullIssue.type,
-                is_damaged: fullIssue.is_damaged ? 'Yes' : 'No',
-                is_fixed: fullIssue.is_fixed,
-                remarks: fullIssue.remarks || '-',
-                note: fullIssue.note || '-',
-                photos_count: 0, // Will be loaded by the modal
-            };
-            isShowIssueDetailModal.value = true;
-        }
+        selectedIssueForDetail.value = {
+            id: issue.id,
+            hbl: props.hbl?.hbl_number || '-',
+            branch: props.hbl?.branch?.name || '-',
+            hbl_name: props.hbl?.hbl_name || '-',
+            consignee_name: props.hbl?.consignee_name || '-',
+            created_at: issue.created_at || new Date().toISOString(),
+            weight: packageData.actual_weight || packageData.weight || 0,
+            volume: packageData.volume || 0,
+            quantity: packageData.quantity || 0,
+            issue: issue.issue || issue.type || '-',
+            type: issue.type || '-',
+            is_damaged: issue.is_damaged ? 'Yes' : 'No',
+            is_fixed: issue.is_fixed || false,
+            remarks: issue.remarks || '-',
+            note: issue.note || '-',
+            photos_count: 0, // Will be loaded by the modal
+        };
+        isShowIssueDetailModal.value = true;
     } catch (error) {
-        console.error('Error fetching issue details:', error);
+        console.error('Error preparing issue details:', error);
         push.error('Failed to load issue details');
     }
 };
