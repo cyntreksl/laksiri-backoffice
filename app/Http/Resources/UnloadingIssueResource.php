@@ -29,6 +29,10 @@ class UnloadingIssueResource extends JsonResource
             'is_damaged' => $this->is_damaged ? 'Yes' : 'No',
             'type' => $this->type ?? '-',
             'is_fixed' => $this->is_fixed ?? '-',
+            'remarks' => $this->remarks ?? '-',
+            'note' => $this->note ?? '-',
+            'has_photos' => $this->files()->count() > 0,
+            'photos_count' => $this->files()->count(),
         ];
     }
 }
