@@ -55,6 +55,7 @@ class HBLResource extends JsonResource
                     'is_today' => $this->tokens()->orderBy('created_at', 'desc')->first()->created_at->isToday(),
                 ]
                 : null,
+            'latest_token' => $this->tokens()->orderBy('created_at', 'desc')->first(),
             'hbl_number' => $this->hbl_number,
             'cr_number' => $this->cr_number,
             'system_status' => $this->system_status,

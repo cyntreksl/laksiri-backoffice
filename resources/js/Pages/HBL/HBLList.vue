@@ -25,6 +25,7 @@ import {debounce} from "lodash";
 import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import {push} from "notivue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
+import CancelTokenDialog from "@/Pages/Token/Partials/CancelTokenDialog.vue";
 
 const props = defineProps({
     users: {
@@ -67,6 +68,8 @@ const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
 const hblName = ref("");
+const showCancelTokenDialog = ref(false);
+const selectedToken = ref(null);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -102,6 +105,17 @@ const menuModel = ref([
         icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
         command: () => confirmHBLHold(selectedHBL),
         disabled: !usePage().props.user.permissions.includes("hbls.hold and release"),
+    },
+    {
+        label: "Cancel Token",
+        icon: "pi pi-fw pi-ban",
+        command: () => openCancelTokenDialog(selectedHBL),
+        visible: computed(() => {
+            // Show only if user has permission and HBL has an active token
+            return usePage().props.user.permissions.includes("tokens.cancel") &&
+                   selectedHBL.value?.latest_token &&
+                   !selectedHBL.value?.latest_token?.is_cancelled;
+        }),
     },
     {
         label: "Download",
@@ -371,6 +385,24 @@ const closeCallFlagModal = () => {
     hblName.value = "";
 };
 
+const openCancelTokenDialog = (hbl) => {
+    if (hbl.value?.latest_token) {
+        selectedToken.value = hbl.value.latest_token;
+        showCancelTokenDialog.value = true;
+    }
+};
+
+const closeCancelTokenDialog = () => {
+    showCancelTokenDialog.value = false;
+    selectedToken.value = null;
+};
+
+const handleTokenCancelled = (token) => {
+    // Refresh the HBL list to show updated token status
+    fetchHBLs(currentPage.value, filters.value.global.value);
+    push.success('Token cancelled successfully');
+};
+
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -594,6 +626,13 @@ const exportCSVFilename = computed(() => {
         :visible="showConfirmViewCallFlagModal"
         @close="closeCallFlagModal"
         @update:visible="showConfirmViewCallFlagModal = $event"/>
+
+    <CancelTokenDialog
+        :token="selectedToken"
+        :visible="showCancelTokenDialog"
+        @update:visible="showCancelTokenDialog = $event"
+        @token-cancelled="handleTokenCancelled"
+    />
 </template>
 
 <style>
