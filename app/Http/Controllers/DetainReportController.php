@@ -8,11 +8,13 @@ use App\Models\HBL;
 use App\Models\HBLPackage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DetainReportController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display the detain report page
      */
@@ -32,13 +34,13 @@ class DetainReportController extends Controller
     private function getDetainTypes(): array
     {
         return [
-            ['value' => 'RTF', 'label' => 'RTF - Return to Facility'],
-            ['value' => 'DDC', 'label' => 'DDC - Document Discrepancy'],
-            ['value' => 'SDDC', 'label' => 'SDDC - Serious Document Discrepancy'],
-            ['value' => 'IAU', 'label' => 'IAU - Investigation and Assessment Unit'],
-            ['value' => 'DC', 'label' => 'DC - Damage Check'],
-            ['value' => 'CO', 'label' => 'CO - Customs Office'],
-            ['value' => 'ICT', 'label' => 'ICT - Import Control Team'],
+            ['value' => 'RTF', 'label' => 'RTF'],
+            ['value' => 'DDC', 'label' => 'DDC'],
+            ['value' => 'SDDC', 'label' => 'SDDC'],
+            ['value' => 'IAU', 'label' => 'IAU'],
+            ['value' => 'DC', 'label' => 'DC'],
+            ['value' => 'CO', 'label' => 'CO '],
+            ['value' => 'ICT', 'label' => 'ICT'],
         ];
     }
 

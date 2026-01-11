@@ -99,12 +99,47 @@ const resetFilters = () => {
 };
 
 const exportData = () => {
-    const params = new URLSearchParams({
-        ...lazyParams,
-        ...filters,
+    // Build params object, excluding null/undefined values and formatting dates
+    const params = {};
+    
+    // Add lazy params
+    Object.keys(lazyParams).forEach(key => {
+        if (lazyParams[key] !== null && lazyParams[key] !== undefined) {
+            params[key] = lazyParams[key];
+        }
     });
+    
+    // Add filters, formatting dates and excluding null values
+    if (filters.date_from) {
+        params.date_from = filters.date_from instanceof Date 
+            ? filters.date_from.toISOString().split('T')[0]
+            : filters.date_from;
+    }
+    
+    if (filters.date_to) {
+        params.date_to = filters.date_to instanceof Date 
+            ? filters.date_to.toISOString().split('T')[0]
+            : filters.date_to;
+    }
+    
+    if (filters.status) {
+        params.status = filters.status;
+    }
+    
+    if (filters.detain_type) {
+        params.detain_type = filters.detain_type;
+    }
+    
+    if (filters.entity_level) {
+        params.entity_level = filters.entity_level;
+    }
+    
+    if (filters.search && filters.search.trim() !== '') {
+        params.search = filters.search;
+    }
 
-    window.location.href = route('report.detain-report.export') + '?' + params.toString();
+    const queryString = new URLSearchParams(params).toString();
+    window.location.href = route('report.detain-report.export') + '?' + queryString;
     push.success('Export started. Download will begin shortly.');
 };
 

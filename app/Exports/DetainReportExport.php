@@ -82,29 +82,51 @@ class DetainReportExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
             return $data;
         }
 
-        switch ($record->rtfable_type) {
-            case 'App\Models\Container':
-                $data['shipment_reference'] = $record->rtfable->reference;
-                break;
+        try {
+            switch ($record->rtfable_type) {
+                case 'App\Models\Container':
+                    $data['shipment_reference'] = $record->rtfable->reference ?? null;
+                    break;
 
-            case 'App\Models\HBL':
-                $hbl = $record->rtfable;
-                $data['hbl_reference'] = $hbl->reference;
-                if ($hbl->container) {
-                    $data['shipment_reference'] = $hbl->container->reference;
-                }
-                break;
-
-            case 'App\Models\HBLPackage':
-                $package = $record->rtfable;
-                $data['package_number'] = $package->package_number;
-                if ($package->hbl) {
-                    $data['hbl_reference'] = $package->hbl->reference;
-                    if ($package->hbl->container) {
-                        $data['shipment_reference'] = $package->hbl->container->reference;
+                case 'App\Models\HBL':
+                    $hbl = $record->rtfable;
+                    $data['hbl_reference'] = $hbl->reference ?? null;
+                    // Load container relationship if not loaded
+                    if ($hbl->relationLoaded('container')) {
+                        $data['shipment_reference'] = $hbl->container->reference ?? null;
+                    } else {
+                        $container = $hbl->container()->first();
+                        $data['shipment_reference'] = $container->reference ?? null;
                     }
-                }
-                break;
+                    break;
+
+                case 'App\Models\HBLPackage':
+                    $package = $record->rtfable;
+                    $data['package_number'] = $package->package_number ?? null;
+                    
+                    // Load HBL relationship if not loaded
+                    if ($package->relationLoaded('hbl')) {
+                        $hbl = $package->hbl;
+                    } else {
+                        $hbl = $package->hbl()->first();
+                    }
+                    
+                    if ($hbl) {
+                        $data['hbl_reference'] = $hbl->reference ?? null;
+                        
+                        // Load container relationship if not loaded
+                        if ($hbl->relationLoaded('container')) {
+                            $data['shipment_reference'] = $hbl->container->reference ?? null;
+                        } else {
+                            $container = $hbl->container()->first();
+                            $data['shipment_reference'] = $container->reference ?? null;
+                        }
+                    }
+                    break;
+            }
+        } catch (\Exception $e) {
+            // If any error occurs, just return the data as is
+            \Log::error('Error getting entity data for detain record: ' . $e->getMessage());
         }
 
         return $data;
@@ -164,15 +186,16 @@ class DetainReportExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 
     private function applyFilters($query): void
     {
-        if ($this->request->filled('date_from')) {
+        // Only apply filters if they are actually set and not null
+        if ($this->request->filled('date_from') && $this->request->input('date_from') !== null) {
             $query->where('created_at', '>=', $this->request->input('date_from'));
         }
 
-        if ($this->request->filled('date_to')) {
+        if ($this->request->filled('date_to') && $this->request->input('date_to') !== null) {
             $query->where('created_at', '<=', $this->request->input('date_to') . ' 23:59:59');
         }
 
-        if ($this->request->filled('status')) {
+        if ($this->request->filled('status') && $this->request->input('status') !== null) {
             $status = $this->request->input('status');
             if ($status === 'detained') {
                 $query->where('action', 'detain')->where('is_rtf', true);
@@ -181,15 +204,15 @@ class DetainReportExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
             }
         }
 
-        if ($this->request->filled('detain_type')) {
+        if ($this->request->filled('detain_type') && $this->request->input('detain_type') !== null) {
             $query->where('detain_type', $this->request->input('detain_type'));
         }
 
-        if ($this->request->filled('entity_level')) {
+        if ($this->request->filled('entity_level') && $this->request->input('entity_level') !== null) {
             $query->where('entity_level', $this->request->input('entity_level'));
         }
 
-        if ($this->request->filled('search')) {
+        if ($this->request->filled('search') && $this->request->input('search') !== null) {
             $search = $this->request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('detain_reason', 'like', "%{$search}%")
@@ -198,7 +221,7 @@ class DetainReportExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
             });
         }
 
-        if ($this->request->filled('branch_id')) {
+        if ($this->request->filled('branch_id') && $this->request->input('branch_id') !== null) {
             $query->where('branch_id', $this->request->input('branch_id'));
         }
     }
