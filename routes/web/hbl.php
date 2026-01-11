@@ -120,6 +120,15 @@ Route::post('hbl-packages/{hbl_package}/set/detain', [HBLController::class, 'set
 Route::post('hbl-packages/{hbl_package}/unset/detain', [HBLController::class, 'unsetPackageDetain'])
     ->name('hbl-packages.unset.detain');
 
+Route::post('hbls/{hbl}/set/detain', [HBLController::class, 'setHBLDetain'])
+    ->name('hbls.set.detain');
+
+Route::post('hbls/{hbl}/unset/detain', [HBLController::class, 'unsetHBLDetain'])
+    ->name('hbls.unset.detain');
+
+Route::get('hbls/{hbl}/detain-history', [HBLController::class, 'getDetainHistory'])
+    ->name('hbls.detain-history');
+
 Route::get('hbl-charge/{id}', [HBLController::class, 'hblChargeDetails'])
     ->name('hbl-charge.details');
 
