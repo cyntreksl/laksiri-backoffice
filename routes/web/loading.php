@@ -108,6 +108,12 @@ Route::name('loading.')->group(function () {
     Route::post('containers/{container}/unset/rtf', [ContainerController::class, 'unsetRTF'])
         ->name('containers.unset.rtf');
 
+    Route::post('containers/{container}/set/detain', [ContainerController::class, 'setContainerDetain'])
+        ->name('containers.set.detain');
+
+    Route::post('containers/{container}/unset/detain', [ContainerController::class, 'unsetContainerDetain'])
+        ->name('containers.unset.detain');
+
     Route::get('all-shipments', [ContainerController::class, 'allShipments'])
         ->name('all-shipments');
 

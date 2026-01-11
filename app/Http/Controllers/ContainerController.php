@@ -366,6 +366,48 @@ class ContainerController extends Controller
         return $this->containerRepository->undoRTF($container);
     }
 
+    public function setContainerDetain(Request $request, Container $container)
+    {
+        $validated = $request->validate([
+            'detain_type' => 'required|string',
+            'detain_reason' => 'required|string',
+            'remarks' => 'nullable|string',
+        ]);
+
+        try {
+            $this->containerRepository->doDetain(
+                $container,
+                $validated['detain_type'],
+                $validated['detain_reason'],
+                $validated['remarks'] ?? null
+            );
+
+            return redirect()->back();
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['message' => $e->getMessage()]);
+        }
+    }
+
+    public function unsetContainerDetain(Request $request, Container $container)
+    {
+        $validated = $request->validate([
+            'lift_reason' => 'required|string',
+            'remarks' => 'nullable|string',
+        ]);
+
+        try {
+            $this->containerRepository->undoDetain(
+                $container,
+                $validated['lift_reason'],
+                $validated['remarks'] ?? null
+            );
+
+            return redirect()->back();
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['message' => $e->getMessage()]);
+        }
+    }
+
     public function storeRemark(StoreRemarksRequest $request, Container $container)
     {
         $remark = new Remark;
