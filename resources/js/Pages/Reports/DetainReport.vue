@@ -27,6 +27,8 @@ const props = defineProps({
 const loading = ref(false);
 const records = ref([]);
 const totalRecords = ref(0);
+const detainedCount = ref(0);
+const releasedCount = ref(0);
 const lazyParams = reactive({
     page: 1,
     per_page: 25,
@@ -62,6 +64,8 @@ const fetchData = async () => {
         if (response.data.success) {
             records.value = response.data.data;
             totalRecords.value = response.data.total;
+            detainedCount.value = response.data.detained_count || 0;
+            releasedCount.value = response.data.released_count || 0;
         }
     } catch (error) {
         console.error('Error fetching detain report:', error);
@@ -184,8 +188,8 @@ const formatDate = (dateString) => {
 const summaryStats = computed(() => {
     return {
         total: totalRecords.value,
-        detained: records.value.filter(r => r.status === 'Detained').length,
-        released: records.value.filter(r => r.status === 'Released').length,
+        detained: detainedCount.value,
+        released: releasedCount.value,
     };
 });
 

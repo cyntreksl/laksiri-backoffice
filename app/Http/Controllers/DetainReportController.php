@@ -71,6 +71,13 @@ class DetainReportController extends Controller
 
         // Get total count before pagination
         $totalRecords = $query->count();
+        
+        // Calculate stats for summary cards
+        $statsQuery = DetainRecord::withoutGlobalScope(\App\Models\Scopes\BranchScope::class);
+        $this->applyFilters($statsQuery, $request);
+        
+        $detainedCount = (clone $statsQuery)->where('action', 'detain')->count();
+        $releasedCount = (clone $statsQuery)->where('action', 'lift')->count();
 
         // Apply sorting - handle computed fields
         $sortField = $request->input('sort_field', 'created_at');
@@ -108,6 +115,8 @@ class DetainReportController extends Controller
             'success' => true,
             'data' => $data,
             'total' => $totalRecords,
+            'detained_count' => $detainedCount,
+            'released_count' => $releasedCount,
             'per_page' => $perPage,
             'current_page' => $page,
             'last_page' => ceil($totalRecords / $perPage),
