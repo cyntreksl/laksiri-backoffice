@@ -63,7 +63,7 @@ class DetainReportController extends Controller
     {
         $this->authorize('reports.detain');
 
-        $query = DetainRecord::query()
+        $query = DetainRecord::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
             ->with(['detainedBy', 'liftedBy', 'rtfable', 'branch']);
 
         // Apply filters

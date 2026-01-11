@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\DetainRecord;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -171,7 +172,7 @@ class DetainReportExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
 
     public function query()
     {
-        $query = DetainRecord::query()
+        $query = DetainRecord::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
             ->with(['detainedBy', 'liftedBy', 'rtfable', 'branch']);
 
         $this->applyFilters($query);
