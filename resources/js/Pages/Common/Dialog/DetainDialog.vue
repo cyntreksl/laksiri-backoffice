@@ -31,7 +31,7 @@ const emit = defineEmits(['update:visible', 'confirm']);
 
 const detainTypeOptions = [
     { label: 'RTF', value: 'RTF' },
-    { label: 'DDC ', value: 'DDC' },
+    { label: 'DDC', value: 'DDC' },
     { label: 'SDDC', value: 'SDDC' },
     { label: 'IAU', value: 'IAU' },
     { label: 'DC', value: 'DC' },
@@ -64,19 +64,22 @@ const handleConfirm = () => {
         if (!detainType.value || !detainReason.value) {
             return;
         }
-        emit('confirm', {
+        const data = {
             detain_type: detainType.value,
             detain_reason: detainReason.value,
             remarks: remarks.value
-        });
+        };
+
+        emit('confirm', data);
     } else {
         if (!liftReason.value) {
             return;
         }
-        emit('confirm', {
+        const data = {
             lift_reason: liftReason.value,
             remarks: remarks.value
-        });
+        };
+        emit('confirm', data);
     }
 };
 
