@@ -738,6 +738,13 @@ class RolePermissionSeeder extends Seeder
                     'manage_whatsapp',
                 ],
             ],
+
+            [
+                'group_name' => 'Reports',
+                'permissions' => [
+                    'reports.detain',
+                ],
+            ],
         ];
     }
 

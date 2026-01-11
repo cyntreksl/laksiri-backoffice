@@ -891,10 +891,17 @@ const setMenu = (menu) => {
             changeSidePanelTitle("Delivery");
             break;
         case "report":
-            childMenuList.splice(0, childMenuList.length, {
-                title: "Payment Summery",
-                route: "report.payment-summaries.index",
-            });
+            childMenuList.splice(0, childMenuList.length, 
+                {
+                    title: "Payment Summery",
+                    route: "report.payment-summaries.index",
+                },
+                {
+                    title: "Detain Report",
+                    route: "report.detain-report.index",
+                    permission: "reports.detain",
+                }
+            );
             changeSidePanelTitle("Report");
             break;
         case "setting":
