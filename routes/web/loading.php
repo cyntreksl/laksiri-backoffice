@@ -114,6 +114,9 @@ Route::name('loading.')->group(function () {
     Route::post('containers/{container}/unset/detain', [ContainerController::class, 'unsetContainerDetain'])
         ->name('containers.unset.detain');
 
+    Route::get('containers/{container}/detain-history', [ContainerController::class, 'getDetainHistory'])
+        ->name('containers.detain-history');
+
     Route::get('all-shipments', [ContainerController::class, 'allShipments'])
         ->name('all-shipments');
 
