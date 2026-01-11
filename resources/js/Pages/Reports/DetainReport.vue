@@ -2,6 +2,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { router } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -194,7 +195,10 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="detain-report-page">
+    <AppLayout title="Detain Report">
+        <template #header>Detain Report</template>
+
+        <div class="detain-report-page">
         <!-- Page Header -->
         <div class="page-header">
             <div class="header-content">
@@ -478,6 +482,7 @@ onMounted(() => {
             </template>
         </Card>
     </div>
+    </AppLayout>
 </template>
 
 <style scoped>
