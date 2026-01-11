@@ -72,10 +72,27 @@ class DetainReportController extends Controller
         // Get total count before pagination
         $totalRecords = $query->count();
 
-        // Apply sorting
+        // Apply sorting - handle computed fields
         $sortField = $request->input('sort_field', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
-        $query->orderBy($sortField, $sortOrder);
+        
+        // Map frontend field names to database columns
+        $sortableFields = [
+            'id' => 'id',
+            'shipment_reference' => 'rtfable_id', // Not perfect but best we can do
+            'hbl_reference' => 'rtfable_id',
+            'package_number' => 'rtfable_id',
+            'entity_level' => 'entity_level',
+            'detain_type' => 'detain_type',
+            'detained_date' => 'created_at',
+            'detention_duration_human' => 'created_at', // Sort by created_at as proxy
+            'status' => 'action',
+            'released_date' => 'lifted_at',
+        ];
+        
+        // Use mapped field or default to created_at
+        $dbSortField = $sortableFields[$sortField] ?? 'created_at';
+        $query->orderBy($dbSortField, $sortOrder);
 
         // Apply pagination
         $perPage = $request->input('per_page', 25);
@@ -155,6 +172,19 @@ class DetainReportController extends Controller
         $entityData = $this->getEntityData($record);
         $detentionDuration = $this->calculateDuration($record);
 
+        // If this is a lift action, find the corresponding detain record
+        $detainRecord = null;
+        if ($record->action === 'lift') {
+            $detainRecord = DetainRecord::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+                ->where('rtfable_type', $record->rtfable_type)
+                ->where('rtfable_id', $record->rtfable_id)
+                ->where('action', 'detain')
+                ->where('detain_type', $record->detain_type)
+                ->where('created_at', '<=', $record->created_at)
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
+
         return [
             'id' => $record->id,
             'shipment_reference' => $entityData['shipment_reference'],
@@ -163,19 +193,22 @@ class DetainReportController extends Controller
             'entity_level' => $record->entity_level,
             'entity_type' => $entityData['entity_type'],
             'detain_type' => $record->detain_type,
-            'detain_reason' => $record->detain_reason,
+            'detain_reason' => $record->action === 'detain' ? $record->detain_reason : ($detainRecord?->detain_reason ?? 'N/A'),
             'lift_reason' => $record->lift_reason,
             'remarks' => $record->remarks,
             'action' => $record->action,
             'status' => $record->action === 'detain' ? 'Detained' : 'Released',
-            'detained_date' => $record->created_at?->format('Y-m-d H:i:s'),
-            'released_date' => $record->lifted_at?->format('Y-m-d H:i:s'),
-            'detention_duration' => $detentionDuration,
-            'detention_duration_human' => $this->formatDuration($detentionDuration),
-            'detained_by' => $record->detainedBy ? [
+            'detained_date' => $record->action === 'detain' ? $record->created_at?->format('Y-m-d H:i:s') : ($detainRecord?->created_at?->format('Y-m-d H:i:s') ?? 'N/A'),
+            'released_date' => $record->action === 'lift' ? $record->lifted_at?->format('Y-m-d H:i:s') : null,
+            'detention_duration' => $detainRecord ? $this->calculateDurationBetween($detainRecord->created_at, $record->lifted_at ?? now()) : $detentionDuration,
+            'detention_duration_human' => $detainRecord ? $this->formatDuration($this->calculateDurationBetween($detainRecord->created_at, $record->lifted_at ?? now())) : $this->formatDuration($detentionDuration),
+            'detained_by' => $record->action === 'detain' ? ($record->detainedBy ? [
                 'id' => $record->detainedBy->id,
                 'name' => $record->detainedBy->name,
-            ] : null,
+            ] : null) : ($detainRecord?->detainedBy ? [
+                'id' => $detainRecord->detainedBy->id,
+                'name' => $detainRecord->detainedBy->name,
+            ] : null),
             'lifted_by' => $record->liftedBy ? [
                 'id' => $record->liftedBy->id,
                 'name' => $record->liftedBy->name,
@@ -242,6 +275,18 @@ class DetainReportController extends Controller
 
         $startDate = $record->created_at;
         $endDate = $record->lifted_at ?? now();
+
+        return $startDate->diffInMinutes($endDate);
+    }
+
+    /**
+     * Calculate duration between two dates in minutes
+     */
+    private function calculateDurationBetween($startDate, $endDate): ?int
+    {
+        if (!$startDate) {
+            return null;
+        }
 
         return $startDate->diffInMinutes($endDate);
     }

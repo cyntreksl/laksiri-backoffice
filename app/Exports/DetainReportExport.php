@@ -51,6 +51,23 @@ class DetainReportExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
         $entityData = $this->getEntityData($record);
         $duration = $this->calculateDuration($record);
 
+        // If this is a lift action, find the corresponding detain record
+        $detainRecord = null;
+        if ($record->action === 'lift') {
+            $detainRecord = DetainRecord::withoutGlobalScope(BranchScope::class)
+                ->where('rtfable_type', $record->rtfable_type)
+                ->where('rtfable_id', $record->rtfable_id)
+                ->where('action', 'detain')
+                ->where('detain_type', $record->detain_type)
+                ->where('created_at', '<=', $record->created_at)
+                ->orderBy('created_at', 'desc')
+                ->first();
+                
+            if ($detainRecord) {
+                $duration = $detainRecord->created_at->diffInMinutes($record->lifted_at ?? now());
+            }
+        }
+
         return [
             $record->id,
             $entityData['shipment_reference'] ?? 'N/A',
@@ -58,14 +75,14 @@ class DetainReportExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
             $entityData['package_number'] ?? 'N/A',
             ucfirst($record->entity_level ?? 'N/A'),
             $record->detain_type ?? 'N/A',
-            $record->detain_reason ?? 'N/A',
-            $record->created_at?->format('Y-m-d H:i:s') ?? 'N/A',
+            $record->action === 'detain' ? ($record->detain_reason ?? 'N/A') : ($detainRecord?->detain_reason ?? 'N/A'),
+            $record->action === 'detain' ? ($record->created_at?->format('Y-m-d H:i:s') ?? 'N/A') : ($detainRecord?->created_at?->format('Y-m-d H:i:s') ?? 'N/A'),
             $this->formatDuration($duration),
             $record->action === 'detain' ? 'Detained' : 'Released',
-            $record->lifted_at?->format('Y-m-d H:i:s') ?? 'N/A',
+            $record->action === 'lift' ? ($record->lifted_at?->format('Y-m-d H:i:s') ?? 'N/A') : 'N/A',
             $record->lift_reason ?? 'N/A',
             $record->remarks ?? 'N/A',
-            $record->detainedBy?->name ?? 'N/A',
+            $record->action === 'detain' ? ($record->detainedBy?->name ?? 'N/A') : ($detainRecord?->detainedBy?->name ?? 'N/A'),
             $record->liftedBy?->name ?? 'N/A',
             $record->branch?->name ?? 'N/A',
         ];

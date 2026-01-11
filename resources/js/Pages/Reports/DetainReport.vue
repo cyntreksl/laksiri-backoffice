@@ -385,19 +385,19 @@ onMounted(() => {
                         </template>
                     </Column>
 
-                    <Column field="shipment_reference" header="Shipment Ref" sortable style="min-width: 150px">
+                    <Column field="shipment_reference" header="Shipment Ref" style="min-width: 150px">
                         <template #body="{ data }">
                             <span class="font-mono font-semibold">{{ data.shipment_reference || 'N/A' }}</span>
                         </template>
                     </Column>
 
-                    <Column field="hbl_reference" header="HBL Ref" sortable style="min-width: 150px">
+                    <Column field="hbl_reference" header="HBL Ref" style="min-width: 150px">
                         <template #body="{ data }">
                             <span class="font-mono">{{ data.hbl_reference || 'N/A' }}</span>
                         </template>
                     </Column>
 
-                    <Column field="package_number" header="Package #" sortable style="min-width: 120px">
+                    <Column field="package_number" header="Package #" style="min-width: 120px">
                         <template #body="{ data }">
                             <span class="font-mono">{{ data.package_number || 'N/A' }}</span>
                         </template>
@@ -435,7 +435,7 @@ onMounted(() => {
                         </template>
                     </Column>
 
-                    <Column field="detention_duration_human" header="Duration" sortable style="min-width: 120px">
+                    <Column field="detention_duration_human" header="Duration" style="min-width: 120px">
                         <template #body="{ data }">
                             <span class="font-mono text-sm font-semibold">
                                 {{ data.detention_duration_human || 'N/A' }}
@@ -470,6 +470,22 @@ onMounted(() => {
                                 <span class="text-sm">{{ data.detained_by.name }}</span>
                             </div>
                             <span v-else class="text-gray-400">N/A</span>
+                        </template>
+                    </Column>
+
+                    <Column field="lifted_by.name" header="Lifted By" style="min-width: 150px">
+                        <template #body="{ data }">
+                            <div v-if="data.lifted_by" class="flex items-center gap-2">
+                                <i class="pi pi-user text-green-500"></i>
+                                <span class="text-sm">{{ data.lifted_by.name }}</span>
+                            </div>
+                            <span v-else class="text-gray-400">N/A</span>
+                        </template>
+                    </Column>
+
+                    <Column field="lift_reason" header="Lift Reason" style="min-width: 200px">
+                        <template #body="{ data }">
+                            <span class="text-sm text-green-700">{{ data.lift_reason || 'N/A' }}</span>
                         </template>
                     </Column>
 
