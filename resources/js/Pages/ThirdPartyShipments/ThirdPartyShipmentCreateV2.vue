@@ -648,9 +648,6 @@ const grandTotalVolume = ref(0);
 const addPackageData = () => {
     if (
         !packageItem.type ||
-        packageItem.length <= 0 ||
-        packageItem.width <= 0 ||
-        packageItem.height <= 0 ||
         packageItem.quantity <= 0 ||
         packageItem.volume <= 0 ||
         form.is_active_package
@@ -2006,7 +2003,7 @@ watch(
                                         variant="outlined"
                                         type="submit"
                                     />
-                                    <Button
+                                    <!-- <Button
                                         :class="{
                                             'opacity-50': form.processing,
                                         }"
@@ -2016,7 +2013,7 @@ watch(
                                         label="Save & Finish"
                                         severity="info"
                                         @click.prevent="saveAndFinish"
-                                    />
+                                    /> -->
                                 </div>
                         </div>
                     </form>
@@ -2046,7 +2043,7 @@ watch(
                 !editMode ? "Add new package to HBL" : ""
             }}</span>
 
-            <div class="grid grid-cols-4 gap-4">
+            <div class="grid grid-cols-4 gap-6">
                 <div class="col-span-4 md:col-span-1">
                     <InputLabel value="Type" />
                     <Select
@@ -2089,7 +2086,6 @@ watch(
                 <div class="col-span-4 md:col-span-1">
                     <InputLabel>
                         Length
-                        <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
                     <InputNumber
                         v-model="packageItem.length"
@@ -2097,7 +2093,7 @@ watch(
                         :minFractionDigits="2"
                         class="w-full"
                         min="0.00"
-                        placeholder="1.00"
+                        placeholder="0.00"
                         step="0.01"
                     />
                     <Message severity="secondary" size="small" variant="simple"
@@ -2108,7 +2104,6 @@ watch(
                 <div class="col-span-4 md:col-span-1">
                     <InputLabel>
                         Width
-                        <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
                     <InputNumber
                         v-model="packageItem.width"
@@ -2116,7 +2111,7 @@ watch(
                         :minFractionDigits="2"
                         class="w-full"
                         min="0.00"
-                        placeholder="1.00"
+                        placeholder="0.00"
                         step="0.01"
                     />
                     <Message severity="secondary" size="small" variant="simple"
@@ -2127,7 +2122,6 @@ watch(
                 <div class="col-span-4 md:col-span-1">
                     <InputLabel>
                         Height
-                        <span class="text-red-500 text-sm">*</span>
                     </InputLabel>
                     <InputNumber
                         v-model="packageItem.height"
@@ -2135,7 +2129,7 @@ watch(
                         :minFractionDigits="2"
                         class="w-full"
                         min="0.00"
-                        placeholder="1.00"
+                        placeholder="0.00"
                         step="0.01"
                     />
                     <Message severity="secondary" size="small" variant="simple"
@@ -2157,7 +2151,7 @@ watch(
                     />
                 </div>
 
-                <div class="col-span-2">
+                <div class="col-span-2 mt-2">
                     <InputLabel>
                         Volume ({{ volumeUnit }})
                         <span class="text-red-500 text-sm">*</span>
@@ -2175,7 +2169,7 @@ watch(
                     >
                 </div>
 
-                <div class="col-span-2">
+                <div class="col-span-2 mt-2">
                     <InputLabel value="Total Weight" />
                     <InputNumber
                         v-model="packageItem.totalWeight"
@@ -2197,7 +2191,7 @@ watch(
                     >
                 </div>
 
-                <div class="col-span-4">
+                <div class="col-span-4 mt-2">
                     <InputLabel value="Remarks" />
                     <Textarea
                         v-model="packageItem.remarks"
