@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BondedWarehouseController;
 use App\Http\Controllers\ContainerController;
+use App\Http\Controllers\ContainerUnloadingAuditController;
 use App\Http\Controllers\UnloadingIssueController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,28 @@ Route::name('arrival.')->group(function () {
 
     Route::post('/unload-container/reload', [ContainerController::class, 'reloadContainer'])
         ->name('unload-container.reload');
+
+    Route::post('/unload-container/unload-hbl-group', [ContainerController::class, 'unloadHBLGroup'])
+        ->name('unload-container.unload-hbl-group');
+
+    Route::post('/unload-container/unload-mhbl-group', [ContainerController::class, 'unloadMHBLGroup'])
+        ->name('unload-container.unload-mhbl-group');
+
+    // Audit Logs
+    Route::get('/containers/{container}/audit-logs', [ContainerUnloadingAuditController::class, 'index'])
+        ->name('containers.audit-logs.index');
+
+    Route::get('/containers/{container}/audit-logs/json', [ContainerUnloadingAuditController::class, 'getAuditLogs'])
+        ->name('containers.audit-logs.json');
+
+    Route::get('/hbl/{hblId}/audit-logs', [ContainerUnloadingAuditController::class, 'hblAuditLogs'])
+        ->name('hbl.audit-logs');
+
+    Route::get('/mhbl/{mhblId}/audit-logs', [ContainerUnloadingAuditController::class, 'mhblAuditLogs'])
+        ->name('mhbl.audit-logs');
+
+    Route::get('/package/{packageId}/audit-logs', [ContainerUnloadingAuditController::class, 'packageAuditLogs'])
+        ->name('package.audit-logs');
 
     Route::post('/unloading-points/create/unloading-issue', [ContainerController::class, 'storeUnloadingIssue'])
         ->name('unloading-points.create.unloading-issue');

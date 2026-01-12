@@ -451,6 +451,24 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         }
     }
 
+    public function unloadHBLGroup(array $data)
+    {
+        try {
+            return \App\Actions\Container\Unloading\UnloadHBLGroup::run($data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to unload HBL group: '.$e->getMessage());
+        }
+    }
+
+    public function unloadMHBLGroup(array $data)
+    {
+        try {
+            return \App\Actions\Container\Unloading\UnloadMHBLGroup::run($data);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to unload MHBL group: '.$e->getMessage());
+        }
+    }
+
     public function createUnloadingIssue(array $data): void
     {
         CreateUnloadingIssue::run($data);
