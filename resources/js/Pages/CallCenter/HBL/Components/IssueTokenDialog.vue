@@ -14,6 +14,7 @@ import Divider from "primevue/divider";
 import Avatar from "primevue/avatar";
 import Tag from "primevue/tag";
 import TokenSuccessModal from "./TokenSuccessModal.vue";
+import PaymentSummaryCard from "@/Pages/CallCenter/Components/PaymentSummaryCard.vue";
 
 const props = defineProps({
     visible: {
@@ -415,52 +416,7 @@ watch(() => props.visible, (newVal) => {
             <!-- Right Panel - Payment Summary & Reception Verification -->
             <div class="col-span-4">
                 <!-- Payment Summary -->
-                <Card class="mb-5">
-                    <template #title>
-                        <div class="flex items-center gap-3">
-                            <Avatar icon="pi pi-wallet" class="bg-green-100 text-green-600" size="large" />
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900">Payment Summary</h3>
-                            </div>
-                        </div>
-                    </template>
-                                                                                <template #content>
-                                                <div v-if="props.hbl?.grand_total" class="space-y-4">
-                            <!-- Total Amount -->
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-600">Total Amount:</span>
-                                <span class="font-bold text-lg">{{ currencyCode }} {{ parseFloat(props.hbl.grand_total || 0).toFixed(2) }}</span>
-                            </div>
-
-                            <!-- Paid Amount -->
-                            <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                                <span class="font-medium text-gray-600">Paid Amount:</span>
-                                <span class="font-bold text-lg text-green-700">{{ currencyCode }} {{ parseFloat(props.hbl.paid_amount || 0).toFixed(2) }}</span>
-                            </div>
-
-                            <!-- Outstanding -->
-                            <div class="flex justify-between items-center p-3 rounded-lg"
-                                 :class="((props.hbl.grand_total || 0) - (props.hbl.paid_amount || 0)) > 0 ? 'bg-orange-50' : 'bg-green-50'">
-                                <span class="font-medium text-gray-600">Outstanding:</span>
-                                <span class="font-bold text-lg"
-                                      :class="((props.hbl.grand_total || 0) - (props.hbl.paid_amount || 0)) > 0 ? 'text-orange-700' : 'text-green-700'">
-                                    {{ currencyCode }} {{ ((props.hbl.grand_total || 0) - (props.hbl.paid_amount || 0)).toFixed(2) }}
-                                </span>
-                            </div>
-
-                            <!-- Status -->
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-gray-600">Payment Status:</span>
-                                <Tag :value="paymentStatus"
-                                     :severity="paymentStatus === 'Paid' ? 'success' : paymentStatus === 'Partial' ? 'warning' : 'danger'" />
-                            </div>
-                        </div>
-                        <div v-else class="text-center py-8">
-                            <i class="pi pi-wallet text-4xl text-gray-400 mb-3"></i>
-                            <p class="text-gray-500">No payment information available</p>
-                        </div>
-                    </template>
-                </Card>
+                <PaymentSummaryCard v-if="props.hbl?.id" :hbl-id="props.hbl.id" />
 
                 <!-- Reception Verification -->
                 <Card>

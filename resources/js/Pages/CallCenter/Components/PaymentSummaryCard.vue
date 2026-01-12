@@ -102,6 +102,10 @@ const departureCharges = computed(() => {
 
 const destinationICharges = computed(() => {
     if (!hblCharges.value) return 0;
+    
+    // If destination charges are already paid, return 0 to avoid showing charges
+    if (hbl.value?.is_destination_charges_paid) return 0;
+    
     const handling = Number(hblCharges.value.destination_handling_charge) || 0;
     const slpa = Number(hblCharges.value.destination_slpa_charge) || 0;
     const bond = Number(hblCharges.value.destination_bond_charge) || 0;
@@ -144,16 +148,24 @@ const destinationIICharges = computed(() => {
 
 const slPortalTotal = computed(() => {
     if (!hblCharges.value) return 0;
+    
+    // Calculate Destination II charges (always in LKR)
+    const dest2Charges = (Number(hblCharges.value.destination_2_total) || 0) +
+                        (Number(hblCharges.value.destination_2_tax) || 0);
+    
     if (isPrepaid.value) {
-        const sum = (Number(hblCharges.value.destination_2_total) || 0) +
-            (Number(hblCharges.value.destination_2_tax) || 0);
-        return convertCurrency(sum, false);
+        // For prepaid, SL Portal only includes Destination II charges
+        return convertCurrency(dest2Charges, false);
     } else {
-        const sum = (Number(hblCharges.value.destination_1_total) || 0) +
-            (Number(hblCharges.value.destination_2_total) || 0) +
-            (Number(hblCharges.value.destination_1_tax) || 0) +
-            (Number(hblCharges.value.destination_2_tax) || 0);
-        return convertCurrency(sum, false);
+        // For non-prepaid, include Destination I only if not already paid
+        let totalCharges = dest2Charges;
+        
+        if (!hbl.value?.is_destination_charges_paid) {
+            totalCharges += (Number(hblCharges.value.destination_1_total) || 0) +
+                           (Number(hblCharges.value.destination_1_tax) || 0);
+        }
+        
+        return convertCurrency(totalCharges, false);
     }
 });
 
@@ -183,61 +195,85 @@ watch(totalDue, (val) => {
                 <div class="space-y-6">
                     <!-- Agent Section -->
                     <div>
-                        <div class="flex items-center mb-4 gap-2">
-                            <i class="pi pi-building text-blue-600 text-xl"></i>
-                            <span class="font-semibold text-blue-900 text-lg">Agent Charges</span>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <i class="pi pi-building text-blue-600 text-xl"></i>
+                                <span class="font-semibold text-blue-900 text-lg">Agent Charges</span>
+                            </div>
+                            <div v-if="hbl?.is_departure_charges_paid || hbl?.is_destination_charges_paid" class="flex items-center space-x-2">
+                                <div v-if="hbl?.is_departure_charges_paid" class="flex items-center space-x-1">
+                                    <i class="fa fa-check-circle text-green-500 text-xs"></i>
+                                    <span class="text-xs text-green-600">Departure</span>
+                                </div>
+                                <div v-if="hbl?.is_destination_charges_paid" class="flex items-center space-x-1">
+                                    <i class="fa fa-check-circle text-green-500 text-xs"></i>
+                                    <span class="text-xs text-green-600">Destination</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="divide-y divide-gray-100">
-                            <div class="flex justify-between items-center py-2">
+                            <div v-if="departureCharges > 0" class="flex justify-between items-center py-2">
                                 <span class="text-gray-700">Departure Charges</span>
                                 <span class="font-semibold">{{ formatCurrency(departureCharges, baseCurrency) }}</span>
                             </div>
-                            <div class="flex justify-between items-center py-2">
+                            <div v-if="isPrepaid && destinationICharges > 0" class="flex justify-between items-center py-2">
                                 <span class="text-gray-700">Destination I Charges</span>
                                 <span class="font-semibold">{{ formatCurrency(destinationICharges, baseCurrency) }}</span>
                             </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-700">Agent Total</span>
+                            <div class="flex justify-between items-center py-2 bg-blue-50">
+                                <span class="text-gray-800 font-medium">Agent Total</span>
                                 <span class="text-blue-700 font-bold text-lg">{{ formatCurrency(agentTotal, baseCurrency) }}</span>
                             </div>
-                            <div class="flex justify-between items-center py-2">
+                            <div v-if="agentPaidAmount > 0" class="flex justify-between items-center py-2">
                                 <span class="text-gray-700">Agent Paid Amount</span>
                                 <span class="text-green-700 font-bold">{{ formatCurrency(agentPaidAmount, baseCurrency) }}</span>
                             </div>
-                            <div class="flex justify-between items-center py-2">
+                            <div v-if="agentDue !== 0" class="flex justify-between items-center py-2">
                                 <span class="text-gray-700">Agent Due</span>
-                                <span class="text-red-700 font-bold">{{ formatCurrency(agentDue, baseCurrency) }}</span>
+                                <span :class="agentDue > 0 ? 'text-red-700' : 'text-green-700'" class="font-bold">{{ formatCurrency(agentDue, baseCurrency) }}</span>
                             </div>
-                            <div class="flex justify-between items-center py-2">
+                            <div v-if="agentDueLKR !== 0 && baseCurrency !== 'LKR'" class="flex justify-between items-center py-2">
                                 <span class="text-gray-700">Agent Due in LKR</span>
-                                <span class="text-red-700 font-bold">{{ formatCurrency(agentDueLKR, 'LKR') }}</span>
+                                <span :class="agentDueLKR > 0 ? 'text-red-700' : 'text-green-700'" class="font-bold">{{ formatCurrency(agentDueLKR, 'LKR') }}</span>
                             </div>
                         </div>
                     </div>
                     <!-- SL Portal Section -->
-                    <div>
+                    <div v-if="slPortalTotal > 0">
                         <div class="flex items-center mb-4 gap-2">
                             <i class="pi pi-globe text-green-600 text-xl"></i>
                             <span class="font-semibold text-green-900 text-lg">SL Portal Charges</span>
                         </div>
                         <div class="divide-y divide-gray-100">
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-700">Destination II Charges</span>
-                                <span class="font-bold">{{ formatCurrency(destinationIICharges, 'LKR') }}</span>
+                            <div v-if="!isPrepaid && destinationICharges > 0" class="flex justify-between items-center py-2">
+                                <span class="text-gray-700">Destination I Charges</span>
+                                <span class="font-semibold">{{ formatCurrency(destinationICharges, 'LKR') }}</span>
                             </div>
-                            <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-700">SL Portal Total</span>
+                            <div v-if="destinationIICharges > 0" class="flex justify-between items-center py-2">
+                                <span class="text-gray-700">Destination II Charges</span>
+                                <span class="font-semibold">{{ formatCurrency(destinationIICharges, 'LKR') }}</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 bg-green-50">
+                                <span class="text-gray-800 font-medium">SL Portal Total</span>
                                 <span class="text-green-700 font-bold text-lg">{{ formatCurrency(slPortalTotal, 'LKR') }}</span>
                             </div>
                         </div>
                     </div>
                     <!-- Total Due Section -->
-                    <div class="bg-gradient-to-r from-purple-100 to-purple-200 rounded-xl shadow p-5 border border-purple-200 flex items-center justify-between mt-2">
+                    <div v-if="totalDue > 0" class="bg-gradient-to-r from-purple-100 to-purple-200 rounded-xl shadow p-5 border border-purple-200 flex items-center justify-between mt-2">
                         <div class="flex items-center gap-3">
                             <i class="pi pi-calculator text-purple-700 text-2xl"></i>
                             <span class="font-semibold text-lg text-gray-900">Total Due</span>
                         </div>
                         <span class="text-purple-700 font-extrabold text-2xl tracking-wide">{{ formatCurrency(totalDue, 'LKR') }}</span>
+                    </div>
+                    <!-- No Payment Required -->
+                    <div v-else-if="totalDue === 0 && (hbl?.is_departure_charges_paid || hbl?.is_destination_charges_paid)" class="bg-gradient-to-r from-green-100 to-green-200 rounded-xl shadow p-5 border border-green-200 flex items-center justify-between mt-2">
+                        <div class="flex items-center gap-3">
+                            <i class="pi pi-check-circle text-green-700 text-2xl"></i>
+                            <span class="font-semibold text-lg text-gray-900">No Payment Required</span>
+                        </div>
+                        <span class="text-green-700 font-extrabold text-xl">Fully Paid</span>
                     </div>
                 </div>
             </div>
