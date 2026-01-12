@@ -95,7 +95,6 @@ const stepActivateCallback = ref(null); // Store the activate callback
 const commonFields = reactive({
     agent: null,
     cargo_type: "",
-    hbl_type: "",
     shipment: null,
 });
 const isCommonFieldsLocked = ref(false);
@@ -431,7 +430,6 @@ const proceedToStep2 = () => {
     if (
         !commonFields.agent ||
         !commonFields.cargo_type ||
-        !commonFields.hbl_type ||
         !commonFields.shipment
     ) {
         push.error("Please fill all required fields before proceeding");
@@ -448,7 +446,6 @@ const proceedToStep2 = () => {
     isCommonFieldsLocked.value = true;
     form.agent = commonFields.agent;
     form.cargo_type = commonFields.cargo_type;
-    form.hbl_type = commonFields.hbl_type;
     form.shipment = commonFields.shipment;
     
     // Initialize current HBL Number from base
@@ -503,6 +500,7 @@ const resetHBLSpecificFields = () => {
     form.hbl = currentHBLNumber.value;
     isHBLNumberManuallyOverridden.value = false; // Reset override flag
     
+    form.hbl_type = "";
     form.hbl_name = "";
     form.email = "";
     contactNumber.value = "";
@@ -655,10 +653,23 @@ const addPackageData = () => {
         push.error("Please fill all required data");
         return;
     }
-    packageItem.length = packageItemLength.value;
-    packageItem.width = packageItemWidth.value;
-    packageItem.height = packageItemHeight.value;
-    packageItem.volume = packageItemVolume.value;
+    packageItem.length = 0;
+    packageItem.width = 0;
+    packageItem.height = 0;
+    // packageItem.volume is already set by v-model or calculation, do not overwrite it with the converted display value unless necessary
+    // If dimensions are used, volume is calculated and set in packageItem.volume. 
+    // If manual volume is used, packageItem.volume holds the raw input (e.g. 150).
+    // The previous code was: packageItem.volume = packageItemVolume.value;
+    // packageItemVolume.value is the converted M3 value. 
+    // If the user enters 150 (say cm3), packageItemVolume might be 0.00015. 
+    // We should decide what to store. The backend seems to expect the volume in a standard unit or the raw input?
+    // The log shows "volume":"0.000". This suggests packageItem.volume is being set to 0.000 somewhere.
+    // Ah, the watcher updates packageItem.volume when dimensions change.
+    // But when manual input happens, the watcher `watch([() => packageItem.volume` triggers.
+    
+    // The issue is likely in `addPackageData` overwriting `packageItem.volume`.
+    // Let's REMOVE the line overwriting packageItem.volume.
+
 
     if (form.cargo_type === "Air Cargo") {
         if (packageItem.totalWeight <= 0 && packageItem.volumetricWeight <= 0) {
@@ -698,76 +709,8 @@ const addPackageData = () => {
 };
 
 const packageItemVolume = ref(0);
+// Removed watchers for dimension-based volume calculation as per user request
 
-// Watch for changes in length, width, height, or quantity to update volume and totalWeight
-watch(
-    [
-        () => packageItem.length,
-        () => packageItem.width,
-        () => packageItem.height,
-        () => packageItem.quantity,
-        () => packageItem.measure_type,
-        () => form.cargo_type,
-    ],
-    ([
-        newLength,
-        newWidth,
-        newHeight,
-        newQuantity,
-        newMeasureType,
-        newCargoType,
-    ]) => {
-        // Convert dimensions from cm to meters
-        const lengthMeters = newLength / 100; // 1 cm = 0.01 meters
-        const widthMeters = newWidth / 100;
-        const heightMeters = newHeight / 100;
-
-        // Calculate volume in cubic meters (m³)
-        const volumeCubicMeters =
-            lengthMeters * widthMeters * heightMeters * newQuantity;
-
-        // Calculate volumetric weight (L × W × H in cm) / 6000 for air cargo only
-        if (newCargoType === "Air Cargo") {
-            const lengthCM = convertMeasurementstocm(newMeasureType, newLength);
-            const widthCM = convertMeasurementstocm(newMeasureType, newWidth);
-            const heightCM = convertMeasurementstocm(newMeasureType, newHeight);
-            packageItem.volumetricWeight =
-                (lengthCM * widthCM * heightCM * newQuantity) / 6000;
-        } else {
-            packageItem.volumetricWeight = 0;
-        }
-
-        // Assuming weight is directly proportional to volume
-        // Convert weight from grams to kilograms
-        const totalWeightKg = (volumeCubicMeters * newQuantity) / 1000; // 1 gram = 0.001 kilograms
-
-        // Update reactive properties
-        packageItem.volume = (
-            newLength *
-            newWidth *
-            newHeight *
-            newQuantity
-        ).toFixed(3);
-        if (packageItem.measure_type === "cm") {
-            // Convert cm³ to m³ by dividing by 1,000,000
-            packageItemVolume.value = (packageItem.volume / 1000000).toFixed(3);
-        } else if (packageItem.measure_type === "in") {
-            // Convert from inches to cubic centimeters (1 inch = 16.387 cm³)
-            packageItemVolume.value = (
-                (packageItem.volume * 16.387) /
-                1000000
-            ).toFixed(3); // Convert to m³
-        } else if (packageItem.measure_type === "ft") {
-            // Convert from cubic feet to cubic meters (1 ft³ = 0.0283 m³)
-            packageItemVolume.value = (packageItem.volume * 0.0283).toFixed(3);
-        } else {
-            // Assume volume is already in cubic meters if no unit conversion is needed
-            packageItemVolume.value = packageItem.volume;
-        }
-
-        // packageItem.totalWeight = totalWeightKg;
-    }
-);
 
 const vat = ref(0);
 
@@ -863,14 +806,16 @@ const restModalFields = () => {
             (type) => type.name.toLowerCase() === "carton".toLowerCase()
         )?.name || "";
     packageItem.length = 0;
-    packageItem.width = 0;
-    packageItem.height = 0;
+    packageItem.length = 0; // Dimensions are reset to 0
+    packageItem.width = 0;  // Dimensions are reset to 0
+    packageItem.height = 0; // Dimensions are reset to 0
     packageItem.quantity = 1;
     packageItem.volume = 0;
     packageItem.volumetricWeight = 0;
     packageItem.totalWeight = 0;
     packageItem.remarks = "";
     packageItem.packageRule = 0;
+    packageItem.measure_type = "m"; // Reset measure_type to default 'm'
 };
 
 const editIndex = ref(null);
@@ -1048,41 +993,11 @@ function convertMeasurementstocm(measureType, value) {
 watch(
     () => packageItem.measure_type,
     (newMeasureType) => {
-        packageItemLength.value = convertMeasurementstocm(
-            newMeasureType,
-            packageItem.length
-        );
-        packageItemWidth.value = convertMeasurementstocm(
-            newMeasureType,
-            packageItem.width
-        );
-        packageItemHeight.value = convertMeasurementstocm(
-            newMeasureType,
-            packageItem.height
-        );
+        // No longer updating dimensions on measure type change
     }
 );
+// Removed watchers for individual dimensions
 
-watch([() => packageItem.length], ([newLength]) => {
-    packageItemLength.value = convertMeasurementstocm(
-        packageItem.measure_type,
-        newLength
-    );
-});
-
-watch([() => packageItem.width], ([newWidth]) => {
-    packageItemWidth.value = convertMeasurementstocm(
-        packageItem.measure_type,
-        newWidth
-    );
-});
-
-watch([() => packageItem.height], ([newHeight]) => {
-    packageItemHeight.value = convertMeasurementstocm(
-        packageItem.measure_type,
-        newHeight
-    );
-});
 
 const volumeUnit = computed(() => {
     const units = {
@@ -1249,17 +1164,7 @@ watch(
                                                 </SelectButton>
                                             </div>
 
-                                            <div>
-                                                <InputLabel value="Type" />
-                                                <SelectButton
-                                                    v-model="
-                                                        commonFields.hbl_type
-                                                    "
-                                                    :options="hblTypes"
-                                                    class="mt-1 w-full"
-                                                    name="HBL Type"
-                                                />
-                                            </div>
+
 
                                             <div>
                                                 <div
@@ -1360,13 +1265,7 @@ watch(
                                     <i class="pi pi-lock mr-2"></i>
                                     {{ commonFields.cargo_type }}
                                 </Tag>
-                                <Tag
-                                    severity="info"
-                                    v-if="commonFields.hbl_type"
-                                >
-                                    <i class="pi pi-lock mr-2"></i>
-                                    {{ commonFields.hbl_type }}
-                                </Tag>
+
                                 <Tag
                                     severity="info"
                                     v-if="commonFields.shipment"
@@ -1414,6 +1313,30 @@ watch(
                                             />
                                             <small class="text-gray-500 mt-2 block">Auto-incremented. You can override manually if needed.</small>
                                         </div>
+                                    </div>
+                                </template>
+                            </Card>
+                        </div>
+
+                        <!-- HBL Type Section -->
+                        <div class="my-6">
+                            <Card>
+                                <template #title>
+                                    <div class="flex items-center gap-2">
+                                        <i class="pi pi-tag text-primary"></i>
+                                        <span>HBL Type</span>
+                                    </div>
+                                </template>
+                                <template #content>
+                                    <div>
+                                        <InputLabel value="Type" />
+                                        <SelectButton
+                                            v-model="form.hbl_type"
+                                            :options="hblTypes"
+                                            class="mt-1 w-full"
+                                            name="HBL Type"
+                                        />
+                                        <InputError :message="form.errors.hbl_type" />
                                     </div>
                                 </template>
                             </Card>
@@ -2070,74 +1993,7 @@ watch(
                     />
                 </div>
 
-                <div class="col-span-4 md:col-span-1">
-                    <InputLabel>
-                        Measure Type
-                        <span class="text-red-500 text-sm">*</span>
-                    </InputLabel>
-                    <Select
-                        v-model="packageItem.measure_type"
-                        :options="measureTypes"
-                        class="w-full"
-                        placeholder="Choose One"
-                    />
-                </div>
-
-                <div class="col-span-4 md:col-span-1">
-                    <InputLabel>
-                        Length
-                    </InputLabel>
-                    <InputNumber
-                        v-model="packageItem.length"
-                        :maxFractionDigits="5"
-                        :minFractionDigits="2"
-                        class="w-full"
-                        min="0.00"
-                        placeholder="0.00"
-                        step="0.01"
-                    />
-                    <Message severity="secondary" size="small" variant="simple"
-                        >{{ packageItemLength.toFixed(2) }} cm</Message
-                    >
-                </div>
-
-                <div class="col-span-4 md:col-span-1">
-                    <InputLabel>
-                        Width
-                    </InputLabel>
-                    <InputNumber
-                        v-model="packageItem.width"
-                        :maxFractionDigits="5"
-                        :minFractionDigits="2"
-                        class="w-full"
-                        min="0.00"
-                        placeholder="0.00"
-                        step="0.01"
-                    />
-                    <Message severity="secondary" size="small" variant="simple"
-                        >{{ packageItemWidth.toFixed(2) }} cm</Message
-                    >
-                </div>
-
-                <div class="col-span-4 md:col-span-1">
-                    <InputLabel>
-                        Height
-                    </InputLabel>
-                    <InputNumber
-                        v-model="packageItem.height"
-                        :maxFractionDigits="5"
-                        :minFractionDigits="2"
-                        class="w-full"
-                        min="0.00"
-                        placeholder="0.00"
-                        step="0.01"
-                    />
-                    <Message severity="secondary" size="small" variant="simple"
-                        >{{ packageItemHeight.toFixed(2) }} cm</Message
-                    >
-                </div>
-
-                <div class="col-span-4 md:col-span-1">
+                <div class="col-span-4 md:col-span-2">
                     <InputLabel>
                         Quantity
                         <span class="text-red-500 text-sm">*</span>

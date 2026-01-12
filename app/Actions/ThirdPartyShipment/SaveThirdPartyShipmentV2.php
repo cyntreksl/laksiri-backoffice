@@ -13,6 +13,7 @@ use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HblPackage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class SaveThirdPartyShipmentV2
@@ -78,7 +79,21 @@ class SaveThirdPartyShipmentV2
 
             // Create HBL packages
             foreach ($data['packages'] as $tmpPackage) {
-                $weight = $tmpPackage['chargeableWeight'] ?? $tmpPackage['totalWeight'] ?? 0;
+                Log::info('SaveThirdPartyShipmentV2: Processing package', [
+                    'package_data' => $tmpPackage,
+                    'volume_raw' => $tmpPackage['volume'] ?? 'MISSING',
+                    'length' => $tmpPackage['length'] ?? 'MISSING',
+                    'width' => $tmpPackage['width'] ?? 'MISSING',
+                    'height' => $tmpPackage['height'] ?? 'MISSING',
+                ]);
+
+                $weight = !empty($tmpPackage['chargeableWeight']) ? $tmpPackage['chargeableWeight'] : ($tmpPackage['totalWeight'] ?? 0);
+                
+                // Calculate volumetric weight only if dimensions are present
+                $volumetricWeight = 0;
+                if (($tmpPackage['length'] ?? 0) > 0 && ($tmpPackage['width'] ?? 0) > 0 && ($tmpPackage['height'] ?? 0) > 0) {
+                     $volumetricWeight = ($tmpPackage['length'] * $tmpPackage['width'] * $tmpPackage['height']) / 6000;
+                }
 
                 $package = HblPackage::create([
                     'branch_id' => $branchId, // Use same agent branch as HBL
@@ -91,8 +106,8 @@ class SaveThirdPartyShipmentV2
                     'quantity' => $tmpPackage['quantity'],
                     'volume' => $tmpPackage['volume'],
                     'weight' => $weight,
-                    'actual_weight' => $weight,
-                    'volumetric_weight' => ($tmpPackage['length'] * $tmpPackage['width'] * $tmpPackage['height']) / 6000,
+                    'actual_weight' => $tmpPackage['totalWeight'] ?? 0,
+                    'volumetric_weight' => $volumetricWeight,
                     'remarks' => $tmpPackage['remarks'],
                 ]);
                 $allPackageIds[] = ['id' => $package->id];
