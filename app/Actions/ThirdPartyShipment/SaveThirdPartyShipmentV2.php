@@ -28,13 +28,17 @@ class SaveThirdPartyShipmentV2
             $reference = GenerateHBLReferenceNumber::run();
 
             // Create actual HBL
+            // For third-party HBLs, use the user-provided HBL number if available
+            // Otherwise fall back to auto-generated reference
+            $hblNumber = !empty($data['hbl']) ? $data['hbl'] : $reference;
+
             $hbl = HBL::create([
                 'reference' => $reference,
                 'branch_id' => GetUserCurrentBranchID::run(),
                 'warehouse_id' => GetUserCurrentBranchID::run(),
                 'cargo_type' => $data['cargo_type'],
                 'hbl_type' => $data['hbl_type'],
-                'hbl' => $reference,
+                'hbl' => $hblNumber, // Use user-provided HBL number
                 'hbl_name' => $data['hbl_name'],
                 'email' => $data['email'],
                 'contact_number' => $data['contact_number'],
@@ -61,7 +65,7 @@ class SaveThirdPartyShipmentV2
                 'grand_total' => $data['grand_total'],
                 'created_by' => auth()->id(),
                 'pickup_id' => $data['pickup_id'] ?? null,
-                'hbl_number' => GenerateHBLNumber::run(GetUserCurrentBranchID::run()),
+                'hbl_number' => $hblNumber, // Use same user-provided HBL number
                 'cr_number' => GenerateCRNumber::run(),
                 'system_status' => HBL::SYSTEM_STATUS_HBL_CREATED,
                 'is_departure_charges_paid' => 1,
@@ -92,7 +96,7 @@ class SaveThirdPartyShipmentV2
             }
 
             // Load all HBL packages into the selected container
-            if (! empty($allPackageIds) && isset($data['shipment'])) {
+            if (!empty($allPackageIds) && isset($data['shipment'])) {
                 $container = Container::find($data['shipment']);
                 if ($container) {
                     CreateOrUpdateLoadedContainer::run([

@@ -89,7 +89,7 @@ const measureTypes = ref(["cm", "m", "in", "ft"]);
 const confirm = useConfirm();
 
 // Stepper state for two-step bulk creation workflow
-const activeStep = ref(0);
+const activeStep = ref("0");
 const hblsCreatedCount = ref(0);
 const stepActivateCallback = ref(null); // Store the activate callback
 const commonFields = reactive({
@@ -104,6 +104,11 @@ const isCommonFieldsLocked = ref(false);
 const baseHBLNumber = ref(""); // Starting number set by user
 const currentHBLNumber = ref(""); // Current number (auto-incremented)
 const isHBLNumberManuallyOverridden = ref(false);
+
+// Watch currentHBLNumber and sync with form.hbl
+watch(currentHBLNumber, (newValue) => {
+    form.hbl = newValue;
+});
 
 // Container creation modal
 const showCreateContainerDialog = ref(false);
@@ -451,7 +456,7 @@ const proceedToStep2 = () => {
     form.hbl = currentHBLNumber.value;
 
     // Move to step 2
-    activeStep.value = 1;
+    activeStep.value = "1";
 };
 
 const backToStep1 = () => {
@@ -473,7 +478,7 @@ const backToStep1 = () => {
 
 const resetBulkSession = () => {
     isCommonFieldsLocked.value = false;
-    activeStep.value = 0;
+    activeStep.value = "0";
     hblsCreatedCount.value = 0;
     resetHBLSpecificFields();
 };
@@ -1389,56 +1394,62 @@ watch(
                     </Card>
 
                     <form @submit.prevent="saveAndAddAnother">
-                        <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
+                        <!-- HBL Number Section -->
+                        <div class="my-6">
+                            <Card>
+                                <template #title>
+                                    <div class="flex items-center gap-2">
+                                        <i class="pi pi-hashtag text-primary"></i>
+                                        <span>HBL Number</span>
+                                    </div>
+                                </template>
+                                <template #content>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div class="col-span-1">
+                                            <InputLabel value="HBL Number" />
+                                            <InputText
+                                                v-model="currentHBLNumber"
+                                                class="w-full"
+                                                required
+                                                @input="isHBLNumberManuallyOverridden = true"
+                                            />
+                                            <small class="text-gray-500 mt-2 block">Auto-incremented. You can override manually if needed.</small>
+                                        </div>
+                                    </div>
+                                </template>
+                            </Card>
+                        </div>
 
-                            <div class="sm:col-span-2">
+                        <!-- Shipper and Consignee Details -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 my-6">
+                            <!-- Shipper Details -->
+                            <div>
                                 <Card>
                                     <template #title>
-                                        <div
-                                            class="flex justify-between items-center"
-                                        >
+                                        <div class="flex items-center gap-2">
+                                            <i class="pi pi-user text-primary"></i>
                                             <span>Shipper Details</span>
                                         </div>
                                     </template>
                                     <template #content>
-                                        <div
-                                            class="grid grid-cols-3 gap-5 mt-3"
-                                        >
-                                            <div class="col-span-3">
-                                                <InputLabel value="HBL Number" />
-                                                <InputText
-                                                    v-model="currentHBLNumber"
-                                                    class="w-full"
-                                                    required
-                                                    @input="isHBLNumberManuallyOverridden = true"
-                                                />
-                                                <small class="text-gray-500">Auto-incremented. You can override manually if needed.</small>
-                                            </div>
-                                            <div class="col-span-3">
+                                        <div class="grid grid-cols-1 gap-5">
+                                            <div>
                                                 <InputLabel value="Name" />
                                                 <IconField>
-                                                    <InputIcon
-                                                        class="pi pi-user"
-                                                    />
+                                                    <InputIcon class="pi pi-user" />
                                                     <InputText
                                                         v-model="form.hbl_name"
                                                         class="w-full"
                                                         placeholder="Name"
                                                     />
                                                 </IconField>
-                                                <InputError
-                                                    :message="
-                                                        form.errors.hbl_name
-                                                    "
-                                                />
+                                                <InputError :message="form.errors.hbl_name" />
                                             </div>
 
-                                            <div class="col-span-3">
+                                            <div>
                                                 <InputLabel value="Email" />
                                                 <IconField>
-                                                    <InputIcon
-                                                        class="pi pi-envelope"
-                                                    />
+                                                    <InputIcon class="pi pi-envelope" />
                                                     <InputText
                                                         v-model="form.email"
                                                         class="w-full"
@@ -1446,15 +1457,11 @@ watch(
                                                         type="email"
                                                     />
                                                 </IconField>
-                                                <InputError
-                                                    :message="form.errors.email"
-                                                />
+                                                <InputError :message="form.errors.email" />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <InputLabel
-                                                    value="Mobile Number"
-                                                />
+                                            <div>
+                                                <InputLabel value="Mobile Number" />
                                                 <div class="flex flex-row">
                                                     <Select
                                                         v-model="countryCode"
@@ -1470,47 +1477,29 @@ watch(
                                                     />
                                                 </div>
                                                 <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .contact_number
-                                                    "
-                                                    class="col-span-1"
+                                                    :message="form.errors.contact_number"
                                                 />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <div
-                                                    class="flex items-center gap-2"
-                                                >
+                                            <div>
+                                                <div class="flex items-center gap-2">
                                                     <Checkbox
-                                                        v-model="
-                                                            isSameContactNumber
-                                                        "
+                                                        v-model="isSameContactNumber"
                                                         binary
                                                         inputId="whatsapp"
-                                                        @change="
-                                                            addContactToWhatsapp
-                                                        "
+                                                        @change="addContactToWhatsapp"
                                                     />
                                                     <label for="whatsapp">
-                                                        Use mobile number as
-                                                        whatsapp number</label
-                                                    >
+                                                        Use mobile number as whatsapp number
+                                                    </label>
                                                 </div>
                                             </div>
 
-                                            <div
-                                                v-if="!isSameContactNumber"
-                                                class="col-span-3"
-                                            >
-                                                <InputLabel
-                                                    value="Whatsapp Number"
-                                                />
+                                            <div v-if="!isSameContactNumber">
+                                                <InputLabel value="Whatsapp Number" />
                                                 <div class="flex flex-row">
                                                     <Select
-                                                        v-model="
-                                                            whatsappNumberCountryCode
-                                                        "
+                                                        v-model="whatsappNumberCountryCode"
                                                         :options="countryCodes"
                                                         class="w-25 !rounded-r-none !border-r-0"
                                                         filter
@@ -1523,123 +1512,80 @@ watch(
                                                     />
                                                 </div>
                                                 <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .whatsapp_number
-                                                    "
-                                                    class="col-span-1"
+                                                    :message="form.errors.whatsapp_number"
                                                 />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <InputLabel
-                                                    value="Additional Mobile Number"
-                                                />
+                                            <div>
+                                                <InputLabel value="Additional Mobile Number" />
                                                 <div class="flex flex-row">
                                                     <Select
-                                                        v-model="
-                                                            additionalMobileCountryCode
-                                                        "
+                                                        v-model="additionalMobileCountryCode"
                                                         :options="countryCodes"
                                                         class="w-25 !rounded-r-none !border-r-0"
                                                         filter
                                                         placeholder="Select a Country Code"
                                                     />
                                                     <InputText
-                                                        v-model="
-                                                            additionalMobileNumber
-                                                        "
+                                                        v-model="additionalMobileNumber"
                                                         class="!rounded-l-none w-full"
                                                         placeholder="123 4567 890"
                                                     />
                                                 </div>
                                                 <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .additional_mobile_number
-                                                    "
-                                                    class="col-span-1"
+                                                    :message="form.errors.additional_mobile_number"
                                                 />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <InputLabel
-                                                    value="PP or NIC No"
-                                                />
+                                            <div>
+                                                <InputLabel value="PP or NIC No" />
                                                 <IconField>
-                                                    <InputIcon
-                                                        class="pi pi-tag"
-                                                    />
+                                                    <InputIcon class="pi pi-tag" />
                                                     <InputText
                                                         v-model="form.nic"
                                                         class="w-full"
                                                         placeholder="PP or NIC No"
                                                     />
                                                 </IconField>
-                                                <InputError
-                                                    :message="form.errors.nic"
-                                                />
+                                                <InputError :message="form.errors.nic" />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <InputLabel
-                                                    value="Residency No"
-                                                />
+                                            <div>
+                                                <InputLabel value="Residency No" />
                                                 <IconField>
-                                                    <InputIcon
-                                                        class="pi pi-home"
-                                                    />
+                                                    <InputIcon class="pi pi-home" />
                                                     <InputText
                                                         v-model="form.iq_number"
                                                         class="w-full"
                                                         placeholder="Residency No"
                                                     />
                                                 </IconField>
-                                                <InputError
-                                                    :message="
-                                                        form.errors.iq_number
-                                                    "
-                                                />
+                                                <InputError :message="form.errors.iq_number" />
                                             </div>
 
-                                            <div class="col-span-3">
+                                            <div>
                                                 <InputLabel value="Address" />
                                                 <Textarea
                                                     v-model="form.address"
                                                     class="w-full"
                                                     cols="30"
                                                     placeholder="Type address here..."
-                                                    rows="5"
+                                                    rows="4"
                                                 />
-                                                <InputError
-                                                    :message="
-                                                        form.errors.address
-                                                    "
-                                                />
+                                                <InputError :message="form.errors.address" />
                                             </div>
 
-                                            <div
-                                                v-if="
-                                                    form.hbl_type ===
-                                                    'Door to Door'
-                                                "
-                                                class="col-span-3"
-                                            >
-                                                <div
-                                                    class="flex items-center gap-2"
-                                                >
+                                            <div v-if="form.hbl_type === 'Door to Door'">
+                                                <div class="flex items-center gap-2">
                                                     <Checkbox
                                                         v-model="isChecked"
                                                         binary
                                                         inputId="consignee-same"
-                                                        @change="
-                                                            addToConsigneeDetails
-                                                        "
+                                                        @change="addToConsigneeDetails"
                                                     />
-                                                    <label for="consignee-same"
-                                                        >Same as Consignee
-                                                        Details</label
-                                                    >
+                                                    <label for="consignee-same">
+                                                        Same as Consignee Details
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
@@ -1647,235 +1593,152 @@ watch(
                                 </Card>
                             </div>
 
-                            <div class="sm:col-span-2 grid grid-rows">
+                            <!-- Consignee Details -->
+                            <div>
                                 <Card>
                                     <template #title>
-                                        <div
-                                            class="flex justify-between items-center"
-                                        >
-                                            <span>Consignee Details</span>
-                                            <div class="flex space-x-1">
-                                                <Button
-                                                    v-if="form.hbl_name"
-                                                    aria-label="Copy Shipper"
-                                                    icon="pi pi-clone"
-                                                    rounded
-                                                    size="large"
-                                                    variant="text"
-                                                    x-tooltip.placement.bottom="'Copy Shipper'"
-                                                    @click.prevent="
-                                                        handleCopyShipper
-                                                    "
-                                                />
+                                        <div class="flex justify-between items-center">
+                                            <div class="flex items-center gap-2">
+                                                <i class="pi pi-users text-primary"></i>
+                                                <span>Consignee Details</span>
                                             </div>
+                                            <Button
+                                                v-if="form.hbl_name"
+                                                aria-label="Copy Shipper"
+                                                icon="pi pi-clone"
+                                                rounded
+                                                size="small"
+                                                variant="text"
+                                                x-tooltip.placement.bottom="'Copy Shipper'"
+                                                @click.prevent="handleCopyShipper"
+                                            />
                                         </div>
                                     </template>
                                     <template #content>
-                                        <div
-                                            class="grid grid-cols-3 gap-5 mt-3"
-                                        >
-                                            <div class="col-span-3">
+                                        <div class="grid grid-cols-1 gap-5">
+                                            <div>
                                                 <InputLabel value="Name" />
                                                 <IconField>
-                                                    <InputIcon
-                                                        class="pi pi-user"
-                                                    />
+                                                    <InputIcon class="pi pi-user" />
                                                     <InputText
-                                                        v-model="
-                                                            form.consignee_name
-                                                        "
+                                                        v-model="form.consignee_name"
                                                         class="w-full"
                                                         placeholder="Name"
                                                     />
                                                 </IconField>
-                                                <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .consignee_name
-                                                    "
-                                                />
+                                                <InputError :message="form.errors.consignee_name" />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <InputLabel
-                                                    value="PP or NIC No"
-                                                />
+                                            <div>
+                                                <InputLabel value="PP or NIC No" />
                                                 <IconField>
-                                                    <InputIcon
-                                                        class="pi pi-tag"
-                                                    />
+                                                    <InputIcon class="pi pi-tag" />
                                                     <InputText
-                                                        v-model="
-                                                            form.consignee_nic
-                                                        "
+                                                        v-model="form.consignee_nic"
                                                         class="w-full"
                                                         placeholder="PP or NIC No"
                                                     />
                                                 </IconField>
-                                                <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .consignee_nic
-                                                    "
-                                                />
+                                                <InputError :message="form.errors.consignee_nic" />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <InputLabel
-                                                    value="Mobile Number"
-                                                />
+                                            <div>
+                                                <InputLabel value="Mobile Number" />
                                                 <div class="flex flex-row">
                                                     <Select
-                                                        v-model="
-                                                            consignee_countryCode
-                                                        "
+                                                        v-model="consignee_countryCode"
                                                         :options="countryCodes"
                                                         class="w-25 !rounded-r-none !border-r-0"
                                                         filter
                                                         placeholder="Select a Country Code"
                                                     />
                                                     <InputText
-                                                        v-model="
-                                                            consignee_contact
-                                                        "
+                                                        v-model="consignee_contact"
                                                         class="!rounded-l-none w-full"
                                                         placeholder="123 4567 890"
                                                     />
                                                 </div>
-                                                <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .consignee_contact
-                                                    "
-                                                    class="col-span-1"
-                                                />
+                                                <InputError :message="form.errors.consignee_contact" />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <div
-                                                    class="flex items-center gap-2"
-                                                >
+                                            <div>
+                                                <div class="flex items-center gap-2">
                                                     <Checkbox
-                                                        v-model="
-                                                            isSameConsigneeContactNumber
-                                                        "
+                                                        v-model="isSameConsigneeContactNumber"
                                                         binary
                                                         inputId="consignee-whatsapp"
-                                                        @change="
-                                                            addConsigneeContactToWhatsapp
-                                                        "
+                                                        @change="addConsigneeContactToWhatsapp"
                                                     />
-                                                    <label
-                                                        for="consignee-whatsapp"
-                                                        >Use mobile number as
-                                                        whatsapp number</label
-                                                    >
+                                                    <label for="consignee-whatsapp">
+                                                        Use mobile number as whatsapp number
+                                                    </label>
                                                 </div>
                                             </div>
 
-                                            <div
-                                                v-if="
-                                                    !isSameConsigneeContactNumber
-                                                "
-                                                class="col-span-3"
-                                            >
-                                                <InputLabel
-                                                    value="Whatsapp Number"
-                                                />
+                                            <div v-if="!isSameConsigneeContactNumber">
+                                                <InputLabel value="Whatsapp Number" />
                                                 <div class="flex flex-row">
                                                     <Select
-                                                        v-model="
-                                                            consigneeWhatsappNumberCountryCode
-                                                        "
+                                                        v-model="consigneeWhatsappNumberCountryCode"
                                                         :options="countryCodes"
                                                         class="w-25 !rounded-r-none !border-r-0"
                                                         filter
                                                         placeholder="Select a Country Code"
                                                     />
                                                     <InputText
-                                                        v-model="
-                                                            consigneeWhatsappNumber
-                                                        "
+                                                        v-model="consigneeWhatsappNumber"
                                                         class="!rounded-l-none w-full"
                                                         placeholder="123 4567 890"
                                                     />
                                                 </div>
                                                 <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .consignee_whatsapp_number
-                                                    "
-                                                    class="col-span-1"
+                                                    :message="form.errors.consignee_whatsapp_number"
                                                 />
                                             </div>
 
-                                            <div class="col-span-3">
-                                                <InputLabel
-                                                    value="Additional Mobile Number"
-                                                />
+                                            <div>
+                                                <InputLabel value="Additional Mobile Number" />
                                                 <div class="flex flex-row">
                                                     <Select
-                                                        v-model="
-                                                            consigneeAdditionalMobileCountryCode
-                                                        "
+                                                        v-model="consigneeAdditionalMobileCountryCode"
                                                         :options="countryCodes"
                                                         class="w-25 !rounded-r-none !border-r-0"
                                                         filter
                                                         placeholder="Select a Country Code"
                                                     />
                                                     <InputText
-                                                        v-model="
-                                                            consigneeAdditionalMobileNumber
-                                                        "
+                                                        v-model="consigneeAdditionalMobileNumber"
                                                         class="!rounded-l-none w-full"
                                                         placeholder="123 4567 890"
                                                     />
                                                 </div>
                                                 <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .consignee_additional_mobile_number
-                                                    "
-                                                    class="col-span-1"
+                                                    :message="form.errors.consignee_additional_mobile_number"
                                                 />
                                             </div>
 
-                                            <div class="col-span-3">
+                                            <div>
                                                 <InputLabel value="Address" />
                                                 <Textarea
-                                                    v-model="
-                                                        form.consignee_address
-                                                    "
+                                                    v-model="form.consignee_address"
                                                     class="w-full"
                                                     cols="30"
                                                     placeholder="Type address here..."
-                                                    rows="5"
+                                                    rows="4"
                                                 />
-                                                <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .consignee_address
-                                                    "
-                                                />
+                                                <InputError :message="form.errors.consignee_address" />
                                             </div>
 
-                                            <div class="col-span-3">
+                                            <div>
                                                 <InputLabel value="Note" />
                                                 <Textarea
-                                                    v-model="
-                                                        form.consignee_note
-                                                    "
+                                                    v-model="form.consignee_note"
                                                     class="w-full"
                                                     cols="30"
                                                     placeholder="Type note here..."
                                                     rows="3"
                                                 />
-                                                <InputError
-                                                    :message="
-                                                        form.errors
-                                                            .consignee_note
-                                                    "
-                                                />
+                                                <InputError :message="form.errors.consignee_note" />
                                             </div>
                                         </div>
                                     </template>
@@ -1883,18 +1746,15 @@ watch(
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-6 my-4 gap-4">
-                            <div class="sm:col-span-12">
-                                <Card>
-                                    <template #title>
-                                        <div
-                                            class="flex justify-between items-center"
-                                        >
-                                            <div
-                                                class="flex items-center space-x-2"
-                                            >
-                                                <span>Package Details</span>
-                                            </div>
+                        <!-- Package Details Section -->
+                        <div class="my-6">
+                            <Card>
+                                <template #title>
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center gap-2">
+                                            <i class="pi pi-box text-primary"></i>
+                                            <span>Package Details</span>
+                                        </div>
                                             <Button
                                                 v-if="
                                                     Object.values(
@@ -2119,17 +1979,10 @@ watch(
                                         </div>
                                     </template>
                                 </Card>
-                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-6 my-6 gap-4">
-                            <!-- Empty grid columns for spacing -->
-                            <div class="col-span-4"></div>
-
-                            <!-- Action Buttons for Bulk Creation -->
-                            <div
-                                class="flex justify-between space-x-5 col-span-6 mt-6"
-                            >
+                        <!-- Action Buttons for Bulk Creation -->
+                        <div class="flex justify-between items-center my-6">
                                 <Button
                                     icon="pi pi-arrow-left"
                                     label="Back to Common Fields"
@@ -2163,7 +2016,6 @@ watch(
                                         @click.prevent="saveAndFinish"
                                     />
                                 </div>
-                            </div>
                         </div>
                     </form>
                 </StepPanel>
