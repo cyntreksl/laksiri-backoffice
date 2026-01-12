@@ -100,7 +100,7 @@ const menuModel = ref([
         label: "Issue Token",
         icon: "pi pi-fw pi-tag",
         command: () => confirmIssueToken(selectedHBL),
-        visible: () => selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token"),
+        visible: () => !selectedHBL.value?.tokens && selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token"),
     },
     {
         label: "Call Flag",
@@ -131,6 +131,32 @@ const menuModel = ref([
         icon: "pi pi-fw pi-receipt",
         url: () => route("hbls.download.invoice", selectedHBL.value.id),
         visible: usePage().props.user.permissions.includes("hbls.download invoice"),
+    },
+    {
+        label: "Stream Invoice",
+        icon: "pi pi-fw pi-file-pdf",
+        url: () => route("hbls.streamCashierReceipt", selectedHBL.value.id),
+        target: "_blank",
+        visible: true,
+    },
+    {
+        label: "Download Invoice",
+        icon: "pi pi-fw pi-download",
+        url: () => route("hbls.getCashierReceipt", selectedHBL.value.id),
+        visible: true,
+    },
+    {
+        label: "Print Token",
+        icon: "pi pi-fw pi-print",
+        url: () => selectedHBL.value?.tokens?.id ? route("call-center.hbls.print-token", {token: selectedHBL.value.tokens.id}) : '#',
+        target: "_blank",
+        visible: () => selectedHBL.value?.tokens && !selectedHBL.value.tokens.is_cancelled && selectedHBL.value.tokens.id,
+    },
+    {
+        label: "Download Token",
+        icon: "pi pi-fw pi-download",
+        url: () => selectedHBL.value?.tokens?.id ? route("call-center.hbls.download-token", {token: selectedHBL.value.tokens.id}) : '#',
+        visible: () => selectedHBL.value?.tokens && !selectedHBL.value.tokens.is_cancelled && selectedHBL.value.tokens.id,
     },
     {
         label: "Download Baggage PDF",
@@ -837,53 +863,7 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column header="Actions" style="width: 15rem">
-                            <template #body="slotProps">
-                                <div class="flex gap-1 flex-wrap">
-                                    <Button
-                                        icon="pi pi-file-pdf"
-                                        severity="warn"
-                                        text
-                                        rounded
-                                        v-tooltip="'Stream Invoice'"
-                                        as="a"
-                                        :href="route('hbls.streamCashierReceipt', slotProps.data.id)"
-                                        target="_blank"
-                                    />
-                                    <Button
-                                        icon="pi pi-download"
-                                        severity="info"
-                                        text
-                                        rounded
-                                        v-tooltip="'Download Invoice'"
-                                        as="a"
-                                        :href="route('hbls.getCashierReceipt', slotProps.data.id)"
-                                    />
 
-                                    <template v-if="slotProps.data.tokens && !slotProps.data.tokens.is_cancelled && slotProps.data.tokens.id">
-                                        <Button
-                                            icon="pi pi-print"
-                                            severity="secondary"
-                                            text
-                                            rounded
-                                            v-tooltip="'Print Token'"
-                                            as="a"
-                                            :href="route('call-center.hbls.print-token', {token: slotProps.data.tokens.id})"
-                                            target="_blank"
-                                        />
-                                        <Button
-                                            icon="pi pi-download"
-                                            severity="success"
-                                            text
-                                            rounded
-                                            v-tooltip="'Download Token'"
-                                            as="a"
-                                            :href="route('call-center.hbls.download-token', {token: slotProps.data.tokens.id})"
-                                        />
-                                    </template>
-                                </div>
-                            </template>
-                        </Column>
 
                         <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs. </template>
                     </DataTable>
