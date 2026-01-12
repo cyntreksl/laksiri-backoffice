@@ -891,10 +891,17 @@ const setMenu = (menu) => {
             changeSidePanelTitle("Delivery");
             break;
         case "report":
-            childMenuList.splice(0, childMenuList.length, {
-                title: "Payment Summery",
-                route: "report.payment-summaries.index",
-            });
+            childMenuList.splice(0, childMenuList.length,
+                // {
+                //     title: "Payment Summery",
+                //     route: "report.payment-summaries.index",
+                // },
+                {
+                    title: "Detain Report",
+                    route: "report.detain-report.index",
+                    permission: "reports.detain",
+                }
+            );
             changeSidePanelTitle("Report");
             break;
         case "setting":
@@ -1254,6 +1261,14 @@ const menuModel = ref([
         }
     },
     {
+        label: 'Report',
+        icon: 'ti ti-report text-2xl',
+        visible: () => isSuperAdmin.value || can('reports.detain'),
+        command: () => {
+            setMenu('report');
+        }
+    },
+    {
         label: 'File Manager',
         icon: 'ti ti-brand-onedrive text-2xl',
         command: () => {
@@ -1272,7 +1287,7 @@ const menuModel = ref([
 ]);
 
 // Split into top and bottom menus for layout
-const bottomLabels = ['Whatsapp', 'File Manager', 'Settings'];
+const bottomLabels = ['Report', 'Whatsapp', 'File Manager', 'Settings'];
 const topMenuModel = computed(() =>
     menuModel.value.filter((item) => !bottomLabels.includes(item.label))
 );
@@ -1402,6 +1417,7 @@ setSidebarState();
               <div
                 v-for="item in childMenuList"
                 :key="item.title"
+                v-show="!item.permission || can(item.permission)"
                 :class="[
                   'p-3 rounded-lg transition-all duration-200 flex items-center',
                   'focus:outline-none focus:ring-2 focus:ring-primary/30 hover:cursor-pointer',
