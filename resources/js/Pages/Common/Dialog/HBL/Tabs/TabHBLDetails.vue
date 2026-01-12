@@ -14,6 +14,7 @@ import Dialog from "primevue/dialog";
 import Input from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import axios from "axios";
+import UnloadingIssueDetailModal from "@/Pages/Arrival/Partials/UnloadingIssueDetailModal.vue";
 
 const props = defineProps({
     hbl: {
@@ -38,6 +39,8 @@ const newRemark = ref('');
 const loading = ref(false);
 const fetching = ref(false);
 const page = usePage();
+const isShowIssueDetailModal = ref(false);
+const selectedIssueForDetail = ref(null);
 
 // Detain By dropdown options
 const detainByOptions = [
@@ -192,9 +195,9 @@ const closeRemarksDialog = () => {
 
 const getIssueBadgeClass = (issueText) => {
     if (!issueText) return 'bg-gray-100 text-gray-700 border-gray-300';
-    
+
     const text = issueText.toLowerCase();
-    
+
     if (text.includes('damage') || text.includes('broken') || text.includes('crashed')) {
         return 'bg-red-100 text-red-700 border-red-300';
     }
@@ -207,19 +210,52 @@ const getIssueBadgeClass = (issueText) => {
     if (text.includes('wrong') || text.includes('mismatch') || text.includes('unmanifest')) {
         return 'bg-purple-100 text-purple-700 border-purple-300';
     }
-    
+
     return 'bg-blue-100 text-blue-700 border-blue-300';
 };
 
 const getIssueLabel = (issueText) => {
     if (!issueText) return 'Issue';
-    
+
     // Truncate long text
     if (issueText.length > 15) {
         return issueText.substring(0, 15) + '...';
     }
-    
+
     return issueText;
+};
+
+const handleIssueClick = async (issue, packageData) => {
+    // Use the data we already have from the HBL props
+    try {
+        selectedIssueForDetail.value = {
+            id: issue.id,
+            hbl: props.hbl?.hbl_number || '-',
+            branch: props.hbl?.branch?.name || '-',
+            hbl_name: props.hbl?.hbl_name || '-',
+            consignee_name: props.hbl?.consignee_name || '-',
+            created_at: issue.created_at || new Date().toISOString(),
+            weight: packageData.actual_weight || packageData.weight || 0,
+            volume: packageData.volume || 0,
+            quantity: packageData.quantity || 0,
+            issue: issue.issue || issue.type || '-',
+            type: issue.type || '-',
+            is_damaged: issue.is_damaged ? 'Yes' : 'No',
+            is_fixed: issue.is_fixed || false,
+            remarks: issue.remarks || '-',
+            note: issue.note || '-',
+            photos_count: 0, // Will be loaded by the modal
+        };
+        isShowIssueDetailModal.value = true;
+    } catch (error) {
+        console.error('Error preparing issue details:', error);
+        push.error('Failed to load issue details');
+    }
+};
+
+const closeIssueDetailModal = () => {
+    isShowIssueDetailModal.value = false;
+    selectedIssueForDetail.value = null;
 };
 </script>
 
@@ -228,10 +264,10 @@ const getIssueLabel = (issueText) => {
         <div class="col-span-12 lg:col-span-6 md:col-span-12 sm:col-span-12 space-y-4">
             <PostSkeleton v-if="isLoading"/>
 
-            <Card v-else 
+            <Card v-else
                 :class="[
-                    hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland 
-                        ? '!border-2 !border-dashed !border-orange-400 !bg-orange-50' 
+                    hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland
+                        ? '!border-2 !border-dashed !border-orange-400 !bg-orange-50'
                         : '!bg-emerald-50 !border !border-emerald-200',
                     '!shadow-md'
                 ]">
@@ -240,20 +276,20 @@ const getIssueLabel = (issueText) => {
                     <div v-if="hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland" class="mb-4 pb-4 border-b-2 border-dashed border-orange-300">
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="text-sm font-semibold text-orange-800 mr-2">HBL Status:</span>
-                            
-                            <span v-if="hbl?.is_short_load" 
+
+                            <span v-if="hbl?.is_short_load"
                                 class="px-3 py-1.5 bg-orange-100 text-orange-800 border-2 border-orange-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
                                 <i class="ti ti-truck-loading text-lg"></i>
                                 <span>SHORTLAND</span>
                             </span>
-                            
-                            <span v-if="hbl?.is_unmanifest" 
+
+                            <span v-if="hbl?.is_unmanifest"
                                 class="px-3 py-1.5 bg-purple-100 text-purple-800 border-2 border-purple-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
                                 <i class="ti ti-file-x text-lg"></i>
                                 <span>UNMANIFEST</span>
                             </span>
-                            
-                            <span v-if="hbl?.is_overland" 
+
+                            <span v-if="hbl?.is_overland"
                                 class="px-3 py-1.5 bg-blue-100 text-blue-800 border-2 border-blue-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
                                 <i class="ti ti-road text-lg"></i>
                                 <span>OVERLAND</span>
@@ -362,13 +398,14 @@ const getIssueLabel = (issueText) => {
                                         :key="idx"
                                         v-tooltip.left="issue.issue || issue.type"
                                         :class="getIssueBadgeClass(issue.issue || issue.type)"
-                                        class="px-2 py-1 text-xs font-semibold rounded-full border flex items-center gap-1"
+                                        class="px-2 py-1 text-xs font-semibold rounded-full border flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+                                        @click="handleIssueClick(issue, item)"
                                     >
                                         <i class="pi pi-exclamation-circle text-xs"></i>
                                         <span>{{ getIssueLabel(issue.issue || issue.type) }}</span>
                                     </span>
                                 </div>
-                                
+
                                 <i v-tooltip="'Remarks'" class="pi pi-comments text-xl hover:cursor-pointer hover:text-success"
                                    @click.prevent="openRemarksDialog(item)"></i>
                             </div>
@@ -686,6 +723,13 @@ const getIssueLabel = (issueText) => {
             </div>
         </div>
     </Dialog>
+
+    <UnloadingIssueDetailModal
+        :issue="selectedIssueForDetail"
+        :show="isShowIssueDetailModal"
+        @close="closeIssueDetailModal"
+        @update:show="isShowIssueDetailModal = $event"
+    />
 </template>
 
 <style scoped>
