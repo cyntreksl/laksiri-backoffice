@@ -54,6 +54,7 @@ const isLoading = ref(false);
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const showPaymentDialog = ref(false);
 const summaryTotalDue = ref(0);
+const verificationInfo = ref(null);
 
 const computedOutstanding = computed(() => {
     return (
@@ -179,6 +180,35 @@ const getHBLPayments = async () => {
 
 getHBLPayments();
 
+const getVerificationInfo = async () => {
+    if (!props.hblId) return;
+    
+    try {
+        const response = await fetch(`/call-center/cashier/verification-info/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            // Only set verificationInfo if verified is true
+            if (data && data.verified === true) {
+                verificationInfo.value = data;
+            } else {
+                verificationInfo.value = null;
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching verification info:", error);
+        verificationInfo.value = null;
+    }
+};
+
+getVerificationInfo();
+
 const form = useForm({
     paid_amount: 0,
     customer_queue: props.customerQueue,
@@ -203,9 +233,24 @@ const handleVerify = () => {
     // For zero payment/verification, we set paid_amount to 0
     form.paid_amount = 0;
     
-    // We can reuse the same update/store endpoint
-    // It should detect that outstanding is 0 and just move the queue
-    handleUpdatePayment();
+    // Submit verification and redirect to queue list
+    form.post(route("call-center.cashier.store"), {
+        onSuccess: () => {
+            router.visit(route("call-center.cashier.queue.list"));
+            form.reset();
+            push.success('Verified Successfully!');
+        },
+        onError: () => {
+            push.error('Something went wrong!');
+        },
+        preserveScroll: true,
+        preserveState: true,
+        data: {
+            ...form,
+            additional_charges: form.additional_charges,
+            discount: form.discount,
+        }
+    });
 };
 
 const downloadInvoice = () => {
@@ -252,15 +297,14 @@ const handleUpdatePayment = () => {
 
     form.post(route("call-center.cashier.store"), {
         onSuccess: () => {
-            router.visit(route("call-center.cashier.queue.list"));
-            form.reset();
-            const successMsg = isVerification ? 'Verified Successfully!' : 'Payment Update Successfully!';
-            push.success(successMsg);
+            // Close the payment modal
+            showPaymentDialog.value = false;
             
-            // Only trigger auto-download if it was a payment
-            if (!isVerification) {
-                downloadInvoice();
-            }
+            // Refresh the current page to show updated payment details
+            router.reload({ preserveScroll: true });
+            
+            form.reset();
+            push.success('Payment Update Successfully!');
         },
         onError: () => {
             push.error('Something went wrong!');
@@ -366,9 +410,23 @@ watch(computedOutstanding, (val) => {
             </div>
 
             <div class="col-span-4">
+                <!-- Verification Status Card -->
+                <Card v-if="verificationInfo" class="mb-4 bg-green-50 border-green-200">
+                    <template #content>
+                        <div class="flex items-center gap-3">
+                            <i class="pi pi-check-circle text-green-600 text-3xl"></i>
+                            <div>
+                                <h3 class="text-lg font-bold text-green-800">Verified</h3>
+                                <p class="text-sm text-green-700">By {{ verificationInfo.verified_by_name }}</p>
+                                <p class="text-xs text-green-600">{{ verificationInfo.verified_at }}</p>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+                
                 <div class="flex flex-col gap-3 mb-4">
-                    <!-- Verify Button for Zero Outstanding -->
-                    <Button v-if="computedOutstanding <= 0"
+                    <!-- Verify Button for Zero Outstanding, disabled if already verified -->
+                    <Button v-if="computedOutstanding <= 0 && !verificationInfo"
                             class="p-button-lg p-button-success w-full"
                             icon="pi pi-check-circle"
                             label="Verify & Next"
@@ -427,31 +485,21 @@ watch(computedOutstanding, (val) => {
                     <InputError :message="form.errors.paid_amount"/>
                 </div>
 
-                <!-- Cash Tendered & Balance -->
-                <div v-if="computedOutstanding > 0" class="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                    <div class="col-span-2 text-sm font-medium text-gray-500 mb-1">Cash Calculation</div>
-                    
-                    <div class="col-span-1">
-                        <IftaLabel>
-                            <InputNumber v-model="cashTendered" 
-                                         :minFractionDigits="2" 
-                                         :maxFractionDigits="2" 
-                                         class="w-full" 
-                                         inputId="cash-tendered"
-                                         min="0" 
-                                         step="any"
-                                         variant="filled" />
-                            <label for="cash-tendered">Cash Given</label>
-                        </IftaLabel>
-                    </div>
-
-                    <div class="col-span-1 flex flex-col justify-center px-3 py-2 bg-white rounded border" 
-                         :class="balanceAmount < 0 ? 'border-red-300 bg-red-50' : 'border-green-300 bg-green-50'">
-                        <span class="text-xs text-gray-500">Balance</span>
-                        <span class="text-lg font-bold" :class="balanceAmount < 0 ? 'text-red-600' : 'text-green-600'">
-                            {{ currencyCode }} {{ balanceAmount.toFixed(2) }}
-                        </span>
-                    </div>
+                <!-- Cash Given Input -->
+                <div v-if="computedOutstanding > 0">
+                    <IftaLabel>
+                        <InputNumber 
+                            v-model="cashTendered" 
+                            :minFractionDigits="2" 
+                            :maxFractionDigits="2" 
+                            class="w-full" 
+                            inputId="cash-tendered"
+                            min="0" 
+                            step="any"
+                            variant="filled" 
+                        />
+                        <label for="cash-tendered">Cash Given</label>
+                    </IftaLabel>
                 </div>
 
                 <!-- Additional Charges Field -->
@@ -498,8 +546,12 @@ watch(computedOutstanding, (val) => {
             </div>
             <template #footer>
                 <div class="flex justify-between items-center w-full">
-                    <div v-if="balanceAmount > 0" class="text-green-600 font-medium">
-                        Return: {{ currencyCode }} {{ balanceAmount.toFixed(2) }}
+                    <!-- Balance/Change Display -->
+                    <div v-if="cashTendered && cashTendered > 0" class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">Balance:</span>
+                        <span class="text-lg font-bold" :class="balanceAmount < 0 ? 'text-red-600' : 'text-green-600'">
+                            {{ currencyCode }} {{ balanceAmount.toFixed(2) }}
+                        </span>
                     </div>
                     <div class="flex gap-2 ml-auto">
                         <Button class="p-button-text" icon="pi pi-times" label="Cancel" @click="showPaymentDialog = false" />
