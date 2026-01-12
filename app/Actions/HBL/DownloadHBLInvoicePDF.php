@@ -15,7 +15,7 @@ class DownloadHBLInvoicePDF
     public function handle(HBL $hbl)
     {
         $pdf = Pdf::loadView('pdf.hbls.hblInvoice', [
-            'hbl' => $hbl->load('packages'),
+            'hbl' => $hbl->load(['packages', 'destinationCharge', 'branch']),
             'settings' => GetSettings::run(),
             'logoPath' => GetSettings::run()['logo_url'] ?? null,
             'invoice_header_title' => GetSettings::run()['invoice_header_title'] ?? null,

@@ -4,6 +4,7 @@ namespace App\Actions\Cashier;
 
 use App\Actions\Container\GetContainerWithoutGlobalScopesById;
 use App\Actions\HBL\GetHBLByIdWithPackages;
+use App\Actions\HBL\HBLCharges\CalculateTax;
 use App\Actions\SLInvoice\CreateSLInvoice;
 use App\Actions\Tax\GetTaxesByWarehouse;
 use App\Actions\User\GetUserById;
@@ -18,6 +19,7 @@ class DownloadCashierReceiptPDF
     public function handle($hbl)
     {
         $hbl = GetHBLByIdWithPackages::run($hbl);
+        $hbl->load('destinationCharge');
         $sl_Invoice = $hbl->slInvoices;
         if (! $sl_Invoice) {
             $sl_Invoice = CreateSLInvoice::run($hbl);
@@ -25,8 +27,26 @@ class DownloadCashierReceiptPDF
         $container = $sl_Invoice && ! is_null($sl_Invoice['container_id'])
             ? GetContainerWithoutGlobalScopesById::run($sl_Invoice['container_id'])
             : $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
+        
+        // Use stored demurrage charge from HBLDestinationCharge if available, otherwise use SLInvoice
+        $demurrageCharge = $hbl->destinationCharge?->destination_demurrage_charge ?? $sl_Invoice['dmg_charge_amount'] ?? 0;
+        $doCharge = $hbl->destinationCharge?->destination_do_charge ?? $sl_Invoice['do_charge'] ?? 0;
+        
+        // Calculate tax on Destination II charges (demurrage + DO)
+        $destination2Total = $demurrageCharge + $doCharge;
+        $taxCalculation = CalculateTax::run($destination2Total);
+        $taxAmount = $taxCalculation['total_tax'];
+        $destination2TotalWithTax = $taxCalculation['amount_with_tax'];
+        
+        // Recalculate total with correct demurrage charge
+        $portChargeAmount = $sl_Invoice['port_charge_amount'] ?? 0;
+        $handlingChargeAmount = $sl_Invoice['handling_charge_amount'] ?? 0;
+        $storageChargeAmount = $sl_Invoice['storage_charge_amount'] ?? 0;
+        $totalAmount = $portChargeAmount + $handlingChargeAmount + $storageChargeAmount + $destination2TotalWithTax;
+        $stampCharge = $destination2TotalWithTax > 25000 ? 25.00 : 0.00;
+
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
-        $total_in_word = strtoupper($formatter->format($sl_Invoice['total']));
+        $total_in_word = strtoupper($formatter->format($totalAmount + $stampCharge));
 
         $data = [
             'clearing_time' => $sl_Invoice['clearing_time'],
@@ -37,23 +57,24 @@ class DownloadCashierReceiptPDF
             'charges' => [
                 'port_charge' => [
                     'rate' => $sl_Invoice['port_charge_rate'],
-                    'amount' => $sl_Invoice['port_charge_amount'],
+                    'amount' => $portChargeAmount,
                 ],
                 'handling_charge' => [
                     'rate' => $sl_Invoice['handling_charge_rate'],
-                    'amount' => $sl_Invoice['handling_charge_amount'],
+                    'amount' => $handlingChargeAmount,
                 ],
                 'storage_charge' => [
                     'rate' => $sl_Invoice['storage_charge_rate'],
-                    'amount' => $sl_Invoice['storage_charge_amount'],
+                    'amount' => $storageChargeAmount,
                 ],
                 'dmg_charge' => [
-                    'rate' => $sl_Invoice['dmg_charge_rate'],
-                    'amount' => $sl_Invoice['dmg_charge_amount'],
+                    'rate' => $sl_Invoice['dmg_charge_rate'] ?? 0,
+                    'amount' => $demurrageCharge,
                 ],
-                'total' => $sl_Invoice['total'],
-                'do_charge' => $sl_Invoice['do_charge'],
-                'stamp_charge' => $sl_Invoice['stamp_charge'],
+                'do_charge' => $doCharge,
+                'tax' => $taxAmount,
+                'total' => $totalAmount,
+                'stamp_charge' => $stampCharge,
             ],
             'total_in_word' => $total_in_word,
             'by' => GetUserById::run($sl_Invoice['created_by'])->name,

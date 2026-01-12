@@ -90,6 +90,10 @@
             <span>{{ number_format($data['charges']['do_charge'], 2) }}</span>
         </div>
         <div class="flex justify-between mb-1">
+            <span>Tax</span>
+            <span>{{ number_format($data['charges']['tax'] ?? 0, 2) }}</span>
+        </div>
+        <div class="flex justify-between mb-1">
             <span>Stamp Duty</span>
             <span>{{ number_format($data['charges']['stamp_charge'], 2) }}</span>
         </div>
@@ -98,7 +102,7 @@
 
         <div class="flex justify-between font-bold text-sm">
             <span>TOTAL</span>
-            <span>{{ number_format($data['charges']['total'] + $data['charges']['do_charge'] + $data['charges']['stamp_charge'], 2) }}</span>
+            <span>{{ number_format($data['charges']['total'] + $data['charges']['stamp_charge'], 2) }}</span>
         </div>
     </div>
 
