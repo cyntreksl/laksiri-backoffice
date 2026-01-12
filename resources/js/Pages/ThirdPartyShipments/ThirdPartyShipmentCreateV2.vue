@@ -1141,7 +1141,9 @@ const filteredShipments = computed(() => {
 watch(
     () => form.cargo_type,
     (newVal) => {
-        form.shipment = null;
+        if (!isCommonFieldsLocked.value) {
+            form.shipment = null;
+        }
     }
 );
 </script>
@@ -1160,12 +1162,12 @@ watch(
                     ><i class="pi pi-check-circle mr-2"></i
                     >{{ hblsCreatedCount }} HBL(s) created in this session</span
                 >
-                <Button
+                <!-- <Button
                     label="Finish & View All"
                     severity="success"
                     size="small"
                     @click="router.visit(route('third-party-shipments.index'))"
-                />
+                /> -->
             </div>
         </Message>
 

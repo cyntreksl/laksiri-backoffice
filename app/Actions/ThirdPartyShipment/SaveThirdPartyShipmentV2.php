@@ -31,10 +31,13 @@ class SaveThirdPartyShipmentV2
             // For third-party HBLs, use the user-provided HBL number if available
             // Otherwise fall back to auto-generated reference
             $hblNumber = !empty($data['hbl']) ? $data['hbl'] : $reference;
+            
+            // Use selected third-party agent as the branch, or fall back to current branch
+            $branchId = $data['agent'] ?? GetUserCurrentBranchID::run();
 
             $hbl = HBL::create([
                 'reference' => $reference,
-                'branch_id' => GetUserCurrentBranchID::run(),
+                'branch_id' => $branchId, // Use selected third-party agent
                 'warehouse_id' => GetUserCurrentBranchID::run(),
                 'cargo_type' => $data['cargo_type'],
                 'hbl_type' => $data['hbl_type'],
@@ -78,7 +81,7 @@ class SaveThirdPartyShipmentV2
                 $weight = $tmpPackage['chargeableWeight'] ?? $tmpPackage['totalWeight'] ?? 0;
 
                 $package = HblPackage::create([
-                    'branch_id' => GetUserCurrentBranchID::run(),
+                    'branch_id' => $branchId, // Use same agent branch as HBL
                     'hbl_id' => $hbl->id,
                     'package_type' => $tmpPackage['type'],
                     'measure_type' => $tmpPackage['measure_type'],
@@ -99,14 +102,19 @@ class SaveThirdPartyShipmentV2
             if (!empty($allPackageIds) && isset($data['shipment'])) {
                 $container = Container::find($data['shipment']);
                 if ($container) {
+                    // Update to loaded status (this marks them as fully loaded)
                     CreateOrUpdateLoadedContainer::run([
                         'container_id' => $data['shipment'],
                         'packages' => $allPackageIds,
-                        'note' => 'Third party shipment - Manual Create Option',
-                        'status' => ContainerStatus::IN_TRANSIT->value,
+                        'note' => 'Third party shipment - Auto-loaded on HBL creation',
                     ]);
+
+                    // Complete the loading process by recalculating weights
+                    \App\Services\ContainerWeightService::recalculate($container);
                 }
             }
+
+            return $hbl;
         });
     }
 }

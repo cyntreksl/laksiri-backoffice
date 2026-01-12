@@ -13,6 +13,7 @@ use App\Models\TmpHbl;
 use App\Models\TmpHblPackage;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
+use Illuminate\Support\Facades\Log;
 
 class SaveThirdPartyShipment
 {
@@ -20,6 +21,7 @@ class SaveThirdPartyShipment
 
     public function handle(string $sessionId, array $requestData): array
     {
+
         return DB::transaction(function () use ($sessionId, $requestData) {
             $tmpHbls = TmpHbl::where('session_id', $sessionId)->with('packages')->get();
 
