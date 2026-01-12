@@ -31,6 +31,8 @@ class TokenResource extends JsonResource
                 return $this->hbl->is_finance_release_approved ? 'Approved' : 'Not Approved';
             }, 'Not Approved'),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'is_cancelled' => $this->is_cancelled,
+            'can_be_cancelled' => $this->canBeCancelled(),
         ];
     }
 }

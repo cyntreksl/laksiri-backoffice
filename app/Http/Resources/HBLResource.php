@@ -50,11 +50,16 @@ class HBLResource extends JsonResource
             'tokens' => $this->tokens()->orderBy('created_at', 'desc')->first()
                 ? [
                     'token_number' => $this->tokens()->orderBy('created_at', 'desc')->first()->token,
-                    'queue_type' => ucwords(strtolower(str_replace('_', ' ', $this->tokens()->orderBy('created_at', 'desc')->first()->customerQueue()->orderBy('created_at', 'desc')->first()->type))),
+                    'queue_type' => $this->tokens()->orderBy('created_at', 'desc')->first()->customerQueue()->orderBy('created_at', 'desc')->first()
+                        ? ucwords(strtolower(str_replace('_', ' ', $this->tokens()->orderBy('created_at', 'desc')->first()->customerQueue()->orderBy('created_at', 'desc')->first()->type)))
+                        : 'N/A',
                     'created_at' => $this->tokens()->orderBy('created_at', 'desc')->first()->created_at->format('Y-m-d H:i:s'),
                     'is_today' => $this->tokens()->orderBy('created_at', 'desc')->first()->created_at->isToday(),
+                    'is_cancelled' => $this->tokens()->orderBy('created_at', 'desc')->first()->is_cancelled ?? false,
+                    'cancelled_at' => $this->tokens()->orderBy('created_at', 'desc')->first()->cancelled_at?->format('Y-m-d H:i:s'),
                 ]
                 : null,
+            'latest_token' => $this->tokens()->orderBy('created_at', 'desc')->first(),
             'hbl_number' => $this->hbl_number,
             'cr_number' => $this->cr_number,
             'system_status' => $this->system_status,

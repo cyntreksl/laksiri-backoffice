@@ -19,6 +19,13 @@ class Token extends Model
 
     protected $fillable = [
         'hbl_id', 'customer_id', 'receptionist_id', 'reference', 'package_count', 'token', 'departed_by', 'departed_at',
+        'is_cancelled', 'cancelled_at', 'cancelled_by', 'cancellation_reason',
+    ];
+
+    protected $casts = [
+        'is_cancelled' => 'boolean',
+        'cancelled_at' => 'datetime',
+        'departed_at' => 'datetime',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -97,5 +104,43 @@ class Token extends Model
     public function queueLogs(): HasMany
     {
         return $this->hasMany(QueueLog::class, 'token_id');
+    }
+
+    public function cancellation(): HasOne
+    {
+        return $this->hasOne(TokenCancellation::class);
+    }
+
+    public function cancelledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->is_cancelled === true;
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->departed_at !== null;
+    }
+
+    public function canBeCancelled(): bool
+    {
+        if ($this->isCancelled()) {
+            return false;
+        }
+
+        if (!$this->isCompleted()) {
+            return true;
+        }
+
+        // Completed tokens can be cancelled within 3 days
+        // diffInDays() returns the number of complete 24-hour periods
+        // So a token issued 3 days ago (72 hours) will return 3
+        // We want to allow cancellation for 0, 1, 2, and 3 days ago
+        $daysSinceIssue = $this->created_at->diffInDays(now());
+        return $daysSinceIssue < 4;
     }
 }
