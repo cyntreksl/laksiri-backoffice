@@ -143,21 +143,22 @@ const destinationIICharges = computed(() => {
     const demurrage = Number(hblCharges.value.destination_demurrage_charge) || 0;
     const doCharge = Number(hblCharges.value.destination_do_charge) || 0;
     const tax2 = Number(hblCharges.value.destination_2_tax) || 0;
-    return convertCurrency(demurrage + doCharge + tax2, isPrepaid.value);
+    // Destination II charges are always in LKR, no conversion needed
+    return demurrage + doCharge + tax2;
 });
 
 const slPortalTotal = computed(() => {
     if (!hblCharges.value) return 0;
     
-    // Calculate Destination II charges (always in LKR)
+    // Calculate Destination II charges (always in LKR - no conversion needed)
     const dest2Charges = (Number(hblCharges.value.destination_2_total) || 0) +
                         (Number(hblCharges.value.destination_2_tax) || 0);
     
     if (isPrepaid.value) {
-        // For prepaid, SL Portal only includes Destination II charges
-        return convertCurrency(dest2Charges, false);
+        // For prepaid, SL Portal only includes Destination II charges (in LKR)
+        return dest2Charges;
     } else {
-        // For non-prepaid, include Destination I only if not already paid
+        // For non-prepaid, include Destination I only if not already paid (all in LKR)
         let totalCharges = dest2Charges;
         
         if (!hbl.value?.is_destination_charges_paid) {
@@ -165,7 +166,8 @@ const slPortalTotal = computed(() => {
                            (Number(hblCharges.value.destination_1_tax) || 0);
         }
         
-        return convertCurrency(totalCharges, false);
+        // SL Portal charges are always in LKR, no conversion needed
+        return totalCharges;
     }
 });
 

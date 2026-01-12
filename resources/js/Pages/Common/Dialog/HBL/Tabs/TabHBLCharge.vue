@@ -84,17 +84,27 @@ const agentTotal = computed(() => {
 const slPortalCharge = computed(() => {
     if (!hblCharges.value) return 0;
 
+    // Calculate Destination II charges (always in LKR)
+    const dest2Charges = (hblCharges.value.destination_2_total || 0) +
+                        (hblCharges.value.destination_2_tax || 0);
+
     if (isPrepaid.value) {
-        // Prepaid: destination2 + destination2_tax (convert to base currency)
+        // Prepaid: destination2 + destination2_tax (convert to base currency for display)
         const rateRaw = currencyRate.value || 1;
         const rate = 1 / rateRaw;
-        return ((hblCharges.value.destination_2_total || 0) +
-                (hblCharges.value.destination_2_tax || 0)) * rate;
+        return parseFloat((dest2Charges * rate).toFixed(2));
     } else {
-        return ((hblCharges.value.destination_1_total || 0) +
-                (hblCharges.value.destination_2_total || 0) +
-                (hblCharges.value.destination_1_tax || 0) +
-                (hblCharges.value.destination_2_tax || 0)) ;
+        // For non-prepaid, include Destination I only if not already paid
+        let totalCharges = dest2Charges;
+        
+        if (!props.hbl?.is_destination_charges_paid) {
+            totalCharges += (hblCharges.value.destination_1_total || 0) +
+                           (hblCharges.value.destination_1_tax || 0);
+        }
+        
+        // SL Portal charges are always in LKR, no conversion needed
+        // Round to 2 decimal places
+        return parseFloat(totalCharges.toFixed(2));
     }
 });
 
@@ -451,15 +461,15 @@ const getHBLChargeDetails = async (hbl) => {
                         <div class="space-y-2 ml-4">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Demurrage Charge</span>
-                                <span class="font-medium">LKR {{ hblCharges.destination_demurrage_charge  }}</span>
+                                <span class="font-medium">LKR {{ parseFloat(hblCharges.destination_demurrage_charge || 0).toFixed(2) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">DO Charge</span>
-                                <span class="font-medium">LKR {{ hblCharges.destination_do_charge  }}</span>
+                                <span class="font-medium">LKR {{ parseFloat(hblCharges.destination_do_charge || 0).toFixed(2) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Tax II</span>
-                                <span class="font-medium">LKR {{ hblCharges.destination_2_tax  }}</span>
+                                <span class="font-medium">LKR {{ parseFloat(hblCharges.destination_2_tax || 0).toFixed(2) }}</span>
                             </div>
                         </div>
                     </div>
@@ -468,7 +478,7 @@ const getHBLChargeDetails = async (hbl) => {
                     <div class="border-t pt-3 mt-4">
                         <div class="flex justify-between items-center">
                             <span class="text-lg font-semibold text-gray-900">SL Portal Total</span>
-                            <span class="text-lg font-bold text-green-600">LKR {{ slPortalCharge }}</span>
+                            <span class="text-lg font-bold text-green-600">LKR {{ parseFloat(slPortalCharge || 0).toFixed(2) }}</span>
                         </div>
                     </div>
                 </template>
