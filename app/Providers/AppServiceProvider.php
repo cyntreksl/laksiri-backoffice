@@ -13,6 +13,8 @@ use App\Listeners\SendPickupCreatedNotification;
 use App\Listeners\SendPickupDriverAssignedNotification;
 use App\Listeners\SendShipmentDeparturedNotification;
 use App\Listeners\SetUserCurrentBranch;
+use App\Models\Token;
+use App\Observers\TokenObserver;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
@@ -64,5 +66,8 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(PickupDriverAssigned::class, SendPickupDriverAssignedNotification::class);
         Event::listen(PickupCollected::class, SendPickupCollectedNotification::class);
         Event::listen(ShipmentDepartured::class, SendShipmentDeparturedNotification::class);
+
+        // Register Token observer for automatic status updates
+        Token::observe(TokenObserver::class);
     }
 }

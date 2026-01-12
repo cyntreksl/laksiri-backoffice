@@ -119,7 +119,10 @@ const handleTokenCancelled = (cancelledToken) => {
             ...tokens.value[tokenIndex],
             is_cancelled: true,
             cancelled_at: new Date().toISOString(),
-            can_be_cancelled: false
+            can_be_cancelled: false,
+            status: 'CANCELLED',
+            status_label: 'Cancelled',
+            status_color: 'secondary'
         };
     }
 
@@ -132,7 +135,7 @@ const handleTokenCancelled = (cancelledToken) => {
 
 // Check if cancel button should be shown
 const canCancelToken = (token) => {
-    return can('tokens.cancel') && token.can_be_cancelled && !token.is_cancelled;
+    return can('tokens.cancel') && token.can_be_cancelled && token.status !== 'CANCELLED';
 };
 </script>
 
@@ -159,7 +162,12 @@ const canCancelToken = (token) => {
                            :sortOrder="-1"
                            sortField="created_at"
                            tableStyle="min-width: 50rem"
-                           :rowClass="(data) => data.is_cancelled ? 'bg-red-50 opacity-75' : ''"
+                           :rowClass="(data) => {
+                               if (data.status === 'CANCELLED') return 'bg-red-50 opacity-75';
+                               if (data.status === 'DUE') return 'bg-orange-50';
+                               if (data.status === 'COMPLETED') return 'bg-green-50';
+                               return '';
+                           }"
                            @page="onPageChange"
                            @sort="onSort"
                 >
@@ -205,7 +213,13 @@ const canCancelToken = (token) => {
                                     <i class="ti ti-tag mr-1 text-blue-500"></i>
                                     {{ slotProps.data.token }}
                                 </div>
-                                <Tag v-if="slotProps.data.is_cancelled" class="w-fit" severity="danger" value="CANCELLED" />
+                                <div class="flex gap-2">
+                                    <Tag 
+                                        :severity="slotProps.data.status_color" 
+                                        :value="slotProps.data.status_label" 
+                                        class="w-fit"
+                                    />
+                                </div>
                             </div>
                         </template>
                     </Column>
@@ -231,12 +245,24 @@ const canCancelToken = (token) => {
 
                     <Column :sortField="'created_at'" field="created_at" header="Created At" sortable></Column>
 
-                    <Column field="cancelled_at" header="Cancelled At">
+                    <Column field="cancelled_at" header="Status Info">
                         <template #body="slotProps">
-                            <span v-if="slotProps.data.is_cancelled && slotProps.data.cancelled_at" class="text-red-600">
-                                {{ slotProps.data.cancelled_at }}
-                            </span>
-                            <span v-else class="text-gray-400">-</span>
+                            <div v-if="slotProps.data.status === 'CANCELLED' && slotProps.data.cancelled_at" class="text-red-600">
+                                <div class="font-semibold">Cancelled</div>
+                                <div class="text-sm">{{ slotProps.data.cancelled_at }}</div>
+                            </div>
+                            <div v-else-if="slotProps.data.status === 'COMPLETED'" class="text-green-600">
+                                <div class="font-semibold">Completed</div>
+                                <div class="text-sm">{{ slotProps.data.created_at }}</div>
+                            </div>
+                            <div v-else-if="slotProps.data.status === 'DUE'" class="text-orange-600">
+                                <div class="font-semibold">Due</div>
+                                <div class="text-sm">Created: {{ slotProps.data.created_at }}</div>
+                            </div>
+                            <div v-else class="text-blue-600">
+                                <div class="font-semibold">Ongoing</div>
+                                <div class="text-sm">{{ slotProps.data.created_at }}</div>
+                            </div>
                         </template>
                     </Column>
 
@@ -249,9 +275,9 @@ const canCancelToken = (token) => {
                                 severity="info"
                                 variant="text"
                                 size="small"
-                                v-tooltip.top="data.is_cancelled ? 'Cannot view cancelled token' : 'View token'"
-                                :disabled="data.is_cancelled"
-                                @click.prevent="() => !data.is_cancelled && router.visit(route('call-center.tokens.show', data.id))"
+                                v-tooltip.top="data.status === 'CANCELLED' ? 'Cannot view cancelled token' : 'View token'"
+                                :disabled="data.status === 'CANCELLED'"
+                                @click.prevent="() => data.status !== 'CANCELLED' && router.visit(route('call-center.tokens.show', data.id))"
                             />
                             <Button
                                 v-if="canCancelToken(data)"

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\TokenStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,14 +20,36 @@ class Token extends Model
 
     protected $fillable = [
         'hbl_id', 'customer_id', 'receptionist_id', 'reference', 'package_count', 'token', 'departed_by', 'departed_at',
-        'is_cancelled', 'cancelled_at', 'cancelled_by', 'cancellation_reason',
+        'is_cancelled', 'cancelled_at', 'cancelled_by', 'cancellation_reason', 'status',
     ];
 
     protected $casts = [
         'is_cancelled' => 'boolean',
         'cancelled_at' => 'datetime',
         'departed_at' => 'datetime',
+        'status' => TokenStatus::class,
     ];
+
+    /**
+     * Boot the model and register event listeners for automatic status updates.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Automatically update status when departed_at is set (token completed)
+        static::saving(function ($token) {
+            // If departed_at is being set and token is not cancelled, mark as COMPLETED
+            if ($token->isDirty('departed_at') && $token->departed_at !== null && !$token->is_cancelled) {
+                $token->status = TokenStatus::COMPLETED;
+            }
+
+            // If token is being cancelled, mark as CANCELLED
+            if ($token->isDirty('is_cancelled') && $token->is_cancelled === true) {
+                $token->status = TokenStatus::CANCELLED;
+            }
+        });
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -142,5 +165,44 @@ class Token extends Model
         // We want to allow cancellation for 0, 1, 2, and 3 days ago
         $daysSinceIssue = $this->created_at->diffInDays(now());
         return $daysSinceIssue < 4;
+    }
+
+    /**
+     * Get the current status of the token.
+     * This method computes the status dynamically based on token state.
+     */
+    public function getStatus(): TokenStatus
+    {
+        if ($this->is_cancelled) {
+            return TokenStatus::CANCELLED;
+        }
+
+        if ($this->departed_at !== null) {
+            return TokenStatus::COMPLETED;
+        }
+
+        // Check if token should be marked as DUE
+        // Token is DUE if created before today and not completed
+        if ($this->created_at->isBefore(now()->startOfDay())) {
+            return TokenStatus::DUE;
+        }
+
+        return TokenStatus::ONGOING;
+    }
+
+    /**
+     * Check if token is due (not completed by same day midnight).
+     */
+    public function isDue(): bool
+    {
+        return $this->status === TokenStatus::DUE;
+    }
+
+    /**
+     * Check if token is ongoing.
+     */
+    public function isOngoing(): bool
+    {
+        return $this->status === TokenStatus::ONGOING;
     }
 }

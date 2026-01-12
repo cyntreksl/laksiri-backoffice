@@ -32,7 +32,11 @@ class TokenResource extends JsonResource
             }, 'Not Approved'),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'is_cancelled' => $this->is_cancelled,
+            'cancelled_at' => $this->cancelled_at?->format('Y-m-d H:i:s'),
             'can_be_cancelled' => $this->canBeCancelled(),
+            'status' => $this->status->value,
+            'status_label' => $this->status->getLabel(),
+            'status_color' => $this->status->getColor(),
         ];
     }
 }
