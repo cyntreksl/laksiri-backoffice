@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Actions\HBL\HBLPackage;
+namespace App\Actions\HBL;
 
-use App\Models\HBLPackage;
+use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class MarkAsDetain
@@ -10,24 +10,24 @@ class MarkAsDetain
     use AsAction;
 
     public function handle(
-        HBLPackage $HBLPackage,
+        HBL $hbl,
         string $detainType = 'RTF',
         ?string $detainReason = null,
         ?string $remarks = null
     ): void {
         try {
-            $HBLPackage->detainRecords()->create([
+            $hbl->detainRecords()->create([
                 'is_rtf' => true,
                 'detain_type' => $detainType,
                 'action' => 'detain',
-                'detain_reason' => $detainReason ?? "Package detained by {$detainType}",
+                'detain_reason' => $detainReason ?? "HBL detained by {$detainType}",
                 'remarks' => $remarks,
                 'rtf_by' => auth()->id(),
-                'note' => "Package detained by {$detainType} due to completion of checks.",
-                'entity_level' => 'package',
+                'note' => "HBL detained by {$detainType}.",
+                'entity_level' => 'hbl',
             ]);
         } catch (\Exception $e) {
-            throw new \Exception('Failed to detain HBL Package: '.$e->getMessage());
+            throw new \Exception('Failed to detain HBL: '.$e->getMessage());
         }
     }
 }

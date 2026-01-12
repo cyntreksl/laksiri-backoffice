@@ -14,6 +14,7 @@ import Divider from 'primevue/divider';
 import moment from "moment";
 import {useConfirm} from "primevue/useconfirm";
 import { useDwellTime } from '@/composable/useDwellTime';
+import DetainDialog from "@/Pages/Common/Dialog/DetainDialog.vue";
 
 const props = defineProps({
     container: {
@@ -41,6 +42,9 @@ const confirm = useConfirm();
 
 const arrivedDwellTimeNow = useDwellTime(() => props.container.arrived_at_primary_warehouse);
 const departedDwellTimeNow = useDwellTime(() => props.container.departed_at_primary_warehouse);
+
+const showDetainDialog = ref(false);
+const detainDialogMode = ref('detain');
 
 const handleDeleteLoadedShipment = () => {
     confirm.require({
@@ -143,70 +147,62 @@ const handleUpdateContainer = () => {
 }
 
 const handleRTFContainer = () => {
-    confirm.require({
-        message: 'Would you like to RTF this shipment?',
-        header: 'RTF Shipment?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Sure, RTF',
-            severity: 'warn'
-        },
-        accept: () => {
-            router.post(route("loading.containers.set.rtf", props.container.id), {}, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    emit('close')
-                    router.visit(route('loading.loaded-containers.index'))
-                    push.success('Shipment going to RTF');
-                },
-                onError: () => {
-                    push.error('Something went to wrong!');
-                }
-            })
-        },
-        reject: () => {
-        }
-    })
-}
+    detainDialogMode.value = 'detain';
+    showDetainDialog.value = true;
+};
 
 const handleUndoRTFContainer = () => {
-    confirm.require({
-        message: 'Would you like to Undo RTF for this shipment?',
-        header: 'Undo RTF Shipment?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Sure, Remove RTF',
-            severity: 'warn'
-        },
-        accept: () => {
-            router.post(route("loading.containers.unset.rtf", props.container.id), {}, {
+    detainDialogMode.value = 'lift';
+    showDetainDialog.value = true;
+};
+
+const confirmDetainAction = (data) => {
+    console.log('confirmDetainAction called with data:', data);
+    console.log('Container ID:', props.container.id);
+    console.log('Mode:', detainDialogMode.value);
+
+    if (detainDialogMode.value === 'detain') {
+        console.log('Posting detain request');
+        router.post(
+            route("loading.containers.set.detain", props.container.id),
+            data,
+            {
                 preserveScroll: true,
                 onSuccess: () => {
-                    emit('close')
-                    router.visit(route('loading.loaded-containers.index'))
-                    push.success('Undo RTF for this shipment successfully!');
+                    console.log('Detain success');
+                    push.success(`Shipment detained by ${data.detain_type}`);
+                    showDetainDialog.value = false;
+                    emit('close');
+                    router.visit(route('loading.loaded-containers.index'));
                 },
-                onError: () => {
-                    push.error('Something went to wrong!');
+                onError: (errors) => {
+                    console.error('Detain error:', errors);
+                    push.error(errors?.message || 'Something went wrong!');
                 }
-            })
-        },
-        reject: () => {
-        }
-    })
-}
+            }
+        );
+    } else {
+        console.log('Posting lift detain request');
+        router.post(
+            route("loading.containers.unset.detain", props.container.id),
+            data,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    console.log('Lift detain success');
+                    push.success('Shipment detain lifted successfully!');
+                    showDetainDialog.value = false;
+                    emit('close');
+                    router.visit(route('loading.loaded-containers.index'));
+                },
+                onError: (errors) => {
+                    console.error('Lift detain error:', errors);
+                    push.error(errors?.message || 'Something went wrong!');
+                }
+            }
+        );
+    }
+};
 
 const containerTypes = ref(props.seaContainerOptions);
 
@@ -250,13 +246,13 @@ watchEffect(() => {
         </div>
         <div class="flex items-center space-x-2">
             <template v-if="$page.props.user.permissions.includes('set_rtf')">
-              <Button v-if="!container?.latest_rtf_record?.is_rtf" icon="pi pi-lock" label="RTF Shipment"
+              <Button v-if="!container?.latest_detain_record?.is_rtf" icon="pi pi-lock" label="Detain Shipment"
                     severity="warn" size="small" variant="outlined" @click.prevent="handleRTFContainer" />
             </template>
 
             <template v-if="$page.props.user.permissions.includes('lift_rtf')">
-              <Button v-if="container?.latest_rtf_record?.is_rtf" icon="pi pi-unlock" label="Lift RTF Shipment"
-                    severity="warn" size="small" variant="outlined" @click.prevent="handleUndoRTFContainer" />
+              <Button v-if="container?.latest_detain_record?.is_rtf" icon="pi pi-unlock" label="Lift Detain"
+                    severity="success" size="small" variant="outlined" @click.prevent="handleUndoRTFContainer" />
             </template>
 
             <Button :disabled="container.status === 'IN TRANSIT' || container.status === 'REACHED DESTINATION'" icon="pi pi-trash" label="Delete Shipment"
@@ -458,5 +454,14 @@ watchEffect(() => {
         </div>
 
     </div>
+
+    <DetainDialog
+        :entity-name="container.reference"
+        :mode="detainDialogMode"
+        :visible="showDetainDialog"
+        entity-type="shipment"
+        @confirm="confirmDetainAction"
+        @update:visible="showDetainDialog = $event"
+    />
 
 </template>

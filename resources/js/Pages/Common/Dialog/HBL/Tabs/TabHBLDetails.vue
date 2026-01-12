@@ -15,6 +15,7 @@ import Input from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import axios from "axios";
 import UnloadingIssueDetailModal from "@/Pages/Arrival/Partials/UnloadingIssueDetailModal.vue";
+import DetainDialog from "@/Pages/Common/Dialog/DetainDialog.vue";
 
 const props = defineProps({
     hbl: {
@@ -42,6 +43,11 @@ const page = usePage();
 const isShowIssueDetailModal = ref(false);
 const selectedIssueForDetail = ref(null);
 
+// Detain Dialog state
+const showDetainDialog = ref(false);
+const detainDialogMode = ref('detain'); // 'detain' or 'lift'
+const selectedPackageForDetain = ref(null);
+
 // Detain By dropdown options
 const detainByOptions = [
     { label: 'RTF', value: 'RTF' },
@@ -56,68 +62,54 @@ const detainByOptions = [
 const selectedDetainBy = ref(null);
 
 const handleDetainPackage = (packageId, detainType) => {
-    confirm.require({
-        message: `Would you like to detain this package by ${detainType}?`,
-        header: `Detain Package by ${detainType}?`,
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: `Sure, Detain by ${detainType}`,
-            severity: 'warn'
-        },
-        accept: () => {
-            router.post(route("hbl-packages.set.detain", packageId), { detain_type: detainType }, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    push.success(`Package detained by ${detainType}`);
-                    window.location.reload();
-                },
-                onError: () => {
-                    push.error('Something went wrong!');
-                }
-            })
-        },
-        reject: () => {
-        }
-    })
-}
+    selectedPackageForDetain.value = packageId;
+    detainDialogMode.value = 'detain';
+    showDetainDialog.value = true;
+};
 
 const handleLiftDetainPackage = (packageId) => {
-    confirm.require({
-        message: 'Would you like to lift the detain for this package?',
-        header: 'Lift Detain Package?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Sure, Lift Detain',
-            severity: 'warn'
-        },
-        accept: () => {
-            router.post(route("hbl-packages.unset.detain", packageId), {}, {
+    selectedPackageForDetain.value = packageId;
+    detainDialogMode.value = 'lift';
+    showDetainDialog.value = true;
+};
+
+const confirmDetainAction = (data) => {
+    if (detainDialogMode.value === 'detain') {
+        router.post(
+            route("hbl-packages.set.detain", selectedPackageForDetain.value),
+            data,
+            {
                 preserveScroll: true,
                 onSuccess: () => {
-                    push.success('Detain lifted for this package successfully!');
+                    push.success(`Package detained by ${data.detain_type}`);
+                    showDetainDialog.value = false;
+                    selectedPackageForDetain.value = null;
                     window.location.reload();
                 },
-                onError: () => {
-                    push.error('Something went wrong!');
+                onError: (errors) => {
+                    push.error(errors?.message || 'Something went wrong!');
                 }
-            })
-        },
-        reject: () => {
-        }
-    })
-}
+            }
+        );
+    } else {
+        router.post(
+            route("hbl-packages.unset.detain", selectedPackageForDetain.value),
+            data,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('Detain lifted successfully!');
+                    showDetainDialog.value = false;
+                    selectedPackageForDetain.value = null;
+                    window.location.reload();
+                },
+                onError: (errors) => {
+                    push.error(errors?.message || 'Something went wrong!');
+                }
+            }
+        );
+    }
+};
 
 watch(
     () => props.pickup,
@@ -437,30 +429,27 @@ const closeIssueDetailModal = () => {
 
                         <div class="mt-3">
                             <template v-if="$page.props.user.permissions.includes('set_rtf')">
-                                <div v-if="!item?.latest_detain_record?.is_rtf" class="flex items-center gap-2">
-                                    <Dropdown
-                                        v-model="selectedDetainBy"
-                                        :options="detainByOptions"
-                                        class="w-48"
-                                        optionLabel="label"
-                                        optionValue="value"
-                                        placeholder="Select Detain By"
-                                    />
-                                    <Button
-                                        :disabled="!selectedDetainBy"
-                                        icon="pi pi-lock"
-                                        label="Detain Package"
-                                        severity="warn"
-                                        size="small"
-                                        variant="outlined"
-                                        @click.prevent="handleDetainPackage(item.id, selectedDetainBy)"
-                                    />
-                                </div>
+                                <Button
+                                    v-if="!item?.latest_detain_record?.is_rtf"
+                                    icon="pi pi-lock"
+                                    label="Detain Package"
+                                    severity="warn"
+                                    size="small"
+                                    variant="outlined"
+                                    @click.prevent="handleDetainPackage(item.id)"
+                                />
                             </template>
 
                             <template v-if="$page.props.user.permissions.includes('lift_rtf')">
-                                <Button v-if="item?.latest_detain_record?.is_rtf" icon="pi pi-unlock" label="Lift Detain"
-                                        severity="warn" size="small" variant="outlined" @click.prevent="handleLiftDetainPackage(item.id)" />
+                                <Button
+                                    v-if="item?.latest_detain_record?.is_rtf"
+                                    icon="pi pi-unlock"
+                                    label="Lift Detain"
+                                    severity="success"
+                                    size="small"
+                                    variant="outlined"
+                                    @click.prevent="handleLiftDetainPackage(item.id)"
+                                />
                             </template>
                         </div>
                     </template>
@@ -729,6 +718,14 @@ const closeIssueDetailModal = () => {
         :show="isShowIssueDetailModal"
         @close="closeIssueDetailModal"
         @update:show="isShowIssueDetailModal = $event"
+    />
+
+    <DetainDialog
+        :mode="detainDialogMode"
+        :visible="showDetainDialog"
+        entity-type="package"
+        @confirm="confirmDetainAction"
+        @update:visible="showDetainDialog = $event"
     />
 </template>
 

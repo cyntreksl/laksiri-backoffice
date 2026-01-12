@@ -15,6 +15,7 @@ import TabHBLDetails from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLDetails.vue";
 import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
 import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
 import TabRemarks from "@/Pages/Common/Dialog/HBL/Tabs/TabRemarks.vue";
+import TabDetainHistory from "@/Pages/Common/Dialog/HBL/Tabs/TabDetainHistory.vue";
 
 const props = defineProps({
     show: {
@@ -176,6 +177,12 @@ onMounted(() => {
                         <span>Remarks</span>
                     </a>
                 </Tab>
+                <Tab value="7">
+                    <a class="flex items-center gap-2 text-inherit">
+                        <i class="pi pi-lock" />
+                        <span>Detain History</span>
+                    </a>
+                </Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -198,6 +205,9 @@ onMounted(() => {
                 </TabPanel>
                 <TabPanel value="6">
                     <TabRemarks v-if="hbl" :hbl-id="hbl.id"/>
+                </TabPanel>
+                <TabPanel value="7">
+                    <TabDetainHistory v-if="hbl && hbl.id" :hbl-id="hbl.id"/>
                 </TabPanel>
             </TabPanels>
         </Tabs>

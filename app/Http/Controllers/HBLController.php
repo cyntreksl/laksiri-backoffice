@@ -525,13 +525,136 @@ class HBLController extends Controller
 
     public function setPackageDetain(HBLPackage $hbl_package, Request $request)
     {
-        $detainType = $request->input('detain_type', 'RTF');
-        return $this->HBLRepository->doPackageDetain($hbl_package, $detainType);
+        $request->validate([
+            'detain_type' => 'required|string',
+            'detain_reason' => 'required|string|max:500',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
+        return $this->HBLRepository->doPackageDetain(
+            $hbl_package,
+            $request->input('detain_type'),
+            $request->input('detain_reason'),
+            $request->input('remarks')
+        );
     }
 
-    public function unsetPackageDetain(HBLPackage $hbl_package)
+    public function unsetPackageDetain(HBLPackage $hbl_package, Request $request)
     {
-        return $this->HBLRepository->undoPackageDetain($hbl_package);
+        $request->validate([
+            'lift_reason' => 'required|string|max:500',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
+        return $this->HBLRepository->undoPackageDetain(
+            $hbl_package,
+            $request->input('lift_reason'),
+            $request->input('remarks')
+        );
+    }
+
+    public function setHBLDetain(HBL $hbl, Request $request)
+    {
+        $request->validate([
+            'detain_type' => 'required|string',
+            'detain_reason' => 'required|string|max:500',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
+        return $this->HBLRepository->doHBLDetain(
+            $hbl,
+            $request->input('detain_type'),
+            $request->input('detain_reason'),
+            $request->input('remarks')
+        );
+    }
+
+    public function unsetHBLDetain(HBL $hbl, Request $request)
+    {
+        $request->validate([
+            'lift_reason' => 'required|string|max:500',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
+        return $this->HBLRepository->undoHBLDetain(
+            $hbl,
+            $request->input('lift_reason'),
+            $request->input('remarks')
+        );
+    }
+
+    public function getDetainHistory(HBL $hbl): JsonResponse
+    {
+        try {
+            // Get all detain records for this HBL
+            $hblDetains = $hbl->detainRecords()
+                ->with(['detainedBy', 'liftedBy'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Get detain records from all packages of this HBL
+            $packageDetains = HBLPackage::where('hbl_id', $hbl->id)
+                ->with(['detainRecords' => function ($query) {
+                    $query->with(['detainedBy', 'liftedBy'])
+                        ->orderBy('created_at', 'desc');
+                }])
+                ->get()
+                ->pluck('detainRecords')
+                ->flatten();
+
+            // Get detain records from the shipment (container) if HBL is loaded
+            $shipmentDetains = collect();
+            if ($hbl->container_id) {
+                $shipmentDetains = Container::withoutGlobalScope(BranchScope::class)
+                    ->where('id', $hbl->container_id)
+                    ->with(['detainRecords' => function ($query) {
+                        $query->with(['detainedBy', 'liftedBy'])
+                            ->orderBy('created_at', 'desc');
+                    }])
+                    ->first()
+                    ?->detainRecords ?? collect();
+            }
+
+            // Merge all detain records and sort by date
+            $allDetains = $hblDetains
+                ->concat($packageDetains)
+                ->concat($shipmentDetains)
+                ->sortByDesc('created_at')
+                ->values()
+                ->map(function ($record) {
+                    return [
+                        'id' => $record->id,
+                        'action' => $record->action,
+                        'detain_type' => $record->detain_type,
+                        'detain_reason' => $record->detain_reason,
+                        'lift_reason' => $record->lift_reason,
+                        'remarks' => $record->remarks,
+                        'entity_level' => $record->entity_level,
+                        'is_rtf' => $record->is_rtf,
+                        'created_at' => $record->created_at,
+                        'lifted_at' => $record->lifted_at,
+                        'detained_by' => $record->detainedBy ? [
+                            'id' => $record->detainedBy->id,
+                            'name' => $record->detainedBy->name,
+                        ] : null,
+                        'lifted_by_user' => $record->liftedBy ? [
+                            'id' => $record->liftedBy->id,
+                            'name' => $record->liftedBy->name,
+                        ] : null,
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $allDetains,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching detain history: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch detain history',
+            ], 500);
+        }
     }
 
     public function hblChargeDetails(Request $request)

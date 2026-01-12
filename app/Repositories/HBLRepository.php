@@ -665,21 +665,71 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         }
     }
 
-    public function doPackageDetain(HBLPackage $hbl_package, string $detainType): void
-    {
+    public function doPackageDetain(
+        HBLPackage $hbl_package,
+        string $detainType,
+        ?string $detainReason = null,
+        ?string $remarks = null
+    ): void {
         try {
-            \App\Actions\HBL\HBLPackage\MarkAsDetain::run($hbl_package, $detainType);
+            \App\Actions\HBL\HBLPackage\MarkAsDetain::run(
+                $hbl_package,
+                $detainType,
+                $detainReason,
+                $remarks
+            );
         } catch (\Exception $e) {
             throw new \Exception('Failed to detain HBL Package: '.$e->getMessage());
         }
     }
 
-    public function undoPackageDetain(HBLPackage $hbl_package): void
-    {
+    public function undoPackageDetain(
+        HBLPackage $hbl_package,
+        string $liftReason,
+        ?string $remarks = null
+    ): void {
         try {
-            \App\Actions\HBL\HBLPackage\MarkAsUnDetain::run($hbl_package);
+            \App\Actions\HBL\HBLPackage\MarkAsUnDetain::run(
+                $hbl_package,
+                $liftReason,
+                $remarks
+            );
         } catch (\Exception $e) {
             throw new \Exception('Failed to lift detain HBL Package: '.$e->getMessage());
+        }
+    }
+
+    public function doHBLDetain(
+        HBL $hbl,
+        string $detainType,
+        ?string $detainReason = null,
+        ?string $remarks = null
+    ): void {
+        try {
+            \App\Actions\HBL\MarkAsDetain::run(
+                $hbl,
+                $detainType,
+                $detainReason,
+                $remarks
+            );
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to detain HBL: '.$e->getMessage());
+        }
+    }
+
+    public function undoHBLDetain(
+        HBL $hbl,
+        string $liftReason,
+        ?string $remarks = null
+    ): void {
+        try {
+            \App\Actions\HBL\MarkAsUnDetain::run(
+                $hbl,
+                $liftReason,
+                $remarks
+            );
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to lift detain HBL: '.$e->getMessage());
         }
     }
 }

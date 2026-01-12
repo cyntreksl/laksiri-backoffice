@@ -753,6 +753,59 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         }
     }
 
+    public function doDetain(Container $container, string $detainType, string $detainReason, ?string $remarks = null): void
+    {
+        try {
+            \App\Actions\Shipment\MarkAsDetain::run($container, $detainType, $detainReason, $remarks);
+
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                \App\Actions\HBL\MarkAsDetain::run($hbl, $detainType, $detainReason, $remarks);
+            }
+
+            $packages = $container
+                ->hbl_packages
+                ->unique();
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsDetain::run($package, $detainType, $detainReason, $remarks);
+            }
+
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to detain container: '.$e->getMessage());
+        }
+    }
+
+    public function undoDetain(Container $container, string $liftReason, ?string $remarks = null): void
+    {
+        try {
+            \App\Actions\Shipment\MarkAsUnDetain::run($container, $liftReason, $remarks);
+
+            $hbls = $container
+                ->hbl_packages
+                ->pluck('hbl')
+                ->unique();
+
+            foreach ($hbls as $hbl) {
+                \App\Actions\HBL\MarkAsUnDetain::run($hbl, $liftReason, $remarks);
+            }
+
+            $packages = $container
+                ->hbl_packages
+                ->unique();
+
+            foreach ($packages as $package) {
+                \App\Actions\HBL\HBLPackage\MarkAsUnDetain::run($package, $liftReason, $remarks);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to lift detain for container: '.$e->getMessage());
+        }
+    }
+
     public function getAllShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse
     {
         $query = Container::query();
@@ -772,7 +825,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         $query->with([
             'branch:id,name',
             'latestDetainRecord' => function ($query) {
-                $query->select('detain_records.id', 'detain_records.rtfable_id', 'detain_records.rtfable_type', 'detain_records.is_rtf', 'detain_records.detain_type');
+                $query->select('detain_records.id', 'detain_records.rtfable_id', 'detain_records.rtfable_type', 'detain_records.is_rtf', 'detain_records.detain_type', 'detain_records.action', 'detain_records.detain_reason', 'detain_records.lift_reason', 'detain_records.remarks', 'detain_records.entity_level', 'detain_records.created_at');
             },
         ]);
 

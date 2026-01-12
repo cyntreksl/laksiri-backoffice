@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Actions\HBL\HBLPackage;
+namespace App\Actions\HBL;
 
-use App\Models\HBLPackage;
+use App\Models\HBL;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class MarkAsUnDetain
@@ -10,19 +10,19 @@ class MarkAsUnDetain
     use AsAction;
 
     public function handle(
-        HBLPackage $HBLPackage,
+        HBL $hbl,
         string $liftReason,
         ?string $remarks = null
     ): void {
         try {
             // Get the latest active detain record to reference
-            $latestDetain = $HBLPackage->detainRecords()
+            $latestDetain = $hbl->detainRecords()
                 ->where('is_rtf', true)
                 ->where('action', 'detain')
                 ->latest()
                 ->first();
 
-            $HBLPackage->detainRecords()->create([
+            $hbl->detainRecords()->create([
                 'is_rtf' => false,
                 'detain_type' => $latestDetain?->detain_type,
                 'action' => 'lift',
@@ -31,11 +31,11 @@ class MarkAsUnDetain
                 'rtf_by' => $latestDetain?->rtf_by,
                 'lifted_by' => auth()->id(),
                 'lifted_at' => now(),
-                'note' => 'Detain lifted for package.',
-                'entity_level' => 'package',
+                'note' => 'Detain lifted for HBL.',
+                'entity_level' => 'hbl',
             ]);
         } catch (\Exception $e) {
-            throw new \Exception('Failed to lift detain for HBL Package: '.$e->getMessage());
+            throw new \Exception('Failed to lift detain for HBL: '.$e->getMessage());
         }
     }
 }
