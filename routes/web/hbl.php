@@ -32,6 +32,12 @@ Route::get('hbls/download/receipt/{hbl}', [HBLController::class, 'getCashierRece
 Route::get('hbls/stream/receipt/{hbl}', [HBLController::class, 'streamCashierReceipt'])
     ->name('hbls.streamCashierReceipt');
 
+Route::get('hbls/download/pos-receipt/{hbl}', [HBLController::class, 'downloadPOSReceipt'])
+    ->name('hbls.downloadPOSReceipt');
+
+Route::get('hbls/stream/pos-receipt/{hbl}', [HBLController::class, 'streamPOSReceipt'])
+    ->name('hbls.streamPOSReceipt');
+
 Route::get('hbls/show/cancelled-hbls', [HBLController::class, 'cancelledHBLs'])
     ->name('hbls.cancelled-hbls');
 

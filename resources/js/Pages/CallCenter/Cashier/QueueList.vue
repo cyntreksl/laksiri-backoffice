@@ -73,7 +73,11 @@ const filteredCashierQueue = computed(() => {
                         </template>
                     </Column>
                     <Column field="customer" header="Customer"></Column>
-                    <Column field="reference" header="Reference"></Column>
+                    <Column header="HBL Number">
+                        <template #body="slotProps">
+                            {{ slotProps.data.hbl_number || slotProps.data.hbl?.hbl_number || slotProps.data.reference }}
+                        </template>
+                    </Column>
                     <Column field="package_count" header="Packages">
                         <template #body="slotProps">
                             <div class="flex items-center">

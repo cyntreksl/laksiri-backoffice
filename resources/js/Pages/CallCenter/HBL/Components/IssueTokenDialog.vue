@@ -75,8 +75,7 @@ const isAnyDocumentVerified = computed(() => {
 });
 
 const tokenTimeline = computed(() => {
-    const isPaid = paymentStatus.value === 'Paid';
-    const allDocsVerified = areAllDocumentsVerified.value;
+
     
     return [
         {
@@ -84,7 +83,7 @@ const tokenTimeline = computed(() => {
             label: 'Reception Queue',
             icon: 'pi pi-users',
             description: 'Customer arrival and document verification',
-            status: allDocsVerified ? 'completed' : 'next',
+            status: 'completed', // Reception is always considered done when issuing token
             skipped: false
         },
         {
@@ -92,16 +91,16 @@ const tokenTimeline = computed(() => {
             label: 'Document Verification Queue',
             icon: 'pi pi-file-check',
             description: 'Document verification and approval',
-            status: allDocsVerified ? 'skipped' : (allDocsVerified ? 'completed' : 'pending'),
-            skipped: allDocsVerified
+            status: 'next', // Always next after reception
+            skipped: false
         },
         {
             id: 3,
             label: 'Cashier Queue',
             icon: 'pi pi-wallet',
             description: 'Payment processing and collection',
-            status: (allDocsVerified && isPaid) ? 'skipped' : (isPaid ? 'completed' : 'pending'),
-            skipped: allDocsVerified && isPaid
+            status: 'pending',
+            skipped: false
         },
         {
             id: 4,
@@ -116,7 +115,7 @@ const tokenTimeline = computed(() => {
             label: 'Examination Queue',
             icon: 'pi pi-search',
             description: 'Gate pass creation and examination',
-            status: (allDocsVerified && isPaid) ? 'next' : 'pending',
+            status: 'pending',
             skipped: false
         },
         {
@@ -191,18 +190,10 @@ const handleIssueToken = () => {
                     // Show appropriate success message based on queue placement
                     let queueMessage = '';
                     
-                    if (data.token.skipped_cashier && data.token.skipped_document_verification) {
-                        // Fully paid and all docs verified - went directly to examination
-                        queueMessage = 'Token issued and placed in Examination Queue - All documents verified and payment completed!';
-                    } else if (data.token.skipped_document_verification && !data.token.skipped_cashier) {
-                        // All docs verified but not paid - went to cashier
-                        queueMessage = 'Token issued and placed in Cashier Queue - All documents verified!';
-                    } else if (data.token.all_documents_verified) {
-                        // All docs verified - went to document verification (shouldn't happen with new logic, but keep for backward compatibility)
+                    if (data.token.all_documents_verified) {
                         queueMessage = 'Token issued and placed in Document Verification Queue - All documents verified!';
                     } else {
-                        // Documents not fully verified - went to reception queue
-                        queueMessage = 'Token issued and placed in Reception Queue - Please complete document verification.';
+                        queueMessage = 'Token issued and placed in Document Verification Queue - Please complete document verification.';
                     }
 
                     push.success(queueMessage);

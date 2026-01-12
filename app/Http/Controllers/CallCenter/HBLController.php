@@ -477,6 +477,7 @@ class HBLController extends Controller
                 'download_url' => route('call-center.hbls.download-token', $resultData->token->id ?? ''),
                 'print_url' => route('call-center.hbls.print-token', $resultData->token->id ?? ''),
                 'hbl' => [
+                    'id' => $hbl->id,
                     'hbl_number' => $hbl->hbl_number,
                     'hbl_name' => $hbl->hbl_name,
                     'reference' => $hbl->reference,

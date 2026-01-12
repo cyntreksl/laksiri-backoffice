@@ -53,6 +53,7 @@ class HBLResource extends JsonResource
             // Token related data
             'tokens' => $this->tokens()->orderBy('created_at', 'desc')->first()
                 ? [
+                    'id' => $this->tokens()->orderBy('created_at', 'desc')->first()->id,
                     'token_number' => $this->tokens()->orderBy('created_at', 'desc')->first()->token,
                     'queue_type' => $this->tokens()->orderBy('created_at', 'desc')->first()->customerQueue()->orderBy('created_at', 'desc')->first()
                         ? ucwords(strtolower(str_replace('_', ' ', $this->tokens()->orderBy('created_at', 'desc')->first()->customerQueue()->orderBy('created_at', 'desc')->first()->type)))

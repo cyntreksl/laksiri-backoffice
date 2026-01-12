@@ -157,7 +157,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         }
 
         if ($data['paid_amount'] >= ($payment->getData()->grand_total - $payment->getData()->paid_amount)) {
-            $this->sendToExaminationQueue($customerQueue, $hbl, $data);
+            $this->sendToPackageDelivery($customerQueue, $hbl, $data);
         } else {
             $this->sendToCashierQueue($customerQueue);
         }
@@ -179,15 +179,11 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         );
     }
 
-    private function sendToExaminationQueue(CustomerQueue $customerQueue, HBL $hbl, array $data): void
+    private function sendToPackageDelivery(CustomerQueue $customerQueue, HBL $hbl, array $data): void
     {
-        // Create examination queue
-        $customerQueue->create([
-            'type' => CustomerQueue::EXAMINATION_QUEUE,
-            'token_id' => $customerQueue->token_id,
-        ]);
-
-        // Create package queue
+        // Create package queue (Step 4: Waiting for Package Receive)
+        // We DO NOT create Examination Queue here yet. That happens after package release.
+        
         PackageQueue::create([
             'token_id' => $customerQueue->token_id,
             'hbl_id' => $hbl->id,
@@ -196,14 +192,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             'package_count' => $data['customer_queue']['token']['package_count'],
         ]);
 
-        // Set queue status
-        $customerQueue->addQueueStatus(
-            CustomerQueue::EXAMINATION_QUEUE,
-            $customerQueue->token->customer_id,
-            $customerQueue->token_id,
-            now(),
-            null
-        );
+        // Note: usage of addQueueStatus for ExaminationQueue removed here, 
+        // as we are not in Examination Queue yet.
     }
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])

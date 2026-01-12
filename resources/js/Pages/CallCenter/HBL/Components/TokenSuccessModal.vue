@@ -40,6 +40,17 @@ const printToken = () => {
         window.open(props.tokenData.print_url, '_blank');
     }
 };
+const downloadInvoice = () => {
+    if (props.tokenData?.hbl?.id) {
+        window.location.href = route("hbls.getCashierReceipt", {hbl: props.tokenData.hbl.id});
+    }
+};
+
+const streamInvoice = () => {
+    if (props.tokenData?.hbl?.id) {
+        window.open(route("hbls.streamCashierReceipt", {hbl: props.tokenData.hbl.id}), '_blank');
+    }
+};
 </script>
 
 <template>
@@ -142,7 +153,24 @@ const printToken = () => {
 
         <template #footer>
             <div class="flex justify-between">
-                <div class="flex gap-3">
+                <div class="flex gap-2 flex-wrap">
+                    <Button
+                        label="Stream Invoice"
+                        icon="pi pi-file-pdf"
+                        severity="warn"
+                        outlined
+                        @click="streamInvoice"
+                        :disabled="!tokenData?.hbl?.id"
+                    />
+                    <Button
+                        label="Invoice"
+                        icon="pi pi-download"
+                        severity="info"
+                        outlined
+                        @click="downloadInvoice"
+                        :disabled="!tokenData?.hbl?.id"
+                    />
+
                     <Button
                         label="Print Token"
                         icon="pi pi-print"
@@ -162,7 +190,7 @@ const printToken = () => {
                     label="Close"
                     icon="pi pi-times"
                     severity="secondary"
-                    outlined
+                    text
                     @click="closeModal"
                 />
                 </div>

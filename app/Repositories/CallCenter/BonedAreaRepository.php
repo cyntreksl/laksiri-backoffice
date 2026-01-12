@@ -9,6 +9,9 @@ use App\Interfaces\GridJsInterface;
 use App\Models\PackageQueue;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\CustomerQueue;
+use App\Models\Token;
+
 class BonedAreaRepository implements BonedAreaRepositoryInterface, GridJsInterface
 {
     public function releasePackage(array $data): void
@@ -23,6 +26,26 @@ class BonedAreaRepository implements BonedAreaRepositoryInterface, GridJsInterfa
             $data['auth_id'] = auth()->id();
 
             UpdatePackageQueue::run($data, $data['package_queue']['id']);
+
+            // Create Examination Queue (Step 5)
+            $packageQueue = PackageQueue::with('token')->find($data['package_queue']['id']);
+            
+            if ($packageQueue && $packageQueue->token) {
+                // Create examination queue
+                $customerQueue = CustomerQueue::create([
+                    'type' => CustomerQueue::EXAMINATION_QUEUE,
+                    'token_id' => $packageQueue->token_id,
+                ]);
+
+                // Set queue status
+                $customerQueue->addQueueStatus(
+                    CustomerQueue::EXAMINATION_QUEUE,
+                    $packageQueue->token->customer_id,
+                    $packageQueue->token_id,
+                    now(),
+                    null
+                );
+            }
 
             DB::commit();
         } catch (\Exception $e) {

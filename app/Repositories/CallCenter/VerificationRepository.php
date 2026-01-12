@@ -36,77 +36,20 @@ class VerificationRepository implements GridJsInterface, VerificationRepositoryI
                     now(),
                 );
 
-                // check payment status
-                $payment = GetPaymentByReference::run($customerQueue->token->reference);
+                // Always send to cashier queue (Step-by-step flow)
+                $customerQueue->create([
+                    'type' => CustomerQueue::CASHIER_QUEUE,
+                    'token_id' => $customerQueue->token_id,
+                ]);
 
-                // If $data is an object, convert it to an array
-                $paymentArray = (array) $payment->getData();
-
-                if (! empty($paymentArray)) {
-                    if ($payment->getData()->paid_amount >= $payment->getData()->grand_total) {
-                        // send examination queue
-                        $customerQueue->create([
-                            'type' => CustomerQueue::EXAMINATION_QUEUE,
-                            'token_id' => $customerQueue->token_id,
-                        ]);
-
-                        // find token
-                        $token = Token::find($data['customer_queue']['token_id']);
-
-                        // find hbl
-                        if ($token) {
-                            $hbl = HBL::where('reference', $token->reference)->withoutGlobalScopes()->firstOrFail();
-
-                            // create package queue
-                            PackageQueue::create([
-                                'token_id' => $customerQueue->token_id,
-                                'hbl_id' => $hbl->id,
-                                'auth_id' => auth()->id(),
-                                'reference' => $token->reference,
-                                'package_count' => $token->package_count,
-                            ]);
-
-                            // set queue status log
-                            $customerQueue->addQueueStatus(
-                                CustomerQueue::EXAMINATION_QUEUE,
-                                $customerQueue->token->customer_id,
-                                $customerQueue->token_id,
-                                now(),
-                                null,
-                            );
-                        }
-                    } else {
-                        // send to cashier queue
-                        $customerQueue->create([
-                            'type' => CustomerQueue::CASHIER_QUEUE,
-                            'token_id' => $customerQueue->token_id,
-                        ]);
-
-                        // set queue status log
-                        $customerQueue->addQueueStatus(
-                            CustomerQueue::CASHIER_QUEUE,
-                            $customerQueue->token->customer_id,
-                            $customerQueue->token_id,
-                            now(),
-                            null,
-                        );
-                    }
-                } else {
-                    // send to cashier queue
-                    $customerQueue->create([
-                        'type' => CustomerQueue::CASHIER_QUEUE,
-                        'token_id' => $customerQueue->token_id,
-                    ]);
-
-                    // set queue status log
-                    $customerQueue->addQueueStatus(
-                        CustomerQueue::CASHIER_QUEUE,
-                        $customerQueue->token->customer_id,
-                        $customerQueue->token_id,
-                        now(),
-                        null,
-                    );
-                }
+                // set queue status log
+                $customerQueue->addQueueStatus(
+                    CustomerQueue::CASHIER_QUEUE,
+                    $customerQueue->token->customer_id,
+                    $customerQueue->token_id,
+                    now(),
+                    null,
+                );
             }
         } catch (\Exception $e) {
             throw new \Exception('Failed to verified: '.$e->getMessage());

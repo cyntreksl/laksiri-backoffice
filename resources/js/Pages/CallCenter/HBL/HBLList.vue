@@ -16,7 +16,6 @@ import IconField from "primevue/iconfield";
 import DataTable from "primevue/datatable";
 import Card from "primevue/card";
 import Column from "primevue/column";
-import Checkbox from "primevue/checkbox";
 import DatePicker from "primevue/datepicker";
 import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
@@ -24,7 +23,6 @@ import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
-import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 import IssueTokenDialog from "./Components/IssueTokenDialog.vue";
 import DetainDialog from "@/Pages/Common/Dialog/DetainDialog.vue";
@@ -750,7 +748,14 @@ const exportCSV = () => {
 
                         <Column field="cargo_type" header="Cargo Type" sortable>
                             <template #body="slotProps">
-                                <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                                <Tag 
+                                    v-if="resolveCargoType(slotProps.data)" 
+                                    :icon="resolveCargoType(slotProps.data).icon" 
+                                    :severity="resolveCargoType(slotProps.data).color" 
+                                    :value="slotProps.data.cargo_type" 
+                                    class="text-sm">
+                                </Tag>
+                                <span v-else>{{ slotProps.data.cargo_type }}</span>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
                                 <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
@@ -829,6 +834,54 @@ const exportCSV = () => {
                             <template #body="slotProps">
                                 <Tag v-if="slotProps.data.finance_status" :value="slotProps.data.finance_status" severity="success" class="text-sm"></Tag>
                                 <span v-else class="text-gray-400">-</span>
+                            </template>
+                        </Column>
+
+                        <Column header="Actions" style="width: 15rem">
+                            <template #body="slotProps">
+                                <div class="flex gap-1 flex-wrap">
+                                    <Button
+                                        icon="pi pi-file-pdf"
+                                        severity="warn"
+                                        text
+                                        rounded
+                                        v-tooltip="'Stream Invoice'"
+                                        as="a"
+                                        :href="route('hbls.streamCashierReceipt', slotProps.data.id)"
+                                        target="_blank"
+                                    />
+                                    <Button
+                                        icon="pi pi-download"
+                                        severity="info"
+                                        text
+                                        rounded
+                                        v-tooltip="'Download Invoice'"
+                                        as="a"
+                                        :href="route('hbls.getCashierReceipt', slotProps.data.id)"
+                                    />
+
+                                    <template v-if="slotProps.data.tokens && !slotProps.data.tokens.is_cancelled && slotProps.data.tokens.id">
+                                        <Button
+                                            icon="pi pi-print"
+                                            severity="secondary"
+                                            text
+                                            rounded
+                                            v-tooltip="'Print Token'"
+                                            as="a"
+                                            :href="route('call-center.hbls.print-token', {token: slotProps.data.tokens.id})"
+                                            target="_blank"
+                                        />
+                                        <Button
+                                            icon="pi pi-download"
+                                            severity="success"
+                                            text
+                                            rounded
+                                            v-tooltip="'Download Token'"
+                                            as="a"
+                                            :href="route('call-center.hbls.download-token', {token: slotProps.data.tokens.id})"
+                                        />
+                                    </template>
+                                </div>
                             </template>
                         </Column>
 

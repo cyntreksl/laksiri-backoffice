@@ -6,7 +6,9 @@ use App\Actions\Branch\GetBranchById;
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\CallFlag\CreateCallFlag;
 use App\Actions\Cashier\DownloadCashierInvoicePDF;
+use App\Actions\Cashier\DownloadCashierReceiptPDF;
 use App\Actions\Cashier\StreamCashierInvoicePDF;
+use App\Actions\Cashier\StreamCashierReceiptPDF;
 use App\Actions\Examination\DownloadGatePassPDF;
 use App\Actions\HBL\CalculatePayment;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
@@ -519,6 +521,24 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             return StreamCashierInvoicePDF::run($hbl);
         } catch (\Exception $e) {
             throw new \Exception('Failed to stream invoice'.$e->getMessage());
+        }
+    }
+
+    public function downloadCashierReceipt($hbl)
+    {
+        try {
+            return DownloadCashierReceiptPDF::run($hbl);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to download cashier receipt'.$e->getMessage());
+        }
+    }
+
+    public function streamCashierReceipt($hbl)
+    {
+        try {
+            return StreamCashierReceiptPDF::run($hbl);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to stream receipt'.$e->getMessage());
         }
     }
 
