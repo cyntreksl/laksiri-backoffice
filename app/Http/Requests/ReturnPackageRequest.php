@@ -25,7 +25,8 @@ class ReturnPackageRequest extends FormRequest
             'token_number' => 'nullable|string', // Made optional for selective returns
             'remarks' => 'nullable|string',
             'selected_packages' => 'sometimes|array|min:1',
-            'selected_packages.*.package_queue_id' => 'required_with:selected_packages|integer|exists:package_queues,id',
+            'selected_packages.*.hbl_package_id' => 'required_with:selected_packages|integer|exists:hbl_packages,id',
+            'selected_packages.*.package_queue_id' => 'nullable|integer|exists:package_queues,id',
         ];
     }
 

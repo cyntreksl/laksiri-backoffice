@@ -59,7 +59,7 @@ const returnForm = useForm({
     token_number: '',
     package_details: null,
     remarks: '',
-    selected_packages: []
+    selected_packages: [] // Will contain individual package IDs
 });
 
 const showReturnDialog = () => {
@@ -88,7 +88,7 @@ const loadPackageDetails = async () => {
 
 const togglePackageSelection = (packageData) => {
     const index = returnForm.selected_packages.findIndex(
-        p => p.package_queue_id === packageData.package_queue_id
+        p => p.hbl_package_id === packageData.hbl_package_id
     );
 
     if (index >= 0) {
@@ -98,9 +98,11 @@ const togglePackageSelection = (packageData) => {
         // Add to selection (only if released)
         if (packageData.is_released) {
             returnForm.selected_packages.push({
+                hbl_package_id: packageData.hbl_package_id,
                 package_queue_id: packageData.package_queue_id,
-                reference: packageData.reference,
-                package_count: packageData.package_count
+                package_type: packageData.package_type,
+                quantity: packageData.quantity,
+                hbl_reference: packageData.hbl_reference
             });
         }
     }
@@ -108,9 +110,17 @@ const togglePackageSelection = (packageData) => {
 
 const isPackageSelected = (packageData) => {
     return returnForm.selected_packages.some(
-        p => p.package_queue_id === packageData.package_queue_id
+        p => p.hbl_package_id === packageData.hbl_package_id
     );
 };
+
+// Get individual packages list
+const allPackages = computed(() => {
+    if (!returnForm.package_details?.individual_packages) {
+        return [];
+    }
+    return returnForm.package_details.individual_packages;
+});
 
 // Computed properties to optimize the complex filtering logic
 const hblGroupSelectionStates = computed(() => {
@@ -374,106 +384,75 @@ const showLogDialog = (token) => {
                             <strong>Customer:</strong> {{ returnForm.package_details.customer }}
                         </div>
                         <div>
-                            <strong>Total HBLs:</strong> {{ returnForm.package_details.summary.total_hbls }}
+                            <strong>HBL:</strong> {{ returnForm.package_details.hbl_reference }}
+                        </div>
+                        <div>
+                            <strong>Total Packages:</strong> {{ returnForm.package_details.summary?.total_packages || allPackages.length }}
                         </div>
                         <div>
                             <strong>Available for Return:</strong>
-                            <Tag :value="returnForm.package_details.summary.available_for_return" severity="info" />
+                            <Tag :value="returnForm.package_details.summary?.available_for_return || allPackages.filter(p => p.is_released).length" severity="info" />
                         </div>
                     </div>
                 </div>
 
-                <!-- HBL Groups -->
+                <!-- Individual Packages List -->
                 <div class="space-y-3">
                     <h4 class="font-bold text-base flex items-center gap-2">
                         <i class="pi pi-list"></i>
                         Select Packages to Return
                     </h4>
 
-                    <Accordion multiple>
-                        <AccordionTab
-                            v-for="(hblGroup, index) in returnForm.package_details.hbl_groups"
-                            :key="index"
-                            :header="`📋 HBL: ${hblGroup.hbl_reference} (${hblGroup.released_packages}/${hblGroup.total_packages} released)`"
+                    <!-- Package List - Flat display of all packages -->
+                    <div class="grid gap-3 max-h-96 overflow-y-auto">
+                        <div
+                            v-for="packageData in allPackages"
+                            :key="packageData.id"
+                            class="border rounded-lg p-4 transition-all"
+                            :class="{
+                                'border-green-300 bg-green-50': packageData.is_released && isPackageSelected(packageData),
+                                'border-blue-300 bg-blue-50': packageData.is_released && !isPackageSelected(packageData),
+                                'border-gray-300 bg-gray-50': !packageData.is_released
+                            }"
                         >
-                            <div class="space-y-3">
-                                <!-- HBL Actions -->
-                                <div class="flex justify-between items-center bg-gray-50 p-3 rounded">
-                                    <div class="text-sm text-gray-600">
-                                        <strong>Customer:</strong> {{ hblGroup.customer }}
-                                    </div>
-                                    <Button
-                                        :label="hblGroupSelectionStates[index]?.buttonLabel || 'Select All Released'"
-                                        :severity="hblGroupSelectionStates[index]?.buttonSeverity || 'info'"
-                                        size="small"
-                                        @click="selectAllPackagesInHBL(hblGroup, index)"
-                                        :disabled="hblGroupSelectionStates[index]?.disabled || hblGroup.packages.filter(pkg => pkg.is_released).length === 0"
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start gap-3 flex-1">
+                                    <!-- Selection Checkbox -->
+                                    <Checkbox
+                                        v-if="packageData.is_released"
+                                        :modelValue="isPackageSelected(packageData)"
+                                        @update:modelValue="togglePackageSelection(packageData)"
+                                        :binary="true"
                                     />
-                                </div>
+                                    <div v-else class="w-6"></div>
 
-                                <!-- Package List -->
-                                <div class="grid gap-3">
-                                    <div
-                                        v-for="packageData in hblGroup.packages"
-                                        :key="packageData.id"
-                                        class="border rounded-lg p-4 transition-all"
-                                        :class="{
-                                            'border-green-300 bg-green-50': packageData.is_released && isPackageSelected(packageData),
-                                            'border-blue-300 bg-blue-50': packageData.is_released && !isPackageSelected(packageData),
-                                            'border-gray-300 bg-gray-50': !packageData.is_released
-                                        }"
-                                    >
-                                        <div class="flex items-start justify-between">
-                                            <div class="flex items-start gap-3 flex-1">
-                                                <!-- Selection Checkbox -->
-                                                <Checkbox
-                                                    v-if="packageData.is_released"
-                                                    :modelValue="isPackageSelected(packageData)"
-                                                    @update:modelValue="togglePackageSelection(packageData)"
-                                                    :binary="true"
+                                    <!-- Package Info -->
+                                    <div class="flex-1">
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mb-2">
+                                            <div><strong>Package Type:</strong> {{ packageData.package_type }}</div>
+                                            <div><strong>Quantity:</strong> {{ packageData.quantity }}</div>
+                                            <div><strong>Size:</strong> {{ packageData.length }}x{{ packageData.width }}x{{ packageData.height }}</div>
+                                            <div><strong>Status:</strong>
+                                                <Tag
+                                                    :value="packageData.is_released ? 'Released' : 'Not Released'"
+                                                    :severity="packageData.is_released ? 'success' : 'warning'"
                                                 />
-                                                <div v-else class="w-6"></div>
-
-                                                <!-- Package Info -->
-                                                <div class="flex-1">
-                                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm mb-2">
-                                                        <div><strong>Reference:</strong> {{ packageData.reference }}</div>
-                                                        <div><strong>Packages:</strong> {{ packageData.package_count }}</div>
-                                                        <div><strong>Status:</strong>
-                                                            <Tag
-                                                                :value="packageData.is_released ? 'Released' : 'Not Released'"
-                                                                :severity="packageData.is_released ? 'success' : 'warning'"
-                                                            />
-                                                        </div>
-                                                        <div v-if="packageData.released_at">
-                                                            <strong>Released:</strong> {{ new Date(packageData.released_at).toLocaleDateString() }}
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Release History -->
-                                                    <div v-if="packageData.logs && packageData.logs.length > 0" class="mt-2">
-                                                        <details class="text-xs">
-                                                            <summary class="cursor-pointer text-blue-600 hover:text-blue-800">View History ({{ packageData.logs.length }} entries)</summary>
-                                                            <div class="mt-2 space-y-1 pl-4 border-l-2 border-gray-200">
-                                                                <div v-for="log in packageData.logs" :key="log.id" class="bg-gray-100 p-2 rounded">
-                                                                    <div class="flex justify-between items-center">
-                                                                        <Tag :value="log.type" :severity="log.type === 'return' ? 'warning' : 'success'" />
-                                                                        <span class="text-xs text-gray-500">{{ new Date(log.created_at).toLocaleString() }}</span>
-                                                                    </div>
-                                                                    <div v-if="log.remarks" class="text-xs mt-1">{{ log.remarks }}</div>
-                                                                    <div v-if="log.created_by" class="text-xs text-gray-600">by {{ log.created_by }}</div>
-                                                                </div>
-                                                            </div>
-                                                        </details>
-                                                    </div>
-                                                </div>
                                             </div>
+                                        </div>
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-600 mb-2">
+                                            <div><strong>Weight:</strong> {{ packageData.weight || 0 }}</div>
+                                            <div><strong>Volume:</strong> {{ packageData.volume || 0 }}</div>
+                                            <div v-if="packageData.bond_storage_number"><strong>Bond Storage:</strong> {{ packageData.bond_storage_number }}</div>
+                                            <div v-if="packageData.released_at"><strong>Released:</strong> {{ new Date(packageData.released_at).toLocaleDateString() }}</div>
+                                        </div>
+                                        <div v-if="packageData.remarks" class="text-xs text-gray-600 mb-2">
+                                            <strong>Remarks:</strong> {{ packageData.remarks }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </AccordionTab>
-                    </Accordion>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Selected Packages Summary -->
@@ -488,7 +467,7 @@ const showLogDialog = (token) => {
                             :key="index"
                             class="flex items-center gap-2 bg-white border border-green-300 rounded-full px-3 py-1 text-sm"
                         >
-                            <span>{{ pkg.reference }} ({{ pkg.package_count }})</span>
+                            <span>{{ pkg.package_type }} (Qty: {{ pkg.quantity }}) - {{ pkg.hbl_reference }}</span>
                             <Button
                                 icon="pi pi-times"
                                 severity="danger"
