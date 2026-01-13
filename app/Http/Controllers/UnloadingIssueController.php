@@ -200,13 +200,15 @@ class UnloadingIssueController extends Controller
         $query = \App\Models\HBLPackage::query()
             ->with(['hbl' => function($q) {
                 $q->withoutGlobalScopes()
-                  ->select('id', 'hbl_number', 'hbl_name')
+                  ->select('id', 'hbl_number', 'hbl_name', 'system_status')
+                  ->where('system_status', '!=', 6.8)
                   ->with(['mhbls' => function($mhblQ) {
                       $mhblQ->withoutGlobalScopes()->select('mhbls.id', 'mhbls.hbl_number');
                   }]);
             }, 'unloadingIssue'])
             ->whereHas('hbl', function ($q) use ($hblNumber) {
                 $q->withoutGlobalScopes()
+                  ->where('system_status', '!=', 6.8)
                   ->where(function($subQ) use ($hblNumber) {
                       // Search by HBL number
                       $subQ->where('hbl_number', 'like', "%{$hblNumber}%")
