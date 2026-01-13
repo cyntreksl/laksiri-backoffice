@@ -39,22 +39,26 @@ class CustomerQueue extends Model
 
     public function scopeReceptionQueue(Builder $query): void
     {
-        $query->where('type', self::RECEPTION_VERIFICATION_QUEUE);
+        $query->where('type', self::RECEPTION_VERIFICATION_QUEUE)
+              ->whereNull('left_at');
     }
 
     public function scopeDocumentVerificationQueue(Builder $query): void
     {
-        $query->where('type', self::DOCUMENT_VERIFICATION_QUEUE);
+        $query->where('type', self::DOCUMENT_VERIFICATION_QUEUE)
+              ->whereNull('left_at');
     }
 
     public function scopeCashierQueue(Builder $query): void
     {
-        $query->where('type', self::CASHIER_QUEUE);
+        $query->where('type', self::CASHIER_QUEUE)
+              ->whereNull('left_at');
     }
 
     public function scopeExaminationQueue(Builder $query): void
     {
-        $query->where('type', self::EXAMINATION_QUEUE);
+        $query->where('type', self::EXAMINATION_QUEUE)
+              ->whereNull('left_at');
     }
 
     public function cashierHBLPayment(): HasOne

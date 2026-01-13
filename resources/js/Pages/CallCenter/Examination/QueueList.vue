@@ -1,6 +1,6 @@
 <script setup>
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import DashboardCard from "@/Components/Widgets/DashboardCard.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router} from "@inertiajs/vue3";
@@ -28,11 +28,7 @@ const props = defineProps({
 const layout = ref('list');
 const options = ref(['list', 'grid']);
 
-const filteredExaminationQueue = computed(() => {
-    return props.examinationQueue.filter(q => {
-        return q.is_verified === true && q.is_paid === true && q.is_force_released === false
-    });
-})
+
 </script>
 
 <template>
@@ -51,7 +47,7 @@ const filteredExaminationQueue = computed(() => {
         </div>
 
 
-        <DataView :layout="layout" :value="filteredExaminationQueue" class="my-5">
+        <DataView :layout="layout" :value="props.examinationQueue" class="my-5">
             <template #header>
                 <div class="flex justify-between items-center">
                     <div class="text-lg font-medium">
@@ -81,7 +77,11 @@ const filteredExaminationQueue = computed(() => {
                         </template>
                     </Column>
                     <Column field="customer" header="Customer"></Column>
-                    <Column field="reference" header="Reference"></Column>
+                    <Column field="hbl_number" header="HBL Number">
+                         <template #body="slotProps">
+                            {{ slotProps.data.hbl_number || slotProps.data.hbl?.hbl_number || slotProps.data.reference }}
+                        </template>
+                    </Column>
                     <Column field="package_count" header="Packages">
                         <template #body="slotProps">
                             <div class="flex items-center">

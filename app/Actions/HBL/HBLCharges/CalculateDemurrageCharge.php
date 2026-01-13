@@ -36,19 +36,34 @@ class CalculateDemurrageCharge
 
     public function handle(HBL $HBL)
     {
-        $firstContainer = $HBL->containers()->first();
-        $containerArrivalDate = $firstContainer ? $firstContainer->arrived_at_primary_warehouse : null;
+        // Get containers through packages
+        $firstContainer = $this->getFirstContainer($HBL);
+        
+        // Use arrived_at_primary_warehouse, fallback to reached_date if not available
+        $containerArrivalDate = null;
+        if ($firstContainer) {
+            $containerArrivalDate = $firstContainer->arrived_at_primary_warehouse 
+                ?? $firstContainer->reached_date 
+                ?? null;
+        }
 
+        // Calculate volume/weight from packages if HBL totals are not set
         $grand_volume = $HBL->grand_total_volume;
         $grand_weight = $HBL->grand_total_weight;
+        
+        if (empty($grand_volume) && empty($grand_weight)) {
+            $packages = $HBL->packages;
+            $grand_volume = $packages->sum('volume');
+            $grand_weight = $packages->sum('weight');
+        }
 
         if (! empty($containerArrivalDate)) {
             $arrivedAt = Carbon::parse($containerArrivalDate);
             $currentDate = Carbon::now();
-            $containerArrivalDatesCount = $arrivedAt->diffInDays($currentDate);
+            $containerArrivalDatesCount = (int) $arrivedAt->diffInDays($currentDate);
 
             if ($containerArrivalDatesCount > 1) {
-                return $this->demurrageCharge($containerArrivalDatesCount, $grand_volume, $grand_weight);
+                return $this->demurrageCharge($HBL, $containerArrivalDatesCount, $grand_volume, $grand_weight);
             } else {
                 return [
                     'rate' => 0.00,
@@ -61,17 +76,48 @@ class CalculateDemurrageCharge
         }
     }
 
-    private function demurrageCharge(int $containerArrivalDatesCount, float $grand_volume, float $grand_weight): array
+    private function getFirstContainer(HBL $HBL)
     {
+        // Get containers through packages since HBL->containers() relationship is incorrect
+        // Check both regular containers and duplicate containers (used for unloading history)
+        $packages = $HBL->packages;
+        
+        foreach ($packages as $package) {
+            // First try regular containers
+            $container = $package->containers()->withoutGlobalScopes()->first();
+            if ($container) {
+                return $container;
+            }
+            
+            // Fallback to duplicate containers (used when packages are unloaded)
+            $container = $package->duplicate_containers()->withoutGlobalScopes()->first();
+            if ($container) {
+                return $container;
+            }
+        }
+        
+        return null;
+    }
 
-        $quantity = $this->cargo_mode === 'Sea Cargo' ? ($grand_volume * 35) : $grand_weight;
+    private function demurrageCharge(HBL $HBL, int $containerArrivalDatesCount, float $grand_volume, float $grand_weight): array
+    {
+        $cargoType = $HBL->cargo_type;
+        
+        if (! isset($this->charges[$cargoType])) {
+            return [
+                'rate' => 0.00,
+            ];
+        }
+
+        $quantity = $cargoType === 'Sea Cargo' ? ($grand_volume * 35) : $grand_weight;
         $rate = 0.0;
 
+        $demurrageCharges = $this->charges[$cargoType]['demurrage_charge'];
         $chargeBrackets = [
-            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][0]],
-            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][1]],
-            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][2]],
-            ['days' => 7, 'rate' => $this->charges['demurrage_charge'][3]],
+            ['days' => 7, 'rate' => $demurrageCharges[0]],
+            ['days' => 7, 'rate' => $demurrageCharges[1]],
+            ['days' => 7, 'rate' => $demurrageCharges[2]],
+            ['days' => 7, 'rate' => $demurrageCharges[3]],
         ];
 
         foreach ($chargeBrackets as $bracket) {

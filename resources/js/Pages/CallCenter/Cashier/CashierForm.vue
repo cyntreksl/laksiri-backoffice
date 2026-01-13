@@ -54,6 +54,7 @@ const isLoading = ref(false);
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const showPaymentDialog = ref(false);
 const summaryTotalDue = ref(0);
+const verificationInfo = ref(null);
 
 const computedOutstanding = computed(() => {
     return (
@@ -179,6 +180,35 @@ const getHBLPayments = async () => {
 
 getHBLPayments();
 
+const getVerificationInfo = async () => {
+    if (!props.hblId) return;
+    
+    try {
+        const response = await fetch(`/call-center/cashier/verification-info/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            // Only set verificationInfo if verified is true
+            if (data && data.verified === true) {
+                verificationInfo.value = data;
+            } else {
+                verificationInfo.value = null;
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching verification info:", error);
+        verificationInfo.value = null;
+    }
+};
+
+getVerificationInfo();
+
 const form = useForm({
     paid_amount: 0,
     customer_queue: props.customerQueue,
@@ -187,49 +217,121 @@ const form = useForm({
     additional_charges: 0,
 });
 
-const handleUpdatePayment = () => {
-    const outstandingAmount = parseFloat(computedOutstanding.value);
-    const paidAmount = parseFloat(form.paid_amount);
+const cashTendered = ref(null);
 
-    // Round to 2 decimal places for comparison
-    const roundedOutstanding = Math.round(outstandingAmount * 100) / 100;
-    const roundedPaid = Math.round(paidAmount * 100) / 100;
+const balanceAmount = computed(() => {
+    if (!cashTendered.value) return 0;
+    return parseFloat(cashTendered.value) - parseFloat(form.paid_amount || 0);
+});
 
-    if (roundedPaid < roundedOutstanding) {
-        push.error('Please pay full amount');
-    } else {
-        form.post(route("call-center.cashier.store"), {
-            onSuccess: () => {
-                router.visit(route("call-center.cashier.queue.list"));
-                form.reset();
-                push.success('Payment Update Successfully!');
-                // Trigger the download of the PDF
-                window.location.href = route("hbls.getCashierReceipt", {hbl: props.hblId});
-            },
-            onError: () => {
-                push.error('Something went to wrong!');
-            },
-            preserveScroll: true,
-            preserveState: true,
-            data: {
-                ...form,
-                additional_charges: form.additional_charges,
-                discount: form.discount,
-            }
-        });
+// Watch cash tendered to update amount if needed, though they are separate
+watch(cashTendered, (val) => {
+    // Optional: if want to auto-fill amount? No, better keep manual.
+});
+
+const handleVerify = () => {
+    // For zero payment/verification, we set paid_amount to 0
+    form.paid_amount = 0;
+    
+    // Submit verification and redirect to queue list
+    form.post(route("call-center.cashier.store"), {
+        onSuccess: () => {
+            router.visit(route("call-center.cashier.queue.list"));
+            form.reset();
+            push.success('Verified Successfully!');
+        },
+        onError: () => {
+            push.error('Something went wrong!');
+        },
+        preserveScroll: true,
+        preserveState: true,
+        data: {
+            ...form,
+            additional_charges: form.additional_charges,
+            discount: form.discount,
+        }
+    });
+};
+
+const downloadInvoice = () => {
+    if (props.hblId) {
+        window.location.href = route("hbls.getCashierReceipt", {hbl: props.hblId});
     }
+};
+
+const streamInvoice = () => {
+    if (props.hblId) {
+        window.open(route("hbls.streamCashierReceipt", {hbl: props.hblId}), '_blank');
+    }
+};
+
+const downloadReceipt = () => {
+    if (props.hblId) {
+        window.location.href = route("hbls.downloadPOSReceipt", {hbl: props.hblId});
+    }
+};
+
+const streamReceipt = () => {
+    if (props.hblId) {
+        window.open(route("hbls.streamPOSReceipt", {hbl: props.hblId}), '_blank');
+    }
+};
+
+const handleUpdatePayment = () => {
+    // If it's a verification (zero payment), skip validations
+    const isVerification = computedOutstanding.value <= 0;
+    
+    if (!isVerification) {
+        const outstandingAmount = parseFloat(computedOutstanding.value);
+        const paidAmount = parseFloat(form.paid_amount);
+
+        // Round to 2 decimal places for comparison
+        const roundedOutstanding = Math.round(outstandingAmount * 100) / 100;
+        const roundedPaid = Math.round(paidAmount * 100) / 100;
+
+        if (roundedPaid < roundedOutstanding) {
+            push.error('Please pay full amount');
+            return;
+        }
+    }
+
+    form.post(route("call-center.cashier.store"), {
+        onSuccess: () => {
+            // Close the payment modal
+            showPaymentDialog.value = false;
+            
+            // Refresh the current page to show updated payment details
+            router.reload({ preserveScroll: true });
+            
+            form.reset();
+            push.success('Payment Update Successfully!');
+        },
+        onError: () => {
+            push.error('Something went wrong!');
+        },
+        preserveScroll: true,
+        preserveState: true,
+        data: {
+            ...form,
+            additional_charges: form.additional_charges,
+            discount: form.discount,
+        }
+    });
 }
 
 // Watch for the dialog open to set the default amount
 watch(showPaymentDialog, (val) => {
     if (val) {
         form.paid_amount = parseFloat(computedOutstanding.value.toFixed(2));
+        cashTendered.value = null; // Reset cash tendered
     }
 });
 
-// Always sync amount with outstanding
+// Always sync amount with outstanding if dialog is closed? No only initialization.
 watch(computedOutstanding, (val) => {
-    form.paid_amount = parseFloat(val.toFixed(2));
+    if (showPaymentDialog.value && val > 0) {
+       form.paid_amount = parseFloat(val.toFixed(2));
+    }
 });
 </script>
 
@@ -308,8 +410,34 @@ watch(computedOutstanding, (val) => {
             </div>
 
             <div class="col-span-4">
-                <div class="flex mb-4">
-                    <Button v-show="(paymentRecord.grand_total - hbl.paid_amount) !== 0"
+                <!-- Verification Status Card -->
+                <Card v-if="verificationInfo" class="mb-4 bg-green-50 border-green-200">
+                    <template #content>
+                        <div class="flex items-center gap-3">
+                            <i class="pi pi-check-circle text-green-600 text-3xl"></i>
+                            <div>
+                                <h3 class="text-lg font-bold text-green-800">Verified</h3>
+                                <p class="text-sm text-green-700">By {{ verificationInfo.verified_by_name }}</p>
+                                <p class="text-xs text-green-600">{{ verificationInfo.verified_at }}</p>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+                
+                <div class="flex flex-col gap-3 mb-4">
+                    <!-- Verify Button for Zero Outstanding, disabled if already verified -->
+                    <Button v-if="computedOutstanding <= 0 && !verificationInfo"
+                            class="p-button-lg p-button-success w-full"
+                            icon="pi pi-check-circle"
+                            label="Verify & Next"
+                            raised
+                            size="large"
+                            style="min-width: 180px; font-size: 1.25rem;"
+                            :loading="form.processing"
+                            @click="handleVerify"/>
+
+                    <!-- Pay Now Button for Outstanding > 0 -->
+                    <Button v-else
                             class="p-button-lg p-button-primary w-full"
                             icon="pi pi-credit-card"
                             label="Pay Now"
@@ -317,6 +445,15 @@ watch(computedOutstanding, (val) => {
                             size="large"
                             style="min-width: 180px; font-size: 1.25rem;"
                             @click="showPaymentDialog = true"/>
+
+                    <!-- Print Invoice Button (Always visible if there's any payment history or simply always for re-printing) -->
+                    <Button
+                            class="p-button-lg p-button-secondary p-button-outlined w-full"
+                            icon="pi pi-print"
+                            label="Print Invoice"
+                            size="large"
+                            style="min-width: 180px;"
+                            @click="printInvoice"/>
                 </div>
 
                 <Skeleton v-if="isLoading" height="350px" width="100%"></Skeleton>
@@ -337,15 +474,32 @@ watch(computedOutstanding, (val) => {
                         {{ currencyCode }} {{ parseFloat(computedOutstanding).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                     </div>
                 </div>
-                <div v-show="computedOutstanding !== 0">
+                <div v-show="computedOutstanding > 0">
                     <IftaLabel>
                         <InputNumber v-model="form.paid_amount" :max="computedOutstanding"
                                      :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="paid-amount"
                                      min="0" step="any"
                                      variant="filled"/>
-                        <label for="paid-amount">Amount ({{ currencyCode }})</label>
+                        <label for="paid-amount">Amount to Pay ({{ currencyCode }})</label>
                     </IftaLabel>
                     <InputError :message="form.errors.paid_amount"/>
+                </div>
+
+                <!-- Cash Given Input -->
+                <div v-if="computedOutstanding > 0">
+                    <IftaLabel>
+                        <InputNumber 
+                            v-model="cashTendered" 
+                            :minFractionDigits="2" 
+                            :maxFractionDigits="2" 
+                            class="w-full" 
+                            inputId="cash-tendered"
+                            min="0" 
+                            step="any"
+                            variant="filled" 
+                        />
+                        <label for="cash-tendered">Cash Given</label>
+                    </IftaLabel>
                 </div>
 
                 <!-- Additional Charges Field -->
@@ -391,15 +545,26 @@ watch(computedOutstanding, (val) => {
                 </div>
             </div>
             <template #footer>
-                <Button class="p-button-text" icon="pi pi-times" label="Cancel" @click="showPaymentDialog = false" />
-                <Button
-                  :class="{ 'opacity-25': form.processing }"
-                  :disabled="form.processing"
-                  icon="pi pi-wallet"
-                  icon-class="animate-pulse"
-                  label="Pay Now"
-                  @click="handleUpdatePayment"
-                />
+                <div class="flex justify-between items-center w-full">
+                    <!-- Balance/Change Display -->
+                    <div v-if="cashTendered && cashTendered > 0" class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">Balance:</span>
+                        <span class="text-lg font-bold" :class="balanceAmount < 0 ? 'text-red-600' : 'text-green-600'">
+                            {{ currencyCode }} {{ balanceAmount.toFixed(2) }}
+                        </span>
+                    </div>
+                    <div class="flex gap-2 ml-auto">
+                        <Button class="p-button-text" icon="pi pi-times" label="Cancel" @click="showPaymentDialog = false" />
+                        <Button
+                          :class="{ 'opacity-25': form.processing }"
+                          :disabled="form.processing"
+                          icon="pi pi-wallet"
+                          icon-class="animate-pulse"
+                          label="Pay Now"
+                          @click="handleUpdatePayment"
+                        />
+                    </div>
+                </div>
             </template>
         </Dialog>
     </AppLayout>

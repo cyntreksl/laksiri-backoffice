@@ -73,6 +73,19 @@ class ContainerResource extends JsonResource
             'detain_type' => $this->whenLoaded('latestDetainRecord', function () {
                 return $this->latestDetainRecord?->detain_type;
             }),
+            'latest_detain_record' => $this->whenLoaded('latestDetainRecord', function () {
+                return $this->latestDetainRecord ? [
+                    'id' => $this->latestDetainRecord->id,
+                    'is_rtf' => $this->latestDetainRecord->is_rtf,
+                    'detain_type' => $this->latestDetainRecord->detain_type,
+                    'action' => $this->latestDetainRecord->action,
+                    'detain_reason' => $this->latestDetainRecord->detain_reason,
+                    'lift_reason' => $this->latestDetainRecord->lift_reason,
+                    'remarks' => $this->latestDetainRecord->remarks,
+                    'entity_level' => $this->latestDetainRecord->entity_level,
+                    'created_at' => $this->latestDetainRecord->created_at,
+                ] : null;
+            }),
         ];
     }
 

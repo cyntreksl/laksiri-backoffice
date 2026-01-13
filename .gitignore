@@ -29,3 +29,5 @@ package-lock.json
 .cursor/
 /WARP.md
 .qoder/
+
+.DS_Store

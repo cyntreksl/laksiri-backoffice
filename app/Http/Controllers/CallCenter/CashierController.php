@@ -117,4 +117,30 @@ class CashierController extends Controller
         
         return response()->json($users);
     }
+
+    public function getVerificationInfo($hblId)
+    {
+        // Check if HBL is paid (has payment with paid_amount > 0)
+        $hbl = HBL::withoutGlobalScopes()->find($hblId);
+        if (!$hbl || ($hbl->paid_amount ?? 0) <= 0) {
+            return response()->json(['verified' => false]);
+        }
+
+        // Check if there's a verification record (verified_at is not null)
+        $verification = \App\Models\CashierHBLPayment::where('hbl_id', $hblId)
+            ->whereNotNull('verified_at')
+            ->with('verifiedBy:id,name')
+            ->latest('verified_at')
+            ->first();
+
+        if (!$verification) {
+            return response()->json(['verified' => false]);
+        }
+
+        return response()->json([
+            'verified' => true,
+            'verified_by_name' => $verification->verifiedBy->name ?? 'Unknown',
+            'verified_at' => $verification->verified_at->format('M d, Y h:i A'),
+        ]);
+    }
 }

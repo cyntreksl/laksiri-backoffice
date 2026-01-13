@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Interfaces\ContainerRepositoryInterface;
 use App\Interfaces\UnloadingIssuesRepositoryInterface;
+use App\Models\Container;
 use App\Models\HBL;
 use App\Models\UnloadingIssue;
 use App\Models\UnloadingIssueFile;
@@ -29,10 +30,8 @@ class UnloadingIssueController extends Controller
 
     public function create()
     {
-        $this->authorize('issues.index');
-
         // Get containers for selection
-        $containers = \App\Models\Container::select('id', 'container_number')
+        $containers = Container::select('id', 'container_number')
             ->whereNotNull('container_number')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -53,10 +52,13 @@ class UnloadingIssueController extends Controller
 
         $validated = $request->validate([
             'container_id' => 'required|exists:containers,id',
-            'issue_type' => 'required|in:Unmanifest,Overland,Shortland',
+            'issue_type' => 'required|in:Unmanifest,Overland,Shortland,Damage,Other',
             'selected_packages' => 'required|array|min:1',
             'selected_packages.*' => 'exists:hbl_packages,id',
             'create_another' => 'nullable|boolean',
+            'remarks' => 'required_if:issue_type,Damage,Other|nullable|string',
+            'photos' => 'nullable|array',
+            'photos.*' => 'file|mimes:jpg,jpeg,png,pdf|max:10240',
         ]);
 
         try {
@@ -80,14 +82,26 @@ class UnloadingIssueController extends Controller
 
             // Create issues for packages without existing issues
             foreach ($validated['selected_packages'] as $packageId) {
-                UnloadingIssue::create([
+                $issue = UnloadingIssue::create([
                     'hbl_package_id' => $packageId,
                     'issue' => $validated['issue_type'],
                     'type' => $validated['issue_type'],
-                    'is_damaged' => false,
+                    'is_damaged' => in_array($validated['issue_type'], ['Damage']),
                     'rtf' => false,
                     'is_fixed' => false,
+                    'remarks' => $validated['remarks'] ?? null,
                 ]);
+
+                // Handle photo uploads if provided
+                if ($request->hasFile('photos')) {
+                    foreach ($request->file('photos') as $photo) {
+                        $unloadingIssueFile = new UnloadingIssueFile();
+                        $unloadingIssueFile->package_id = $packageId;
+                        $unloadingIssueFile->name = $photo->getClientOriginalName();
+                        $unloadingIssueFile->save();
+                        $unloadingIssueFile->addMedia($photo)->toMediaCollection();
+                    }
+                }
             }
 
             // If create_another is true, return JSON response (no redirect)

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Actions\HBL\HBLCharges\CalculateDemurrageCharge;
 use App\Actions\HBL\HBLCharges\UpdateHBLDestinationCharges;
 use App\Models\HBL;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -35,7 +36,30 @@ class CalculateDemurrageChargeSchedule extends Command
         $updated = 0;
         $batchSize = 100;
 
-        HBL::with(['packages', 'branch', 'destinationCharge', 'containers'])
+        HBL::withoutGlobalScope(BranchScope::class)
+            ->where(function ($query) {
+                // HBLs that have arrived at primary warehouse
+                $query->where('is_arrived_to_primary_warehouse', true)
+                    // OR have system status indicating they're in destination warehouse
+                    ->orWhereIn('system_status', [
+                        HBL::SYSTEM_STATUS_PARTIAL_UNLOADED,  // 4.3
+                        HBL::SYSTEM_STATUS_FULLY_UNLOADED,    // 4.4
+                        HBL::SYSTEM_STATUS_CASH_RECEIVED,     // 2.2
+                    ]);
+            })
+            // Exclude released HBLs
+            ->where('is_released', false)
+            // Exclude HBLs that are still on the way (fully loaded but not arrived)
+            ->where('system_status', '!=', HBL::SYSTEM_STATUS_FULLY_LOADED)
+            ->with([
+                'packages' => function ($query) {
+                    $query->withoutGlobalScope(BranchScope::class);
+                },
+                'packages.containers',
+                'packages.duplicate_containers',
+                'branch',
+                'destinationCharge'
+            ])
             ->chunk($batchSize, function ($hbls) use (&$count, &$skipped, &$updated) {
                 foreach ($hbls as $hbl) {
                     if ($hbl->destinationCharge) {

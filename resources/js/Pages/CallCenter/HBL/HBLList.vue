@@ -16,7 +16,6 @@ import IconField from "primevue/iconfield";
 import DataTable from "primevue/datatable";
 import Card from "primevue/card";
 import Column from "primevue/column";
-import Checkbox from "primevue/checkbox";
 import DatePicker from "primevue/datepicker";
 import {useConfirm} from "primevue/useconfirm";
 import moment from "moment";
@@ -24,9 +23,9 @@ import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
 import {debounce} from "lodash";
 import {push} from "notivue";
-import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
 import IssueTokenDialog from "./Components/IssueTokenDialog.vue";
+import DetainDialog from "@/Pages/Common/Dialog/DetainDialog.vue";
 
 const props = defineProps({
     users: {
@@ -76,6 +75,8 @@ const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
 const showIssueTokenDialog = ref(false);
 const hblName = ref("");
+const showDetainDialog = ref(false);
+const detainDialogMode = ref('detain');
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -99,7 +100,7 @@ const menuModel = ref([
         label: "Issue Token",
         icon: "pi pi-fw pi-tag",
         command: () => confirmIssueToken(selectedHBL),
-        visible: () => selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token"),
+        visible: () => !selectedHBL.value?.tokens && selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token"),
     },
     {
         label: "Call Flag",
@@ -132,6 +133,32 @@ const menuModel = ref([
         visible: usePage().props.user.permissions.includes("hbls.download invoice"),
     },
     {
+        label: "Stream Invoice",
+        icon: "pi pi-fw pi-file-pdf",
+        url: () => route("hbls.streamCashierReceipt", selectedHBL.value.id),
+        target: "_blank",
+        visible: true,
+    },
+    {
+        label: "Download Invoice",
+        icon: "pi pi-fw pi-download",
+        url: () => route("hbls.getCashierReceipt", selectedHBL.value.id),
+        visible: true,
+    },
+    {
+        label: "Print Token",
+        icon: "pi pi-fw pi-print",
+        url: () => selectedHBL.value?.tokens?.id ? route("call-center.hbls.print-token", {token: selectedHBL.value.tokens.id}) : '#',
+        target: "_blank",
+        visible: () => selectedHBL.value?.tokens && !selectedHBL.value.tokens.is_cancelled && selectedHBL.value.tokens.id,
+    },
+    {
+        label: "Download Token",
+        icon: "pi pi-fw pi-download",
+        url: () => selectedHBL.value?.tokens?.id ? route("call-center.hbls.download-token", {token: selectedHBL.value.tokens.id}) : '#',
+        visible: () => selectedHBL.value?.tokens && !selectedHBL.value.tokens.is_cancelled && selectedHBL.value.tokens.id,
+    },
+    {
         label: "Download Baggage PDF",
         icon: "pi pi-fw pi-shopping-bag",
         url: () => route("hbls.download.baggage", selectedHBL.value.id),
@@ -154,6 +181,24 @@ const menuModel = ref([
         icon: "pi pi-fw pi-unlock",
         command: () => handleUndoRTFHBL(selectedHBL),
         visible: () => selectedHBL.value?.is_rtf,
+    },
+    {
+        label: "Detain HBL",
+        icon: "pi pi-fw pi-lock",
+        command: () => openDetainDialog(selectedHBL),
+        visible: computed(() => {
+            const isDetained = selectedHBL.value?.latest_detain_record?.is_rtf ?? false;
+            return usePage().props.user.permissions.includes("set_rtf") && !isDetained;
+        }),
+    },
+    {
+        label: "Lift Detain",
+        icon: "pi pi-fw pi-unlock",
+        command: () => openLiftDetainDialog(selectedHBL),
+        visible: computed(() => {
+            const isDetained = selectedHBL.value?.latest_detain_record?.is_rtf ?? false;
+            return usePage().props.user.permissions.includes("lift_rtf") && isDetained;
+        }),
     },
     {
         label: "Delete",
@@ -501,6 +546,86 @@ const onTokenIssued = (result) => {
     selectedHblSummary.value = {};
 };
 
+const openDetainDialog = (hbl) => {
+    console.log('openDetainDialog called with:', hbl);
+    // Store the HBL data before the context menu closes
+    if (hbl && hbl.value) {
+        selectedHBLID.value = hbl.value.id;
+        console.log('Stored HBL ID:', selectedHBLID.value);
+    }
+    detainDialogMode.value = 'detain';
+    showDetainDialog.value = true;
+};
+
+const openLiftDetainDialog = (hbl) => {
+    console.log('openLiftDetainDialog called with:', hbl);
+    // Store the HBL data before the context menu closes
+    if (hbl && hbl.value) {
+        selectedHBLID.value = hbl.value.id;
+        console.log('Stored HBL ID:', selectedHBLID.value);
+    }
+    detainDialogMode.value = 'lift';
+    showDetainDialog.value = true;
+};
+
+const confirmDetainAction = (data) => {
+    console.log('confirmDetainAction called with data:', data);
+    console.log('selectedHBL:', selectedHBL.value);
+    console.log('selectedHBLID:', selectedHBLID.value);
+
+    // Use selectedHBLID instead of selectedHBL.value.id
+    if (!selectedHBLID.value) {
+        console.error('No HBL ID stored');
+        return;
+    }
+
+    const hblId = selectedHBLID.value;
+    console.log('HBL ID:', hblId);
+    console.log('Mode:', detainDialogMode.value);
+
+    if (detainDialogMode.value === 'detain') {
+        console.log('Posting detain request to:', route("hbls.set.detain", hblId));
+        router.post(
+            route("hbls.set.detain", hblId),
+            data,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    console.log('Detain success');
+                    push.success(`HBL detained by ${data.detain_type}`);
+                    showDetainDialog.value = false;
+                    selectedHBLID.value = null;
+                    fetchHBLs(currentPage.value, filters.value.global.value);
+                },
+                onError: (errors) => {
+                    console.error('Detain error:', errors);
+                    push.error(errors?.message || 'Something went wrong!');
+                }
+            }
+        );
+    } else {
+        console.log('Posting lift detain request to:', route("hbls.unset.detain", hblId));
+        router.post(
+            route("hbls.unset.detain", hblId),
+            data,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    console.log('Lift detain success');
+                    push.success('HBL detain lifted successfully!');
+                    showDetainDialog.value = false;
+                    selectedHBLID.value = null;
+                    fetchHBLs(currentPage.value, filters.value.global.value);
+                },
+                onError: (errors) => {
+                    console.error('Lift detain error:', errors);
+                    push.error(errors?.message || 'Something went wrong!');
+                }
+            }
+        );
+    }
+};
+
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -573,18 +698,18 @@ const exportCSV = () => {
                                     {{route().current() === "call-center.hbls.index" ? 'All HBLs' : 'Issue Tokens For HBLs'}}
                                 </div>
                                 <div class="flex gap-2">
-                                    <Button v-if="$page.props.user.permissions.includes('hbls.baggage-receipt')" 
+                                    <Button v-if="$page.props.user.permissions.includes('hbls.baggage-receipt')"
                                             icon="pi pi-file-pdf"
                                             icon-pos="left"
-                                            label="Baggage Receipts" 
+                                            label="Baggage Receipts"
                                             severity="secondary"
-                                            size="small" 
+                                            size="small"
                                             @click="router.visit(route('call-center.hbls.baggage-receipts'))"/>
-                                    <Button v-if="$page.props.user.permissions.includes('hbls.create')" 
+                                    <Button v-if="$page.props.user.permissions.includes('hbls.create')"
                                             icon="pi pi-arrow-right"
                                             icon-pos="right"
-                                            label="Create New HBL" 
-                                            size="small" 
+                                            label="Create New HBL"
+                                            size="small"
                                             @click="router.visit(route('hbls.create'))"/>
                                 </div>
                             </div>
@@ -632,7 +757,12 @@ const exportCSV = () => {
                         <Column field="hbl_number" header="HBL" sortable>
                             <template #body="slotProps">
                                 <div class="flex items-center space-x-2">
-                                    <i v-if="slotProps.data.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <i v-if="slotProps.data.latest_detain_record?.is_rtf"
+                                       v-tooltip.left="`Detained by ${slotProps.data.latest_detain_record?.detain_type || 'RTF'}`"
+                                       class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <i v-else-if="slotProps.data.is_rtf"
+                                       v-tooltip.left="`RTF`"
+                                       class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
                                     <div>
                                         <div class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</div>
                                         <br v-if="slotProps.data.is_short_loaded">
@@ -644,7 +774,14 @@ const exportCSV = () => {
 
                         <Column field="cargo_type" header="Cargo Type" sortable>
                             <template #body="slotProps">
-                                <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                                <Tag 
+                                    v-if="resolveCargoType(slotProps.data)" 
+                                    :icon="resolveCargoType(slotProps.data).icon" 
+                                    :severity="resolveCargoType(slotProps.data).color" 
+                                    :value="slotProps.data.cargo_type" 
+                                    class="text-sm">
+                                </Tag>
+                                <span v-else>{{ slotProps.data.cargo_type }}</span>
                             </template>
                             <template #filter="{ filterModel, filterCallback }">
                                 <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
@@ -688,17 +825,33 @@ const exportCSV = () => {
 
                         <Column field="tokens.queue_type" header="Queue Type">
                             <template #body="slotProps">
-                                <Tag v-if="slotProps.data.tokens" :value="slotProps.data.tokens.queue_type" severity="info" class="text-sm whitespace-nowrap"></Tag>
+                                <Tag v-if="slotProps.data.tokens && slotProps.data.tokens.is_cancelled"
+                                     class="text-sm whitespace-nowrap"
+                                     severity="danger"
+                                     value="Cancelled" />
+                                <Tag v-else-if="slotProps.data.tokens"
+                                     :value="slotProps.data.tokens.queue_type"
+                                     class="text-sm whitespace-nowrap"
+                                     severity="info" />
                                 <span v-else class="text-gray-400">-</span>
                             </template>
                         </Column>
 
                         <Column field="tokens.token_number" header="Token Number">
                             <template #body="slotProps">
-                                <span v-if="slotProps.data.tokens"
-                                      class="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-blue-500 rounded-full">
-                                    {{ slotProps.data.tokens.token_number }}
-                                </span>
+                                <div v-if="slotProps.data.tokens" class="flex flex-col items-center gap-1">
+                                    <span
+                                        :class="slotProps.data.tokens.is_cancelled
+                                            ? 'inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-red-500 rounded-full line-through'
+                                            : 'inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-blue-500 rounded-full'">
+                                        {{ slotProps.data.tokens.token_number }}
+                                    </span>
+                                    <Tag v-if="slotProps.data.tokens.is_cancelled"
+                                         class="text-xs"
+                                         severity="danger"
+                                         size="small"
+                                         value="Cancelled" />
+                                </div>
                                 <span v-else class="text-gray-400">-</span>
                             </template>
                         </Column>
@@ -709,6 +862,8 @@ const exportCSV = () => {
                                 <span v-else class="text-gray-400">-</span>
                             </template>
                         </Column>
+
+
 
                         <template #footer> In total there are {{ hbls ? totalRecords : 0 }} HBLs. </template>
                     </DataTable>
@@ -736,4 +891,13 @@ const exportCSV = () => {
         :hbl="selectedHBLData"
         @update:visible="closeIssueTokenDialog"
         @token-issued="onTokenIssued"/>
+
+    <DetainDialog
+        :entity-name="selectedHBL?.value?.hbl_number || selectedHBL?.value?.hbl || ''"
+        :mode="detainDialogMode"
+        :visible="showDetainDialog"
+        entity-type="hbl"
+        @confirm="confirmDetainAction"
+        @update:visible="showDetainDialog = $event"
+    />
 </template>

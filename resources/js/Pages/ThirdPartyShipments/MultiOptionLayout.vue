@@ -25,7 +25,7 @@ const goToNext = () => {
             <div class="border border-gray-200 rounded-md overflow-hidden divide-y divide-gray-200">
 
                 <!-- CSV Upload Option -->
-                <label class="block cursor-pointer">
+                <!-- <label class="block cursor-pointer">
                     <input v-model="selectedOption" class="sr-only" name="access" type="radio" value="csv">
                     <div :class="['flex items-start p-4', selectedOption === 'csv' ? 'bg-blue-50' : 'hover:bg-gray-50']">
                         <div :class="['h-5 w-5 mt-1.5 border-2 rounded-full flex items-center justify-center', selectedOption === 'csv' ? 'border-blue-600' : 'border-gray-400']">
@@ -38,7 +38,7 @@ const goToNext = () => {
                             </div>
                         </div>
                     </div>
-                </label>
+                </label> -->
 
                 <!-- Manual Entry Option -->
                 <label class="block cursor-pointer">

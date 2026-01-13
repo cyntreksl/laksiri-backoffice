@@ -14,6 +14,8 @@ import Dialog from "primevue/dialog";
 import Input from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import axios from "axios";
+import UnloadingIssueDetailModal from "@/Pages/Arrival/Partials/UnloadingIssueDetailModal.vue";
+import DetainDialog from "@/Pages/Common/Dialog/DetainDialog.vue";
 
 const props = defineProps({
     hbl: {
@@ -38,6 +40,13 @@ const newRemark = ref('');
 const loading = ref(false);
 const fetching = ref(false);
 const page = usePage();
+const isShowIssueDetailModal = ref(false);
+const selectedIssueForDetail = ref(null);
+
+// Detain Dialog state
+const showDetainDialog = ref(false);
+const detainDialogMode = ref('detain'); // 'detain' or 'lift'
+const selectedPackageForDetain = ref(null);
 
 // Detain By dropdown options
 const detainByOptions = [
@@ -53,68 +62,54 @@ const detainByOptions = [
 const selectedDetainBy = ref(null);
 
 const handleDetainPackage = (packageId, detainType) => {
-    confirm.require({
-        message: `Would you like to detain this package by ${detainType}?`,
-        header: `Detain Package by ${detainType}?`,
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: `Sure, Detain by ${detainType}`,
-            severity: 'warn'
-        },
-        accept: () => {
-            router.post(route("hbl-packages.set.detain", packageId), { detain_type: detainType }, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    push.success(`Package detained by ${detainType}`);
-                    window.location.reload();
-                },
-                onError: () => {
-                    push.error('Something went wrong!');
-                }
-            })
-        },
-        reject: () => {
-        }
-    })
-}
+    selectedPackageForDetain.value = packageId;
+    detainDialogMode.value = 'detain';
+    showDetainDialog.value = true;
+};
 
 const handleLiftDetainPackage = (packageId) => {
-    confirm.require({
-        message: 'Would you like to lift the detain for this package?',
-        header: 'Lift Detain Package?',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Sure, Lift Detain',
-            severity: 'warn'
-        },
-        accept: () => {
-            router.post(route("hbl-packages.unset.detain", packageId), {}, {
+    selectedPackageForDetain.value = packageId;
+    detainDialogMode.value = 'lift';
+    showDetainDialog.value = true;
+};
+
+const confirmDetainAction = (data) => {
+    if (detainDialogMode.value === 'detain') {
+        router.post(
+            route("hbl-packages.set.detain", selectedPackageForDetain.value),
+            data,
+            {
                 preserveScroll: true,
                 onSuccess: () => {
-                    push.success('Detain lifted for this package successfully!');
+                    push.success(`Package detained by ${data.detain_type}`);
+                    showDetainDialog.value = false;
+                    selectedPackageForDetain.value = null;
                     window.location.reload();
                 },
-                onError: () => {
-                    push.error('Something went wrong!');
+                onError: (errors) => {
+                    push.error(errors?.message || 'Something went wrong!');
                 }
-            })
-        },
-        reject: () => {
-        }
-    })
-}
+            }
+        );
+    } else {
+        router.post(
+            route("hbl-packages.unset.detain", selectedPackageForDetain.value),
+            data,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    push.success('Detain lifted successfully!');
+                    showDetainDialog.value = false;
+                    selectedPackageForDetain.value = null;
+                    window.location.reload();
+                },
+                onError: (errors) => {
+                    push.error(errors?.message || 'Something went wrong!');
+                }
+            }
+        );
+    }
+};
 
 watch(
     () => props.pickup,
@@ -192,9 +187,9 @@ const closeRemarksDialog = () => {
 
 const getIssueBadgeClass = (issueText) => {
     if (!issueText) return 'bg-gray-100 text-gray-700 border-gray-300';
-    
+
     const text = issueText.toLowerCase();
-    
+
     if (text.includes('damage') || text.includes('broken') || text.includes('crashed')) {
         return 'bg-red-100 text-red-700 border-red-300';
     }
@@ -207,19 +202,52 @@ const getIssueBadgeClass = (issueText) => {
     if (text.includes('wrong') || text.includes('mismatch') || text.includes('unmanifest')) {
         return 'bg-purple-100 text-purple-700 border-purple-300';
     }
-    
+
     return 'bg-blue-100 text-blue-700 border-blue-300';
 };
 
 const getIssueLabel = (issueText) => {
     if (!issueText) return 'Issue';
-    
+
     // Truncate long text
     if (issueText.length > 15) {
         return issueText.substring(0, 15) + '...';
     }
-    
+
     return issueText;
+};
+
+const handleIssueClick = async (issue, packageData) => {
+    // Use the data we already have from the HBL props
+    try {
+        selectedIssueForDetail.value = {
+            id: issue.id,
+            hbl: props.hbl?.hbl_number || '-',
+            branch: props.hbl?.branch?.name || '-',
+            hbl_name: props.hbl?.hbl_name || '-',
+            consignee_name: props.hbl?.consignee_name || '-',
+            created_at: issue.created_at || new Date().toISOString(),
+            weight: packageData.actual_weight || packageData.weight || 0,
+            volume: packageData.volume || 0,
+            quantity: packageData.quantity || 0,
+            issue: issue.issue || issue.type || '-',
+            type: issue.type || '-',
+            is_damaged: issue.is_damaged ? 'Yes' : 'No',
+            is_fixed: issue.is_fixed || false,
+            remarks: issue.remarks || '-',
+            note: issue.note || '-',
+            photos_count: 0, // Will be loaded by the modal
+        };
+        isShowIssueDetailModal.value = true;
+    } catch (error) {
+        console.error('Error preparing issue details:', error);
+        push.error('Failed to load issue details');
+    }
+};
+
+const closeIssueDetailModal = () => {
+    isShowIssueDetailModal.value = false;
+    selectedIssueForDetail.value = null;
 };
 </script>
 
@@ -228,10 +256,10 @@ const getIssueLabel = (issueText) => {
         <div class="col-span-12 lg:col-span-6 md:col-span-12 sm:col-span-12 space-y-4">
             <PostSkeleton v-if="isLoading"/>
 
-            <Card v-else 
+            <Card v-else
                 :class="[
-                    hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland 
-                        ? '!border-2 !border-dashed !border-orange-400 !bg-orange-50' 
+                    hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland
+                        ? '!border-2 !border-dashed !border-orange-400 !bg-orange-50'
                         : '!bg-emerald-50 !border !border-emerald-200',
                     '!shadow-md'
                 ]">
@@ -240,20 +268,20 @@ const getIssueLabel = (issueText) => {
                     <div v-if="hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland" class="mb-4 pb-4 border-b-2 border-dashed border-orange-300">
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="text-sm font-semibold text-orange-800 mr-2">HBL Status:</span>
-                            
-                            <span v-if="hbl?.is_short_load" 
+
+                            <span v-if="hbl?.is_short_load"
                                 class="px-3 py-1.5 bg-orange-100 text-orange-800 border-2 border-orange-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
                                 <i class="ti ti-truck-loading text-lg"></i>
                                 <span>SHORTLAND</span>
                             </span>
-                            
-                            <span v-if="hbl?.is_unmanifest" 
+
+                            <span v-if="hbl?.is_unmanifest"
                                 class="px-3 py-1.5 bg-purple-100 text-purple-800 border-2 border-purple-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
                                 <i class="ti ti-file-x text-lg"></i>
                                 <span>UNMANIFEST</span>
                             </span>
-                            
-                            <span v-if="hbl?.is_overland" 
+
+                            <span v-if="hbl?.is_overland"
                                 class="px-3 py-1.5 bg-blue-100 text-blue-800 border-2 border-blue-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
                                 <i class="ti ti-road text-lg"></i>
                                 <span>OVERLAND</span>
@@ -362,13 +390,14 @@ const getIssueLabel = (issueText) => {
                                         :key="idx"
                                         v-tooltip.left="issue.issue || issue.type"
                                         :class="getIssueBadgeClass(issue.issue || issue.type)"
-                                        class="px-2 py-1 text-xs font-semibold rounded-full border flex items-center gap-1"
+                                        class="px-2 py-1 text-xs font-semibold rounded-full border flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+                                        @click="handleIssueClick(issue, item)"
                                     >
                                         <i class="pi pi-exclamation-circle text-xs"></i>
                                         <span>{{ getIssueLabel(issue.issue || issue.type) }}</span>
                                     </span>
                                 </div>
-                                
+
                                 <i v-tooltip="'Remarks'" class="pi pi-comments text-xl hover:cursor-pointer hover:text-success"
                                    @click.prevent="openRemarksDialog(item)"></i>
                             </div>
@@ -400,30 +429,27 @@ const getIssueLabel = (issueText) => {
 
                         <div class="mt-3">
                             <template v-if="$page.props.user.permissions.includes('set_rtf')">
-                                <div v-if="!item?.latest_detain_record?.is_rtf" class="flex items-center gap-2">
-                                    <Dropdown
-                                        v-model="selectedDetainBy"
-                                        :options="detainByOptions"
-                                        class="w-48"
-                                        optionLabel="label"
-                                        optionValue="value"
-                                        placeholder="Select Detain By"
-                                    />
-                                    <Button
-                                        :disabled="!selectedDetainBy"
-                                        icon="pi pi-lock"
-                                        label="Detain Package"
-                                        severity="warn"
-                                        size="small"
-                                        variant="outlined"
-                                        @click.prevent="handleDetainPackage(item.id, selectedDetainBy)"
-                                    />
-                                </div>
+                                <Button
+                                    v-if="!item?.latest_detain_record?.is_rtf"
+                                    icon="pi pi-lock"
+                                    label="Detain Package"
+                                    severity="warn"
+                                    size="small"
+                                    variant="outlined"
+                                    @click.prevent="handleDetainPackage(item.id)"
+                                />
                             </template>
 
                             <template v-if="$page.props.user.permissions.includes('lift_rtf')">
-                                <Button v-if="item?.latest_detain_record?.is_rtf" icon="pi pi-unlock" label="Lift Detain"
-                                        severity="warn" size="small" variant="outlined" @click.prevent="handleLiftDetainPackage(item.id)" />
+                                <Button
+                                    v-if="item?.latest_detain_record?.is_rtf"
+                                    icon="pi pi-unlock"
+                                    label="Lift Detain"
+                                    severity="success"
+                                    size="small"
+                                    variant="outlined"
+                                    @click.prevent="handleLiftDetainPackage(item.id)"
+                                />
                             </template>
                         </div>
                     </template>
@@ -686,6 +712,21 @@ const getIssueLabel = (issueText) => {
             </div>
         </div>
     </Dialog>
+
+    <UnloadingIssueDetailModal
+        :issue="selectedIssueForDetail"
+        :show="isShowIssueDetailModal"
+        @close="closeIssueDetailModal"
+        @update:show="isShowIssueDetailModal = $event"
+    />
+
+    <DetainDialog
+        :mode="detainDialogMode"
+        :visible="showDetainDialog"
+        entity-type="package"
+        @confirm="confirmDetainAction"
+        @update:visible="showDetainDialog = $event"
+    />
 </template>
 
 <style scoped>

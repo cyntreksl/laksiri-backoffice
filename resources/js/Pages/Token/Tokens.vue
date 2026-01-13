@@ -1,7 +1,7 @@
 <script setup>
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch, computed} from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import DataView from 'primevue/dataview';
 import Button from 'primevue/button';
@@ -18,6 +18,8 @@ import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
 import moment from "moment";
 import Tag from "primevue/tag";
+import CancelTokenDialog from "@/Pages/Token/Partials/CancelTokenDialog.vue";
+import { push } from 'notivue';
 
 const baseUrl = ref("/call-center/token-list");
 const loading = ref(true);
@@ -27,6 +29,19 @@ const perPage = ref(10);
 const currentPage = ref(1);
 const fromDate = ref(moment(new Date()).subtract(1, "month").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+
+// Cancel token dialog state
+const showCancelDialog = ref(false);
+const selectedToken = ref(null);
+
+// Permission checking
+const page = usePage();
+const can = (perm) => {
+    const isSuperAdmin = page.props.auth?.user?.roles?.some(role =>
+        (typeof role === 'string' ? role : role?.name)?.toLowerCase() === 'super-admin'
+    );
+    return isSuperAdmin || page.props.user?.permissions?.includes(perm);
+};
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -88,6 +103,40 @@ const clearFilter = () => {
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchTokens(currentPage.value);
 };
+
+// Open cancel dialog
+const openCancelDialog = (token) => {
+    selectedToken.value = token;
+    showCancelDialog.value = true;
+};
+
+// Handle token cancelled event
+const handleTokenCancelled = (cancelledToken) => {
+    // 1. Update token status in local state
+    const tokenIndex = tokens.value.findIndex(t => t.id === cancelledToken.id);
+    if (tokenIndex !== -1) {
+        tokens.value[tokenIndex] = {
+            ...tokens.value[tokenIndex],
+            is_cancelled: true,
+            cancelled_at: new Date().toISOString(),
+            can_be_cancelled: false,
+            status: 'CANCELLED',
+            status_label: 'Cancelled',
+            status_color: 'secondary'
+        };
+    }
+
+    // 2. Show success notification
+    push.success('Token cancelled successfully');
+
+    // 3. Refresh the token list to get updated data from server
+    fetchTokens(currentPage.value, filters.value.global.value);
+};
+
+// Check if cancel button should be shown
+const canCancelToken = (token) => {
+    return can('tokens.cancel') && token.can_be_cancelled && token.status !== 'CANCELLED';
+};
 </script>
 
 <template>
@@ -113,6 +162,12 @@ const clearFilter = () => {
                            :sortOrder="-1"
                            sortField="created_at"
                            tableStyle="min-width: 50rem"
+                           :rowClass="(data) => {
+                               if (data.status === 'CANCELLED') return 'bg-red-50 opacity-75';
+                               if (data.status === 'DUE') return 'bg-orange-50';
+                               if (data.status === 'COMPLETED') return 'bg-green-50';
+                               return '';
+                           }"
                            @page="onPageChange"
                            @sort="onSort"
                 >
@@ -153,9 +208,18 @@ const clearFilter = () => {
 
                     <Column field="token" header="Token">
                         <template #body="slotProps">
-                            <div class="flex items-center text-2xl">
-                                <i class="ti ti-tag mr-1 text-blue-500"></i>
-                                {{ slotProps.data.token }}
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center text-2xl">
+                                    <i class="ti ti-tag mr-1 text-blue-500"></i>
+                                    {{ slotProps.data.token }}
+                                </div>
+                                <div class="flex gap-2">
+                                    <Tag 
+                                        :severity="slotProps.data.status_color" 
+                                        :value="slotProps.data.status_label" 
+                                        class="w-fit"
+                                    />
+                                </div>
                             </div>
                         </template>
                     </Column>
@@ -181,6 +245,27 @@ const clearFilter = () => {
 
                     <Column :sortField="'created_at'" field="created_at" header="Created At" sortable></Column>
 
+                    <Column field="cancelled_at" header="Status Info">
+                        <template #body="slotProps">
+                            <div v-if="slotProps.data.status === 'CANCELLED' && slotProps.data.cancelled_at" class="text-red-600">
+                                <div class="font-semibold">Cancelled</div>
+                                <div class="text-sm">{{ slotProps.data.cancelled_at }}</div>
+                            </div>
+                            <div v-else-if="slotProps.data.status === 'COMPLETED'" class="text-green-600">
+                                <div class="font-semibold">Completed</div>
+                                <div class="text-sm">{{ slotProps.data.created_at }}</div>
+                            </div>
+                            <div v-else-if="slotProps.data.status === 'DUE'" class="text-orange-600">
+                                <div class="font-semibold">Due</div>
+                                <div class="text-sm">Created: {{ slotProps.data.created_at }}</div>
+                            </div>
+                            <div v-else class="text-blue-600">
+                                <div class="font-semibold">Ongoing</div>
+                                <div class="text-sm">{{ slotProps.data.created_at }}</div>
+                            </div>
+                        </template>
+                    </Column>
+
                     <Column field="" style="width: 10%">
                         <template #body="{ data }">
                             <Button
@@ -190,7 +275,20 @@ const clearFilter = () => {
                                 severity="info"
                                 variant="text"
                                 size="small"
-                                @click.prevent="() => router.visit(route('call-center.tokens.show', data.id))"
+                                v-tooltip.top="data.status === 'CANCELLED' ? 'Cannot view cancelled token' : 'View token'"
+                                :disabled="data.status === 'CANCELLED'"
+                                @click.prevent="() => data.status !== 'CANCELLED' && router.visit(route('call-center.tokens.show', data.id))"
+                            />
+                            <Button
+                                v-if="canCancelToken(data)"
+                                v-tooltip.top="'Cancel Token'"
+                                class="mr-2"
+                                icon="pi pi-times"
+                                rounded
+                                severity="danger"
+                                size="small"
+                                variant="text"
+                                @click.prevent="() => openCancelDialog(data)"
                             />
                         </template>
                     </Column>
@@ -198,5 +296,12 @@ const clearFilter = () => {
                 </DataTable>
             </template>
         </Card>
+
+        <!-- Cancel Token Dialog -->
+        <CancelTokenDialog
+            v-model:visible="showCancelDialog"
+            :token="selectedToken"
+            @token-cancelled="handleTokenCancelled"
+        />
     </AppLayout>
 </template>

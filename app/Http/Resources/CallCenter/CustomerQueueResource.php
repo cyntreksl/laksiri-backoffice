@@ -18,11 +18,14 @@ class CustomerQueueResource extends JsonResource
     {
         $is_released_from_boned_area = PackageQueue::where('token_id', $this->token_id)->value('is_released');
 
+        $hbl = $this->token->hbl()->withoutGlobalScope(BranchScope::class)->first();
+
         return [
             'id' => $this->id,
             'token' => $this->token->token,
             'package_count' => $this->token->package_count,
             'reference' => $this->token->reference,
+            'hbl_number' => $hbl?->hbl_number,
             'created_at' => $this->token->created_at->format('Y-m-d H:i:s'),
             'customer' => $this->token->customer->name,
             'reception' => $this->token->reception->name,
@@ -30,11 +33,9 @@ class CustomerQueueResource extends JsonResource
             'is_paid' => $this->token->isPaid(),
             'is_released_from_boned_area' => $is_released_from_boned_area,
             'is_force_released' => $this->examination()->exists(),
-            'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()),
+            'hbl' => $hbl,
             'is_reception_verified' => $this->token->isReceptionVerified(),
-            'hbl_packages' => optional(
-                $this->token->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first()
-            )->packages,
+            'hbl_packages' => optional($hbl)->packages,
         ];
     }
 }

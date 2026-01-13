@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command(\App\Console\Commands\VesselScheduleGenerator::class)->cron('0 0 * * 1');
-Schedule::command(\App\Console\Commands\CalculateDoChargeSchedule::class)->dailyAt('01:00');
-Schedule::command(\App\Console\Commands\CalculateDemurrageChargeSchedule::class)->dailyAt('02:00');
+// Schedule the token due marking command to run at midnight every day
+Schedule::command('tokens:mark-due')
+    ->dailyAt('23:59')
+    ->withoutOverlapping()
+    ->runInBackground();

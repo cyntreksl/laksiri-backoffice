@@ -262,6 +262,16 @@ class ContainerController extends Controller
         $this->containerRepository->reloadContainer($request->all());
     }
 
+    public function unloadHBLGroup(Request $request)
+    {
+        $this->containerRepository->unloadHBLGroup($request->all());
+    }
+
+    public function unloadMHBLGroup(Request $request)
+    {
+        $this->containerRepository->unloadMHBLGroup($request->all());
+    }
+
     public function storeUnloadingIssue(StoreUnloadingIssue $request)
     {
         $this->containerRepository->createUnloadingIssue($request->all());
@@ -354,6 +364,184 @@ class ContainerController extends Controller
     public function unsetRTF(Container $container)
     {
         return $this->containerRepository->undoRTF($container);
+    }
+
+    public function setContainerDetain(Request $request, Container $container)
+    {
+        $validated = $request->validate([
+            'detain_type' => 'required|string',
+            'detain_reason' => 'required|string',
+            'remarks' => 'nullable|string',
+        ]);
+
+        try {
+            $this->containerRepository->doDetain(
+                $container,
+                $validated['detain_type'],
+                $validated['detain_reason'],
+                $validated['remarks'] ?? null
+            );
+
+            return redirect()->back();
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['message' => $e->getMessage()]);
+        }
+    }
+
+    public function unsetContainerDetain(Request $request, Container $container)
+    {
+        $validated = $request->validate([
+            'lift_reason' => 'required|string',
+            'remarks' => 'nullable|string',
+        ]);
+
+        try {
+            $this->containerRepository->undoDetain(
+                $container,
+                $validated['lift_reason'],
+                $validated['remarks'] ?? null
+            );
+
+            return redirect()->back();
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['message' => $e->getMessage()]);
+        }
+    }
+
+    public function getDetainHistory($containerId): \Illuminate\Http\JsonResponse
+    {
+        try {
+            // Get container without global scope to avoid branch filtering issues
+            $container = Container::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+                ->with('hbl_packages')
+                ->findOrFail($containerId);
+
+            // Get all detain records for this container
+            $containerRecords = $container->detainRecords()
+                ->with(['detainedBy', 'liftedBy'])
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($record) {
+                    return [
+                        'id' => $record->id,
+                        'entity_type' => 'Shipment',
+                        'entity_reference' => $record->rtfable->reference ?? 'N/A',
+                        'action' => $record->action,
+                        'detain_type' => $record->detain_type,
+                        'detain_reason' => $record->detain_reason,
+                        'lift_reason' => $record->lift_reason,
+                        'remarks' => $record->remarks,
+                        'is_rtf' => $record->is_rtf,
+                        'entity_level' => $record->entity_level,
+                        'created_by' => $record->detainedBy ? [
+                            'id' => $record->detainedBy->id,
+                            'name' => $record->detainedBy->name,
+                        ] : null,
+                        'lifted_by' => $record->liftedBy ? [
+                            'id' => $record->liftedBy->id,
+                            'name' => $record->liftedBy->name,
+                        ] : null,
+                        'created_at' => $record->created_at,
+                        'lifted_at' => $record->lifted_at,
+                    ];
+                });
+
+            // Get unique HBL IDs from packages
+            $hblIds = $container->hbl_packages->pluck('hbl_id')->unique()->filter();
+
+            // Get all HBL records from packages in this container
+            $hblRecords = collect([]);
+            if ($hblIds->isNotEmpty()) {
+                $hblRecords = \App\Models\DetainRecord::whereIn('rtfable_id', $hblIds)
+                    ->where('rtfable_type', 'App\\Models\\HBL')
+                    ->with(['detainedBy', 'liftedBy', 'rtfable'])
+                    ->orderBy('created_at', 'desc')
+                    ->get()
+                    ->map(function ($record) {
+                        return [
+                            'id' => $record->id,
+                            'entity_type' => 'HBL',
+                            'entity_reference' => $record->rtfable->reference ?? 'N/A',
+                            'action' => $record->action,
+                            'detain_type' => $record->detain_type,
+                            'detain_reason' => $record->detain_reason,
+                            'lift_reason' => $record->lift_reason,
+                            'remarks' => $record->remarks,
+                            'is_rtf' => $record->is_rtf,
+                            'entity_level' => $record->entity_level,
+                            'created_by' => $record->detainedBy ? [
+                                'id' => $record->detainedBy->id,
+                                'name' => $record->detainedBy->name,
+                            ] : null,
+                            'lifted_by' => $record->liftedBy ? [
+                                'id' => $record->liftedBy->id,
+                                'name' => $record->liftedBy->name,
+                            ] : null,
+                            'created_at' => $record->created_at,
+                            'lifted_at' => $record->lifted_at,
+                        ];
+                    });
+            }
+
+            // Get package IDs
+            $packageIds = $container->hbl_packages->pluck('id')->filter();
+
+            // Get all package records from this container
+            $packageRecords = collect([]);
+            if ($packageIds->isNotEmpty()) {
+                $packageRecords = \App\Models\DetainRecord::whereIn('rtfable_id', $packageIds)
+                    ->where('rtfable_type', 'App\\Models\\HBLPackage')
+                    ->with(['detainedBy', 'liftedBy', 'rtfable'])
+                    ->orderBy('created_at', 'desc')
+                    ->get()
+                    ->map(function ($record) {
+                        return [
+                            'id' => $record->id,
+                            'entity_type' => 'Package',
+                            'entity_reference' => $record->rtfable->package_number ?? 'N/A',
+                            'action' => $record->action,
+                            'detain_type' => $record->detain_type,
+                            'detain_reason' => $record->detain_reason,
+                            'lift_reason' => $record->lift_reason,
+                            'remarks' => $record->remarks,
+                            'is_rtf' => $record->is_rtf,
+                            'entity_level' => $record->entity_level,
+                            'created_by' => $record->detainedBy ? [
+                                'id' => $record->detainedBy->id,
+                                'name' => $record->detainedBy->name,
+                            ] : null,
+                            'lifted_by' => $record->liftedBy ? [
+                                'id' => $record->liftedBy->id,
+                                'name' => $record->liftedBy->name,
+                            ] : null,
+                            'created_at' => $record->created_at,
+                            'lifted_at' => $record->lifted_at,
+                        ];
+                    });
+            }
+
+            // Merge all records and sort by created_at
+            $allRecords = $containerRecords
+                ->concat($hblRecords)
+                ->concat($packageRecords)
+                ->sortByDesc('created_at')
+                ->values();
+
+            return response()->json([
+                'success' => true,
+                'data' => $allRecords,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching detain history: ' . $e->getMessage(), [
+                'container_id' => $containerId ?? 'unknown',
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch detain history',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function storeRemark(StoreRemarksRequest $request, Container $container)

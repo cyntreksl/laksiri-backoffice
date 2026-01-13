@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {ref, watch} from "vue";
+import {ref, watch, computed} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import Button from "primevue/button";
 import Card from "primevue/card";
@@ -14,6 +14,8 @@ import axios from "axios";
 import {debounce} from "lodash";
 import {useForm, usePage} from "@inertiajs/vue3";
 import {push} from "notivue";
+import Textarea from "primevue/textarea";
+import FileUpload from "primevue/fileupload";
 
 const props = defineProps({
     containers: Array,
@@ -26,12 +28,16 @@ const form = useForm({
     hbl_search: '',
     issue_type: null,
     selected_packages: [],
+    remarks: '',
+    photos: [],
 });
 
 const issueTypes = ref([
     {label: 'Unmanifest', value: 'Unmanifest'},
     {label: 'Overland', value: 'Overland'},
     {label: 'Shortland', value: 'Shortland'},
+    {label: 'Damage', value: 'Damage'},
+    {label: 'Other', value: 'Other'},
 ]);
 
 const searchResults = ref([]);
@@ -39,6 +45,13 @@ const loading = ref(false);
 const totalRecords = ref(0);
 const perPage = ref(10);
 const currentPage = ref(1);
+const fileInput = ref(null);
+const selectedFiles = ref([]);
+
+// Check if remarks and photos are required
+const requiresRemarksAndPhotos = computed(() => {
+    return form.issue_type === 'Damage' || form.issue_type === 'Other';
+});
 
 const searchHBL = debounce(async (page = 1) => {
     if (!form.hbl_search || form.hbl_search.length < 3) {
@@ -91,6 +104,17 @@ const updateSelectedPackages = () => {
         .map(pkg => pkg.id);
 };
 
+const handleFileSelect = (event) => {
+    const files = Array.from(event.files || []);
+    selectedFiles.value = files;
+    form.photos = files;
+};
+
+const removeFile = (index) => {
+    selectedFiles.value.splice(index, 1);
+    form.photos = selectedFiles.value;
+};
+
 const togglePackageSelection = (pkg) => {
     if (pkg.has_issue && pkg.selected) {
         pkg.selected = false;
@@ -106,21 +130,38 @@ const submitAndCreateNew = () => {
         return;
     }
 
-    // Use axios for create another to avoid Inertia redirect
-    const formData = {
-        container_id: form.container_id,
-        issue_type: form.issue_type,
-        selected_packages: form.selected_packages,
-        create_another: true
-    };
+    // Check if remarks is required
+    if (requiresRemarksAndPhotos.value && !form.remarks) {
+        push.error('Remarks are required for Damage and Other issue types.');
+        return;
+    }
+
+    // Use FormData for file uploads
+    const formData = new FormData();
+    formData.append('container_id', form.container_id);
+    formData.append('issue_type', form.issue_type);
+    formData.append('create_another', 'true');
+
+    form.selected_packages.forEach((packageId, index) => {
+        formData.append(`selected_packages[${index}]`, packageId);
+    });
+
+    if (form.remarks) {
+        formData.append('remarks', form.remarks);
+    }
+
+    if (form.photos && form.photos.length > 0) {
+        form.photos.forEach((photo, index) => {
+            formData.append(`photos[${index}]`, photo);
+        });
+    }
 
     form.processing = true;
     form.clearErrors();
 
     axios.post(route('arrival.unloading-issues.store'), formData, {
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
             'X-CSRF-TOKEN': usePage().props.csrf
         }
     })
@@ -129,6 +170,9 @@ const submitAndCreateNew = () => {
             // Reset form for new entry
             form.hbl_search = '';
             form.selected_packages = [];
+            form.remarks = '';
+            form.photos = [];
+            selectedFiles.value = [];
             searchResults.value = [];
             totalRecords.value = 0;
             currentPage.value = 1;
@@ -139,14 +183,24 @@ const submitAndCreateNew = () => {
 
             if (error.response?.status === 422 && error.response?.data?.errors) {
                 // Validation errors
-                Object.keys(error.response.data.errors).forEach(key => {
-                    form.errors[key] = error.response.data.errors[key][0];
+                const errors = error.response.data.errors;
+                Object.keys(errors).forEach(key => {
+                    form.errors[key] = errors[key][0];
                 });
-                push.error('Validation failed. Please check the form.');
+
+                // Show specific error message for photo validation
+                const photoErrors = Object.keys(errors).filter(key => key.startsWith('photos'));
+                if (photoErrors.length > 0) {
+                    push.error('Some photos have invalid format or size. Please check and try again.');
+                } else {
+                    push.error('Validation failed. Please check the form.');
+                }
             } else if (error.response?.status === 403) {
                 push.error('You do not have permission to perform this action.');
             } else if (error.response?.data?.message) {
                 push.error(error.response.data.message);
+            } else {
+                push.error('An error occurred. Please try again.');
             }
         })
         .finally(() => {
@@ -155,14 +209,49 @@ const submitAndCreateNew = () => {
 };
 
 const submitAndRedirect = () => {
-    // Use Inertia form for regular submit (with redirect)
-    form.post(route('arrival.unloading-issues.store'), {
+    // Validate before submitting
+    if (!form.container_id || !form.issue_type || form.selected_packages.length === 0) {
+        push.error('Please fill all required fields and select at least one package.');
+        return;
+    }
+
+    // Check if remarks is required
+    if (requiresRemarksAndPhotos.value && !form.remarks) {
+        push.error('Remarks are required for Damage and Other issue types.');
+        return;
+    }
+
+    // Use FormData for file uploads via Inertia
+    const formData = {
+        container_id: form.container_id,
+        issue_type: form.issue_type,
+        selected_packages: form.selected_packages,
+        remarks: form.remarks || null,
+        _method: 'POST'
+    };
+
+    // Add photos if present
+    if (form.photos && form.photos.length > 0) {
+        form.photos.forEach((photo, index) => {
+            formData[`photos[${index}]`] = photo;
+        });
+    }
+
+    form.transform(() => formData).post(route('arrival.unloading-issues.store'), {
+        forceFormData: true,
         onSuccess: () => {
             push.success('Unloading issues created successfully!');
         },
         onError: (errors) => {
             console.error('Form errors:', errors);
-            push.error('Failed to create unloading issues. Please check the form.');
+
+            // Check for photo errors
+            const photoErrors = Object.keys(errors).filter(key => key.startsWith('photos'));
+            if (photoErrors.length > 0) {
+                push.error('Some photos have invalid format or size. Please check and try again.');
+            } else {
+                push.error('Failed to create unloading issues. Please check the form.');
+            }
         }
     });
 };
@@ -229,6 +318,69 @@ const cancel = () => {
                                 />
                             </FloatLabel>
                             <small class="text-gray-500">Enter at least 3 characters to search all HBLs</small>
+                        </div>
+
+                        <!-- Remarks Field (Required for Damage/Other) -->
+                        <div v-if="requiresRemarksAndPhotos">
+                            <FloatLabel variant="on">
+                                <Textarea
+                                    v-model="form.remarks"
+                                    :class="{'p-invalid': form.errors.remarks}"
+                                    class="w-full"
+                                    input-id="remarks"
+                                    placeholder="Enter remarks (required for Damage/Other)"
+                                    rows="4"
+                                />
+                            </FloatLabel>
+                            <small v-if="form.errors.remarks" class="text-red-500">{{ form.errors.remarks }}</small>
+                        </div>
+
+                        <!-- Photo Upload (Optional for Damage/Other) -->
+                        <div v-if="requiresRemarksAndPhotos">
+                            <label class="block text-sm font-medium mb-2">Upload Photos (Optional)</label>
+                            <FileUpload
+                                :multiple="true"
+                                accept="image/*,application/pdf"
+                                mode="basic"
+                                @select="handleFileSelect"
+                            >
+                                <template #empty>
+                                    <p>Drag and drop files here or click to upload.</p>
+                                </template>
+                            </FileUpload>
+
+                            <!-- Display photo validation errors -->
+                            <div v-if="Object.keys(form.errors).some(key => key.startsWith('photos'))" class="mt-2">
+                                <small
+                                    v-for="(error, key) in form.errors"
+                                    v-show="key.startsWith('photos')"
+                                    :key="key"
+                                    class="block text-red-500 mb-1"
+                                >
+                                    {{ error }}
+                                </small>
+                            </div>
+
+                            <!-- Display selected files -->
+                            <div v-if="selectedFiles.length > 0" class="mt-3">
+                                <p class="text-sm font-medium mb-2">Selected Files:</p>
+                                <div class="space-y-2">
+                                    <div
+                                        v-for="(file, index) in selectedFiles"
+                                        :key="index"
+                                        class="flex items-center justify-between p-2 bg-gray-50 rounded"
+                                    >
+                                        <span class="text-sm">{{ file.name }}</span>
+                                        <Button
+                                            icon="pi pi-times"
+                                            severity="danger"
+                                            size="small"
+                                            text
+                                            @click="removeFile(index)"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- HBL Packages Results -->

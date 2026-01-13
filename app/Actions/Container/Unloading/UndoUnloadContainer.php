@@ -6,6 +6,7 @@ use App\Events\PackageUnloaded;
 use App\Models\Container;
 use App\Models\HBLPackage;
 use App\Models\Scopes\BranchScope;
+use App\Services\UnloadingAuditService;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -21,6 +22,7 @@ class UndoUnloadContainer
         try {
             $container = Container::withoutGlobalScope(BranchScope::class)
                 ->find($data['container_id']);
+            $auditService = app(UnloadingAuditService::class);
 
             DB::beginTransaction();
 
@@ -40,6 +42,9 @@ class UndoUnloadContainer
                 ->find($data['package_id']);
 
             if ($package) {
+                // Log the reload action
+                $auditService->logPackageAction($container, $package, 'reload');
+
                 // Broadcast the reload event
                 $user = auth()->user();
                 $userName = !empty($user->name) ? $user->name : ($user->username ?? 'Unknown User');

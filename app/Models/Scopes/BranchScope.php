@@ -17,7 +17,7 @@ class BranchScope implements Scope
     {
         $currentBranch = GetUserCurrentBranch::run();
         //        $builder->where('branch_id', '=', $currentBranch['branchId']);
-        if ($currentBranch['branchType'] === 'Departure' || $currentBranch['branchType'] === 'Destination' && Auth::user()->hasRole('admin')) {
+        if ($currentBranch['branchType'] === 'Departure') {
             $builder->where('branch_id', '=', $currentBranch['branchId']);
         }
     }

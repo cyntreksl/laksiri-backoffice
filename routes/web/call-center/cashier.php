@@ -14,8 +14,11 @@ Route::get('/cashier/search-customers', [CashierController::class, 'searchCustom
 
 Route::get('/cashier/search-users', [CashierController::class, 'searchUsers']);
 
+Route::get('/cashier/verification-info/{hblId}', [CashierController::class, 'getVerificationInfo']);
+
 Route::get('/cashier/{customer_queue}', [CashierController::class, 'create'])
     ->name('cashier.create');
 
 Route::post('/cashier', [CashierController::class, 'store'])
     ->name('cashier.store');
+
