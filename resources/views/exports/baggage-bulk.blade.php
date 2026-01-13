@@ -11,7 +11,7 @@
 
         body {
             font-family: Arial, sans-serif;
-            margin: 40px;
+            margin: 20px;
             line-height: 1.6;
         }
 
@@ -60,6 +60,25 @@
         .border-bottom {
             border-bottom: 1px solid black;
         }
+
+        .two-column-container {
+            width: 100%;
+            display: table;
+        }
+
+        .column {
+            width: 50%;
+            display: table-cell;
+            vertical-align: top;
+        }
+
+        .column:first-child {
+            padding-right: 10px;
+        }
+
+        .column:last-child {
+            padding-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -68,96 +87,187 @@
         <div class="page-break"></div>
     @endif
 
-    <div class="header">
+    <div class="two-column-container">
+        <!-- Left Column -->
+        <div class="column">
+            <div class="header">
+                <div>
+                    <div style="align-items: center">                  </div>
+                    <div>                </div>
+                </div>
+            </div>
 
-        <div>
-            <div style="align-items: center">                  </div>
-            <div>                </div>
+            <table class="details-table">
+                <tr>
+                    <td class="label">     </td>
+                    <td>          MF0125455 </td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+
+                <tr>
+                    <td class="label">     </td>
+                    <td><?php echo date('d/m/Y'); ?> </td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+
+                <tr>
+                    <td class="label">     </td>
+                    <td>01/2554-2554</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>APU097099</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$container->bl_number ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$hbl->consignee_name ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>P/E</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$container->port_of_discharge ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$container->vessel_name ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$settings->invoice_header_title ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>          chef</td>
+                <tr>
+            </table>
         </div>
 
+        <!-- Right Column -->
+        <div class="column">
+            <div class="header">
+                <div>
+                    <div style="align-items: center">                  </div>
+                    <div>                </div>
+                </div>
+            </div>
+
+            <table class="details-table">
+                <tr>
+                    <td class="label">     </td>
+                    <td>          MF0125455 </td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+
+                <tr>
+                    <td class="label">     </td>
+                    <td><?php echo date('d/m/Y'); ?> </td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+
+                <tr>
+                    <td class="label">     </td>
+                    <td>01/2554-2554</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>APU097099</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$container->bl_number ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$hbl->consignee_name ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>P/E</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$container->port_of_discharge ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$container->vessel_name ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>{{$settings->invoice_header_title ?? ''}}</td>
+                </tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>     </td>
+                <tr>
+                <tr>
+                    <td class="label">     </td>
+                    <td>          chef</td>
+                <tr>
+            </table>
+        </div>
     </div>
-
-
-
-    <table class="details-table">
-        <tr>
-            <td class="label">     </td>
-            <td>          MF0125455 </td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>     </td>
-        <tr>
-        <tr>
-            <td class="label">     </td>
-            <td>     </td>
-        <tr>
-
-        <tr>
-            <td class="label">     </td>
-            <td><?php echo date('d/m/Y'); ?> </td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>     </td>
-        <tr>
-        <tr>
-            <td class="label">     </td>
-            <td>     </td>
-        <tr>
-
-        <tr>
-            <td class="label">     </td>
-            <td>01/2554-2554</td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>APU097099</td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>{{$container->bl_number ?? ''}}</td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>     </td>
-        <tr>
-            <td class="label">     </td>
-            <td>{{$hbl->consignee_name ?? ''}}</td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>P/E</td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>{{$container->port_of_discharge ?? ''}}</td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>     </td>
-        <tr>
-        <tr>
-            <td class="label">     </td>
-            <td>{{$container->vessel_name ?? ''}}</td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>{{$settings->invoice_header_title ?? ''}}</td>
-        </tr>
-        <tr>
-            <td class="label">     </td>
-            <td>     </td>
-        <tr>
-        <tr>
-            <td class="label">     </td>
-            <td>     </td>
-        <tr>
-        <tr>
-            <td class="label">     </td>
-            <td>          chef</td>
-        <tr>
-    </table>
 @endforeach
 </body>
 </html>
