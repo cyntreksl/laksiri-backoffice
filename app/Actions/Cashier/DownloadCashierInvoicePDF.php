@@ -99,7 +99,7 @@ class DownloadCashierInvoicePDF
             'remaining_packages' => count($hbl->packages) - $collectedPackages,
         ];
 
-        $template = view('pdf.cashier.invoice', [
+        $template = view('pdf.cashier.invoice-v2', [
             'logoPath' => asset('images/app-logo.png') ?? null,
             'data' => $data,
             'hbl' => $hbl,
