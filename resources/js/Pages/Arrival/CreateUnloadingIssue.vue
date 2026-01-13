@@ -47,6 +47,8 @@ const perPage = ref(10);
 const currentPage = ref(1);
 const fileInput = ref(null);
 const selectedFiles = ref([]);
+const hasMhblResults = ref(false);
+const selectAll = ref(false);
 
 // Check if remarks and photos are required
 const requiresRemarksAndPhotos = computed(() => {
@@ -57,6 +59,8 @@ const searchHBL = debounce(async (page = 1) => {
     if (!form.hbl_search || form.hbl_search.length < 3) {
         searchResults.value = [];
         totalRecords.value = 0;
+        hasMhblResults.value = false;
+        selectAll.value = false;
         return;
     }
 
@@ -78,10 +82,16 @@ const searchHBL = debounce(async (page = 1) => {
         }));
         totalRecords.value = response.data.meta.total;
         currentPage.value = response.data.meta.current_page;
+
+        // Check if any results are MHBL matches
+        hasMhblResults.value = searchResults.value.some(pkg => pkg.is_mhbl_match);
+        selectAll.value = false;
     } catch (error) {
         console.error("Error searching HBL:", error);
         searchResults.value = [];
         totalRecords.value = 0;
+        hasMhblResults.value = false;
+        selectAll.value = false;
     } finally {
         loading.value = false;
     }
@@ -102,6 +112,29 @@ const updateSelectedPackages = () => {
     form.selected_packages = searchResults.value
         .filter(pkg => pkg.selected && !pkg.has_issue)
         .map(pkg => pkg.id);
+
+    // Update selectAll state based on current selections
+    const availablePackages = searchResults.value.filter(pkg => !pkg.has_issue);
+    selectAll.value = availablePackages.length > 0 &&
+                      availablePackages.every(pkg => pkg.selected);
+};
+
+const toggleSelectAll = () => {
+    const availablePackages = searchResults.value.filter(pkg => !pkg.has_issue);
+
+    if (selectAll.value) {
+        // Select all available packages
+        availablePackages.forEach(pkg => {
+            pkg.selected = true;
+        });
+    } else {
+        // Deselect all packages
+        searchResults.value.forEach(pkg => {
+            pkg.selected = false;
+        });
+    }
+
+    updateSelectedPackages();
 };
 
 const handleFileSelect = (event) => {
@@ -176,6 +209,7 @@ const submitAndCreateNew = () => {
             searchResults.value = [];
             totalRecords.value = 0;
             currentPage.value = 1;
+            selectAll.value = false;
         })
         .catch(error => {
             console.error('Full error:', error);
@@ -312,12 +346,22 @@ const cancel = () => {
                             <FloatLabel variant="on">
                                 <InputText
                                     v-model="form.hbl_search"
+                                    :disabled="loading"
                                     class="w-full"
                                     input-id="hbl-search"
                                     placeholder="Search by HBL Number"
                                 />
+                                <template v-if="loading" #suffix>
+                                    <i class="pi pi-spin pi-spinner text-blue-500"></i>
+                                </template>
                             </FloatLabel>
-                            <small class="text-gray-500">Enter at least 3 characters to search all HBLs</small>
+                            <div class="flex items-center justify-between mt-2">
+                                <small class="text-gray-500">Enter at least 3 characters to search all HBLs</small>
+                                <small v-if="loading" class="text-blue-600 font-medium">
+                                    <i class="pi pi-spin pi-spinner mr-1"></i>
+                                    Searching...
+                                </small>
+                            </div>
                         </div>
 
                         <!-- Remarks Field (Required for Damage/Other) -->
@@ -383,22 +427,65 @@ const cancel = () => {
                             </div>
                         </div>
 
-                        <!-- HBL Packages Results -->
+                        <!-- Loading State -->
+                        <div v-if="loading && searchResults.length === 0" class="mt-6">
+                            <Card class="border-2 border-gray-300 animate-pulse">
+                                <template #content>
+                                    <div class="flex flex-col items-center justify-center py-12">
+                                        <i class="pi pi-spin pi-spinner text-5xl text-blue-500 mb-4"></i>
+                                        <p class="text-lg font-medium text-gray-700">Searching for packages...</p>
+                                        <p class="text-sm text-gray-500 mt-2">Please wait while we fetch the results</p>
+                                    </div>
+                                </template>
+                            </Card>
+                        </div>
+
+                        <!-- HBL/MHBL Packages Results -->
                         <div v-if="searchResults.length > 0">
-                            <Card>
+                            <Card :class="hasMhblResults ? 'border-2 border-purple-500 shadow-lg shadow-purple-200' : 'border-2 border-blue-500 shadow-lg shadow-blue-200'">
                                 <template #title>
                                     <div class="flex justify-between items-center">
-                                        <span>HBL Packages</span>
+                                        <span :class="hasMhblResults ? 'text-purple-600' : 'text-blue-600'">
+                                            {{ hasMhblResults ? 'MHBL Packages' : 'HBL Packages' }}
+                                        </span>
+                                        <span
+                                            :class="hasMhblResults
+                                                ? 'text-sm font-normal text-purple-600 bg-purple-100 px-3 py-1 rounded-full border border-purple-300'
+                                                : 'text-sm font-normal text-blue-600 bg-blue-100 px-3 py-1 rounded-full border border-blue-300'"
+                                        >
+                                            <i :class="hasMhblResults ? 'pi pi-box mr-1' : 'pi pi-file mr-1'"></i>
+                                            {{ hasMhblResults ? 'MHBL Search Results' : 'HBL Search Results' }}
+                                        </span>
                                     </div>
                                 </template>
 
                                 <template #content>
+                                    <div class="mb-4 flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                        <div class="flex items-center gap-3">
+                                            <Checkbox
+                                                v-model="selectAll"
+                                                :binary="true"
+                                                :disabled="searchResults.filter(pkg => !pkg.has_issue).length === 0"
+                                                input-id="select-all"
+                                                @update:modelValue="toggleSelectAll"
+                                            />
+                                            <label class="font-medium text-gray-700 cursor-pointer" for="select-all">
+                                                Select All Available Packages
+                                            </label>
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            <span class="font-semibold">{{ form.selected_packages.length }}</span> of
+                                            <span class="font-semibold">{{ searchResults.filter(pkg => !pkg.has_issue).length }}</span> selected
+                                        </div>
+                                    </div>
+
                                     <DataTable
                                         :loading="loading"
                                         :value="searchResults"
                                         :rows="perPage"
                                         :rowsPerPageOptions="[5, 10, 20, 50]"
                                         :totalRecords="totalRecords"
+                                        :rowClass="(data) => data.is_mhbl_match ? 'bg-purple-50 hover:bg-purple-100' : 'bg-blue-50 hover:bg-blue-100'"
                                         lazy
                                         paginator
                                         tableStyle="min-width: 50rem"
@@ -424,7 +511,19 @@ const cancel = () => {
                                             </template>
                                         </Column>
 
-                                        <Column field="hbl_number" header="HBL Number"></Column>
+                                        <Column field="hbl_number" header="HBL Number">
+                                            <template #body="slotProps">
+                                                <div>
+                                                    <div :class="slotProps.data.is_mhbl_match ? 'font-semibold text-purple-700' : 'font-semibold text-blue-700'">
+                                                        {{ slotProps.data.hbl_number }}
+                                                    </div>
+                                                    <div v-if="slotProps.data.is_mhbl_match" class="text-xs text-purple-600 mt-1 flex items-center">
+                                                        <i class="pi pi-box mr-1"></i>
+                                                        <span>MHBL: {{ slotProps.data.mhbl_number }}</span>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </Column>
                                         <Column field="hbl_name" header="Name"></Column>
                                         <Column field="weight" header="Weight">
                                             <template #body="slotProps">
@@ -438,7 +537,9 @@ const cancel = () => {
                                         </Column>
 
                                         <template #footer>
-                                            In total there are {{ totalRecords }} packages found.
+                                            <div :class="hasMhblResults ? 'text-purple-700' : 'text-blue-700'">
+                                                In total there are {{ totalRecords }} packages found.
+                                            </div>
                                         </template>
                                     </DataTable>
                                 </template>
