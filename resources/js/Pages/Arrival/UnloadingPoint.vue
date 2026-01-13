@@ -259,7 +259,7 @@ const handleUnloadMHBLGroupToWarehouse = (groupIndex) => {
             accept: async () => {
                 try {
                     // Get MHBL ID from first package
-                    const mhblId = packagesToMove[0]?.hbl?.mhbl_id;
+                    const mhblId = packagesToMove[0]?.hbl?.mhbl?.id;
                     const packageIds = packagesToMove.map(pkg => pkg.id);
 
                     await axios.post(route("arrival.unload-container.unload-mhbl-group"), {
