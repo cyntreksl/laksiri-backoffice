@@ -12,6 +12,7 @@ import TabMHBLUnderShipment from "@/Pages/Common/Dialog/Container/Tabs/TabMHBLUn
 import TabShipmentDetails from "@/Pages/Common/Dialog/Container/Tabs/TabShipmentDetails.vue";
 import TabDocuments from "@/Pages/Common/Dialog/Container/Tabs/TabDocuments.vue";
 import TabRemarks from "@/Pages/Common/Dialog/Container/Tabs/TabRemarks.vue";
+import TabDetainHistory from "@/Pages/Common/Dialog/Container/Tabs/TabDetainHistory.vue";
 
 const props = defineProps({
     show: {
@@ -91,6 +92,12 @@ const emit = defineEmits(['close']);
                         <span>Remarks</span>
                     </a>
                 </Tab>
+                <Tab value="6">
+                    <a class="flex items-center gap-2 text-inherit">
+                        <i class="ti ti-history text-xl" />
+                        <span>Detain History</span>
+                    </a>
+                </Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">
@@ -110,6 +117,9 @@ const emit = defineEmits(['close']);
                 </TabPanel>
                 <TabPanel value="5">
                     <TabRemarks :container-id="container?.id"/>
+                </TabPanel>
+                <TabPanel value="6">
+                    <TabDetainHistory :container="container"/>
                 </TabPanel>
             </TabPanels>
         </Tabs>

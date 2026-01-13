@@ -5,6 +5,7 @@ import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import {useForm, usePage, router} from "@inertiajs/vue3";
 import ImageViewModal from "@/Pages/Arrival/Partials/ImageView.vue";
+import UnloadingIssueDetailModal from "@/Pages/Arrival/Partials/UnloadingIssueDetailModal.vue";
 import {useConfirm} from "primevue/useconfirm";
 import {push} from "notivue";
 import Button from "primevue/button";
@@ -34,6 +35,8 @@ const confirm = useConfirm();
 const fromDate = ref(moment(new Date()).subtract(365, "days").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
 const isShowImageModal = ref(false);
+const isShowDetailModal = ref(false);
+const selectedIssue = ref(null);
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -116,6 +119,16 @@ const handleOpenImageModal = (id) => {
 const closeImageModal = () => {
     isShowImageModal.value = false;
     unloadingIssueId.value = null;
+}
+
+const handleOpenDetailModal = (issue) => {
+    selectedIssue.value = issue;
+    isShowDetailModal.value = true;
+}
+
+const closeDetailModal = () => {
+    isShowDetailModal.value = false;
+    selectedIssue.value = null;
 }
 
 const deleteUnloadingIssue = (id) => {
@@ -309,6 +322,7 @@ const deleteUnloadingIssue = (id) => {
                         <Column :exportable="false" header="Actions">
                             <template #body="slotProps">
                                 <div class="flex gap-2">
+                                    <Button v-tooltip.left="'View Details'" icon="pi pi-eye" rounded severity="info" size="small" @click="handleOpenDetailModal(slotProps.data)" />
                                     <Button
                                         v-tooltip.left="'Show Attachments'"
                                         icon="pi pi-paperclip"
@@ -494,7 +508,7 @@ const deleteUnloadingIssue = (id) => {
                         <Column :exportable="false" header="Actions">
                             <template #body="slotProps">
                                 <div class="flex gap-2">
-                                    <Button
+                                    <Button v-tooltip.left="'View Details'" icon="pi pi-eye" rounded severity="info" size="small" @click="handleOpenDetailModal(slotProps.data)" />`n                                    <Button
                                         v-tooltip.left="'Show Attachments'"
                                         icon="pi pi-paperclip"
                                         rounded
@@ -525,5 +539,13 @@ const deleteUnloadingIssue = (id) => {
                     :unloadingIssueID="unloadingIssueId"
                     @close="closeImageModal"
                     @update:visible="isShowImageModal = $event" />
+
+    <UnloadingIssueDetailModal
+        :issue="selectedIssue"
+        :show="isShowDetailModal"
+        @close="closeDetailModal"
+        @update:show="isShowDetailModal = $event"
+    />
     </div>
 </template>
+

@@ -8,7 +8,21 @@
 @section('pdf-content')
     @include('pdf.hbls.partials.header')
 @php
-   $branch=App\Models\Branch::find($hbl?->branch_id);
+   $branch = $hbl->branch ?? App\Models\Branch::find($hbl?->branch_id);
+   // Calculate SL Portal Total (Destination II + Destination I only if not paid)
+   $destinationCharge = $hbl->destinationCharge;
+   $slPortalTotal = 0;
+   if ($destinationCharge) {
+       $dest2Charges = ($destinationCharge->destination_2_total ?? 0) + ($destinationCharge->destination_2_tax ?? 0);
+       if ($hbl->branch->is_prepaid ?? false) {
+           $slPortalTotal = $dest2Charges;
+       } else {
+           $slPortalTotal = $dest2Charges;
+           if (!($hbl->is_destination_charges_paid ?? false)) {
+               $slPortalTotal += ($destinationCharge->destination_1_total ?? 0) + ($destinationCharge->destination_1_tax ?? 0);
+           }
+       }
+   }
 @endphp
 
 <style>
@@ -111,7 +125,7 @@
         <td   >1</td>
         <td>{{$hbl?->hbl_number}}</td>
         <td>{{$hbl?->cargo_type}} \ {{$hbl?->hbl_type}}</td>
-        <td>{{$hbl?->grand_total }} {{$branch->currency_symbol}}</td>
+        <td>{{number_format($hbl?->grand_total ?? 0, 2) }} {{$branch->currency_symbol ?? 'LKR'}}</td>
 
     </tr>
 
@@ -130,23 +144,24 @@
 Terms and conditions will be provided on request</td>
 			<td  style="width: 15%;" >	Total</td>
 			<td style="width: 2%;" >:</td>
-			<td>{{$hbl?->grand_total }}  {{$branch->currency_symbol}}</td>
+			<td>{{number_format($hbl?->grand_total ?? 0, 2) }}  {{$branch->currency_symbol ?? 'LKR'}}</td>
 		</tr>
 		<tr>
 			<td>Less Discount</td>
 			<td>:</td>
-			<td>{{   $hbl?->discount }}</td>
+			<td>{{number_format($hbl?->discount ?? 0, 2) }}</td>
 		</tr>
 		<tr>
 			<td>Net Amount</td>
 			<td>:</td>
-			<td>{{   ($hbl?->grand_total - $hbl?->discount) }}  {{$branch->currency_symbol}}</td>
+			<td>{{number_format(($hbl?->grand_total ?? 0) - ($hbl?->discount ?? 0), 2) }}  {{$branch->currency_symbol ?? 'LKR'}}</td>
 		</tr>
 		<tr>
             @php
+            $netAmount = ($hbl?->grand_total ?? 0) - ($hbl?->discount ?? 0);
             $amountword = new \NumberFormatter("en", \NumberFormatter::SPELLOUT);
         @endphp
-			<td colspan="6">Amount in words : {{ $amountword ->format(($hbl?->grand_total - $hbl?->discount))}}  only</td>
+			<td colspan="6">Amount in words : {{ $amountword ->format($netAmount)}}  only</td>
 		</tr>
 		<tr>
 			<td colspan="3">Remarks / Destination
@@ -181,7 +196,7 @@ Terms and conditions will be provided on request</td>
 		<tr>
 			<td>Total</td>
 			<td>:</td>
-			<td>{{   ($hbl?->grand_total - $hbl?->discount) }}  {{$branch->currency_symbol}}</td>
+			<td>{{number_format(($hbl?->grand_total ?? 0) - ($hbl?->discount ?? 0), 2) }}  {{$branch->currency_symbol ?? 'LKR'}}</td>
 			<td colspan="3"  style="text-align: right;">Authorized Signatory</td>
 		</tr>
 	</tbody>

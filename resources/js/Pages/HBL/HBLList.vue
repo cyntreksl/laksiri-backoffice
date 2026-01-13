@@ -25,6 +25,8 @@ import {debounce} from "lodash";
 import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import {push} from "notivue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
+import CancelTokenDialog from "@/Pages/Token/Partials/CancelTokenDialog.vue";
+import DetainDialog from "@/Pages/Common/Dialog/DetainDialog.vue";
 
 const props = defineProps({
     users: {
@@ -67,6 +69,10 @@ const hblTypes = ref(['UPB', 'Door to Door', 'Gift']);
 const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
 const hblName = ref("");
+const showCancelTokenDialog = ref(false);
+const selectedToken = ref(null);
+const showDetainDialog = ref(false);
+const detainDialogMode = ref('detain');
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -102,6 +108,35 @@ const menuModel = ref([
         icon: computed(() => (selectedHBL.value?.is_hold ? 'pi pi-fw pi-play-circle' : 'pi pi-fw pi-pause-circle')) ,
         command: () => confirmHBLHold(selectedHBL),
         disabled: !usePage().props.user.permissions.includes("hbls.hold and release"),
+    },
+    {
+        label: "Cancel Token",
+        icon: "pi pi-fw pi-ban",
+        command: () => openCancelTokenDialog(selectedHBL),
+        visible: computed(() => {
+            // Show only if user has permission and HBL has an active token
+            return usePage().props.user.permissions.includes("tokens.cancel") &&
+                   selectedHBL.value?.latest_token &&
+                   !selectedHBL.value?.latest_token?.is_cancelled;
+        }),
+    },
+    {
+        label: "Detain HBL",
+        icon: "pi pi-fw pi-lock",
+        command: () => openDetainDialog(selectedHBL),
+        visible: computed(() => {
+            const isDetained = selectedHBL.value?.latest_detain_record?.is_rtf ?? false;
+            return usePage().props.user.permissions.includes("set_rtf") && !isDetained;
+        }),
+    },
+    {
+        label: "Lift Detain",
+        icon: "pi pi-fw pi-unlock",
+        command: () => openLiftDetainDialog(selectedHBL),
+        visible: computed(() => {
+            const isDetained = selectedHBL.value?.latest_detain_record?.is_rtf ?? false;
+            return usePage().props.user.permissions.includes("lift_rtf") && isDetained;
+        }),
     },
     {
         label: "Download",
@@ -371,6 +406,104 @@ const closeCallFlagModal = () => {
     hblName.value = "";
 };
 
+const openCancelTokenDialog = (hbl) => {
+    if (hbl.value?.latest_token) {
+        selectedToken.value = hbl.value.latest_token;
+        showCancelTokenDialog.value = true;
+    }
+};
+
+const closeCancelTokenDialog = () => {
+    showCancelTokenDialog.value = false;
+    selectedToken.value = null;
+};
+
+const handleTokenCancelled = (token) => {
+    // Refresh the HBL list to show updated token status
+    fetchHBLs(currentPage.value, filters.value.global.value);
+    push.success('Token cancelled successfully');
+};
+
+const openDetainDialog = (hbl) => {
+    console.log('openDetainDialog called with:', hbl);
+    // Store the HBL data before the context menu closes
+    if (hbl && hbl.value) {
+        selectedHBLID.value = hbl.value.id;
+        console.log('Stored HBL ID:', selectedHBLID.value);
+    }
+    detainDialogMode.value = 'detain';
+    showDetainDialog.value = true;
+};
+
+const openLiftDetainDialog = (hbl) => {
+    console.log('openLiftDetainDialog called with:', hbl);
+    // Store the HBL data before the context menu closes
+    if (hbl && hbl.value) {
+        selectedHBLID.value = hbl.value.id;
+        console.log('Stored HBL ID:', selectedHBLID.value);
+    }
+    detainDialogMode.value = 'lift';
+    showDetainDialog.value = true;
+};
+
+const confirmDetainAction = (data) => {
+    console.log('confirmDetainAction called with data:', data);
+    console.log('selectedHBL:', selectedHBL.value);
+    console.log('selectedHBLID:', selectedHBLID.value);
+
+    // Use selectedHBLID instead of selectedHBL.value.id
+    if (!selectedHBLID.value) {
+        console.error('No HBL ID stored');
+        return;
+    }
+
+    const hblId = selectedHBLID.value;
+    console.log('HBL ID:', hblId);
+    console.log('Mode:', detainDialogMode.value);
+
+    if (detainDialogMode.value === 'detain') {
+        console.log('Posting detain request to:', route("hbls.set.detain", hblId));
+        router.post(
+            route("hbls.set.detain", hblId),
+            data,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    console.log('Detain success');
+                    push.success(`HBL detained by ${data.detain_type}`);
+                    showDetainDialog.value = false;
+                    selectedHBLID.value = null;
+                    fetchHBLs(currentPage.value, filters.value.global.value);
+                },
+                onError: (errors) => {
+                    console.error('Detain error:', errors);
+                    push.error(errors?.message || 'Something went wrong!');
+                }
+            }
+        );
+    } else {
+        console.log('Posting lift detain request to:', route("hbls.unset.detain", hblId));
+        router.post(
+            route("hbls.unset.detain", hblId),
+            data,
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    console.log('Lift detain success');
+                    push.success('HBL detain lifted successfully!');
+                    showDetainDialog.value = false;
+                    selectedHBLID.value = null;
+                    fetchHBLs(currentPage.value, filters.value.global.value);
+                },
+                onError: (errors) => {
+                    console.error('Lift detain error:', errors);
+                    push.error(errors?.message || 'Something went wrong!');
+                }
+            }
+        );
+    }
+};
+
 const exportCSV = () => {
     dt.value.exportCSV();
 };
@@ -491,7 +624,12 @@ const exportCSVFilename = computed(() => {
                         <Column field="hbl_number" header="HBL" sortable>
                             <template #body="slotProps">
                                 <div class="flex items-center space-x-2">
-                                    <i v-if="slotProps.data.is_rtf" v-tooltip.left="`RTF`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <i v-if="slotProps.data.latest_detain_record?.is_rtf"
+                                       v-tooltip.left="`Detained by ${slotProps.data.latest_detain_record?.detain_type || 'RTF'}`"
+                                       class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <i v-else-if="slotProps.data.is_rtf"
+                                       v-tooltip.left="`RTF`"
+                                       class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
                                     <div>
                                         <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
                                         <br v-if="slotProps.data.is_short_loaded">
@@ -594,6 +732,22 @@ const exportCSVFilename = computed(() => {
         :visible="showConfirmViewCallFlagModal"
         @close="closeCallFlagModal"
         @update:visible="showConfirmViewCallFlagModal = $event"/>
+
+    <CancelTokenDialog
+        :token="selectedToken"
+        :visible="showCancelTokenDialog"
+        @update:visible="showCancelTokenDialog = $event"
+        @token-cancelled="handleTokenCancelled"
+    />
+
+    <DetainDialog
+        :entity-name="selectedHBL?.value?.hbl_number || selectedHBL?.value?.hbl || ''"
+        :mode="detainDialogMode"
+        :visible="showDetainDialog"
+        entity-type="hbl"
+        @confirm="confirmDetainAction"
+        @update:visible="showDetainDialog = $event"
+    />
 </template>
 
 <style>

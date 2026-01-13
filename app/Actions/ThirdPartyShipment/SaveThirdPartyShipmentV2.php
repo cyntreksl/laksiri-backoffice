@@ -13,6 +13,7 @@ use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HblPackage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class SaveThirdPartyShipmentV2
@@ -28,13 +29,20 @@ class SaveThirdPartyShipmentV2
             $reference = GenerateHBLReferenceNumber::run();
 
             // Create actual HBL
+            // For third-party HBLs, use the user-provided HBL number if available
+            // Otherwise fall back to auto-generated reference
+            $hblNumber = !empty($data['hbl']) ? $data['hbl'] : $reference;
+            
+            // Use selected third-party agent as the branch, or fall back to current branch
+            $branchId = $data['agent'] ?? GetUserCurrentBranchID::run();
+
             $hbl = HBL::create([
                 'reference' => $reference,
-                'branch_id' => GetUserCurrentBranchID::run(),
+                'branch_id' => $branchId, // Use selected third-party agent
                 'warehouse_id' => GetUserCurrentBranchID::run(),
                 'cargo_type' => $data['cargo_type'],
                 'hbl_type' => $data['hbl_type'],
-                'hbl' => $reference,
+                'hbl' => $hblNumber, // Use user-provided HBL number
                 'hbl_name' => $data['hbl_name'],
                 'email' => $data['email'],
                 'contact_number' => $data['contact_number'],
@@ -61,7 +69,7 @@ class SaveThirdPartyShipmentV2
                 'grand_total' => $data['grand_total'],
                 'created_by' => auth()->id(),
                 'pickup_id' => $data['pickup_id'] ?? null,
-                'hbl_number' => GenerateHBLNumber::run(GetUserCurrentBranchID::run()),
+                'hbl_number' => $hblNumber, // Use same user-provided HBL number
                 'cr_number' => GenerateCRNumber::run(),
                 'system_status' => HBL::SYSTEM_STATUS_HBL_CREATED,
                 'is_departure_charges_paid' => 1,
@@ -71,10 +79,24 @@ class SaveThirdPartyShipmentV2
 
             // Create HBL packages
             foreach ($data['packages'] as $tmpPackage) {
-                $weight = $tmpPackage['chargeableWeight'] ?? $tmpPackage['totalWeight'] ?? 0;
+                Log::info('SaveThirdPartyShipmentV2: Processing package', [
+                    'package_data' => $tmpPackage,
+                    'volume_raw' => $tmpPackage['volume'] ?? 'MISSING',
+                    'length' => $tmpPackage['length'] ?? 'MISSING',
+                    'width' => $tmpPackage['width'] ?? 'MISSING',
+                    'height' => $tmpPackage['height'] ?? 'MISSING',
+                ]);
+
+                $weight = !empty($tmpPackage['chargeableWeight']) ? $tmpPackage['chargeableWeight'] : ($tmpPackage['totalWeight'] ?? 0);
+                
+                // Calculate volumetric weight only if dimensions are present
+                $volumetricWeight = 0;
+                if (($tmpPackage['length'] ?? 0) > 0 && ($tmpPackage['width'] ?? 0) > 0 && ($tmpPackage['height'] ?? 0) > 0) {
+                     $volumetricWeight = ($tmpPackage['length'] * $tmpPackage['width'] * $tmpPackage['height']) / 6000;
+                }
 
                 $package = HblPackage::create([
-                    'branch_id' => GetUserCurrentBranchID::run(),
+                    'branch_id' => $branchId, // Use same agent branch as HBL
                     'hbl_id' => $hbl->id,
                     'package_type' => $tmpPackage['type'],
                     'measure_type' => $tmpPackage['measure_type'],
@@ -84,25 +106,30 @@ class SaveThirdPartyShipmentV2
                     'quantity' => $tmpPackage['quantity'],
                     'volume' => $tmpPackage['volume'],
                     'weight' => $weight,
-                    'actual_weight' => $weight,
-                    'volumetric_weight' => ($tmpPackage['length'] * $tmpPackage['width'] * $tmpPackage['height']) / 6000,
+                    'actual_weight' => $tmpPackage['totalWeight'] ?? 0,
+                    'volumetric_weight' => $volumetricWeight,
                     'remarks' => $tmpPackage['remarks'],
                 ]);
                 $allPackageIds[] = ['id' => $package->id];
             }
 
             // Load all HBL packages into the selected container
-            if (! empty($allPackageIds) && isset($data['shipment'])) {
+            if (!empty($allPackageIds) && isset($data['shipment'])) {
                 $container = Container::find($data['shipment']);
                 if ($container) {
+                    // Update to loaded status (this marks them as fully loaded)
                     CreateOrUpdateLoadedContainer::run([
                         'container_id' => $data['shipment'],
                         'packages' => $allPackageIds,
-                        'note' => 'Third party shipment - Manual Create Option',
-                        'status' => ContainerStatus::IN_TRANSIT->value,
+                        'note' => 'Third party shipment - Auto-loaded on HBL creation',
                     ]);
+
+                    // Complete the loading process by recalculating weights
+                    \App\Services\ContainerWeightService::recalculate($container);
                 }
             }
+
+            return $hbl;
         });
     }
 }

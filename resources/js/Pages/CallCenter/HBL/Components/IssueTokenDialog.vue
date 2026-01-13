@@ -14,6 +14,7 @@ import Divider from "primevue/divider";
 import Avatar from "primevue/avatar";
 import Tag from "primevue/tag";
 import TokenSuccessModal from "./TokenSuccessModal.vue";
+import PaymentSummaryCard from "@/Pages/CallCenter/Components/PaymentSummaryCard.vue";
 
 const props = defineProps({
     visible: {
@@ -75,8 +76,7 @@ const isAnyDocumentVerified = computed(() => {
 });
 
 const tokenTimeline = computed(() => {
-    const isPaid = paymentStatus.value === 'Paid';
-    const allDocsVerified = areAllDocumentsVerified.value;
+
     
     return [
         {
@@ -84,7 +84,7 @@ const tokenTimeline = computed(() => {
             label: 'Reception Queue',
             icon: 'pi pi-users',
             description: 'Customer arrival and document verification',
-            status: allDocsVerified ? 'completed' : 'next',
+            status: 'completed', // Reception is always considered done when issuing token
             skipped: false
         },
         {
@@ -92,16 +92,16 @@ const tokenTimeline = computed(() => {
             label: 'Document Verification Queue',
             icon: 'pi pi-file-check',
             description: 'Document verification and approval',
-            status: allDocsVerified ? 'skipped' : (allDocsVerified ? 'completed' : 'pending'),
-            skipped: allDocsVerified
+            status: 'next', // Always next after reception
+            skipped: false
         },
         {
             id: 3,
             label: 'Cashier Queue',
             icon: 'pi pi-wallet',
             description: 'Payment processing and collection',
-            status: (allDocsVerified && isPaid) ? 'skipped' : (isPaid ? 'completed' : 'pending'),
-            skipped: allDocsVerified && isPaid
+            status: 'pending',
+            skipped: false
         },
         {
             id: 4,
@@ -116,7 +116,7 @@ const tokenTimeline = computed(() => {
             label: 'Examination Queue',
             icon: 'pi pi-search',
             description: 'Gate pass creation and examination',
-            status: (allDocsVerified && isPaid) ? 'next' : 'pending',
+            status: 'pending',
             skipped: false
         },
         {
@@ -191,18 +191,10 @@ const handleIssueToken = () => {
                     // Show appropriate success message based on queue placement
                     let queueMessage = '';
                     
-                    if (data.token.skipped_cashier && data.token.skipped_document_verification) {
-                        // Fully paid and all docs verified - went directly to examination
-                        queueMessage = 'Token issued and placed in Examination Queue - All documents verified and payment completed!';
-                    } else if (data.token.skipped_document_verification && !data.token.skipped_cashier) {
-                        // All docs verified but not paid - went to cashier
-                        queueMessage = 'Token issued and placed in Cashier Queue - All documents verified!';
-                    } else if (data.token.all_documents_verified) {
-                        // All docs verified - went to document verification (shouldn't happen with new logic, but keep for backward compatibility)
+                    if (data.token.all_documents_verified) {
                         queueMessage = 'Token issued and placed in Document Verification Queue - All documents verified!';
                     } else {
-                        // Documents not fully verified - went to reception queue
-                        queueMessage = 'Token issued and placed in Reception Queue - Please complete document verification.';
+                        queueMessage = 'Token issued and placed in Document Verification Queue - Please complete document verification.';
                     }
 
                     push.success(queueMessage);
@@ -424,52 +416,7 @@ watch(() => props.visible, (newVal) => {
             <!-- Right Panel - Payment Summary & Reception Verification -->
             <div class="col-span-4">
                 <!-- Payment Summary -->
-                <Card class="mb-5">
-                    <template #title>
-                        <div class="flex items-center gap-3">
-                            <Avatar icon="pi pi-wallet" class="bg-green-100 text-green-600" size="large" />
-                            <div>
-                                <h3 class="text-lg font-semibold text-gray-900">Payment Summary</h3>
-                            </div>
-                        </div>
-                    </template>
-                                                                                <template #content>
-                                                <div v-if="props.hbl?.grand_total" class="space-y-4">
-                            <!-- Total Amount -->
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium text-gray-600">Total Amount:</span>
-                                <span class="font-bold text-lg">{{ currencyCode }} {{ parseFloat(props.hbl.grand_total || 0).toFixed(2) }}</span>
-                            </div>
-
-                            <!-- Paid Amount -->
-                            <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                                <span class="font-medium text-gray-600">Paid Amount:</span>
-                                <span class="font-bold text-lg text-green-700">{{ currencyCode }} {{ parseFloat(props.hbl.paid_amount || 0).toFixed(2) }}</span>
-                            </div>
-
-                            <!-- Outstanding -->
-                            <div class="flex justify-between items-center p-3 rounded-lg"
-                                 :class="((props.hbl.grand_total || 0) - (props.hbl.paid_amount || 0)) > 0 ? 'bg-orange-50' : 'bg-green-50'">
-                                <span class="font-medium text-gray-600">Outstanding:</span>
-                                <span class="font-bold text-lg"
-                                      :class="((props.hbl.grand_total || 0) - (props.hbl.paid_amount || 0)) > 0 ? 'text-orange-700' : 'text-green-700'">
-                                    {{ currencyCode }} {{ ((props.hbl.grand_total || 0) - (props.hbl.paid_amount || 0)).toFixed(2) }}
-                                </span>
-                            </div>
-
-                            <!-- Status -->
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-gray-600">Payment Status:</span>
-                                <Tag :value="paymentStatus"
-                                     :severity="paymentStatus === 'Paid' ? 'success' : paymentStatus === 'Partial' ? 'warning' : 'danger'" />
-                            </div>
-                        </div>
-                        <div v-else class="text-center py-8">
-                            <i class="pi pi-wallet text-4xl text-gray-400 mb-3"></i>
-                            <p class="text-gray-500">No payment information available</p>
-                        </div>
-                    </template>
-                </Card>
+                <PaymentSummaryCard v-if="props.hbl?.id" :hbl-id="props.hbl.id" />
 
                 <!-- Reception Verification -->
                 <Card>

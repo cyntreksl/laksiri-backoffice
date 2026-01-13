@@ -161,7 +161,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                                   });
 
             // Determine next queue based on verification and payment status
-            $queueResult = $this->determineNextQueue($hbl, $token, $allDocumentsVerified);
+            $queueResult = $this->determineNextQueue();
 
             $customerQueue = $token->customerQueue()->create([
                 'type' => $queueResult['queue_type'],
@@ -236,49 +236,14 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
      * @param bool $allDocumentsVerified
      * @return array
      */
-    private function determineNextQueue(HBL $hbl, Token $token, bool $allDocumentsVerified): array
+    private function determineNextQueue(): array
     {
-        $skippedDocumentVerification = false;
-        $skippedCashier = false;
-        $isPaid = false;
-
-        // If all documents verified at reception, skip document verification queue
-        if ($allDocumentsVerified) {
-            $skippedDocumentVerification = true;
-
-            // Check payment status
-            $payment = GetPaymentByReference::run($token->reference);
-            $paymentData = (array) $payment->getData();
-
-            if (! empty($paymentData)) {
-                $paymentObj = $payment->getData();
-                $isPaid = $hbl->paid_amount >= $paymentObj->grand_total;
-
-                if ($isPaid) {
-                    // Fully paid - go directly to examination queue
-                    $skippedCashier = true;
-                    return [
-                        'queue_type' => CustomerQueue::EXAMINATION_QUEUE,
-                        'is_paid' => true,
-                        'skipped_document_verification' => true,
-                        'skipped_cashier' => true,
-                    ];
-                }
-            }
-
-            // Not paid - go to cashier queue
-            return [
-                'queue_type' => CustomerQueue::CASHIER_QUEUE,
-                'is_paid' => false,
-                'skipped_document_verification' => true,
-                'skipped_cashier' => false,
-            ];
-        }
-
-        // Documents not verified - go to reception verification queue
+        // Enforce step-by-step flow: Always go to Document Verification Queue first
+        // Remove skip conditions for document verification and cashier
+        
         return [
-            'queue_type' => CustomerQueue::RECEPTION_VERIFICATION_QUEUE,
-            'is_paid' => false,
+            'queue_type' => CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
+            'is_paid' => false, // We force them to go through the flow regardless of payment status
             'skipped_document_verification' => false,
             'skipped_cashier' => false,
         ];

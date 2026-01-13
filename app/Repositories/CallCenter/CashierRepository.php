@@ -136,6 +136,21 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             return;
         }
 
+        // Check if package queue already exists - if so, token has already moved to next step
+        $existingPackageQueue = PackageQueue::where('token_id', $customerQueue->token_id)->first();
+        if ($existingPackageQueue) {
+            // Package queue exists, just mark current queue as completed and return
+            $customerQueue->update(['left_at' => now()]);
+            $customerQueue->addQueueStatus(
+                CustomerQueue::CASHIER_QUEUE,
+                $customerQueue->token->customer_id,
+                $customerQueue->token_id,
+                null,
+                now()
+            );
+            return;
+        }
+
         // Mark current queue as completed
         $customerQueue->update(['left_at' => now()]);
         $customerQueue->addQueueStatus(
@@ -147,25 +162,60 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         );
 
         // Determine next queue based on payment status
-        $payment = GetPaymentByReference::run($customerQueue->token->reference);
-        $paymentData = (array) $payment->getData();
+        // Use HBL directly for payment information
+        $currencyRate = (float) ($hbl->currency_rate ?: 1);
+        $grandTotal = (float) ($hbl->grand_total ?? 0); // Already in base currency
+        $currentPaidAmount = (float) ($hbl->paid_amount ?? 0); // Already in base currency
+        $outstandingAmount = $grandTotal - $currentPaidAmount;
+        
+        // Form paid_amount is in LKR, convert to base currency for comparison
+        $formPaidAmountLKR = (float) ($data['paid_amount'] ?? 0);
+        $formPaidAmountBase = round($formPaidAmountLKR / $currencyRate, 2);
 
-        if (empty($paymentData)) {
-            $this->sendToCashierQueue($customerQueue);
+        // Check if this is a verification (paid_amount == 0 means already paid, just verifying)
+        $isVerification = $formPaidAmountLKR == 0;
 
-            return;
-        }
-
-        if ($data['paid_amount'] >= ($payment->getData()->grand_total - $payment->getData()->paid_amount)) {
-            $this->sendToExaminationQueue($customerQueue, $hbl, $data);
+        // If it's a verification, check if HBL is already fully paid
+        // If it's a payment, check if the payment amount covers the outstanding
+        if ($isVerification) {
+            // Verification: Check if HBL is already fully paid
+            if ($outstandingAmount <= 0) {
+                // Fully paid, move to package delivery
+                $this->sendToPackageDelivery($customerQueue, $hbl, $data);
+            } else {
+                // Not fully paid, stay in cashier queue
+                $this->sendToCashierQueue($customerQueue);
+            }
         } else {
-            $this->sendToCashierQueue($customerQueue);
+            // Payment: Check if payment covers outstanding amount
+            // Calculate new paid amount after this payment (both in base currency)
+            $newPaidAmount = $currentPaidAmount + $formPaidAmountBase;
+            $newOutstanding = $grandTotal - $newPaidAmount;
+            
+            if ($newOutstanding <= 0) {
+                // Payment covers all outstanding, move to package delivery
+                $this->sendToPackageDelivery($customerQueue, $hbl, $data);
+            } else {
+                // Still has outstanding, stay in cashier queue
+                $this->sendToCashierQueue($customerQueue);
+            }
         }
     }
 
     private function sendToCashierQueue(CustomerQueue $customerQueue): void
     {
-        $customerQueue->create([
+        // Check if there's already an active cashier queue for this token
+        $existingQueue = CustomerQueue::where('token_id', $customerQueue->token_id)
+            ->where('type', CustomerQueue::CASHIER_QUEUE)
+            ->whereNull('left_at')
+            ->first();
+
+        if ($existingQueue) {
+            // Queue already exists, don't create duplicate
+            return;
+        }
+
+        CustomerQueue::create([
             'type' => CustomerQueue::CASHIER_QUEUE,
             'token_id' => $customerQueue->token_id,
         ]);
@@ -179,15 +229,19 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         );
     }
 
-    private function sendToExaminationQueue(CustomerQueue $customerQueue, HBL $hbl, array $data): void
+    private function sendToPackageDelivery(CustomerQueue $customerQueue, HBL $hbl, array $data): void
     {
-        // Create examination queue
-        $customerQueue->create([
-            'type' => CustomerQueue::EXAMINATION_QUEUE,
-            'token_id' => $customerQueue->token_id,
-        ]);
+        // Check if package queue already exists for this token
+        $existingPackageQueue = PackageQueue::where('token_id', $customerQueue->token_id)->first();
 
-        // Create package queue
+        if ($existingPackageQueue) {
+            // Package queue already exists, don't create duplicate
+            return;
+        }
+
+        // Create package queue (Step 4: Waiting for Package Receive)
+        // We DO NOT create Examination Queue here yet. That happens after package release.
+        
         PackageQueue::create([
             'token_id' => $customerQueue->token_id,
             'hbl_id' => $hbl->id,
@@ -196,14 +250,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             'package_count' => $data['customer_queue']['token']['package_count'],
         ]);
 
-        // Set queue status
-        $customerQueue->addQueueStatus(
-            CustomerQueue::EXAMINATION_QUEUE,
-            $customerQueue->token->customer_id,
-            $customerQueue->token_id,
-            now(),
-            null
-        );
+        // Note: usage of addQueueStatus for ExaminationQueue removed here, 
+        // as we are not in Examination Queue yet.
     }
 
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])

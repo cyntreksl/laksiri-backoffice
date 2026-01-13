@@ -4,6 +4,7 @@ namespace App\Actions\HBL\HBLCharges;
 
 use App\Actions\HBL\Warehouse\GetHBLDestinationTotalConvertedCurrency;
 use App\Models\HBL;
+use App\Models\Scopes\BranchScope;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateHBLDestinationCharges
@@ -27,7 +28,12 @@ class UpdateHBLDestinationCharges
      */
     public function handle(HBL $HBL, $paymentData = [])
     {
-        $HBL->load(['packages', 'branch']);
+        $HBL->load([
+            'packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class);
+            },
+            'branch'
+        ]);
         $branchId = $HBL->branch_id;
         $currencyCode = $HBL->branch->currency_symbol;
         $currencyRateInLKR = $HBL->currency_rate;
@@ -35,8 +41,8 @@ class UpdateHBLDestinationCharges
 
         $cargoType = $HBL->cargo_type;
         $packageListLength = $HBL->packages->count();
-        $grandTotalVolume = $HBL->packages()->sum('volume');
-        $grandTotalWeight = $HBL->packages()->sum('weight');
+        $grandTotalVolume = $HBL->packages()->withoutGlobalScope(BranchScope::class)->sum('volume');
+        $grandTotalWeight = $HBL->packages()->withoutGlobalScope(BranchScope::class)->sum('weight');
         $destinationCharge = GetHBLDestinationTotalConvertedCurrency::run($cargoType, $packageListLength, $grandTotalVolume, $grandTotalWeight, $HBL->warehouse_id);
 
         $destinationHandlingCharge = $destinationCharge['handlingCharges'];

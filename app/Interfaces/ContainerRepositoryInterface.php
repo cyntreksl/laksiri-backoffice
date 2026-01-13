@@ -69,5 +69,9 @@ interface ContainerRepositoryInterface
 
     public function undoRTF(Container $container);
 
+    public function doDetain(Container $container, string $detainType, string $detainReason, ?string $remarks = null);
+
+    public function undoDetain(Container $container, string $liftReason, ?string $remarks = null);
+
     public function getAllShipmentsList(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []): JsonResponse;
 }

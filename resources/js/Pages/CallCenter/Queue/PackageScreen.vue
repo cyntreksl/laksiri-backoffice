@@ -1,17 +1,21 @@
 <script setup>
-import {ref} from "vue";
+import {ref, onMounted, onUnmounted} from "vue";
 import ScreenLayout from "@/Layouts/ScreenLayout.vue";
 import {usePage} from '@inertiajs/vue3';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
 import Card from 'primevue/card';
 import Tag from 'primevue/tag';
+import Pusher from 'pusher-js';
 
 const packageQueue = ref([]);
 const firstToken = ref({});
 const nextToken = ref({});
 
 const waitingScreen = ref(false);
+
+let pusher = null;
+let channel = null;
 
 const getPackageQueue = async () => {
     try {
@@ -52,6 +56,88 @@ const getPackageQueue = async () => {
         console.log(error);
     }
 }
+
+/**
+ * Remove a cancelled token from the display
+ */
+const removeTokenFromDisplay = (tokenId) => {
+    // Check if the cancelled token is the first token
+    if (firstToken.value.id === tokenId) {
+        // Move next token to first position
+        firstToken.value = nextToken.value;
+        
+        // Move first item from queue to next position
+        if (packageQueue.value.length > 0) {
+            nextToken.value = packageQueue.value[0];
+            packageQueue.value = packageQueue.value.slice(1);
+        } else {
+            nextToken.value = {};
+        }
+    }
+    // Check if the cancelled token is the next token
+    else if (nextToken.value.id === tokenId) {
+        // Move first item from queue to next position
+        if (packageQueue.value.length > 0) {
+            nextToken.value = packageQueue.value[0];
+            packageQueue.value = packageQueue.value.slice(1);
+        } else {
+            nextToken.value = {};
+        }
+    }
+    // Check if the cancelled token is in the queue
+    else {
+        packageQueue.value = packageQueue.value.filter(item => item.id !== tokenId);
+    }
+    
+    // Check if all displays are empty
+    if (!firstToken.value.token && !nextToken.value.token && packageQueue.value.length === 0) {
+        waitingScreen.value = true;
+    }
+};
+
+/**
+ * Initialize Pusher for real-time updates
+ */
+const initializePusher = () => {
+    const page = usePage();
+    const pusherConfig = page.props.pusher;
+    
+    if (!pusherConfig || !pusherConfig.key) {
+        console.warn('Pusher not configured');
+        return;
+    }
+
+    pusher = new Pusher(pusherConfig.key, {
+        cluster: pusherConfig.cluster,
+        forceTLS: pusherConfig.forceTLS,
+    });
+
+    channel = pusher.subscribe('package-queue');
+
+    // Listen for token cancellation events
+    channel.bind('token.cancelled', (data) => {
+        console.log('Token cancelled:', data);
+        
+        // Remove the cancelled token from display
+        if (data.token_id) {
+            removeTokenFromDisplay(data.token_id);
+        }
+    });
+};
+
+onMounted(() => {
+    initializePusher();
+});
+
+onUnmounted(() => {
+    if (channel) {
+        channel.unbind_all();
+        pusher?.unsubscribe('package-queue');
+    }
+    if (pusher) {
+        pusher.disconnect();
+    }
+});
 
 setInterval(getPackageQueue, 3000);
 

@@ -176,6 +176,16 @@
                         <td class="px-6 py-1 text-right text-neutral-500">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
+                        <td class="px-6 py-1 font-medium">D/O Charges</td>
+                        <td class="px-6 py-1"></td>
+                        <td class="px-6 py-1 text-right font-medium text-neutral-500">{{ number_format($data['charges']['do_charge'],2) }}</td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-1 font-medium">Tax</td>
+                        <td class="px-6 py-1"></td>
+                        <td class="px-6 py-1 text-right font-medium text-neutral-500">{{ number_format($data['charges']['tax'] ?? 0,2) }}</td>
+                    </tr>
+                    <tr>
                         <td class="px-6 py-1 text-xl font-bold">TOTAL</td>
                         <td class="px-6 py-1"></td>
                         <td class="px-6 py-1 text-right text-xl font-bold text-neutral-500">{{ number_format($data['charges']['total'],2)}}</td>
@@ -206,10 +216,6 @@
             <div>
                 <div class="space-y-1">
                     <div class="flex items-center justify-between">
-                        <span class="font-medium">D/O Charges:</span>
-                        <span class="px-6 font-bold">{{ number_format($data['charges']['do_charge'],2) }}</span>
-                    </div>
-                    <div class="flex items-center justify-between">
                         <span class="font-medium">Stamp Duty:</span>
                         <span class="px-6 font-bold">{{ number_format($data['charges']['stamp_charge'],2) }}</span>
                     </div>
@@ -220,7 +226,6 @@
                                 (
                                     (
                                        $data['charges']['total']+
-                                        $data['charges']['do_charge']+
                                         $data['charges']['stamp_charge']
                                     ),2
                                 )
