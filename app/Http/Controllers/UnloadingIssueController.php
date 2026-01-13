@@ -198,16 +198,19 @@ class UnloadingIssueController extends Controller
         }
 
         $query = \App\Models\HBLPackage::query()
-            ->with(['hbl:id,hbl_number,hbl_name', 'unloadingIssue'])
+            ->with(['hbl' => function($q) {
+                $q->withoutGlobalScopes()->select('id', 'hbl_number', 'hbl_name');
+            }, 'unloadingIssue'])
             ->whereHas('hbl', function ($q) use ($hblNumber) {
-                $q->where('hbl_number', 'like', "%{$hblNumber}%");
+                $q->withoutGlobalScopes()
+                  ->where('hbl_number', 'like', "%{$hblNumber}%");
             });
 
-        if ($containerId) {
-            $query->whereHas('containers', function ($cq) use ($containerId) {
-                $cq->where('container_id', $containerId);
-            });
-        }
+//        if ($containerId) {
+//            $query->whereHas('containers', function ($cq) use ($containerId) {
+//                $cq->where('container_id', $containerId);
+//            });
+//        }
 
         $packages = $query->paginate($perPage, ['*'], 'page', $page);
 
