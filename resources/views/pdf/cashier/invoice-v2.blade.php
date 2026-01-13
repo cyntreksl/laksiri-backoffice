@@ -39,7 +39,7 @@
             </div>
 
             <!-- Title -->
-            <div class="mb-2 border-y-2 border-black py-1 text-center invisible">
+            <div class="mb-2 py-1 text-center invisible">
                 <h2 class="text-sm font-bold">U.P.B. WAREHOUSE INVOICE FOR <span class="underline">SEA CARGO</span></h2>
             </div>
 
@@ -84,53 +84,53 @@
                 <table class="w-full border-collapse text-xs">
                     <thead>
                     <tr class="bg-gray-200">
-                        <th class="border border-gray-400 px-2 py-1 text-left font-bold text-gray-600 invisible">DESCRIPTION</th>
-                        <th class="border border-gray-400 px-2 py-1 text-center font-bold text-gray-600 invisible">RATE</th>
-                        <th class="border border-gray-400 px-2 py-1 text-right font-bold text-gray-600 invisible">AMOUNT</th>
+                        <th class="px-2 py-1 text-left font-bold text-gray-600 invisible">DESCRIPTION</th>
+                        <th class="px-2 py-1 text-center font-bold text-gray-600 invisible">RATE</th>
+                        <th class="px-2 py-1 text-right font-bold text-gray-600 invisible">AMOUNT</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="border border-gray-400 px-2 py-1 invisible">Sri Lanka Port Charges - Sea Cargo</td>
-                        <td class="border border-gray-400 px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['port_charge']['rate'],2) }}</td>
-                        <td class="border border-gray-400 px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['port_charge']['amount'],2) }}</td>
+                        <td class="px-2 py-1 invisible">Sri Lanka Port Charges - Sea Cargo</td>
+                        <td class="px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['port_charge']['rate'],2) }}</td>
+                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['port_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
-                        <td class="border border-gray-400 px-2 py-1"></td>
-                        <td class="border border-gray-400 px-2 py-1 text-center text-gray-500">0.00</td>
-                        <td class="border border-gray-400 px-2 py-1 text-right text-gray-500">0.00</td>
+                        <td class="px-2 py-1"></td>
+                        <td class="px-2 py-1 text-center text-gray-500">0.00</td>
+                        <td class="px-2 py-1 text-right text-gray-500">0.00</td>
                     </tr>
                     <tr>
-                        <td class="border border-gray-400 px-2 py-1 invisible">
+                        <td class="px-2 py-1 invisible">
                             Handling Charges<br />
                             <span class="text-[10px]">( Per Package )</span>
                         </td>
-                        <td class="border border-gray-400 px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['handling_charge']['rate'],2) }}</td>
-                        <td class="border border-gray-400 px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['handling_charge']['amount'],2) }}</td>
+                        <td class="px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['handling_charge']['rate'],2) }}</td>
+                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['handling_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
-                        <td class="border border-gray-400 px-2 py-1 invisible">
+                        <td class="px-2 py-1 invisible">
                             Bond Storage Charges<br />
                             <span class="text-[10px]">( Per Cubic Foot )</span>
                         </td>
-                        <td class="border border-gray-400 px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['storage_charge']['rate'],2) }}</td>
-                        <td class="border border-gray-400 px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['storage_charge']['amount'],2) }}</td>
+                        <td class="px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['storage_charge']['rate'],2) }}</td>
+                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['storage_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
-                        <td class="border border-gray-400 px-2 py-1 invisible">
+                        <td class="px-2 py-1 invisible">
                             Demurrage Charges<br />
                             <span class="text-[10px]">( Per Cubic Foot )</span>
                         </td>
-                        <td class="border border-gray-400 px-2 py-1 text-center text-gray-500">
+                        <td class="px-2 py-1 text-center text-gray-500">
                             9.50<br />
                             10.00
                         </td>
-                        <td class="border border-gray-400 px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
+                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
                     </tr>
                     <tr class="font-bold">
-                        <td class="border border-gray-400 px-2 py-1 invisible">TOTAL</td>
-                        <td class="border border-gray-400 px-2 py-1"></td>
-                        <td class="border border-gray-400 px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['total'],2)}}</td>
+                        <td class="px-2 py-1 invisible">TOTAL</td>
+                        <td class="px-2 py-1"></td>
+                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['total'],2)}}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -139,7 +139,7 @@
             <!-- Payment Summary -->
             <div class="mb-2 text-xs">
                 <div class="mb-1">
-                    <span class="font-bold">Rupees :</span>
+                    <span class="font-bold invisible">Rupees :</span>
                     <div class="ml-12">
                         <div><span class="">D/O Chrgs. </span><span class="float-right text-gray-500">{{ number_format($data['charges']['do_charge'],2) }}</span></div>
                         <div><span class="">Stamp Duty </span><span class="float-right text-gray-500">{{ number_format($data['charges']['stamp_charge'],2) }}</span></div>
@@ -158,12 +158,12 @@
             <div class="mb-2 mt-8 grid grid-cols-2 gap-4">
                 <div>
                     <div class="mb-8 text-xs invisible">Cashier - Amount Received</div>
-                    <div class="border-b border-black"></div>
+{{--                    <div class="border-b border-black"></div>--}}
                     <div class="text-center text-xs invisible">Signature :</div>
                 </div>
                 <div>
                     <div class="mb-8 text-xs">&nbsp;</div>
-                    <div class="border-b border-black"></div>
+{{--                    <div class="border-b border-black"></div>--}}
                     <div class="text-center text-xs invisible">Signature</div>
                 </div>
             </div>
@@ -277,7 +277,7 @@
             <!-- Signature Section -->
             <div class="mb-2 mt-12 text-right">
                 <div class="mb-8 text-xs">&nbsp;</div>
-                <div class="ml-auto w-48 border-b border-black"></div>
+                <div class="ml-auto w-48 border-b invisible"></div>
                 <div class="text-xs invisible">Officer</div>
             </div>
 
