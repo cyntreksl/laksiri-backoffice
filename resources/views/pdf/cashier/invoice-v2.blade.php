@@ -10,7 +10,7 @@
 <div class="mx-auto max-w-7xl">
     <div class="grid grid-cols-2 gap-4">
         <!-- LEFT COLUMN - INVOICE -->
-        <div class="border-r-2 border-dashed border-gray-400 pr-4">
+        <div class="pr-4">
             <!-- Header -->
             <div class="mb-2 flex items-start gap-3">
                 <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center invisible">
