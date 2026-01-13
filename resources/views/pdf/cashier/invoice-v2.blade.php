@@ -29,13 +29,13 @@
             </div>
 
             <div class="mb-2 flex justify-between text-xs">
-                <div><span class="invisible">Clearing Time : </span><span class="text-gray-500">{{ $data['clearing_time'] }}</span></div>
+                <div><span class="invisible">Clearing Time : </span><span class="text-gray-800">{{ $data['clearing_time'] }}</span></div>
                 <div><span class="invisible">Vehicle No :</span></div>
             </div>
 
             <div class="mb-2 flex justify-between text-xs">
-                <div><span class="invisible">Date : </span><span class="text-gray-500">{{ $data['date'] }}</span></div>
-                <div><span class="invisible">Serial No. : </span><span class="text-gray-500">IN00708920</span></div>
+                <div><span class="invisible">Date : </span><span class="text-gray-800">{{ $data['date'] }}</span></div>
+                <div><span class="invisible">Serial No. : </span><span class="text-gray-800">IN00708920</span></div>
             </div>
 
             <!-- Title -->
@@ -47,35 +47,35 @@
             <div class="mb-2 space-y-1 text-xs">
                 <div class="flex">
                     <span class="invisible w-40">Name of Consignee</span>
-                    <span class="text-gray-500">{{$data['hbl']['consignee_name']}}</span>
+                    <span class="text-gray-800">{{$data['hbl']['consignee_name']}}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">B/L No.</span>
-                    <span class="text-gray-500">{{ $data['vessel']['bl_number'] ?? ''}}</span>
+                    <span class="text-gray-800">{{ $data['vessel']['bl_number'] ?? ''}}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Vessel</span>
-                    <span class="text-gray-500">{{ $data['vessel']['vessel_name'] ?? '' }}</span>
+                    <span class="text-gray-800">{{ $data['vessel']['vessel_name'] ?? '' }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Passport / I.D. Card No.</span>
-                    <span class="text-gray-500">{{$data['hbl']['nic']}}</span>
+                    <span class="text-gray-800">{{$data['hbl']['nic']}}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">No. of Packages</span>
-                    <span class="text-gray-500">{{ count($data['hbl']['packages']) }}</span>
+                    <span class="text-gray-800">{{ count($data['hbl']['packages']) }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Bond Storage No.</span>
-                    <span class="text-gray-500">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</span>
+                    <span class="text-gray-800">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Agent</span>
-                    <span class="text-gray-500">{{ $data['hbl']['branch']['name'] }}</span>
+                    <span class="text-gray-800">{{ $data['hbl']['branch']['name'] }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Volume</span>
-                    <span class="text-gray-500">{{ $data['grand_volume'] }}</span>
+                    <span class="text-gray-800">{{ $data['grand_volume'] }}</span>
                 </div>
             </div>
 
@@ -92,45 +92,45 @@
                     <tbody>
                     <tr>
                         <td class="px-2 py-1 invisible">Sri Lanka Port Charges - Sea Cargo</td>
-                        <td class="px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['port_charge']['rate'],2) }}</td>
-                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['port_charge']['amount'],2) }}</td>
+                        <td class="px-2 py-1 text-center text-gray-800">{{ number_format($data['charges']['port_charge']['rate'],2) }}</td>
+                        <td class="px-2 py-1 text-right text-gray-800">{{ number_format($data['charges']['port_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td class="px-2 py-1"></td>
-                        <td class="px-2 py-1 text-center text-gray-500">0.00</td>
-                        <td class="px-2 py-1 text-right text-gray-500">0.00</td>
+                        <td class="px-2 py-1 text-center text-gray-800">0.00</td>
+                        <td class="px-2 py-1 text-right text-gray-800">0.00</td>
                     </tr>
                     <tr>
                         <td class="px-2 py-1 invisible">
                             Handling Charges<br />
                             <span class="text-[10px]">( Per Package )</span>
                         </td>
-                        <td class="px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['handling_charge']['rate'],2) }}</td>
-                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['handling_charge']['amount'],2) }}</td>
+                        <td class="px-2 py-1 text-center text-gray-800">{{ number_format($data['charges']['handling_charge']['rate'],2) }}</td>
+                        <td class="px-2 py-1 text-right text-gray-800">{{ number_format($data['charges']['handling_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td class="px-2 py-1 invisible">
                             Bond Storage Charges<br />
                             <span class="text-[10px]">( Per Cubic Foot )</span>
                         </td>
-                        <td class="px-2 py-1 text-center text-gray-500">{{ number_format($data['charges']['storage_charge']['rate'],2) }}</td>
-                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['storage_charge']['amount'],2) }}</td>
+                        <td class="px-2 py-1 text-center text-gray-800">{{ number_format($data['charges']['storage_charge']['rate'],2) }}</td>
+                        <td class="px-2 py-1 text-right text-gray-800">{{ number_format($data['charges']['storage_charge']['amount'],2) }}</td>
                     </tr>
                     <tr>
                         <td class="px-2 py-1 invisible">
                             Demurrage Charges<br />
                             <span class="text-[10px]">( Per Cubic Foot )</span>
                         </td>
-                        <td class="px-2 py-1 text-center text-gray-500">
+                        <td class="px-2 py-1 text-center text-gray-800">
                             9.50<br />
                             10.00
                         </td>
-                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
+                        <td class="px-2 py-1 text-right text-gray-800">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</td>
                     </tr>
                     <tr class="font-bold">
                         <td class="px-2 py-1 invisible">TOTAL</td>
                         <td class="px-2 py-1"></td>
-                        <td class="px-2 py-1 text-right text-gray-500">{{ number_format($data['charges']['total'],2)}}</td>
+                        <td class="px-2 py-1 text-right text-gray-800">{{ number_format($data['charges']['total'],2)}}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -141,15 +141,15 @@
                 <div class="mb-1">
                     <span class="font-bold invisible">Rupees :</span>
                     <div class="ml-12">
-                        <div><span class="">D/O Chrgs. </span><span class="float-right text-gray-500">{{ number_format($data['charges']['do_charge'],2) }}</span></div>
-                        <div><span class="">Stamp Duty </span><span class="float-right text-gray-500">{{ number_format($data['charges']['stamp_charge'],2) }}</span></div>
-                        <div class="font-bold"><span class="">G/Total : </span><span class="float-right text-gray-500">{{ number_format($data['charges']['total']+$data['charges']['do_charge']+$data['charges']['stamp_charge'],2) }}</span></div>
+                        <div><span class="">D/O Chrgs. </span><span class="float-right text-gray-800">{{ number_format($data['charges']['do_charge'],2) }}</span></div>
+                        <div><span class="">Stamp Duty </span><span class="float-right text-gray-800">{{ number_format($data['charges']['stamp_charge'],2) }}</span></div>
+                        <div class="font-bold"><span class="">G/Total : </span><span class="float-right text-gray-800">{{ number_format($data['charges']['total']+$data['charges']['do_charge']+$data['charges']['stamp_charge'],2) }}</span></div>
                     </div>
                 </div>
                 @if (!empty($data['taxes']))
                 <div class="text-[10px]">
                     <span class="">VAT 18% included in the charges</span><br />
-                    <span class="text-gray-500">{{ strtoupper($data['total_in_word']) }}</span>
+                    <span class="text-gray-800">{{ strtoupper($data['total_in_word']) }}</span>
                 </div>
                 @endif
             </div>
@@ -203,7 +203,7 @@
             </div>
 
             <div class="mb-2 flex justify-between text-xs">
-                <div><span class="invisible">Gate Pass : </span><span class="text-gray-500">0.00</span></div>
+                <div><span class="invisible">Gate Pass : </span><span class="text-gray-800">0.00</span></div>
             </div>
 
             <!-- Title -->
@@ -215,43 +215,43 @@
             <div class="mb-2 space-y-1 text-xs">
                 <div class="flex">
                     <span class="invisible w-40">No.</span>
-                    <span class="text-gray-500">IN00708920</span>
+                    <span class="text-gray-800">IN00708920</span>
                 </div>
                 <div class="flex">
                     <span class="w-40">Dostuf Date .</span>
-                    <span class="text-gray-500">{{ $data['date'] }}</span>
+                    <span class="text-gray-800">{{ $data['date'] }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">B/L No.</span>
-                    <span class="text-gray-500">{{ $data['vessel']['bl_number'] ?? ''}}</span>
+                    <span class="text-gray-800">{{ $data['vessel']['bl_number'] ?? ''}}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Description of goods</span>
-                    <span class="text-gray-500">BUNDLES FRIDGE SOFA SET</span>
+                    <span class="text-gray-800">BUNDLES FRIDGE SOFA SET</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40"></span>
-                    <span class="text-gray-500">J-VEARITON</span>
+                    <span class="text-gray-800">J-VEARITON</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">No. of Packages</span>
-                    <span class="text-gray-500">{{ count($data['hbl']['packages']) }}</span>
+                    <span class="text-gray-800">{{ count($data['hbl']['packages']) }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Passport / I.D. Card No.</span>
-                    <span class="text-gray-500"></span>
+                    <span class="text-gray-800"></span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Bond Storage No.</span>
-                    <span class="text-gray-500">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</span>
+                    <span class="text-gray-800">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Vessel</span>
-                    <span class="text-gray-500">{{ $data['vessel']['vessel_name'] ?? '' }}</span>
+                    <span class="text-gray-800">{{ $data['vessel']['vessel_name'] ?? '' }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Delivered from</span>
-                    <span class="text-gray-500"></span>
+                    <span class="text-gray-800"></span>
                 </div>
             </div>
 
@@ -262,15 +262,15 @@
             <div class="mb-2 space-y-1 text-xs">
                 <div class="flex">
                     <span class="invisible w-20">BY</span>
-                    <span class="text-gray-500">{{$data['hbl']['consignee_name']}}</span>
+                    <span class="text-gray-800">{{$data['hbl']['consignee_name']}}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-20">Date</span>
-                    <span class="text-gray-500">{{ $data['date'] }}</span>
+                    <span class="text-gray-800">{{ $data['date'] }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-20">Time</span>
-                    <span class="text-gray-500">{{ $data['clearing_time'] }}</span>
+                    <span class="text-gray-800">{{ $data['clearing_time'] }}</span>
                 </div>
             </div>
 
@@ -285,15 +285,15 @@
             <div class="mt-8 space-y-1 text-xs">
                 <div class="flex">
                     <span class="invisible w-32">Reference No. :</span>
-                    <span class="text-gray-500">MF00020377</span>
+                    <span class="text-gray-800">MF00020377</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-32">Serial No.</span>
-                    <span class="text-gray-500">23</span>
+                    <span class="text-gray-800">23</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-32">User ID</span>
-                    <span class="text-gray-500">KALIMAN</span>
+                    <span class="text-gray-800">KALIMAN</span>
                 </div>
             </div>
         </div>
