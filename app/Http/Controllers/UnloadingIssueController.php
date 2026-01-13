@@ -199,11 +199,23 @@ class UnloadingIssueController extends Controller
 
         $query = \App\Models\HBLPackage::query()
             ->with(['hbl' => function($q) {
-                $q->withoutGlobalScopes()->select('id', 'hbl_number', 'hbl_name');
+                $q->withoutGlobalScopes()
+                  ->select('id', 'hbl_number', 'hbl_name')
+                  ->with(['mhbls' => function($mhblQ) {
+                      $mhblQ->withoutGlobalScopes()->select('mhbls.id', 'mhbls.hbl_number');
+                  }]);
             }, 'unloadingIssue'])
             ->whereHas('hbl', function ($q) use ($hblNumber) {
                 $q->withoutGlobalScopes()
-                  ->where('hbl_number', 'like', "%{$hblNumber}%");
+                  ->where(function($subQ) use ($hblNumber) {
+                      // Search by HBL number
+                      $subQ->where('hbl_number', 'like', "%{$hblNumber}%")
+                           // Also search by MHBL number
+                           ->orWhereHas('mhbls', function($mhblQ) use ($hblNumber) {
+                               $mhblQ->withoutGlobalScopes()
+                                     ->where('hbl_number', 'like', "%{$hblNumber}%");
+                           });
+                  });
             });
 
 //        if ($containerId) {
@@ -214,8 +226,22 @@ class UnloadingIssueController extends Controller
 
         $packages = $query->paginate($perPage, ['*'], 'page', $page);
 
-        $data = $packages->map(function ($package) {
+        $data = $packages->map(function ($package) use ($hblNumber) {
             $existingIssue = $package->unloadingIssue->first();
+            
+            // Check if this is an MHBL match
+            $isMhblMatch = false;
+            $mhblNumber = null;
+            
+            if ($package->hbl && $package->hbl->mhbls) {
+                foreach ($package->hbl->mhbls as $mhbl) {
+                    if (stripos($mhbl->hbl_number, $hblNumber) !== false) {
+                        $isMhblMatch = true;
+                        $mhblNumber = $mhbl->hbl_number;
+                        break;
+                    }
+                }
+            }
 
             return [
                 'id' => $package->id,
@@ -226,6 +252,8 @@ class UnloadingIssueController extends Controller
                 'volume' => $package->volume,
                 'has_unloading_issue' => $package->unloadingIssue->isNotEmpty(),
                 'existing_issue_type' => $existingIssue ? $existingIssue->type : null,
+                'is_mhbl_match' => $isMhblMatch,
+                'mhbl_number' => $mhblNumber,
             ];
         });
 
