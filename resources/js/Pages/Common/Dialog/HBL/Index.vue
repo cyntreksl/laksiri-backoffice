@@ -29,7 +29,19 @@ const props = defineProps({
     pickupId: {
         type: Number,
         default: null,
-    }
+    },
+    containerStatus: {
+        type: Array,
+        default: () => [],
+    },
+    seaContainerOptions: {
+        type: Array,
+        default: () => [],
+    },
+    airContainerOptions: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(['close']);
@@ -195,7 +207,14 @@ onMounted(() => {
                     <TabPayments :hbl="hbl"></TabPayments>
                 </TabPanel>
                 <TabPanel value="3">
-                    <TabShipment v-if="hbl" :hbl="hbl" :pickup="pickup" />
+                    <TabShipment
+                        v-if="hbl"
+                        :air-container-options="airContainerOptions"
+                        :container-status="containerStatus"
+                        :hbl="hbl"
+                        :pickup="pickup"
+                        :sea-container-options="seaContainerOptions"
+                    />
                 </TabPanel>
                 <TabPanel value="4">
                     <TabStatus v-if="hbl" :hbl="hbl" :pickup="pickup" />
