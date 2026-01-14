@@ -70,9 +70,11 @@ class ExaminationRepository implements ExaminationRepositoryInterface
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
         $query = CustomerQueue::query()
-            ->examinationQueue()
+            ->where('type', CustomerQueue::EXAMINATION_QUEUE)
             ->whereNotNull('left_at')
-            ->has('token.verification');
+            ->has('token.verification')
+            ->has('examination')
+            ->with(['token.customer', 'token.reception', 'token.hbl', 'examination.releasedBy']);
 
         $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 
