@@ -326,6 +326,26 @@ class HBLController extends Controller
         return $this->HBLRepository->getHBLStatusByReference($reference);
     }
 
+    public function checkHBLNumberExists(string $hblNumber): JsonResponse
+    {
+        try {
+            $exists = HBL::withoutGlobalScope(BranchScope::class)
+                ->where('hbl_number', $hblNumber)
+                ->exists();
+
+            return response()->json([
+                'exists' => $exists,
+                'hbl_number' => $hblNumber
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error checking HBL number: ' . $e->getMessage());
+            return response()->json([
+                'exists' => false,
+                'error' => 'Failed to check HBL number'
+            ], 500);
+        }
+    }
+
     public function getHBLDetailsByReference(string $reference)
     {
         $hbl = HBL::withoutGlobalScope(BranchScope::class)
