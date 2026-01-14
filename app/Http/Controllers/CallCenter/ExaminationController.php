@@ -68,4 +68,60 @@ class ExaminationController extends Controller
 
         return $this->examinationRepository->dataset($limit, $page, $order, $dir);
     }
+
+    public function showReturnToBond(Request $request)
+    {
+        $tokenNumber = $request->input('token');
+        
+        if (!$tokenNumber) {
+            return Inertia::render('CallCenter/Examination/ReturnToBond', [
+                'packages' => [],
+                'token' => null,
+            ]);
+        }
+
+        $token = \App\Models\Token::where('token', $tokenNumber)->first();
+        
+        if (!$token) {
+            return Inertia::render('CallCenter/Examination/ReturnToBond', [
+                'packages' => [],
+                'token' => null,
+                'error' => 'Token not found',
+            ]);
+        }
+
+        $hbl = HBL::withoutGlobalScopes()->where('reference', $token->reference)->first();
+        
+        if (!$hbl) {
+            return Inertia::render('CallCenter/Examination/ReturnToBond', [
+                'packages' => [],
+                'token' => $token,
+                'error' => 'HBL not found',
+            ]);
+        }
+
+        // Get only held packages
+        $heldPackages = $hbl->packages()->where('release_status', 'held')->get();
+
+        return Inertia::render('CallCenter/Examination/ReturnToBond', [
+            'packages' => $heldPackages,
+            'token' => $token,
+            'hbl' => $hbl,
+        ]);
+    }
+
+    public function returnToBond(Request $request)
+    {
+        $this->examinationRepository->returnPackagesToBond($request->all());
+        
+        return redirect()->route('call-center.examination.return-to-bond')
+            ->with('success', 'Packages returned to bond storage successfully');
+    }
+
+    public function completeToken(Request $request)
+    {
+        $this->examinationRepository->completeToken($request->all());
+        
+        return redirect()->back()->with('success', 'Token completed successfully');
+    }
 }
