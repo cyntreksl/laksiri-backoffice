@@ -342,6 +342,8 @@ class RolePermissionSeeder extends Seeder
             'mark-shipment-arrived-to-warehouse',
             'mark-shipment-depart-from-warehouse',
             'mark-gate-pass',
+            'gate-control.complete-token',
+            'gate-control.view-completed-tokens',
         ];
 
         foreach ($securityPermissions as $permName) {
@@ -681,6 +683,8 @@ class RolePermissionSeeder extends Seeder
                     'mark-shipment-arrived-to-warehouse',
                     'mark-shipment-depart-from-warehouse',
                     'mark-gate-pass',
+                    'gate-control.complete-token',
+                    'gate-control.view-completed-tokens',
                 ],
             ],
 

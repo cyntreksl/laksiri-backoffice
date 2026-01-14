@@ -123,8 +123,8 @@ const getHBLPackagesByReference = async () => {
 
 getHBLPackagesByReference();
 
-const updateChecked = (pType, isChecked) => {
-    form.released_packages = { ...form.released_packages, [pType]: isChecked };
+const updateChecked = (packageId, isChecked) => {
+    form.released_packages = { ...form.released_packages, [packageId]: isChecked };
 };
 
 const form = useForm({
@@ -239,10 +239,10 @@ const handleUpdateReleaseHBLPackages = () => {
                         <div class="grid grid-cols-1 gap-5 mt-3">
                             <div class="space-y-4">
                                 <div v-for="(p, index) in hblPackages" :key="p.id" class="flex items-center gap-2">
-                                    <Checkbox :checked="form.released_packages[p.id] || false" :input-id="`${p.package_type}-${index}`"
-                                              :value="p.id"  @change="(event) => updateChecked(`${p.package_type} PKG ${index + 1}`, event.target.checked)" />
-                                    <label :for="`${p.package_type}-${index}`" class="cursor-pointer">
-                                        {{ p.package_type }}
+                                    <Checkbox :checked="form.released_packages[p.id] || false" :input-id="`package-${p.id}`"
+                                              :value="p.id"  @change="(event) => updateChecked(p.id, event.target.checked)" />
+                                    <label :for="`package-${p.id}`" class="cursor-pointer">
+                                        {{ p.package_type }} (ID: {{ p.id }})
                                     </label>
                                 </div>
                             </div>

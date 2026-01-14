@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Examination extends Model
 {
@@ -21,5 +22,25 @@ class Examination extends Model
     public function releasedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'released_by');
+    }
+
+    public function packageExaminations(): HasMany
+    {
+        return $this->hasMany(PackageExamination::class);
+    }
+
+    public function hbl(): BelongsTo
+    {
+        return $this->belongsTo(HBL::class);
+    }
+
+    public function customerQueue(): BelongsTo
+    {
+        return $this->belongsTo(CustomerQueue::class);
+    }
+
+    public function token(): BelongsTo
+    {
+        return $this->belongsTo(Token::class);
     }
 }

@@ -12,11 +12,12 @@ class PackageQueue extends Model
     use HasFactory;
 
     protected $fillable = [
-        'token_id', 'hbl_id', 'auth_id', 'reference', 'package_count', 'is_released', 'released_at', 'note', 'released_packages',
+        'token_id', 'hbl_id', 'auth_id', 'reference', 'package_count', 'is_released', 'released_at', 'note', 'released_packages', 'status', 'released_package_count', 'held_package_count', 'completed_at',
     ];
 
     protected $casts = [
         'released_packages' => 'array',
+        'completed_at' => 'datetime',
     ];
 
     public function token(): BelongsTo

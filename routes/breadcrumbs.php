@@ -583,3 +583,4 @@ Breadcrumbs::for('third-party-shipments.create.v2', function (BreadcrumbTrail $t
 require_once __DIR__.'/call-center-breadcrumbs.php';
 require_once __DIR__.'/finance-breadcrumbs.php';
 require_once __DIR__.'/clearance-breadcrumbs.php';
+require_once __DIR__.'/gate-control-breadcrumbs.php';

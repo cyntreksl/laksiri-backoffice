@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -53,6 +54,10 @@ class HBLPackage extends Model
         'is_hold',
         'is_rtf',
         'bond_storage_number',
+        'release_status',
+        'released_at',
+        'released_by',
+        'release_note',
     ];
 
     /**
@@ -68,6 +73,7 @@ class HBLPackage extends Model
             'is_rtf' => 'boolean',
             'loaded_at' => 'datetime',
             'unloaded_at' => 'datetime',
+            'released_at' => 'datetime',
         ];
     }
 
@@ -123,5 +129,20 @@ class HBLPackage extends Model
     public function remarks(): MorphMany
     {
         return $this->morphMany(Remark::class, 'remarkable');
+    }
+
+    public function releasedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'released_by');
+    }
+
+    public function packageExaminations(): HasMany
+    {
+        return $this->hasMany(PackageExamination::class, 'hbl_package_id');
+    }
+
+    public function latestPackageExamination()
+    {
+        return $this->hasOne(PackageExamination::class, 'hbl_package_id')->latestOfMany();
     }
 }
