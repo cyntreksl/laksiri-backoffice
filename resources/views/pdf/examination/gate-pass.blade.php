@@ -107,7 +107,7 @@
                     </div>
                     <div class="flex">
                         <span class="w-40 font-semibold">No. of Packages:</span>
-                        <span class="font-medium text-neutral-500">{{ count($data['hbl']['packages']) }}</span>
+                        <span class="font-medium text-neutral-500">{{ count($data['releasedPackages']) }}</span>
                     </div>
                 </div>
 
@@ -115,7 +115,7 @@
                     <div class="flex">
                         <span class="w-40 font-semibold">Description of goods:</span>
                         <span class="font-medium text-neutral-500">
-                            @foreach($data['hbl']['packages'] as $package)
+                            @foreach($data['releasedPackages'] as $package)
                                 {{ $package['package_type'] }}{{ !$loop->last ? ', ' : '' }}
                             @endforeach</span>
                     </div>
