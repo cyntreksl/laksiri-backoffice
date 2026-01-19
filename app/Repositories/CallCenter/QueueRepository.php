@@ -10,6 +10,7 @@ use App\Models\CustomerQueue;
 use App\Models\PackageQueue;
 use App\Models\PackageReleaseLog;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class QueueRepository implements QueueRepositoryInterface
 {
@@ -123,29 +124,25 @@ class QueueRepository implements QueueRepositoryInterface
             return response()->json(['error' => 'HBL not found for this token'], 404);
         }
 
-        // Get all package queues for this token to check release status
-        $packageQueues = PackageQueue::where('token_id', $tokenModel->id)
-            ->where('is_released', true)
-            ->first();
+        // Get package queue for this token
+        $packageQueue = PackageQueue::where('token_id', $tokenModel->id)->first();
 
-        $isReleased = $packageQueues ? true : false;
-        $releasedAt = $packageQueues ? $packageQueues->released_at : null;
-
-        // Get individual HBL packages
+        // Get individual HBL packages - only show HELD packages (not released)
         $hblPackages = $hbl->packages()
             ->withoutGlobalScopes()
+            ->where('release_status', 'held') // Only held packages can be returned to bond
             ->get();
 
         if ($hblPackages->isEmpty()) {
-            return response()->json(['error' => 'No packages found for this HBL'], 404);
+            return response()->json(['error' => 'No held packages found for this token'], 404);
         }
 
         // Build individual package list
-        $individualPackages = $hblPackages->map(function ($package) use ($isReleased, $releasedAt, $packageQueues, $hbl) {
+        $individualPackages = $hblPackages->map(function ($package) use ($packageQueue, $hbl) {
             return [
                 'id' => $package->id,
                 'hbl_package_id' => $package->id,
-                'package_queue_id' => $packageQueues ? $packageQueues->id : null,
+                'package_queue_id' => $packageQueue ? $packageQueue->id : null,
                 'hbl_reference' => $hbl->reference,
                 'hbl_number' => $hbl->hbl_number,
                 'package_type' => $package->package_type,
@@ -155,8 +152,9 @@ class QueueRepository implements QueueRepositoryInterface
                 'height' => $package->height,
                 'weight' => $package->weight,
                 'volume' => $package->volume,
-                'is_released' => $isReleased,
-                'released_at' => $releasedAt,
+                'release_status' => $package->release_status,
+                'is_released' => false, // These are held packages
+                'released_at' => null,
                 'bond_storage_number' => $package->bond_storage_number,
                 'remarks' => $package->remarks,
             ];
@@ -169,9 +167,9 @@ class QueueRepository implements QueueRepositoryInterface
             'hbl_number' => $hbl->hbl_number,
             'individual_packages' => $individualPackages,
             'summary' => [
-                'total_packages' => count($individualPackages),
-                'released_packages' => $isReleased ? count($individualPackages) : 0,
-                'available_for_return' => $isReleased ? count($individualPackages) : 0,
+                'total_packages' => $hbl->packages()->withoutGlobalScopes()->count(),
+                'held_packages' => count($individualPackages),
+                'available_for_return' => count($individualPackages),
             ],
         ]);
     }
@@ -180,73 +178,95 @@ class QueueRepository implements QueueRepositoryInterface
     {
         // Handle selective package returns (individual HBLPackage records)
         if (isset($data['selected_packages']) && ! empty($data['selected_packages'])) {
-            // Get unique package_queue_ids from selected packages
-            $packageQueueIds = collect($data['selected_packages'])
-                ->pluck('package_queue_id')
-                ->filter()
-                ->unique()
-                ->values()
-                ->all();
+            DB::beginTransaction();
+            
+            try {
+                // Get the individual package IDs that were selected
+                $selectedPackageIds = collect($data['selected_packages'])
+                    ->pluck('hbl_package_id')
+                    ->filter()
+                    ->values()
+                    ->all();
 
-            // Get the individual package IDs that were selected
-            $selectedPackageIds = collect($data['selected_packages'])
-                ->pluck('hbl_package_id')
-                ->filter()
-                ->values()
-                ->all();
+                // Get package details for logging
+                $selectedPackages = \App\Models\HBLPackage::withoutGlobalScopes()
+                    ->whereIn('id', $selectedPackageIds)
+                    ->get();
 
-            // Get package details for logging
-            $selectedPackages = \App\Models\HBLPackage::withoutGlobalScopes()
-                ->whereIn('id', $selectedPackageIds)
-                ->get();
+                $packageQueueId = null;
+                $tokenId = null;
 
-            // Group by package_queue_id and process each queue
-            foreach ($packageQueueIds as $packageQueueId) {
-                $packageQueue = PackageQueue::find($packageQueueId);
+                // Process each selected package
+                foreach ($selectedPackages as $package) {
+                    // Update package status to returned_to_bond
+                    $package->update([
+                        'release_status' => 'returned_to_bond',
+                        'release_note' => $data['remarks'] ?? 'Returned to bond storage',
+                    ]);
 
-                if ($packageQueue && $packageQueue->is_released) {
-                    // Get packages for this queue's HBL
-                    $hbl = $packageQueue->token->hbl;
-                    $allHblPackages = $hbl->packages()->withoutGlobalScopes()->get();
-                    
-                    // Filter to only selected packages for this queue
-                    $packagesForThisQueue = $selectedPackages->filter(function ($pkg) use ($hbl) {
-                        return $pkg->hbl_id === $hbl->id;
-                    });
+                    // Get package queue and token info
+                    if (!$packageQueueId) {
+                        $hbl = $package->hbl;
+                        $token = \App\Models\Token::where('reference', $hbl->reference)->first();
+                        if ($token) {
+                            $tokenId = $token->id;
+                            $packageQueue = PackageQueue::where('token_id', $token->id)->first();
+                            $packageQueueId = $packageQueue ? $packageQueue->id : null;
+                        }
+                    }
 
-                    // Build package details for log
-                    $returnedPackages = $packagesForThisQueue->map(function ($pkg) {
-                        return [
-                            'hbl_package_id' => $pkg->id,
-                            'package_type' => $pkg->package_type,
-                            'quantity' => $pkg->quantity,
-                            'size' => "{$pkg->length}x{$pkg->width}x{$pkg->height}",
-                            'weight' => $pkg->weight,
-                            'volume' => $pkg->volume,
-                            'returned_at' => now()->toDateTimeString(),
-                        ];
-                    })->values()->all();
+                    // Create package examination record for audit trail
+                    if ($tokenId) {
+                        \App\Models\PackageExamination::create([
+                            'hbl_package_id' => $package->id,
+                            'examination_id' => null, // No examination record for returns from bond
+                            'customer_queue_id' => null,
+                            'token_id' => $tokenId,
+                            'action' => 'returned_to_bond',
+                            'note' => $data['remarks'] ?? 'Returned to bond storage',
+                            'processed_by' => auth()->id(),
+                            'processed_at' => now(),
+                        ]);
+                    }
+                }
 
-                    // Create a release log entry for the return
+                // Build package details for log
+                $returnedPackages = $selectedPackages->map(function ($pkg) {
+                    return [
+                        'hbl_package_id' => $pkg->id,
+                        'package_type' => $pkg->package_type,
+                        'quantity' => $pkg->quantity,
+                        'size' => "{$pkg->length}x{$pkg->width}x{$pkg->height}",
+                        'weight' => $pkg->weight,
+                        'volume' => $pkg->volume,
+                        'returned_at' => now()->toDateTimeString(),
+                    ];
+                })->values()->all();
+
+                // Create a release log entry for the return
+                if ($packageQueueId) {
                     PackageReleaseLog::create([
-                        'package_queue_id' => $packageQueue->id,
+                        'package_queue_id' => $packageQueueId,
                         'type' => 'return',
                         'packages' => $returnedPackages,
                         'remarks' => $data['remarks'] ?? null,
                         'created_by' => auth()->id(),
                     ]);
 
-                    // Update the package queue to mark as not released
-                    // Note: Currently the system works at PackageQueue level, so we mark entire queue as returned
-                    // If you need partial returns, you'd need to track which packages are still released
-                    $packageQueue->update([
-                        'is_released' => false,
-                        'released_at' => null,
-                        'released_packages' => null,
-                        'note' => $data['remarks'] ?? null,
-                        'auth_id' => auth()->id(),
-                    ]);
+                    // Update package queue counts
+                    $packageQueue = PackageQueue::find($packageQueueId);
+                    if ($packageQueue) {
+                        $returnedCount = count($selectedPackageIds);
+                        $packageQueue->update([
+                            'held_package_count' => max(0, $packageQueue->held_package_count - $returnedCount),
+                        ]);
+                    }
                 }
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw new \Exception('Failed to return packages to bond: ' . $e->getMessage());
             }
 
             return;

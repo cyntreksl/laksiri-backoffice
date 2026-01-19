@@ -7,6 +7,9 @@ import InfoDisplay from "@/Pages/Common/Components/InfoDisplay.vue";
 import {usePage} from '@inertiajs/vue3';
 import Card from "primevue/card";
 import Chip from 'primevue/chip';
+import Button from 'primevue/button';
+import LoadedShipmentDetailDialog from "@/Pages/Common/Dialog/Container/Index.vue";
+import axios from "axios";
 
 const props = defineProps({
     hbl: {
@@ -14,10 +17,25 @@ const props = defineProps({
         default: () => {
         },
     },
+    containerStatus: {
+        type: Array,
+        default: () => [],
+    },
+    seaContainerOptions: {
+        type: Array,
+        default: () => [],
+    },
+    airContainerOptions: {
+        type: Array,
+        default: () => [],
+    },
 })
 
 const container = ref({});
 const isLoadingContainer = ref(false);
+const showShipmentDetailModal = ref(false);
+const fullContainerData = ref(null);
+const isLoadingFullContainer = ref(false);
 
 const fetchContainer = async () => {
     isLoadingContainer.value = true;
@@ -41,6 +59,22 @@ const fetchContainer = async () => {
         console.log(error);
     } finally {
         isLoadingContainer.value = false;
+    }
+}
+
+const viewShipmentDetails = async () => {
+    if (!container.value?.id) return;
+
+    isLoadingFullContainer.value = true;
+
+    try {
+        const response = await axios.get(`/loaded-containers/get-container/${container.value.id}`);
+        fullContainerData.value = response.data[0];
+        showShipmentDetailModal.value = true;
+    } catch (error) {
+        console.error('Error fetching full container details:', error);
+    } finally {
+        isLoadingFullContainer.value = false;
     }
 }
 
@@ -88,11 +122,21 @@ const resolveCargoType = (cargoType) => {
                             <Chip :label="container?.container_type" class="!bg-amber-200" icon="pi pi-arrows-h"/>
                         </div>
                     </div>
-                    <img v-if="container?.cargo_type === 'Sea Cargo'" :src="LongVehicle" alt="image"
-                         class="w-1/4"/>
+                    <div class="flex flex-col items-end gap-3">
+                        <Button
+                            :loading="isLoadingFullContainer"
+                            icon="pi pi-external-link"
+                            label="View Shipment Details"
+                            outlined
+                            severity="info"
+                            @click="viewShipmentDetails"
+                        />
+                        <img v-if="container?.cargo_type === 'Sea Cargo'" :src="LongVehicle" alt="image"
+                             class="w-48"/>
 
-                    <img v-if="container?.cargo_type === 'Air Cargo'" :src="CargoPlane" alt="image"
-                         class="w-1/4"/>
+                        <img v-if="container?.cargo_type === 'Air Cargo'" :src="CargoPlane" alt="image"
+                             class="w-48"/>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 mt-10 gap-10">
@@ -146,6 +190,16 @@ const resolveCargoType = (cargoType) => {
         <img :src="NotFound" alt="image"
              class="w-1/4 mt-10"/>
     </div>
+
+    <LoadedShipmentDetailDialog
+        v-if="fullContainerData"
+        :air-container-options="airContainerOptions"
+        :container="fullContainerData"
+        :container-status="containerStatus"
+        :sea-container-options="seaContainerOptions"
+        :show="showShipmentDetailModal"
+        @update:show="showShipmentDetailModal = $event"
+    />
 </template>
 
 <style>

@@ -431,6 +431,22 @@ const setMenu = (menu) => {
                 );
             }
 
+            // Add Complete Token menu item
+            if (can("gate-control.complete-token")) {
+                gateControllerMenu.push({
+                    title: "Complete Token",
+                    route: "gate-control.complete-token",
+                });
+            }
+
+            // Add Completed Tokens menu item
+            if (can("gate-control.view-completed-tokens")) {
+                gateControllerMenu.push({
+                    title: "Completed Tokens",
+                    route: "gate-control.completed-tokens.index",
+                });
+            }
+
             childMenuList.splice(
                 0,
                 childMenuList.length,

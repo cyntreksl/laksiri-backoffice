@@ -22,7 +22,17 @@ class DownloadGatePassPDF
 
         $examination = Examination::where('token_id', $token->id)->first();
 
-        $container = $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
+        // Filter only released packages
+        $releasedPackages = $hbl->packages->filter(function ($package) {
+            return $package->release_status === 'released';
+        });
+
+        // If no released packages, return error
+        if ($releasedPackages->isEmpty()) {
+            abort(404, 'No released packages found for this gate pass.');
+        }
+
+        $container = $releasedPackages->first()->containers()->withoutGlobalScopes()->first();
 
         $data = [
             'token' => $token->token,
@@ -30,6 +40,7 @@ class DownloadGatePassPDF
             'date' => Carbon::parse($examination->released_at)->toDateString(),
             'vessel' => $container,
             'hbl' => $hbl,
+            'releasedPackages' => $releasedPackages,
             'userId' => GetUserById::run($token->customer_id)->name,
             'by' => GetUserById::run(auth()->id())->name,
             'serial' => $customerQueue->id,

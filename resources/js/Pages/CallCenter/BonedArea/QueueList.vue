@@ -95,16 +95,14 @@ const togglePackageSelection = (packageData) => {
         // Remove from selection
         returnForm.selected_packages.splice(index, 1);
     } else {
-        // Add to selection (only if released)
-        if (packageData.is_released) {
-            returnForm.selected_packages.push({
-                hbl_package_id: packageData.hbl_package_id,
-                package_queue_id: packageData.package_queue_id,
-                package_type: packageData.package_type,
-                quantity: packageData.quantity,
-                hbl_reference: packageData.hbl_reference
-            });
-        }
+        // Add to selection (held packages only)
+        returnForm.selected_packages.push({
+            hbl_package_id: packageData.hbl_package_id,
+            package_queue_id: packageData.package_queue_id,
+            package_type: packageData.package_type,
+            quantity: packageData.quantity,
+            hbl_reference: packageData.hbl_reference
+        });
     }
 };
 
@@ -131,19 +129,19 @@ const hblGroupSelectionStates = computed(() => {
     const states = {};
 
     returnForm.package_details.hbl_groups.forEach((hblGroup, index) => {
-        const releasedPackages = hblGroup.packages.filter(pkg => pkg.is_released);
-        const allSelected = releasedPackages.every(pkg => isPackageSelected(pkg));
-        const noneSelected = releasedPackages.every(pkg => !isPackageSelected(pkg));
+        const heldPackages = hblGroup.packages.filter(pkg => !pkg.is_released);
+        const allSelected = heldPackages.every(pkg => isPackageSelected(pkg));
+        const noneSelected = heldPackages.every(pkg => !isPackageSelected(pkg));
         const someSelected = !allSelected && !noneSelected;
 
         states[index] = {
-            releasedPackagesCount: releasedPackages.length,
+            heldPackagesCount: heldPackages.length,
             allSelected,
             noneSelected,
             someSelected,
-            buttonLabel: allSelected ? 'Deselect All' : 'Select All Released',
+            buttonLabel: allSelected ? 'Deselect All' : 'Select All Held',
             buttonSeverity: allSelected ? 'secondary' : 'info',
-            disabled: releasedPackages.length === 0
+            disabled: heldPackages.length === 0
         };
     });
 
@@ -152,11 +150,11 @@ const hblGroupSelectionStates = computed(() => {
 
 const selectAllPackagesInHBL = (hblGroup, hblIndex) => {
     const state = hblGroupSelectionStates.value[hblIndex];
-    const releasedPackages = hblGroup.packages.filter(pkg => pkg.is_released);
+    const heldPackages = hblGroup.packages.filter(pkg => !pkg.is_released);
 
     if (state.allSelected) {
         // Deselect all packages in this HBL
-        releasedPackages.forEach(pkg => {
+        heldPackages.forEach(pkg => {
             const index = returnForm.selected_packages.findIndex(
                 p => p.package_queue_id === pkg.package_queue_id
             );
@@ -165,8 +163,8 @@ const selectAllPackagesInHBL = (hblGroup, hblIndex) => {
             }
         });
     } else {
-        // Select all released packages in this HBL
-        releasedPackages.forEach(pkg => {
+        // Select all held packages in this HBL
+        heldPackages.forEach(pkg => {
             if (!isPackageSelected(pkg)) {
                 returnForm.selected_packages.push({
                     package_queue_id: pkg.package_queue_id,
@@ -346,7 +344,7 @@ const showLogDialog = (token) => {
                           @close="closePackageReleaseModal"
                           @update:visible="showPackageReleaseDialog = $event"/>
 
-    <Dialog :style="{ width: '70rem' }" :visible="returnDialogVisible" header="Return Package - Enhanced Selection" modal @update:visible="returnDialogVisible = $event">
+    <Dialog :style="{ width: '70rem' }" :visible="returnDialogVisible" header="Return Held Packages to Bond Storage" modal @update:visible="returnDialogVisible = $event">
         <div class="space-y-6">
             <!-- Token Number Input -->
             <div class="field">
@@ -391,7 +389,7 @@ const showLogDialog = (token) => {
                         </div>
                         <div>
                             <strong>Available for Return:</strong>
-                            <Tag :value="returnForm.package_details.summary?.available_for_return || allPackages.filter(p => p.is_released).length" severity="info" />
+                            <Tag :value="returnForm.package_details.summary?.available_for_return || allPackages.length" severity="warning" />
                         </div>
                     </div>
                 </div>
@@ -400,31 +398,28 @@ const showLogDialog = (token) => {
                 <div class="space-y-3">
                     <h4 class="font-bold text-base flex items-center gap-2">
                         <i class="pi pi-list"></i>
-                        Select Packages to Return
+                        Select Held Packages to Return to Bond Storage
                     </h4>
 
-                    <!-- Package List - Flat display of all packages -->
+                    <!-- Package List - Flat display of all held packages -->
                     <div class="grid gap-3 max-h-96 overflow-y-auto">
                         <div
                             v-for="packageData in allPackages"
                             :key="packageData.id"
                             class="border rounded-lg p-4 transition-all"
                             :class="{
-                                'border-green-300 bg-green-50': packageData.is_released && isPackageSelected(packageData),
-                                'border-blue-300 bg-blue-50': packageData.is_released && !isPackageSelected(packageData),
-                                'border-gray-300 bg-gray-50': !packageData.is_released
+                                'border-orange-300 bg-orange-50': isPackageSelected(packageData),
+                                'border-yellow-300 bg-yellow-50': !isPackageSelected(packageData)
                             }"
                         >
                             <div class="flex items-start justify-between">
                                 <div class="flex items-start gap-3 flex-1">
                                     <!-- Selection Checkbox -->
                                     <Checkbox
-                                        v-if="packageData.is_released"
                                         :modelValue="isPackageSelected(packageData)"
                                         @update:modelValue="togglePackageSelection(packageData)"
                                         :binary="true"
                                     />
-                                    <div v-else class="w-6"></div>
 
                                     <!-- Package Info -->
                                     <div class="flex-1">
@@ -433,10 +428,7 @@ const showLogDialog = (token) => {
                                             <div><strong>Quantity:</strong> {{ packageData.quantity }}</div>
                                             <div><strong>Size:</strong> {{ packageData.length }}x{{ packageData.width }}x{{ packageData.height }}</div>
                                             <div><strong>Status:</strong>
-                                                <Tag
-                                                    :value="packageData.is_released ? 'Released' : 'Not Released'"
-                                                    :severity="packageData.is_released ? 'success' : 'warning'"
-                                                />
+                                                <Tag severity="warning" value="Held" />
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-600 mb-2">
@@ -456,16 +448,16 @@ const showLogDialog = (token) => {
                 </div>
 
                 <!-- Selected Packages Summary -->
-                <div v-if="returnForm.selected_packages.length > 0" class="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <h4 class="font-bold text-green-800 mb-2 flex items-center gap-2">
+                <div v-if="returnForm.selected_packages.length > 0" class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <h4 class="font-bold text-orange-800 mb-2 flex items-center gap-2">
                         <i class="pi pi-check-circle"></i>
-                        Selected Packages for Return ({{ returnForm.selected_packages.length }})
+                        Selected Held Packages for Return to Bond ({{ returnForm.selected_packages.length }})
                     </h4>
                     <div class="flex flex-wrap gap-2">
                         <div
                             v-for="(pkg, index) in returnForm.selected_packages"
                             :key="index"
-                            class="flex items-center gap-2 bg-white border border-green-300 rounded-full px-3 py-1 text-sm"
+                            class="flex items-center gap-2 bg-white border border-orange-300 rounded-full px-3 py-1 text-sm"
                         >
                             <span>{{ pkg.package_type }} (Qty: {{ pkg.quantity }}) - {{ pkg.hbl_reference }}</span>
                             <Button
@@ -483,13 +475,13 @@ const showLogDialog = (token) => {
 
             <!-- Remarks -->
             <div class="field">
-                <label for="return_remarks" class="block mb-2 font-semibold">Return Remarks</label>
+                <label class="block mb-2 font-semibold" for="return_remarks">Return to Bond Remarks</label>
                 <Textarea
                     id="return_remarks"
                     v-model="returnForm.remarks"
                     class="w-full"
                     rows="3"
-                    placeholder="Enter reason for return..."
+                    placeholder="Enter reason for returning to bond storage..."
                 />
                 <div v-if="returnForm.errors.remarks" class="text-red-500 text-sm mt-1">
                     {{ returnForm.errors.remarks }}
@@ -516,8 +508,9 @@ const showLogDialog = (token) => {
                     <Button
                         :disabled="returnForm.selected_packages.length === 0 || returnForm.processing"
                         :class="{ 'opacity-75': returnForm.processing }"
-                        label="Process Return"
-                        icon="pi pi-check"
+                        icon="pi pi-arrow-left"
+                        label="Return to Bond Storage"
+                        severity="warning"
                         @click="handleReturnPackage"
                     />
                 </div>

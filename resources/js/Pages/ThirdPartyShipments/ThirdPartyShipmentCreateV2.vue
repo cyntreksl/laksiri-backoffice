@@ -103,11 +103,66 @@ const isCommonFieldsLocked = ref(false);
 const baseHBLNumber = ref(""); // Starting number set by user
 const currentHBLNumber = ref(""); // Current number (auto-incremented)
 const isHBLNumberManuallyOverridden = ref(false);
+const isCheckingHBLNumber = ref(false);
+const hblNumberError = ref("");
+let hblCheckTimeout = null;
 
 // Watch currentHBLNumber and sync with form.hbl
 watch(currentHBLNumber, (newValue) => {
     form.hbl = newValue;
+    // Check for duplicates when HBL number changes (with debounce)
+    if (newValue) {
+        // Clear previous timeout
+        if (hblCheckTimeout) {
+            clearTimeout(hblCheckTimeout);
+        }
+        // Set new timeout for 500ms debounce
+        hblCheckTimeout = setTimeout(() => {
+            checkHBLNumberDuplicate(newValue);
+        }, 500);
+    } else {
+        hblNumberError.value = "";
+    }
 });
+
+// Function to check if HBL number already exists
+const checkHBLNumberDuplicate = async (hblNumber) => {
+    if (!hblNumber) {
+        hblNumberError.value = "";
+        return;
+    }
+
+    isCheckingHBLNumber.value = true;
+    hblNumberError.value = "";
+
+    try {
+        const response = await fetch(
+            `/check-hbl-number-exists/${encodeURIComponent(hblNumber)}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": usePage().props.csrf,
+                },
+            }
+        );
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.exists) {
+                hblNumberError.value = `HBL Number "${hblNumber}" already exists. Please use a different number.`;
+            } else {
+                hblNumberError.value = "";
+            }
+        }
+    } catch (error) {
+        console.log("Error checking HBL number:", error);
+        // Don't block the user if the check fails
+        hblNumberError.value = "";
+    } finally {
+        isCheckingHBLNumber.value = false;
+    }
+};
 
 // Container creation modal
 const showCreateContainerDialog = ref(false);
@@ -381,6 +436,18 @@ const handleHBLCreate = () => {
         return;
     }
 
+    // Check for duplicate HBL number
+    if (hblNumberError.value) {
+        push.error("Cannot create HBL: " + hblNumberError.value);
+        return;
+    }
+
+    // Wait for any pending HBL number check
+    if (isCheckingHBLNumber.value) {
+        push.error("Please wait while we verify the HBL number");
+        return;
+    }
+
     form.additional_mobile_number =
         additionalMobileCountryCode.value + additionalMobileNumber.value;
     form.whatsapp_number =
@@ -551,6 +618,18 @@ const handleHBLCreateBulk = (continueAdding) => {
         Object.values(copiedPackages.value).length === 0
     ) {
         push.error("Please add at least one package before creating an HBL");
+        return;
+    }
+
+    // Check for duplicate HBL number
+    if (hblNumberError.value) {
+        push.error("Cannot create HBL: " + hblNumberError.value);
+        return;
+    }
+
+    // Wait for any pending HBL number check
+    if (isCheckingHBLNumber.value) {
+        push.error("Please wait while we verify the HBL number");
         return;
     }
 
@@ -1305,13 +1384,24 @@ watch(
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div class="col-span-1">
                                             <InputLabel value="HBL Number" />
-                                            <InputText
-                                                v-model="currentHBLNumber"
-                                                class="w-full"
-                                                required
-                                                @input="isHBLNumberManuallyOverridden = true"
-                                            />
-                                            <small class="text-gray-500 mt-2 block">Auto-incremented. You can override manually if needed.</small>
+                                            <div class="relative">
+                                                <InputText
+                                                    v-model="currentHBLNumber"
+                                                    :class="{ 'border-red-500': hblNumberError || form.errors.hbl }"
+                                                    class="w-full"
+                                                    required
+                                                    @input="isHBLNumberManuallyOverridden = true"
+                                                />
+                                                <i
+                                                    v-if="isCheckingHBLNumber"
+                                                    class="pi pi-spin pi-spinner absolute right-3 top-3 text-gray-400"
+                                                ></i>
+                                            </div>
+                                            <small v-if="!hblNumberError && !form.errors.hbl" class="text-gray-500 mt-2 block">Auto-incremented. You can override manually if needed.</small>
+                                            <Message v-if="hblNumberError" class="mt-2" severity="error" size="small">
+                                                {{ hblNumberError }}
+                                            </Message>
+                                            <InputError :message="form.errors.hbl" class="mt-2" />
                                         </div>
                                     </div>
                                 </template>

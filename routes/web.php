@@ -102,6 +102,8 @@ Route::middleware([
 
 });
 
+Route::get('check-hbl-number-exists/{hblNumber}', [HBLController::class, 'checkHBLNumberExists']);
+
 Route::get('get-hbl-status-by-reference/{reference}', [HBLController::class, 'getHBLStatusByReference']);
 
 Route::get('get-hbl-details-by-reference/{reference}', [HBLController::class, 'getHBLDetailsByReference']);
