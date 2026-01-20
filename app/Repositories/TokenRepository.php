@@ -11,14 +11,35 @@ class TokenRepository implements GridJsInterface, TokenRepositoryInterface
 {
     public function dataset(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {
-        $query = Token::query();
+        $query = Token::query()->with(['customer', 'reception', 'hbl', 'queueLogs']);
 
+        // Search functionality
         if (! empty($search)) {
-            $query->where('token', 'like', '%'.$search.'%');
+            $query->where(function ($q) use ($search) {
+                $q->where('token', 'like', '%'.$search.'%')
+                    ->orWhereHas('customer', function ($q) use ($search) {
+                        $q->where('name', 'like', '%'.$search.'%');
+                    })
+                    ->orWhereHas('hbl', function ($q) use ($search) {
+                        $q->where('reference', 'like', '%'.$search.'%')
+                            ->orWhere('hbl_number', 'like', '%'.$search.'%');
+                    });
+            });
         }
 
-        // apply filters
-        //        FilterFactory::apply($query, $filters);
+        // Date range filter
+        if (! empty($filters['fromDate'])) {
+            $query->whereDate('created_at', '>=', $filters['fromDate']);
+        }
+
+        if (! empty($filters['toDate'])) {
+            $query->whereDate('created_at', '<=', $filters['toDate']);
+        }
+
+        // Status filter
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
 
         $records = $query->orderBy($order, $direction)->paginate($limit, ['*'], 'page', $offset);
 

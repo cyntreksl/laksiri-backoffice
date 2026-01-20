@@ -15,6 +15,15 @@ class TokenResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Get the latest queue log from eager-loaded collection to avoid N+1 queries
+        $latestQueueLog = $this->queueLogs->sortByDesc('created_at')->first();
+        $latestQueueType = $latestQueueLog 
+            ? [
+                'type' => \Illuminate\Support\Str::headline($latestQueueLog->queue_type),
+                'created_at' => $latestQueueLog->created_at->format('Y-m-d H:i:s'),
+            ]
+            : null;
+
         return [
             'id' => $this->id,
             'hbl' => $this->when($this->hbl_id, function () {
@@ -37,6 +46,7 @@ class TokenResource extends JsonResource
             'status' => $this->status->value,
             'status_label' => $this->status->getLabel(),
             'status_color' => $this->status->getColor(),
+            'latest_queue_type' => $latestQueueType,
         ];
     }
 }

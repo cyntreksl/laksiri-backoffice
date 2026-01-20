@@ -9,6 +9,8 @@ import SelectButton from 'primevue/selectbutton';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Card from 'primevue/card';
+import Panel from 'primevue/panel';
+import FloatLabel from 'primevue/floatlabel';
 import Divider from 'primevue/divider';
 import {FilterMatchMode} from "@primevue/core/api";
 import axios from "axios";
@@ -16,6 +18,8 @@ import {debounce} from "lodash";
 import IconField from "primevue/iconfield";
 import InputIcon from "primevue/inputicon";
 import InputText from "primevue/inputtext";
+import DatePicker from "primevue/datepicker";
+import Select from "primevue/select";
 import moment from "moment";
 import Tag from "primevue/tag";
 import CancelTokenDialog from "@/Pages/Token/Partials/CancelTokenDialog.vue";
@@ -29,6 +33,9 @@ const perPage = ref(10);
 const currentPage = ref(1);
 const fromDate = ref(moment(new Date()).subtract(1, "month").toISOString().split("T")[0]);
 const toDate = ref(moment(new Date()).toISOString().split("T")[0]);
+
+// Filter options
+const statusOptions = ref(['ONGOING', 'COMPLETED', 'CANCELLED', 'DUE']);
 
 // Cancel token dialog state
 const showCancelDialog = ref(false);
@@ -45,6 +52,7 @@ const can = (perm) => {
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+    status: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
 const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sortOrder = -1) => {
@@ -59,6 +67,7 @@ const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sort
                 sort_order: sortOrder === 1 ? "asc" : "desc",
                 fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
                 toDate: moment(toDate.value).format("YYYY-MM-DD"),
+                status: filters.value.status.value,
             }
         });
         tokens.value = response.data.data;
@@ -81,6 +90,18 @@ watch(() => filters.value.global.value, (newValue) => {
     }
 });
 
+// Watch date filters
+watch([fromDate, toDate], () => {
+    fetchTokens(currentPage.value, filters.value.global.value);
+});
+
+// Watch advanced filters
+watch([
+    () => filters.value.status.value,
+], () => {
+    fetchTokens(1, filters.value.global.value);
+});
+
 const onPageChange = (event) => {
     perPage.value = event.rows;
     currentPage.value = event.page + 1;
@@ -98,8 +119,9 @@ onMounted(() => {
 const clearFilter = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        status: { value: null, matchMode: FilterMatchMode.EQUALS },
     };
-    fromDate.value = moment(new Date()).subtract(24, "months").toISOString().split("T")[0];
+    fromDate.value = moment(new Date()).subtract(1, "month").toISOString().split("T")[0];
     toDate.value = moment(new Date()).toISOString().split("T")[0];
     fetchTokens(currentPage.value);
 };
@@ -144,6 +166,25 @@ const canCancelToken = (token) => {
         <template #header>Tokens</template>
 
         <Breadcrumb/>
+
+        <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <FloatLabel class="w-full" variant="in">
+                    <DatePicker v-model="fromDate" class="w-full" date-format="yy-mm-dd" input-id="from-date"/>
+                    <label for="from-date">From Date</label>
+                </FloatLabel>
+
+                <FloatLabel class="w-full" variant="in">
+                    <DatePicker v-model="toDate" class="w-full" date-format="yy-mm-dd" input-id="to-date"/>
+                    <label for="to-date">To Date</label>
+                </FloatLabel>
+
+                <FloatLabel class="w-full" variant="in">
+                    <Select v-model="filters.status.value" :options="statusOptions" :showClear="true" class="w-full" input-id="status" />
+                    <label for="status">Status</label>
+                </FloatLabel>
+            </div>
+        </Panel>
 
         <Card class="my-5">
             <template #content>
@@ -214,9 +255,9 @@ const canCancelToken = (token) => {
                                     {{ slotProps.data.token }}
                                 </div>
                                 <div class="flex gap-2">
-                                    <Tag 
-                                        :severity="slotProps.data.status_color" 
-                                        :value="slotProps.data.status_label" 
+                                    <Tag
+                                        :severity="slotProps.data.status_color"
+                                        :value="slotProps.data.status_label"
                                         class="w-fit"
                                     />
                                 </div>
@@ -245,23 +286,14 @@ const canCancelToken = (token) => {
 
                     <Column :sortField="'created_at'" field="created_at" header="Created At" sortable></Column>
 
-                    <Column field="cancelled_at" header="Status Info">
+                    <Column field="latest_queue_type" header="Latest Status">
                         <template #body="slotProps">
-                            <div v-if="slotProps.data.status === 'CANCELLED' && slotProps.data.cancelled_at" class="text-red-600">
-                                <div class="font-semibold">Cancelled</div>
-                                <div class="text-sm">{{ slotProps.data.cancelled_at }}</div>
+                            <div v-if="slotProps.data.latest_queue_type" class="text-gray-700">
+                                <div class="font-semibold">{{ slotProps.data.latest_queue_type.type }}</div>
+                                <div class="text-sm text-gray-500">{{ slotProps.data.latest_queue_type.created_at }}</div>
                             </div>
-                            <div v-else-if="slotProps.data.status === 'COMPLETED'" class="text-green-600">
-                                <div class="font-semibold">Completed</div>
-                                <div class="text-sm">{{ slotProps.data.created_at }}</div>
-                            </div>
-                            <div v-else-if="slotProps.data.status === 'DUE'" class="text-orange-600">
-                                <div class="font-semibold">Due</div>
-                                <div class="text-sm">Created: {{ slotProps.data.created_at }}</div>
-                            </div>
-                            <div v-else class="text-blue-600">
-                                <div class="font-semibold">Ongoing</div>
-                                <div class="text-sm">{{ slotProps.data.created_at }}</div>
+                            <div v-else class="text-gray-400 italic">
+                                No queue assigned
                             </div>
                         </template>
                     </Column>

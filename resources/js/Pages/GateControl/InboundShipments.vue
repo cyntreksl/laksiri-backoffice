@@ -37,11 +37,6 @@ const props = defineProps({
         default: () => {
         },
     },
-    containers: {
-        type: Object,
-        default: () => {
-        },
-    },
     containerStatus: {
         type: Array,
         default: () => [],
@@ -258,13 +253,6 @@ const resolveContainerStatus = (container) => {
                 color: "danger",
             };
     }
-};
-
-const confirmViewShipment = (id) => {
-    inboundShipment.value = props.containers.find(
-        (container) => container.id === id
-    );
-    showConfirmShipmentModal.value = true;
 };
 
 const confirmMarkAsArrived = (container) => {

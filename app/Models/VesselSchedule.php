@@ -52,6 +52,6 @@ class VesselSchedule extends Model
             'id',
             'id',
             'container_id'
-        )->where('is_reached', false)->where('is_returned', false);
+        );
     }
 }
