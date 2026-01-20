@@ -614,7 +614,7 @@ const setMenu = (menu) => {
         case "examination":
             let examinationMenu = [];
 
-            if (can("customer-queue.show document verification queue")) {
+            if (can("customer-queue.show examination calling queue")) {
                 examinationMenu.splice(
                     2,
                     0,
@@ -625,7 +625,7 @@ const setMenu = (menu) => {
                 );
             }
 
-            if (can("customer-queue.show document verified list")) {
+            if (can("customer-queue.show gate list")) {
                 examinationMenu.splice(
                     2,
                     0,
