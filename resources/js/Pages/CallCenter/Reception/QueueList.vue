@@ -28,7 +28,10 @@ const props = defineProps({
 const layout = ref('list');
 const options = ref(['list', 'grid']);
 
-const filteredReceptionQueue = props.receptionQueue
+// Filter for only ongoing tokens (tokens that haven't left the queue)
+const filteredReceptionQueue = computed(() => {
+    return props.receptionQueue.filter(queue => !queue.left_at);
+})
 </script>
 
 <template>
