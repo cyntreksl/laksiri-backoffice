@@ -25,6 +25,7 @@ class UpdateClearanceContainerRequest extends FormRequest
             'note' => ['string', 'nullable'],
             'is_reached' => ['required', 'boolean'],
             'is_returned' => ['boolean'],
+            'status' => ['string', 'nullable'],
         ];
 
         // Only add reached_date validation if is_reached is true

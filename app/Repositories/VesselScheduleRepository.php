@@ -53,6 +53,16 @@ class VesselScheduleRepository implements VesselScheduleRepositoryInterface
             $updateData['return_date'] = $data['return_date'];
             $updateData['note'] = $data['note'];
             $updateData['is_returned'] = $data['is_returned'];
+            
+            // Update status if provided
+            if (isset($data['status'])) {
+                $updateData['status'] = $data['status'];
+            }
+            
+            // Auto-set status to REACHED DESTINATION when is_reached is true
+            if ($data['is_reached']) {
+                $updateData['status'] = 'REACHED DESTINATION';
+            }
 
             UpdateContainer::run($container, $updateData);
 

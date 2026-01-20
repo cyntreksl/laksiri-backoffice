@@ -14,6 +14,7 @@ import InputNumber from "primevue/inputnumber";
 import InputText from "primevue/inputtext";
 import DatePicker from "primevue/datepicker";
 import IftaLabel from "primevue/iftalabel";
+import Select from "primevue/select";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
@@ -392,11 +393,16 @@ const updateForm = useForm({
     reached_date: selectedContainer.value?.reached_date,
     return_date: selectedContainer.value?.return_date,
     is_returned: Boolean(selectedContainer.value.is_returned),
+    status: selectedContainer.value?.status,
 });
 
 watch(() => updateForm.is_reached, (newValue) => {
     if (newValue) {
         updateForm.is_returned = false;
+        updateForm.status = 'REACHED DESTINATION';
+        if (!updateForm.reached_date) {
+            updateForm.reached_date = new Date();
+        }
     }
 });
 
@@ -404,6 +410,19 @@ watch(() => updateForm.is_returned, (newValue) => {
     if (newValue) {
         updateForm.is_reached = false;
         updateForm.reached_date = '';
+    }
+});
+
+// Watch for status changes and sync with is_reached checkbox
+watch(() => updateForm.status, (newValue) => {
+    if (newValue === 'REACHED DESTINATION' && !updateForm.is_reached) {
+        updateForm.is_reached = true;
+        if (!updateForm.reached_date) {
+            updateForm.reached_date = new Date();
+        }
+    } else if (newValue && newValue !== 'REACHED DESTINATION' && updateForm.is_reached) {
+        // If status is manually changed to something else, uncheck is_reached
+        updateForm.is_reached = false;
     }
 });
 
@@ -417,6 +436,7 @@ watch(
         updateForm.is_returned = Boolean(newContainer?.is_returned);
         updateForm.reached_date = newContainer?.reached_date ?? null;
         updateForm.return_date = newContainer?.return_date ?? null;
+        updateForm.status = newContainer?.status ?? '';
     },
     { deep: true }
 );
@@ -1082,7 +1102,14 @@ const onNodeSelect = (event) => {
                                     <InfoDisplay :value="selectedContainer.port_of_discharge" label="Port of Discharge"/>
                                     <InfoDisplay :value="selectedContainer.loading_started_at" label="Loading Started Time"/>
                                     <InfoDisplay :value="selectedContainer.loading_ended_at" label="Loading End Time"/>
-                                    <InfoDisplay :value="selectedContainer.status" label="Last Status"/>
+
+                                    <div>
+                                        <IftaLabel>
+                                            <Select v-model="updateForm.status" :options="containerStatus" class="w-full" placeholder="Choose Status" variant="filled"/>
+                                            <label>Last Status</label>
+                                        </IftaLabel>
+                                        <InputError :message="updateForm.errors.status"/>
+                                    </div>
 
                                     <div>
                                         <IftaLabel>
