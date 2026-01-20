@@ -39,7 +39,6 @@ const types = ref([
 const form = useForm({
     hbl_package_id: null,
     issue: '',
-    rtf: false,
     is_damaged: false,
     type: null,
     files: [],
@@ -97,15 +96,7 @@ const updateFiles = (files) => {
                 <InputError :message="form.errors.note"/>
             </div>
 
-            <div>
-                <div class="flex items-center space-x-2">
-                    <Checkbox v-model="form.rtf" binary input-id="rtf"/>
-                    <label class="cursor-pointer" for="rtf">RTF</label>
-                </div>
-                <InputError :message="form.errors.rtf"/>
-            </div>
-
-            <div>
+            <div class="col-span-2">
                 <div class="flex items-center space-x-2">
                     <Checkbox v-model="form.is_damaged" binary input-id="damage"/>
                     <label class="cursor-pointer" for="damage">Damage</label>

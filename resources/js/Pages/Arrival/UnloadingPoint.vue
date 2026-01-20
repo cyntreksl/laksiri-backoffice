@@ -473,8 +473,8 @@ const isMHBLGroupDetained = (mhblGroup) => {
     return mhblGroup?.packages?.some(pkg => isPackageDetained(pkg));
 }
 
-const confirmShowCreateIssueModal = (index) => {
-    hblPackageId.value = warehouseArr.value[index].id;
+const confirmShowCreateIssueModal = (packageId) => {
+    hblPackageId.value = packageId;
     showUnloadingIssueModal.value = true;
 }
 
@@ -935,6 +935,9 @@ onUnmounted(() => {
                                                         : 'border-slate-200 bg-slate-50 hover:bg-slate-100 dark:border-navy-600 dark:bg-navy-700/50 dark:hover:bg-navy-700'
                                                 ]">
                                                     <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                        <div v-if="element.unloading_issue.length > 0" class="flex-shrink-0">
+                                                            <i class="pi pi-exclamation-triangle text-warning text-sm"></i>
+                                                        </div>
                                                         <div v-if="isPackageDetained(element)" class="flex-shrink-0">
                                                             <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
                                                         </div>
@@ -952,6 +955,18 @@ onUnmounted(() => {
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center gap-1.5 flex-shrink-0">
+                                                        <Button
+                                                            v-if="element.unloading_issue.length === 0"
+                                                            v-tooltip.top="'Create Unloading Issue'"
+                                                            class="!p-1.5"
+                                                            icon="pi pi-exclamation-triangle"
+                                                            rounded
+                                                            severity="warn"
+                                                            size="small"
+                                                            text
+                                                            @click.prevent="confirmShowCreateIssueModal(index)"
+                                                        />
+                                                        <i v-else class="pi pi-exclamation-triangle text-warning text-sm"></i>
                                                         <Button
                                                             icon="pi pi-comment"
                                                             severity="secondary"
@@ -1203,6 +1218,18 @@ onUnmounted(() => {
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-1.5 flex-shrink-0">
+                                            <Button
+                                                v-if="element.unloading_issue.length === 0"
+                                                v-tooltip.top="'Create Unloading Issue'"
+                                                class="!p-1.5"
+                                                icon="pi pi-exclamation-triangle"
+                                                rounded
+                                                severity="warn"
+                                                size="small"
+                                                text
+                                                @click.prevent="confirmShowCreateIssueModal(element.id)"
+                                            />
+                                            <i v-else class="pi pi-exclamation-triangle text-warning text-sm"></i>
                                             <Button
                                                 v-if="element.unloading_issue.length === 0"
                                                 icon="pi pi-lock"
