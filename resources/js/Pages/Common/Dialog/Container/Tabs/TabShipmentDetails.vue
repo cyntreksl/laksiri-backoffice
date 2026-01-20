@@ -1,7 +1,7 @@
 <script setup>
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import {ref, watchEffect} from "vue";
+import {ref, watchEffect, watch} from "vue";
 import {router, useForm} from "@inertiajs/vue3";
 import {push} from "notivue";
 import Button from "primevue/button";
@@ -111,6 +111,29 @@ const form = useForm({
     loading_ended_at: props.container.loading_ended_at,
     loading_started_at: props.container.loading_started_at,
     shipment_weight: props.container.shipment_weight
+});
+
+// Watch for is_reached checkbox changes and auto-update status
+watch(() => form.is_reached, (newValue) => {
+    if (newValue) {
+        form.status = 'REACHED DESTINATION';
+        if (!form.reached_date) {
+            form.reached_date = new Date();
+        }
+    }
+});
+
+// Watch for status changes and sync with is_reached checkbox
+watch(() => form.status, (newValue) => {
+    if (newValue === 'REACHED DESTINATION' && !form.is_reached) {
+        form.is_reached = true;
+        if (!form.reached_date) {
+            form.reached_date = new Date();
+        }
+    } else if (newValue && newValue !== 'REACHED DESTINATION' && form.is_reached) {
+        // If status is manually changed to something else, uncheck is_reached
+        form.is_reached = false;
+    }
 });
 
 const handleUpdateContainer = () => {
