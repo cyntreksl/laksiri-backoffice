@@ -15,10 +15,13 @@ class TokenResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // Get the latest queue log for this token
-        $latestQueueLog = $this->queueLogs()->latest('created_at')->first();
+        // Get the latest queue log from eager-loaded collection to avoid N+1 queries
+        $latestQueueLog = $this->queueLogs->sortByDesc('created_at')->first();
         $latestQueueType = $latestQueueLog 
-            ? ucwords(strtolower(str_replace('_', ' ', $latestQueueLog->queue_type)))
+            ? [
+                'type' => \Illuminate\Support\Str::headline($latestQueueLog->queue_type),
+                'created_at' => $latestQueueLog->created_at->format('Y-m-d H:i:s'),
+            ]
             : null;
 
         return [

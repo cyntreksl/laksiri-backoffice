@@ -289,8 +289,8 @@ const canCancelToken = (token) => {
                     <Column field="latest_queue_type" header="Latest Status">
                         <template #body="slotProps">
                             <div v-if="slotProps.data.latest_queue_type" class="text-gray-700">
-                                <div class="font-semibold">{{ slotProps.data.latest_queue_type }}</div>
-                                <div class="text-sm text-gray-500">{{ slotProps.data.created_at }}</div>
+                                <div class="font-semibold">{{ slotProps.data.latest_queue_type.type }}</div>
+                                <div class="text-sm text-gray-500">{{ slotProps.data.latest_queue_type.created_at }}</div>
                             </div>
                             <div v-else class="text-gray-400 italic">
                                 No queue assigned
