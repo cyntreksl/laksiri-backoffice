@@ -31,7 +31,6 @@ class GateControlController extends Controller
         return Inertia::render('GateControl/InboundShipments', [
             'cargoTypes' => CargoType::cases(),
             'containerTypes' => ContainerType::cases(),
-            'containers' => $this->containerRepository->getLoadedContainers(),
             'containerStatus' => $containerStatuses,
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
@@ -68,7 +67,6 @@ class GateControlController extends Controller
         return Inertia::render('GateControl/OutboundShipments', [
             'cargoTypes' => CargoType::cases(),
             'containerTypes' => ContainerType::cases(),
-            'containers' => $this->containerRepository->getLoadedContainers(),
             'containerStatus' => $containerStatuses,
             'seaContainerOptions' => $seaContainerOptions,
             'airContainerOptions' => $airContainerOptions,
