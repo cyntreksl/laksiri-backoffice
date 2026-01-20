@@ -157,27 +157,33 @@ const fetchSummaryStats = async () => {
     }
 };
 
-const fetchHBLs = async (page = 1, search = "", sortField = 'appointment_date', sortOrder = 0) => {
+const fetchHBLs = async (page = 1, search = "", sortField = null, sortOrder = null) => {
     loading.value = true;
     try {
-        const response = await axios.get('/call-center/appointments-data', {
-            params: {
-                page,
-                per_page: perPage.value,
-                search,
-                warehouse: filters.value.warehouse.value || "",
-                deliveryType: filters.value.hbl_type.value || "",
-                cargoMode: filters.value.cargo_type.value || "",
-                isHold: filters.value.is_hold.value || false,
-                sort_field: sortField,
-                sort_order: sortOrder === 1 ? "asc" : "desc",
-                createdBy: filters.value.user.value || "",
-                paymentStatus: filters.value.payments.value || [],
-                fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
-                toDate: moment(toDate.value).format("YYYY-MM-DD"),
-                agent: filters.value.agent.value || "",
-            }
-        });
+        const params = {
+            page,
+            per_page: perPage.value,
+            search,
+            warehouse: filters.value.warehouse.value || "",
+            deliveryType: filters.value.hbl_type.value || "",
+            cargoMode: filters.value.cargo_type.value || "",
+            isHold: filters.value.is_hold.value || false,
+            createdBy: filters.value.user.value || "",
+            paymentStatus: filters.value.payments.value || [],
+            fromDate: moment(fromDate.value).format("YYYY-MM-DD"),
+            toDate: moment(toDate.value).format("YYYY-MM-DD"),
+            agent: filters.value.agent.value || "",
+        };
+
+        // Only add sort parameters if they are provided
+        if (sortField) {
+            params.sort_field = sortField;
+            params.sort_order = sortOrder === 1 ? "asc" : "desc";
+            console.log('Sorting by:', sortField, sortOrder === 1 ? "asc" : "desc");
+        }
+
+        console.log('Fetching with params:', params);
+        const response = await axios.get('/call-center/appointments-data', { params });
 
         // Map CallFlag data to HBL-like structure for display
         const appointmentData = response.data.data.map(callFlag => ({
@@ -277,7 +283,10 @@ const onPageChange = (event) => {
 };
 
 const onSort = (event) => {
-    fetchHBLs(currentPage.value, filters.value.global.value, event.sortField, event.sortOrder);
+    console.log('Sort event:', event); // Debug log
+    const sortField = event.sortField;
+    const sortOrder = event.sortOrder; // 1 for asc, -1 for desc, 0 for no sort
+    fetchHBLs(currentPage.value, filters.value.global.value, sortField, sortOrder);
 };
 
 onMounted(() => {
