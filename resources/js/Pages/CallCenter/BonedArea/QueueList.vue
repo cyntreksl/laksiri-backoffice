@@ -40,7 +40,7 @@ const selectedToken = ref([]);
 
 const filteredPackageQueue = computed(() => {
     return props.packageQueue.filter(q => {
-        return q.is_released == false
+        return !q.left_at && q.is_released == false
     });
 })
 

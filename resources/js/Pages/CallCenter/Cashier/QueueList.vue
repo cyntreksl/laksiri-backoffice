@@ -31,7 +31,7 @@ const filteredCashierQueue = computed(() => {
         return [];
     }
     return props.cashierQueue.filter(q => {
-        return q.is_verified === true && q.is_paid === false
+        return !q.left_at && q.is_verified === true && q.is_paid === false
     });
 })
 </script>

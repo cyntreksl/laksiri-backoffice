@@ -27,7 +27,7 @@ const layout = ref('list');
 const options = ref(['list', 'grid']);
 
 const filteredVerificationQueue = computed(() => {
-    return props.verificationQueue.filter(q => q.is_verified === false);
+    return props.verificationQueue.filter(q => !q.left_at && q.is_verified === false);
 })
 </script>
 
