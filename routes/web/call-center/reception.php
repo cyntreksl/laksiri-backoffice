@@ -10,13 +10,18 @@ Route::get('/reception/hbl-list', [HBLController::class, 'index'])
 Route::get('/reception/queue/list', [ReceptionController::class, 'getReceptionQueueList'])
     ->name('reception.queue.list');
 
+Route::get('/reception/show/verified', [ReceptionController::class, 'showReceptionVerifiedList'])
+    ->name('reception.show.verified');
+
+Route::get('/reception/verified/list', [ReceptionController::class, 'getReceptionVerifiedList']);
+
+Route::get('/reception/appointments', [ReceptionController::class, 'appointmentList'])
+    ->name('reception.appointments');
+
+Route::get('/reception/appointments-data', [ReceptionController::class, 'getAppointmentsData']);
+
 Route::get('/reception/{customer_queue}', [ReceptionController::class, 'create'])
     ->name('reception.create');
 
 Route::post('/reception', [ReceptionController::class, 'store'])
     ->name('reception.store');
-
-Route::get('/reception/show/verified', [ReceptionController::class, 'showReceptionVerifiedList'])
-    ->name('reception.show.verified');
-
-Route::get('/reception/verified/list', [ReceptionController::class, 'getReceptionVerifiedList']);
