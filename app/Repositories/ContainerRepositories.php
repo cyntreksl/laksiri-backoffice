@@ -592,7 +592,8 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         $query = Container::query()->whereIn('status', [
             ContainerStatus::REACHED_DESTINATION->value,
             //            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
-        ])->withoutGlobalScope(BranchScope::class);
+        ])->withoutGlobalScope(BranchScope::class)
+        ->with(['branch:id,name', 'latestDetainRecord']);
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
@@ -656,7 +657,8 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
             //            ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
             ContainerStatus::UNLOADED->value,
             //            ContainerStatus::DEPARTED_PRIMARY_WAREHOUSE->value,
-        ])->withoutGlobalScope(BranchScope::class);
+        ])->withoutGlobalScope(BranchScope::class)
+        ->with(['branch:id,name', 'latestDetainRecord']);
 
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
