@@ -489,6 +489,17 @@ const setMenu = (menu) => {
                     }
                 );
             }
+
+            if (can("customer-queue.issue token")) {
+                receptionMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "Appointments",
+                        route: "call-center.reception.appointments",
+                    }
+                );
+            }
             childMenuList.splice(
                 0,
                 childMenuList.length,
