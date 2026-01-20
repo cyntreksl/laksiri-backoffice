@@ -254,8 +254,7 @@ class HBLController extends Controller
         $this->authorize('hbls.index');
 
         $query = CallFlag::with(['hbl', 'causer'])
-            ->whereNotNull('appointment_date')
-            ->orderBy('appointment_date', 'asc');
+            ->whereNotNull('appointment_date');
 
         // Apply filters
         if ($request->filled('search')) {
@@ -315,11 +314,21 @@ class HBLController extends Controller
             $sortField = $request->sort_field;
             $sortOrder = $request->sort_order === 'asc' ? 'asc' : 'desc';
 
+            // Handle sorting for CallFlag table fields
             if ($sortField === 'appointment_date') {
                 $query->orderBy('appointment_date', $sortOrder);
             } elseif ($sortField === 'created_at') {
                 $query->orderBy('created_at', $sortOrder);
             }
+            // Handle sorting for HBL relationship fields
+            elseif (in_array($sortField, ['hbl_number', 'cargo_type', 'hbl_name', 'consignee_name'])) {
+                $query->join('hbl', 'call_flags.hbl_id', '=', 'hbl.id')
+                    ->orderBy('hbl.' . $sortField, $sortOrder)
+                    ->select('call_flags.*'); // Ensure we only select call_flags columns
+            }
+        } else {
+            // Default sorting by appointment_date if no sort specified
+            $query->orderBy('appointment_date', 'asc');
         }
 
         // Pagination
