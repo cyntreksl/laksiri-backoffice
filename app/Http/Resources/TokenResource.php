@@ -15,6 +15,12 @@ class TokenResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // Get the latest queue log for this token
+        $latestQueueLog = $this->queueLogs()->latest('created_at')->first();
+        $latestQueueType = $latestQueueLog 
+            ? ucwords(strtolower(str_replace('_', ' ', $latestQueueLog->queue_type)))
+            : null;
+
         return [
             'id' => $this->id,
             'hbl' => $this->when($this->hbl_id, function () {
@@ -37,6 +43,7 @@ class TokenResource extends JsonResource
             'status' => $this->status->value,
             'status_label' => $this->status->getLabel(),
             'status_color' => $this->status->getColor(),
+            'latest_queue_type' => $latestQueueType,
         ];
     }
 }
