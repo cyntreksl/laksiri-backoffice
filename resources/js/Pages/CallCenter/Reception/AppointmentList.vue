@@ -784,18 +784,12 @@ const exportCSV = () => {
                                 <span v-else-if="slotProps.data.hbl">{{ slotProps.data.hbl.cargo_type }}</span>
                                 <span v-else class="text-gray-400">N/A</span>
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
                         </Column>
 
                         <Column field="hbl.hbl_type" header="HBL Type" sortable>
                             <template #body="slotProps">
                                 <Tag v-if="slotProps.data.hbl" :severity="resolveHBLType(slotProps.data.hbl)" :value="slotProps.data.hbl.hbl_type"></Tag>
                                 <span v-else class="text-gray-400">N/A</span>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
@@ -850,17 +844,17 @@ const exportCSV = () => {
                                      class="text-sm whitespace-nowrap"
                                      severity="danger"
                                      value="Cancelled" />
-                                <Tag v-else-if="slotProps.data.hbl?.tokens"
+                                <Tag v-else-if="slotProps.data.hbl?.tokens && slotProps.data.hbl.tokens.queue_type"
                                      :value="slotProps.data.hbl.tokens.queue_type"
                                      class="text-sm whitespace-nowrap"
                                      severity="info" />
-                                <span v-else class="text-gray-400">-</span>
+                                <span v-else>-</span>
                             </template>
                         </Column>
 
                         <Column field="hbl.tokens.token" header="Token Number">
                             <template #body="slotProps">
-                                <div v-if="slotProps.data.hbl?.tokens" class="flex flex-col items-center gap-1">
+                                <div v-if="slotProps.data.hbl?.tokens && slotProps.data.hbl.tokens.token" class="flex flex-col items-center gap-1">
                                     <span
                                         :class="slotProps.data.hbl.tokens.is_cancelled
                                             ? 'inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-red-500 rounded-full line-through'
@@ -873,14 +867,14 @@ const exportCSV = () => {
                                          size="small"
                                          value="Cancelled" />
                                 </div>
-                                <span v-else class="text-gray-400">-</span>
+                                <span v-else>-</span>
                             </template>
                         </Column>
 
                         <Column field="hbl.finance_status" header="Finance Status">
                             <template #body="slotProps">
                                 <Tag v-if="slotProps.data.hbl?.finance_status" :value="slotProps.data.hbl.finance_status" class="text-sm" severity="success"></Tag>
-                                <span v-else class="text-gray-400">-</span>
+                                <span v-else>-</span>
                             </template>
                         </Column>
 

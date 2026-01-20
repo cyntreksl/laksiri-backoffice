@@ -5,6 +5,7 @@ namespace App\Http\Controllers\CallCenter;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CallCenter\QueueRepositoryInterface;
 use App\Interfaces\CallCenter\ReceptionRepositoryInterface;
+use App\Models\CallFlag;
 use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\ReceptionVerification;
@@ -107,9 +108,8 @@ class ReceptionController extends Controller
 
     public function getAppointmentsData(Request $request)
     {
-        $query = \App\Models\CallFlag::with(['hbl.tokens', 'causer'])
-            ->whereNotNull('appointment_date')
-            ->orderBy('appointment_date', 'asc');
+        $query = CallFlag::with(['hbl.tokens', 'causer'])
+            ->whereNotNull('appointment_date');
 
         // Apply filters
         if ($request->filled('search')) {
@@ -168,15 +168,24 @@ class ReceptionController extends Controller
         }
 
         // Sorting
-        if ($request->filled('sort_field') && $request->filled('sort_order')) {
-            $sortField = $request->sort_field;
-            $sortOrder = $request->sort_order === 'asc' ? 'asc' : 'desc';
+        $sortField = $request->get('sort_field', 'appointment_date');
+        $sortOrder = $request->get('sort_order', 'asc') === 'asc' ? 'asc' : 'desc';
 
-            if ($sortField === 'appointment_date') {
-                $query->orderBy('appointment_date', $sortOrder);
-            } elseif ($sortField === 'created_at') {
-                $query->orderBy('created_at', $sortOrder);
-            }
+        // Handle direct CallFlag fields
+        if ($sortField === 'appointment_date' || $sortField === 'created_at') {
+            $query->orderBy($sortField, $sortOrder);
+        }
+        // Handle nested HBL fields using join
+        elseif (str_starts_with($sortField, 'hbl.')) {
+            $hblField = str_replace('hbl.', '', $sortField);
+
+            // Use leftJoin to sort by HBL fields
+            $query->leftJoin('hbl', 'call_flags.hbl_id', '=', 'hbl.id')
+                ->select('call_flags.*')
+                ->orderBy('hbl.' . $hblField, $sortOrder);
+        } else {
+            // Default sorting
+            $query->orderBy('appointment_date', 'asc');
         }
 
         // Pagination
