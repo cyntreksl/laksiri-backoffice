@@ -457,10 +457,11 @@ const closeIssueDetailModal = () => {
             </template>
         </div>
 
-        <div class="lg:col-span-3 space-y-4">
+        <div class="lg:col-span-6 space-y-4">
+            <!-- Shipper Details Card -->
             <PostSkeleton v-if="isLoading"/>
 
-            <Card v-else class="!border-2 !border-blue-200 !shadow-lg overflow-hidden">
+            <Card v-else class="!border-2 !border-blue-200 overflow-hidden">
                 <template #title>
                     <div class="flex items-center gap-2 pb-3 border-b-2 border-blue-100">
                         <div class="p-2 bg-blue-100 rounded-lg flex-shrink-0">
@@ -477,7 +478,7 @@ const closeIssueDetailModal = () => {
                                 :label="hbl?.hbl_name?.charAt(0)"
                                 class="!bg-blue-500 !text-white flex-shrink-0 !text-2xl !font-bold"
                                 size="xlarge"
-                                style="width: 45px; height: 45px"
+                                style="width: 65px; height: 65px"
                             />
                             <div class="flex-1 min-w-0">
                                 <p class="font-bold text-gray-900 text-lg mb-2 break-words leading-tight">
@@ -552,12 +553,11 @@ const closeIssueDetailModal = () => {
                     </div>
                 </template>
             </Card>
-        </div>
 
-        <div class="lg:col-span-3 space-y-4">
+            <!-- Consignee Details Card -->
             <PostSkeleton v-if="isLoading"/>
 
-            <Card v-else class="!border-2 !border-green-200 !shadow-lg overflow-hidden">
+            <Card v-else class="!border-2 !border-green-200 overflow-hidden">
                 <template #title>
                     <div class="flex items-center gap-2 pb-3 border-b-2 border-green-100">
                         <div class="p-2 bg-green-100 rounded-lg flex-shrink-0">
@@ -574,7 +574,7 @@ const closeIssueDetailModal = () => {
                                 :label="hbl?.consignee_name?.charAt(0)"
                                 class="!bg-green-500 !text-white flex-shrink-0 !text-2xl !font-bold"
                                 size="xlarge"
-                                style="width: 45px; height: 45px"
+                                style="width: 65px; height: 65px"
                             />
                             <div class="flex-1 min-w-0">
                                 <p class="font-bold text-gray-900 text-lg mb-2 break-words leading-tight">
