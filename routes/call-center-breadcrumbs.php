@@ -45,6 +45,12 @@ Breadcrumbs::for('call-center.reception.show.verified', function (BreadcrumbTrai
     $trail->push('Verified', route('call-center.reception.show.verified'));
 });
 
+Breadcrumbs::for('call-center.reception.appointments', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Reception');
+    $trail->push('Appointments', route('call-center.reception.appointments'));
+});
+
 // Verification
 Breadcrumbs::for('call-center.reception.queue.list', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

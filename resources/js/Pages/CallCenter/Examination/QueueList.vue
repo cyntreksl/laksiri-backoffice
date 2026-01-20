@@ -28,6 +28,9 @@ const props = defineProps({
 const layout = ref('list');
 const options = ref(['list', 'grid']);
 
+const filteredExaminationQueue = computed(() => {
+    return props.examinationQueue.filter(queue => !queue.left_at);
+});
 
 </script>
 
@@ -47,7 +50,7 @@ const options = ref(['list', 'grid']);
         </div>
 
 
-        <DataView :layout="layout" :value="props.examinationQueue" class="my-5">
+        <DataView :layout="layout" :value="filteredExaminationQueue" class="my-5">
             <template #header>
                 <div class="flex justify-between items-center">
                     <div class="text-lg font-medium">
