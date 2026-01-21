@@ -142,15 +142,15 @@ const menuModel = ref([
     {
         label: "Print Token",
         icon: "pi pi-fw pi-print",
-        url: () => selectedHBL.value?.hbl?.tokens?.id ? route("call-center.hbls.print-token", {token: selectedHBL.value.hbl.tokens.id}) : '#',
+        url: () => selectedHBL.value?.hbl?.tokens?.[0]?.id ? route("call-center.hbls.print-token", {token: selectedHBL.value.hbl.tokens[0].id}) : '#',
         target: "_blank",
-        visible: () => selectedHBL.value?.hbl?.tokens && !selectedHBL.value.hbl.tokens.is_cancelled && selectedHBL.value.hbl.tokens.id,
+        visible: () => selectedHBL.value?.hbl?.tokens?.[0] && !selectedHBL.value.hbl.tokens[0].is_cancelled && selectedHBL.value.hbl.tokens[0].id,
     },
     {
         label: "Download Token",
         icon: "pi pi-fw pi-download",
-        url: () => selectedHBL.value?.hbl?.tokens?.id ? route("call-center.hbls.download-token", {token: selectedHBL.value.hbl.tokens.id}) : '#',
-        visible: () => selectedHBL.value?.hbl?.tokens && !selectedHBL.value.hbl.tokens.is_cancelled && selectedHBL.value.hbl.tokens.id,
+        url: () => selectedHBL.value?.hbl?.tokens?.[0]?.id ? route("call-center.hbls.download-token", {token: selectedHBL.value.hbl.tokens[0].id}) : '#',
+        visible: () => selectedHBL.value?.hbl?.tokens?.[0] && !selectedHBL.value.hbl.tokens[0].is_cancelled && selectedHBL.value.hbl.tokens[0].id,
     },
     {
         label: "Download Baggage PDF",
@@ -840,12 +840,12 @@ const exportCSV = () => {
 
                         <Column field="hbl.tokens.queue_type" header="Queue Type">
                             <template #body="slotProps">
-                                <Tag v-if="slotProps.data.hbl?.tokens && slotProps.data.hbl.tokens.is_cancelled"
+                                <Tag v-if="slotProps.data.hbl?.tokens?.[0]?.is_cancelled"
                                      class="text-sm whitespace-nowrap"
                                      severity="danger"
                                      value="Cancelled" />
-                                <Tag v-else-if="slotProps.data.hbl?.tokens && slotProps.data.hbl.tokens.queue_type"
-                                     :value="slotProps.data.hbl.tokens.queue_type"
+                                <Tag v-else-if="slotProps.data.hbl?.tokens?.[0]?.customer_queue?.type"
+                                     :value="slotProps.data.hbl.tokens[0].customer_queue.type.replace(/_/g, ' ')"
                                      class="text-sm whitespace-nowrap"
                                      severity="info" />
                                 <span v-else>-</span>
@@ -854,14 +854,14 @@ const exportCSV = () => {
 
                         <Column field="hbl.tokens.token" header="Token Number">
                             <template #body="slotProps">
-                                <div v-if="slotProps.data.hbl?.tokens && slotProps.data.hbl.tokens.token" class="flex flex-col items-center gap-1">
+                                <div v-if="slotProps.data.hbl?.tokens?.[0]?.token" class="flex flex-col items-center gap-1">
                                     <span
-                                        :class="slotProps.data.hbl.tokens.is_cancelled
+                                        :class="slotProps.data.hbl.tokens[0].is_cancelled
                                             ? 'inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-red-500 rounded-full line-through'
                                             : 'inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-white bg-blue-500 rounded-full'">
-                                        {{ slotProps.data.hbl.tokens.token }}
+                                        {{ slotProps.data.hbl.tokens[0].token }}
                                     </span>
-                                    <Tag v-if="slotProps.data.hbl.tokens.is_cancelled"
+                                    <Tag v-if="slotProps.data.hbl.tokens[0].is_cancelled"
                                          class="text-xs"
                                          severity="danger"
                                          size="small"
@@ -871,12 +871,12 @@ const exportCSV = () => {
                             </template>
                         </Column>
 
-                        <Column field="hbl.finance_status" header="Finance Status">
-                            <template #body="slotProps">
-                                <Tag v-if="slotProps.data.hbl?.finance_status" :value="slotProps.data.hbl.finance_status" class="text-sm" severity="success"></Tag>
-                                <span v-else>-</span>
-                            </template>
-                        </Column>
+<!--                        <Column field="hbl.finance_status" header="Finance Status">-->
+<!--                            <template #body="slotProps">-->
+<!--                                <Tag v-if="slotProps.data.hbl?.finance_status" :value="slotProps.data.hbl.finance_status" class="text-sm" severity="success"></Tag>-->
+<!--                                <span v-else>-</span>-->
+<!--                            </template>-->
+<!--                        </Column>-->
 
 
 
