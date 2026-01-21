@@ -15,6 +15,7 @@ class RolePermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create roles with hierarchy (lower number = higher privilege)
+        // Only create roles if they don't exist - prevents renaming during deployments
         $rolesWithHierarchy = [
             'super-admin' => 0.00,  // optional top role if used
             'admin' => 1.00,
@@ -32,13 +33,14 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($rolesWithHierarchy as $name => $hierarchy) {
-            Role::updateOrCreate(
+            // Only create if role doesn't exist - prevents modification during deployments
+            Role::firstOrCreate(
                 ['name' => $name, 'guard_name' => 'web'],
                 ['hierarchy' => $hierarchy]
             );
         }
 
-        $this->command->info('Default Roles added with hierarchy.');
+        $this->command->info('Default Roles added with hierarchy (existing roles preserved).');
 
         // $this->assignPermissions();
 
