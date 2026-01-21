@@ -574,6 +574,24 @@ const approveHBLs = () => {
                             </template>
                         </Column>
 
+                        <Column field="warehouse" header="Warehouse" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse.toUpperCase()"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
+                            </template>
+                        </Column>
+
                         <Column field="hbl_name" header="HBL Name">
                             <template #body="slotProps">
                                 <a :href="`hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
@@ -590,15 +608,6 @@ const approveHBLs = () => {
                             </template>
                         </Column>
 
-                        <Column field="warehouse" header="Warehouse" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse.toUpperCase()"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
-
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.hbl_name }}</div>
@@ -609,33 +618,40 @@ const approveHBLs = () => {
 
                         <Column field="consignee_address" header="Consignee Address"></Column>
 
-                        <Column field="hbl_type" header="HBL Type" sortable>
-                            <template #body="slotProps">
-                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
-                        </Column>
-
                         <Column field="status" header="Status" hidden></Column>
 
-                        <Column field="grand_total" header="Grand Total"></Column>
-
-                        <Column field="paid_amount" header="Paid Amount"></Column>
-
-                        <Column field="payment_status" header="Payment Status">
+                        <Column field="grand_total" header="Grand Total">
                             <template #body="slotProps">
-                                <Tag :icon="resolvePaymentStatus(slotProps.data.payment_status).icon" :severity="resolvePaymentStatus(slotProps.data.payment_status).color" :value="slotProps.data.payment_status" class="text-sm"></Tag>
+                                {{ Number(slotProps.data.grand_total || 0).toFixed(2) }}
+                            </template>
+                        </Column>
+
+                        <Column field="paid_amount" header="Paid Amount">
+                            <template #body="slotProps">
+                                {{ Number(slotProps.data.paid_amount || 0).toFixed(2) }}
+                            </template>
+                        </Column>
+
+                        <Column field="is_departure_charges_paid" header="Departure Charges">
+                            <template #body="slotProps">
+                                <Tag v-if="slotProps.data.is_departure_charges_paid" class="text-sm" icon="pi pi-check mr-2" severity="success" value="Paid"></Tag>
+                                <Tag v-else class="text-sm" icon="pi pi-times mr-2" severity="danger" value="Not Paid"></Tag>
+                            </template>
+                        </Column>
+
+                        <Column field="is_destination_charges_paid" header="Destination Charges">
+                            <template #body="slotProps">
+                                <Tag v-if="slotProps.data.is_destination_charges_paid" class="text-sm" icon="pi pi-check mr-2" severity="success" value="Paid"></Tag>
+                                <Tag v-else class="text-sm" icon="pi pi-times mr-2" severity="danger" value="Not Paid"></Tag>
                             </template>
                         </Column>
 
 
-                        <Column field="is_short_loaded" header="Loading Status">
-                            <template #body="slotProps">
-                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`"></Tag>
-                            </template>
-                        </Column>
+<!--                        <Column field="is_short_loaded" header="Loading Status">-->
+<!--                            <template #body="slotProps">-->
+<!--                                <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`"></Tag>-->
+<!--                            </template>-->
+<!--                        </Column>-->
 
                         <Column field="hbl_number" header="HBL Number" hidden sortable></Column>
 

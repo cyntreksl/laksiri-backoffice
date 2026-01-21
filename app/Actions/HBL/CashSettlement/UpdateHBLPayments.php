@@ -105,6 +105,10 @@ class UpdateHBLPayments
 
     protected function updateHblPaidAmount(HBL $hbl, float $paidAmount): void
     {
-        $hbl->update(['paid_amount' => $paidAmount]);
+        $hbl->update([
+            'paid_amount' => $paidAmount,
+            'is_departure_charges_paid' => $hbl->hblPayment()->latest()->first()->is_departure_charges_paid ?? false,
+            'is_destination_charges_paid' => $hbl->hblPayment()->latest()->first()->is_destination_charges_paid ?? false,
+        ]);
     }
 }

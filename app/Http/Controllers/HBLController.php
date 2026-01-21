@@ -150,8 +150,13 @@ class HBLController extends Controller
 
     public function show($hbl_id)
     {
+        $hbl = GetHBLByIdWithPackages::run($hbl_id);
+        
         return response()->json([
-            'hbl' => GetHBLByIdWithPackages::run($hbl_id),
+            'hbl' => array_merge($hbl->toArray(), [
+                'finance_status' => $hbl->is_finance_release_approved ? 'Approved' : 'Not Approved',
+                'finance_approval_pending' => ! $hbl->is_finance_release_approved && $hbl->system_status > 4.2,
+            ]),
         ]);
     }
 

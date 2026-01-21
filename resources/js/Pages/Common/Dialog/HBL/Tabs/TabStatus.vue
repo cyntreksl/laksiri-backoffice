@@ -168,6 +168,10 @@ const hblStatusColor = (status) => {
             return 'bg-cyan-600';
         case 'Container Reached Destination ':
             return 'bg-emerald-600';
+        // case 'Approved by Accountant':
+        //     return 'bg-green-500';
+        // case 'Approve Removed by Accountant':
+        //     return 'bg-orange-500';
     }
 };
 
@@ -639,26 +643,26 @@ onMounted(() => {
                     <tbody>
                     <tr v-for="(activity, index) in logs" :key="activity.id || index"
                         class="group border border-transparent border-b-slate-200 dark:border-b-navy-500 hover:bg-slate-50 dark:hover:bg-navy-600/50 transition-colors duration-200">
-                        
+
                         <!-- Activity Description -->
                         <td class="whitespace-nowrap rounded-l-lg px-4 py-4 sm:px-5">
                             <div class="flex items-center space-x-3">
                                 <!-- Activity Icon -->
                                 <div class="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                    <svg v-if="activity.description.toLowerCase().includes('created')" 
+                                    <svg v-if="activity.description.toLowerCase().includes('created')"
                                          class="icon icon-tabler icons-tabler-outline icon-tabler-plus" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                         <path d="M12 5l0 14"/>
                                         <path d="M5 12l14 0"/>
                                     </svg>
-                                    <svg v-else-if="activity.description.toLowerCase().includes('updated')" 
+                                    <svg v-else-if="activity.description.toLowerCase().includes('updated')"
                                          class="icon icon-tabler icons-tabler-outline icon-tabler-edit" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                         <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"/>
                                         <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"/>
                                         <path d="M16 5l3 3"/>
                                     </svg>
-                                    <svg v-else-if="activity.description.toLowerCase().includes('deleted')" 
+                                    <svg v-else-if="activity.description.toLowerCase().includes('deleted')"
                                          class="icon icon-tabler icons-tabler-outline icon-tabler-trash text-red-500" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                         <path d="M4 7l16 0"/>
@@ -667,13 +671,13 @@ onMounted(() => {
                                         <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
                                         <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
                                     </svg>
-                                    <svg v-else 
+                                    <svg v-else
                                          class="icon icon-tabler icons-tabler-outline icon-tabler-activity" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M0 0h24v24H0z" fill="none" stroke="none"/>
                                         <path d="M3 12h4l3 8l4 -16l3 8h4"/>
                                     </svg>
                                 </div>
-                                
+
                                 <!-- Activity Text -->
                                 <div>
                                     <p class="font-medium text-slate-800 dark:text-navy-100 uppercase">
@@ -682,7 +686,7 @@ onMounted(() => {
                                 </div>
                             </div>
                         </td>
-                        
+
                         <!-- Date Time -->
                         <td class="whitespace-nowrap px-4 py-4 sm:px-5">
                             <div class="flex items-center space-x-2">
@@ -701,7 +705,7 @@ onMounted(() => {
                                 </div>
                             </div>
                         </td>
-                        
+
                         <!-- Branch -->
                         <td class="whitespace-nowrap px-4 py-4 sm:px-5">
                             <div class="flex items-center space-x-2">
@@ -721,7 +725,7 @@ onMounted(() => {
                                 </span>
                             </div>
                         </td>
-                        
+
                         <!-- User -->
                         <td class="whitespace-nowrap px-4 py-4 sm:px-5">
                             <div class="flex items-center space-x-2">
@@ -742,7 +746,7 @@ onMounted(() => {
                                 </div>
                             </div>
                         </td>
-                        
+
                         <!-- Inspect -->
                         <td class="whitespace-nowrap px-4 py-4 rounded-r-lg sm:px-5">
                             <div class="flex items-center justify-center">
