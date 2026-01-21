@@ -94,7 +94,7 @@ const menuModel = ref([
         label: "Issue Token",
         icon: "pi pi-fw pi-tag",
         command: () => confirmIssueToken(selectedHBL),
-        visible: () => selectedHBL.value?.hbl && !selectedHBL.value?.hbl?.tokens && usePage().props.user.permissions.includes("hbls.issue token"),
+        visible: () =>  selectedHBL.value?.hbl,
     },
     {
         label: "Call Flag",

@@ -39,17 +39,9 @@ const fetchTokens = async (page = 1, search = "", sortField = 'created_at', sort
             }
         });
 
-        // Get today's date in YYYY-MM-DD format
-        const today = new Date().toISOString().split('T')[0];
-
-        // Filter tokens where `created_at` matches today's date
-        tokens.value = response.data.data.filter(token => {
-            const tokenDate = new Date(token.created_at).toISOString().split('T')[0];
-            return tokenDate === today;
-        });
-
-        totalRecords.value = tokens.value.length;
-        currentPage.value = 1;
+        tokens.value = response.data.data;
+        totalRecords.value = response.data.meta.total;
+        currentPage.value = response.data.meta.current_page;
     } catch (error) {
         console.error("Error fetching tokens:", error);
     } finally {

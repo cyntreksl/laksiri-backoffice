@@ -11,6 +11,7 @@ import DataView from "primevue/dataview";
 import Button from "primevue/button";
 import SelectButton from "primevue/selectbutton";
 import Tag from "primevue/tag";
+import {computed} from "vue";
 
 const props = defineProps({
     examinationQueue: {
