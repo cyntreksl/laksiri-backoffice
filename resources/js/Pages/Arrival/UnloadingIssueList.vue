@@ -405,7 +405,7 @@ const deleteUnloadingIssue = (id) => {
                                         label="Create New Issue"
                                         severity="success"
                                         size="small"
-                                        @click="goToCreatePage"
+                                        @click="router.visit(route('arrival.unloading-issues.create'))"
                                     />
 
                                     <Button
