@@ -213,7 +213,7 @@ const hblChartOptions = computed(() => {
     <AppLayout title="Home">
         <template #header>Dashboard</template>
 
-        <div v-if="usePage().props.auth.user.roles[0].name !== 'customer'" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-4 lg:gap-5">
+        <div v-if="!usePage().props.user?.roles?.includes('customer')" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-4 lg:gap-5">
             <DashboardCard :count="totalHBLs" icon="box" icon-color="info" title="Total HBL"/>
             <DashboardCard :count="loadedShipments" icon="truck-ramp-box" icon-color="error" title="Loaded Shipment"/>
             <DashboardCard :count="totalContainers" icon="truck-moving" icon-color="primary" title="Total Containers"/>
@@ -221,7 +221,7 @@ const hblChartOptions = computed(() => {
         </div>
 
 
-        <div v-if="usePage().props.auth.user.roles[0].name !== 'customer'" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-2 lg:gap-6 mt-10">
+        <div v-if="!usePage().props.user?.roles?.includes('customer')" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-2 lg:gap-6 mt-10">
             <div class="card">
                 <div class="my-3 flex items-center justify-between px-4">
                     <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100">

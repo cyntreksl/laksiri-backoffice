@@ -130,7 +130,7 @@ const setBranch = (branch) => {
                             </div>
 
                             <div class="flex flex-col pt-2">
-                                <template v-if="usePage().props.auth.user.roles[0].name !== 'customer'">
+                                <template v-if="!usePage().props.user?.roles?.includes('customer')">
                                     <a
                                         v-if="! $page.props.user.roles.includes('viewer')"
                                         :href="
