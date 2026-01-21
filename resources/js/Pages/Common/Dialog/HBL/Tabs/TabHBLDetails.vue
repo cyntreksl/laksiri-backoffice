@@ -474,194 +474,83 @@ const closeIssueDetailModal = () => {
             </template>
         </div>
 
-        <div class="lg:col-span-6 space-y-4">
-            <!-- Shipper Details Card -->
+        <div class="col-span-12 lg:col-span-3 md:col-span-6 sm:col-span-12 space-y-5">
             <PostSkeleton v-if="isLoading"/>
 
-            <Card v-else class="!border-2 !border-blue-200 overflow-hidden">
+            <Card v-else class="border">
                 <template #title>
-                    <div class="flex items-center gap-2 pb-3 border-b-2 border-blue-100">
-                        <div class="p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                            <i class="ti ti-user-pentagon text-blue-600 text-xl"></i>
-                        </div>
-                        <span class="text-lg font-semibold text-gray-800">Shipper</span>
+                    <div class="flex items-center space-x-2">
+                        <i class="ti ti-user-pentagon"></i>
+                        <span>Shipper</span>
                     </div>
                 </template>
                 <template #content>
-                    <!-- Avatar and Name Section -->
-                    <div class="mb-5">
-                        <div class="flex items-center gap-4 mb-4">
-                            <Avatar
-                                :label="hbl?.hbl_name?.charAt(0)"
-                                class="!bg-blue-500 !text-white flex-shrink-0 !text-2xl !font-bold"
-                                size="xlarge"
-                                style="width: 65px; height: 65px"
-                            />
-                            <div class="flex-1 min-w-0">
-                                <p class="font-bold text-gray-900 text-lg mb-2 break-words leading-tight">
-                                    {{ hbl?.hbl_name }}
-                                </p>
-                            </div>
-                        </div>
+                    <div class="flex items-start gap-4">
+                        <Avatar
+                            :label="hbl?.hbl_name?.charAt(0)"
+                            class="!bg-emerald-200 flex-shrink-0"
+                            size="xlarge"
+                            style="width: 64px; height: 64px"
+                        />
 
-                        <!-- Contact Info -->
-                        <div class="space-y-2 pl-1">
-                            <div class="flex items-center gap-2 text-gray-700">
-                                <i class="pi pi-phone text-blue-600 flex-shrink-0"></i>
-                                <p class="text-sm font-medium break-all">{{ hbl?.contact_number || '-' }}</p>
-                            </div>
-                            <div class="flex items-start gap-2 text-gray-700">
-                                <i class="pi pi-envelope text-blue-600 flex-shrink-0 mt-0.5"></i>
-                                <p class="text-sm break-all leading-relaxed">{{ hbl?.email || '-' }}</p>
-                            </div>
+                        <div class="flex flex-col min-w-0 flex-grow">
+                            <p class="font-medium text-gray-900 truncate">{{ hbl?.hbl_name }}</p>
+                            <p class="text-gray-500 text-sm truncate">{{ hbl?.contact_number }}</p>
+                            <p class="text-gray-500 text-sm break-all">{{ hbl?.email }}</p>
                         </div>
                     </div>
 
-                    <!-- Details Section -->
-                    <div class="space-y-3">
-                        <!-- Address -->
-                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                            <div class="flex items-start gap-2 mb-1">
-                                <i class="pi pi-map-marker text-blue-600 flex-shrink-0 mt-0.5"></i>
-                                <p class="text-xs font-bold text-blue-700 uppercase tracking-wide">Address</p>
-                            </div>
-                            <p class="text-sm text-gray-800 leading-relaxed break-words pl-6">
-                                {{ hbl?.address || '-' }}
-                            </p>
-                        </div>
+                    <div class="my-5 space-y-3">
+                        <InfoDisplay :value="hbl?.address" label="Address"/>
 
-                        <!-- Additional Contact -->
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <p class="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Additional Contact</p>
-                            <p class="text-sm text-gray-900 font-medium break-all">
-                                {{ hbl?.additional_mobile_number || '-' }}
-                            </p>
-                        </div>
+                        <InfoDisplay :value="hbl?.additional_mobile_number" label="Additional Contact Number"/>
 
-                        <!-- WhatsApp -->
-                        <div class="p-3 bg-green-50 rounded-lg border border-green-200">
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <i class="pi pi-whatsapp text-green-600 flex-shrink-0"></i>
-                                <p class="text-xs font-bold text-green-700 uppercase tracking-wide">WhatsApp</p>
-                            </div>
-                            <p class="text-sm text-gray-900 font-medium break-all">
-                                {{ hbl?.whatsapp_number || '-' }}
-                            </p>
-                        </div>
+                        <InfoDisplay :value="hbl?.whatsapp_number" label="Whatsapp Number"/>
 
-                        <!-- IQ Number -->
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <p class="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">IQ Number</p>
-                            <p class="text-sm text-gray-900 font-medium break-all">
-                                {{ hbl?.iq_number || '-' }}
-                            </p>
-                        </div>
+                        <InfoDisplay :value="hbl?.iq_number" label="IQ Number"/>
 
-                        <!-- Passport -->
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <i class="pi pi-id-card text-blue-600 flex-shrink-0"></i>
-                                <p class="text-xs font-bold text-gray-600 uppercase tracking-wide">Passport Number</p>
-                            </div>
-                            <p class="text-sm text-gray-900 font-medium break-all">
-                                {{ hbl?.nic || '-' }}
-                            </p>
-                        </div>
+                        <InfoDisplay :value="hbl?.nic" label="Passport Number"/>
                     </div>
                 </template>
             </Card>
+        </div>
 
-            <!-- Consignee Details Card -->
+        <div class="col-span-12 lg:col-span-3 md:col-span-6 sm:col-span-12 space-y-5">
             <PostSkeleton v-if="isLoading"/>
 
-            <Card v-else class="!border-2 !border-green-200 overflow-hidden">
+            <Card v-else class="border">
                 <template #title>
-                    <div class="flex items-center gap-2 pb-3 border-b-2 border-green-100">
-                        <div class="p-2 bg-green-100 rounded-lg flex-shrink-0">
-                            <i class="ti ti-user-check text-green-600 text-xl"></i>
-                        </div>
-                        <span class="text-lg font-semibold text-gray-800">Consignee</span>
+                    <div class="flex items-center space-x-2">
+                        <i class="ti ti-user-pentagon"></i>
+                        <span>Consignee</span>
                     </div>
                 </template>
                 <template #content>
-                    <!-- Avatar and Name Section -->
-                    <div class="mb-5">
-                        <div class="flex items-center gap-4 mb-4">
-                            <Avatar
-                                :label="hbl?.consignee_name?.charAt(0)"
-                                class="!bg-green-500 !text-white flex-shrink-0 !text-2xl !font-bold"
-                                size="xlarge"
-                                style="width: 65px; height: 65px"
-                            />
-                            <div class="flex-1 min-w-0">
-                                <p class="font-bold text-gray-900 text-lg mb-2 break-words leading-tight">
-                                    {{ hbl?.consignee_name }}
-                                </p>
-                            </div>
-                        </div>
+                    <div class="flex items-start gap-4">
+                        <Avatar
+                            :label="hbl?.consignee_name.charAt(0)"
+                            class="!bg-emerald-200 flex-shrink-0"
+                            size="xlarge"
+                            style="width: 64px; height: 64px"
+                        />
 
-                        <!-- Contact Info -->
-                        <div class="space-y-2 pl-1">
-                            <div class="flex items-center gap-2 text-gray-700">
-                                <i class="pi pi-phone text-green-600 flex-shrink-0"></i>
-                                <p class="text-sm font-medium break-all">{{ hbl?.consignee_contact || '-' }}</p>
-                            </div>
+                        <div class="flex flex-col min-w-0 flex-grow">
+                            <p class="font-medium text-gray-900 truncate">{{ hbl?.consignee_name }}</p>
+                            <p class="text-gray-500 text-sm truncate">{{ hbl?.consignee_contact }}</p>
                         </div>
                     </div>
 
-                    <!-- Details Section -->
-                    <div class="space-y-3">
-                        <!-- Address -->
-                        <div class="p-3 bg-green-50 rounded-lg border border-green-100">
-                            <div class="flex items-start gap-2 mb-1">
-                                <i class="pi pi-map-marker text-green-600 flex-shrink-0 mt-0.5"></i>
-                                <p class="text-xs font-bold text-green-700 uppercase tracking-wide">Address</p>
-                            </div>
-                            <p class="text-sm text-gray-800 leading-relaxed break-words pl-6">
-                                {{ hbl?.consignee_address || '-' }}
-                            </p>
-                        </div>
+                    <div class="my-5 space-y-3">
+                        <InfoDisplay :value="hbl?.consignee_address" label="Address"/>
 
-                        <!-- NIC/PP -->
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <i class="pi pi-id-card text-green-600 flex-shrink-0"></i>
-                                <p class="text-xs font-bold text-gray-600 uppercase tracking-wide">NIC / PP No</p>
-                            </div>
-                            <p class="text-sm text-gray-900 font-medium break-all">
-                                {{ hbl?.consignee_nic || '-' }}
-                            </p>
-                        </div>
+                        <InfoDisplay :value="hbl?.consignee_nic" label="NIC / PP No"/>
 
-                        <!-- Additional Contact -->
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <p class="text-xs font-bold text-gray-600 uppercase tracking-wide mb-1.5">Additional Contact</p>
-                            <p class="text-sm text-gray-900 font-medium break-all">
-                                {{ hbl?.consignee_additional_mobile_number || '-' }}
-                            </p>
-                        </div>
+                        <InfoDisplay :value="hbl?.consignee_additional_mobile_number"
+                                     label="Additional Contact Number"/>
 
-                        <!-- WhatsApp -->
-                        <div class="p-3 bg-green-50 rounded-lg border border-green-200">
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <i class="pi pi-whatsapp text-green-600 flex-shrink-0"></i>
-                                <p class="text-xs font-bold text-green-700 uppercase tracking-wide">WhatsApp</p>
-                            </div>
-                            <p class="text-sm text-gray-900 font-medium break-all">
-                                {{ hbl?.consignee_whatsapp_number || '-' }}
-                            </p>
-                        </div>
+                        <InfoDisplay :value="hbl?.consignee_whatsapp_number" label="Whatsapp Number"/>
 
-                        <!-- Note -->
-                        <div v-if="hbl?.consignee_note" class="p-3 bg-yellow-50 rounded-lg border-2 border-yellow-300">
-                            <div class="flex items-start gap-2 mb-1">
-                                <i class="pi pi-info-circle text-yellow-600 flex-shrink-0 mt-0.5"></i>
-                                <p class="text-xs font-bold text-yellow-700 uppercase tracking-wide">Important Note</p>
-                            </div>
-                            <p class="text-sm text-gray-800 leading-relaxed break-words pl-6">
-                                {{ hbl?.consignee_note }}
-                            </p>
-                        </div>
+                        <InfoDisplay :value="hbl?.consignee_note" label="Note"/>
                     </div>
                 </template>
             </Card>
