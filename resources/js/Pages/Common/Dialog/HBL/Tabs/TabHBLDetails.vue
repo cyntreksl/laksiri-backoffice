@@ -289,20 +289,37 @@ const closeIssueDetailModal = () => {
                         </div>
                     </div>
 
-                    <div class="flex items-center space-x-5">
-                        <div class="flex space-x-2">
-                            <i v-if="hbl?.latest_detain_record?.is_rtf" v-tooltip.left="`Detained by ${hbl?.latest_detain_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
-                            <i v-if="hbl?.is_short_load" v-tooltip.left="'Short Load'" class="ti ti-truck-loading text-2xl text-orange-500"></i>
-                            <i v-if="hbl?.is_unmanifest" v-tooltip.left="'Unmanifest'" class="ti ti-file-x text-2xl text-purple-500"></i>
-                            <i v-if="hbl?.is_overland" v-tooltip.left="'Overland'" class="ti ti-road text-2xl text-blue-500"></i>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-5">
+                            <div class="flex space-x-2">
+                                <i v-if="hbl?.latest_detain_record?.is_rtf" v-tooltip.left="`Detained by ${hbl?.latest_detain_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                <i v-if="hbl?.is_short_load" v-tooltip.left="'Short Load'" class="ti ti-truck-loading text-2xl text-orange-500"></i>
+                                <i v-if="hbl?.is_unmanifest" v-tooltip.left="'Unmanifest'" class="ti ti-file-x text-2xl text-purple-500"></i>
+                                <i v-if="hbl?.is_overland" v-tooltip.left="'Overland'" class="ti ti-road text-2xl text-blue-500"></i>
+                            </div>
+                            <p class="text-3xl uppercase font-normal">
+                                {{ hbl?.branch.name }}
+                            </p>
+                            <i class="pi pi-arrow-right"></i>
+                            <p class="text-3xl uppercase font-normal">
+                                {{ hbl?.warehouse }}
+                            </p>
                         </div>
-                        <p class="text-3xl uppercase font-normal">
-                            {{ hbl?.branch.name }}
-                        </p>
-                        <i class="pi pi-arrow-right"></i>
-                        <p class="text-3xl uppercase font-normal">
-                            {{ hbl?.warehouse }}
-                        </p>
+
+                        <!-- Finance Approval Badge - Small and Compact -->
+                        <div class="flex items-center gap-2">
+                            <span v-if="hbl?.finance_status === 'Approved'"
+                                class="px-2 py-1 bg-green-100 text-green-700 border border-green-300 rounded text-xs font-semibold flex items-center gap-1.5">
+                                <i class="pi pi-check-circle text-sm"></i>
+                                <span>Finance Approved</span>
+                            </span>
+
+                            <span v-if="hbl?.finance_approval_pending"
+                                class="px-2 py-1 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded text-xs font-semibold flex items-center gap-1.5 animate-pulse">
+                                <i class="pi pi-clock text-sm"></i>
+                                <span>Finance Pending</span>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 mt-10 gap-1">
