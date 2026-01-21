@@ -1,6 +1,6 @@
 <script setup>
 import Breadcrumb from "@/Components/Breadcrumb.vue";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import DashboardCard from "@/Components/Widgets/DashboardCard.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import {router} from "@inertiajs/vue3";
