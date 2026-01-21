@@ -72,6 +72,7 @@ class HBLResource extends JsonResource
             'is_short_loaded' => $isShortLoad,
             'payment_status' => $this->hblPayment()->latest()->first()->status ?? 'Not Updated',
             'finance_status' => $this->is_finance_release_approved ? 'Approved' : 'Not Approved',
+            'finance_approval_pending' => ! $this->is_finance_release_approved && $this->system_status > 4.2,
             'currency_rate' => $this->currency_rate ?? 1.0,
             'is_rtf' => $this->latestDetainRecord?->is_rtf ?? false,
             'detain_type' => $this->latestDetainRecord?->detain_type ?? null,

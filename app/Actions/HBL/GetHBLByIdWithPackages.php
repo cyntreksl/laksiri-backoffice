@@ -21,7 +21,7 @@ class GetHBLByIdWithPackages
             ->with(['packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class)
                     ->with('latestDetainRecord', 'unloadingIssue');
-            }, 'latestDetainRecord', 'mhbl'])
+            }, 'latestDetainRecord', 'mhbl', 'branch'])
             ->withSum(['packages' => function ($query) {
                 $query->withoutGlobalScope(BranchScope::class);
             }], 'actual_weight')
