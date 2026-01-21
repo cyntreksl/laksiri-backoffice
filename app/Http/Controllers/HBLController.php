@@ -152,6 +152,12 @@ class HBLController extends Controller
     {
         $hbl = GetHBLByIdWithPackages::run($hbl_id);
         
+        if (! $hbl) {
+            return response()->json([
+                'message' => 'HBL not found'
+            ], 404);
+        }
+        
         return response()->json([
             'hbl' => array_merge($hbl->toArray(), [
                 'finance_status' => $hbl->is_finance_release_approved ? 'Approved' : 'Not Approved',

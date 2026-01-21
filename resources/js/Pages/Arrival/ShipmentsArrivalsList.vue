@@ -71,14 +71,14 @@ const selectedContainer = ref({});
 const showConfirmLoadedShipmentModal = ref(false);
 const confirm = useConfirm();
 
-const userRole = usePage().props.auth.user.roles[0].name;
+const userRoles = usePage().props.user?.roles || [];
 
 const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
     cargo_type: {value: null, matchMode: FilterMatchMode.EQUALS},
     container_type: {value: null, matchMode: FilterMatchMode.EQUALS},
     status: {
-        value: ['clearance team', 'finance Team'].includes(userRole) ? 'IN TRANSIT' : null,
+        value: (userRoles.includes('clearance team') || userRoles.includes('finance Team')) ? 'IN TRANSIT' : null,
         matchMode: FilterMatchMode.EQUALS
     },
     branch: {value: null, matchMode: FilterMatchMode.EQUALS},

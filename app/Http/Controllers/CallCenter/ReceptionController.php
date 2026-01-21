@@ -108,7 +108,7 @@ class ReceptionController extends Controller
 
     public function getAppointmentsData(Request $request)
     {
-        $query = CallFlag::with(['hbl.tokens', 'causer'])
+        $query = CallFlag::with(['hbl.tokens.customerQueue', 'hbl.latestDetainRecord', 'causer'])
             ->whereNotNull('appointment_date');
 
         // Apply filters
