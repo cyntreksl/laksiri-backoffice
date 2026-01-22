@@ -32,7 +32,22 @@ class PackageQueueResource extends JsonResource
             'created_at' => $this->token->created_at->format('Y-m-d H:i:s'),
 
             'hbl' => $latestHbl,
-            'hbl_packages' => $latestHbl?->packages,
+            'hbl_packages' => $latestHbl && $latestHbl->packages ? $latestHbl->packages->map(function ($package) {
+                return [
+                    'id' => $package->id,
+                    'package_type' => $package->package_type,
+                    'quantity' => $package->quantity,
+                    'length' => $package->length,
+                    'width' => $package->width,
+                    'height' => $package->height,
+                    'weight' => $package->weight,
+                    'volume' => $package->volume,
+                    'remarks' => $package->remarks,
+                    'release_status' => $package->release_status,
+                    'bond_storage_number' => $package->bond_storage_number,
+                    'released_at' => $package->released_at?->format('Y-m-d H:i:s'),
+                ];
+            })->values()->toArray() : [],
 
             'release_logs' => $this->releaseLogs->map(function ($log) {
                 return [

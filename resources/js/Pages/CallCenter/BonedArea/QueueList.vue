@@ -215,6 +215,108 @@ const showLogDialog = (token) => {
             push.error('Error fetching logs');
         });
 };
+
+const remarksDialogVisible = ref(false);
+const selectedTokenRemarks = ref(null);
+const loadingRemarks = ref(false);
+
+const showRemarksDialog = async (token) => {
+    selectedTokenRemarks.value = {
+        ...token,
+        hbl_packages: token.hbl_packages || []
+    };
+    remarksDialogVisible.value = true;
+    loadingRemarks.value = true;
+
+    // Check if hbl_packages exists and is an array
+    if (!token.hbl_packages || !Array.isArray(token.hbl_packages) || token.hbl_packages.length === 0) {
+        loadingRemarks.value = false;
+        push.warning('No packages found for this token');
+        return;
+    }
+
+    // Fetch remarks for each package
+    try {
+        const packagesWithRemarks = await Promise.all(
+            token.hbl_packages.map(async (pkg) => {
+                try {
+                    const { data } = await axios.get(`/remarks/package/${pkg.id}`);
+                    const remarksList = data.data || data || [];
+
+                    return {
+                        ...pkg,
+                        remarks_list: remarksList
+                    };
+                } catch (error) {
+                    console.error(`Error fetching remarks for package ${pkg.id}:`, error.response || error);
+                    return {
+                        ...pkg,
+                        remarks_list: []
+                    };
+                }
+            })
+        );
+
+        selectedTokenRemarks.value = {
+            ...token,
+            hbl_packages: packagesWithRemarks
+        };
+    } catch (error) {
+        console.error('Error loading package remarks:', error);
+        push.error('Error loading package remarks');
+    } finally {
+        loadingRemarks.value = false;
+    }
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+
+    try {
+        // Handle both ISO format and Laravel's datetime format
+        const date = new Date(dateString.includes(' ') ? dateString.replace(' ', 'T') : dateString);
+        return date.toLocaleString();
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return dateString;
+    }
+};
+
+// Add remark functionality
+const newRemark = ref({});
+const addingRemark = ref({});
+
+const addPackageRemark = async (packageId) => {
+    if (!newRemark.value[packageId]?.trim()) return;
+
+    addingRemark.value[packageId] = true;
+
+    try {
+        await axios.post(`/hbl-packages/${packageId}/remarks`, {
+            body: newRemark.value[packageId]
+        });
+
+        // Clear input
+        newRemark.value[packageId] = '';
+
+        // Refetch remarks for this specific package
+        const { data } = await axios.get(`/remarks/package/${packageId}`);
+        const remarksList = data.data || data || [];
+
+        // Update the remarks_list for this package
+        const packageIndex = selectedTokenRemarks.value.hbl_packages.findIndex(pkg => pkg.id === packageId);
+        if (packageIndex !== -1) {
+            selectedTokenRemarks.value.hbl_packages[packageIndex].remarks_list = remarksList;
+        }
+
+        push.success('Remark added successfully!');
+    } catch (error) {
+        console.error('Error adding remark:', error);
+        push.error('Failed to add remark. Please try again.');
+    } finally {
+        addingRemark.value[packageId] = false;
+    }
+};
 </script>
 
 <template>
@@ -280,7 +382,6 @@ const showLogDialog = (token) => {
                                     size="small"
                                     @click.prevent="handlePackageRelease(data)"
                                 />
-                                <!-- Add log icon button -->
                                 <Button
                                     class="mr-2"
                                     icon="ti ti-eye"
@@ -289,6 +390,14 @@ const showLogDialog = (token) => {
                                     severity="secondary"
                                     @click.prevent="showLogDialog(data)"
                                     v-tooltip="'View Release Logs'"
+                                />
+                                <Button
+                                    v-tooltip="'View Package Remarks'"
+                                    icon="ti ti-message-circle"
+                                    rounded
+                                    severity="info"
+                                    size="small"
+                                    @click.prevent="showRemarksDialog(data)"
                                 />
                             </div>
                         </template>
@@ -587,4 +696,163 @@ const showLogDialog = (token) => {
             />
         </template>
     </Dialog>
+
+    <!-- Package Remarks Dialog -->
+    <Dialog
+        :style="{ width: '70rem' }"
+        :visible="remarksDialogVisible"
+        header="Package Remarks"
+        modal
+        @update:visible="remarksDialogVisible = $event"
+    >
+        <div v-if="selectedTokenRemarks" class="space-y-4">
+            <!-- Loading overlay -->
+            <div
+                v-if="loadingRemarks"
+                class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 rounded-lg"
+            >
+                <div class="flex flex-col items-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <p class="mt-2 text-gray-600">Loading remarks...</p>
+                </div>
+            </div>
+
+            <!-- Token Info -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                    <div>
+                        <strong class="text-blue-800">Token:</strong>
+                        <span class="ml-2">{{ selectedTokenRemarks.token }}</span>
+                    </div>
+                    <div>
+                        <strong class="text-blue-800">Customer:</strong>
+                        <span class="ml-2">{{ selectedTokenRemarks.customer }}</span>
+                    </div>
+                    <div>
+                        <strong class="text-blue-800">Reference:</strong>
+                        <span class="ml-2">{{ selectedTokenRemarks.reference }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Packages with Remarks -->
+            <div v-if="!loadingRemarks" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                <h4 class="font-bold text-base flex items-center gap-2 mb-3 sticky top-0 bg-white z-10 py-2">
+                    <i class="pi pi-box"></i>
+                    Package Details & Remarks ({{ selectedTokenRemarks.hbl_packages?.length || 0 }} {{ selectedTokenRemarks.hbl_packages?.length === 1 ? 'package' : 'packages' }})
+                </h4>
+
+                <div
+                    v-for="(hbl_package, index) in selectedTokenRemarks.hbl_packages"
+                    :key="index"
+                    class="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                >
+                    <!-- Package Header -->
+                    <div class="flex items-start justify-between mb-3 pb-3 border-b border-gray-200">
+                        <div class="flex items-center gap-2">
+                            <Tag
+                                :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
+                                severity="info"
+                            />
+                            <span v-if="hbl_package.bond_storage_number" class="text-xs text-gray-500">
+                                Bond: {{ hbl_package.bond_storage_number }}
+                            </span>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            {{ hbl_package.length }}×{{ hbl_package.width }}×{{ hbl_package.height }}
+                        </div>
+                    </div>
+
+                    <!-- Remarks Section -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="pi pi-comments text-blue-500"></i>
+                            <strong class="text-sm text-gray-700">
+                                Remarks ({{ hbl_package.remarks_list?.length || 0 }})
+                            </strong>
+                        </div>
+
+                        <!-- Remarks List (Chat Style) -->
+                        <div class="bg-white rounded-lg p-3 min-h-[100px] max-h-80 overflow-y-auto">
+                            <!-- Empty state -->
+                            <div
+                                v-if="!hbl_package.remarks_list || hbl_package.remarks_list.length === 0"
+                                class="flex items-center justify-center h-20 text-gray-400"
+                            >
+                                <div class="text-center">
+                                    <i class="pi pi-inbox text-3xl mb-2 block text-gray-300"></i>
+                                    <p class="text-sm">No remarks yet</p>
+                                </div>
+                            </div>
+
+                            <!-- Remarks messages -->
+                            <div v-else class="space-y-2">
+                                <div
+                                    v-for="(remark, remarkIndex) in hbl_package.remarks_list"
+                                    :key="remarkIndex"
+                                    :class="remark?.user?.id === $page.props.auth.user.id ? 'justify-end' : 'justify-start'"
+                                    class="flex"
+                                >
+                                    <div
+                                        :class="remark?.user?.id === $page.props.auth.user.id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'"
+                                        class="max-w-[70%] rounded-lg p-3 shadow-sm"
+                                    >
+                                        <p class="text-xs font-semibold mb-1">{{ remark?.user?.name || 'Unknown' }}</p>
+                                        <p class="text-sm break-words whitespace-pre-wrap">{{ remark.body }}</p>
+                                        <small class="block text-xs mt-1 opacity-70">
+                                            {{ formatDate(remark.created_at) }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Remark Input -->
+                        <div class="flex items-center gap-2 mt-3">
+                            <InputText
+                                v-model="newRemark[hbl_package.id]"
+                                :disabled="addingRemark[hbl_package.id]"
+                                class="flex-1"
+                                placeholder="Type a remark..."
+                                @keyup.enter="addPackageRemark(hbl_package.id)"
+                            />
+                            <Button
+                                :disabled="addingRemark[hbl_package.id] || !newRemark[hbl_package.id]?.trim()"
+                                :loading="addingRemark[hbl_package.id]"
+                                icon="pi pi-send"
+                                severity="info"
+                                @click="addPackageRemark(hbl_package.id)"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-if="!selectedTokenRemarks.hbl_packages || selectedTokenRemarks.hbl_packages.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-500">
+                <i class="pi pi-inbox text-6xl mb-4 text-gray-300"></i>
+                <p class="text-lg font-medium mb-1">No Packages Found</p>
+                <p class="text-sm">This token has no package information available.</p>
+            </div>
+        </div>
+
+        <template #footer>
+            <Button
+                label="Close"
+                severity="secondary"
+                @click="remarksDialogVisible = false"
+            />
+        </template>
+    </Dialog>
 </template>
+
+<style scoped>
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>

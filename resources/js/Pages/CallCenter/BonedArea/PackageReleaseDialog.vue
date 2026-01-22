@@ -3,7 +3,7 @@ import InputError from "@/Components/InputError.vue";
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Checkbox from 'primevue/checkbox';
 import {push} from "notivue";
-import {ref, watch} from "vue";
+import {ref, watch, computed} from "vue";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import Textarea from 'primevue/textarea';
@@ -68,7 +68,19 @@ const form = useForm({
     note: ''
 });
 
+const hasSelectedPackages = computed(() => {
+    return Object.values(form.released_packages).some(Boolean);
+});
+
 const handleUpdateReleasePackages = () => {
+    // Validate that at least one package is selected
+    const selectedPackages = Object.values(form.released_packages).filter(Boolean);
+    
+    if (selectedPackages.length === 0) {
+        push.error('Please select at least one package to release.');
+        return;
+    }
+
     form.package_queue = props.packageQueue;
 
     form.post(route("call-center.package.store"), {
@@ -120,7 +132,7 @@ const handleUpdateReleasePackages = () => {
 
         <div class="flex justify-end gap-2 mt-3">
             <Button label="Cancel" severity="secondary" type="button" @click="emit('close')"></Button>
-            <Button :class="{ 'opacity-25': form.processing }" :disabled="form.processing" label="Release Package" type="button"
+            <Button :class="{ 'opacity-25': form.processing || !hasSelectedPackages }" :disabled="form.processing || !hasSelectedPackages" label="Release Package" type="button"
                     @click="handleUpdateReleasePackages"></Button>
         </div>
 
