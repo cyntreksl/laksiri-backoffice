@@ -1,4 +1,3 @@
-<!-- QueueList.vue -->
 <script setup>
 import {router} from "@inertiajs/vue3";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
@@ -571,6 +570,13 @@ const showLogDialog = (token) => {
                 </template>
             </Column>
 
+            <template #empty>
+                <div class="flex flex-col items-center justify-center py-12 text-gray-500">
+                    <i class="pi pi-inbox text-6xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium mb-1">No Release Logs Found</p>
+                    <p class="text-sm">This token has no package release or return history yet.</p>
+                </div>
+            </template>
         </DataTable>
 
         <template #footer>
