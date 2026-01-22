@@ -15,99 +15,177 @@ use Illuminate\Support\Facades\DB;
 
 class ExaminationRepository implements ExaminationRepositoryInterface
 {
+    public function getPackagesForExamination(string $reference)
+    {
+        $hbl = HBL::withoutGlobalScopes()->where('reference', $reference)->first();
+
+        if (!$hbl) {
+            return response()->json(['error' => 'HBL not found'], 404);
+        }
+
+        // Get packages that are:
+        // 1. Released from bonded area (release_status = 'released')
+        // 2. Not yet released from examination (check package_examinations table)
+        $packages = $hbl->packages()
+            ->where('release_status', 'released')
+            ->with(['packageExaminations' => function ($query) {
+                $query->latest();
+            }])
+            ->get()
+            ->filter(function ($package) {
+                // Only show packages that haven't been released from examination
+                $latestExamination = $package->packageExaminations->first();
+                return !$latestExamination || $latestExamination->action !== 'released';
+            })
+            ->map(function ($package) {
+                return [
+                    'id' => $package->id,
+                    'package_type' => $package->package_type,
+                    'quantity' => $package->quantity,
+                    'length' => $package->length,
+                    'width' => $package->width,
+                    'height' => $package->height,
+                    'weight' => $package->weight,
+                    'volume' => $package->volume,
+                    'release_status' => $package->release_status,
+                    'released_at' => $package->released_at?->format('Y-m-d H:i:s'),
+                    'released_by' => $package->releasedByUser?->name,
+                    'bond_storage_number' => $package->bond_storage_number,
+                    'remarks' => $package->remarks,
+                ];
+            })
+            ->values();
+
+        return response()->json($packages);
+    }
+
     public function releaseHBL(array $data): void
     {
         try {
             DB::beginTransaction();
 
-            $hbl = HBL::withoutGlobalScopes()->where('reference', $data['customer_queue']['token']['reference'])->first();
+            // Get customer queue ID
+            $customerQueueId = $data['customer_queue_id'] ?? null;
+
+            if (!$customerQueueId) {
+                throw new \Exception('Customer queue ID is missing.');
+            }
+
+            $customerQueue = CustomerQueue::with('token')->find($customerQueueId);
+            
+            if (!$customerQueue) {
+                throw new \Exception('Customer queue not found.');
+            }
+
+            $reference = $customerQueue->token->reference;
+
+            $hbl = HBL::withoutGlobalScopes()->where('reference', $reference)->first();
+
+            if (!$hbl) {
+                throw new \Exception('HBL not found.');
+            }
+
+            // Prepare data for CreateExamination action (it expects customer_queue structure)
+            $examinationData = [
+                'customer_queue' => [
+                    'id' => $customerQueue->id,
+                    'token_id' => $customerQueue->token_id,
+                ],
+                'released_packages' => $data['released_packages'] ?? [],
+                'note' => $data['note'] ?? null,
+            ];
 
             // Create examination record
-            $examination = CreateExamination::run($data, $hbl->id);
+            $examination = CreateExamination::run($examinationData, $hbl->id);
 
-            $customerQueue = CustomerQueue::find($data['customer_queue']['id']);
+            // Get only packages that were released from bonded area (release_status = 'released')
+            $releasedFromBondPackages = $hbl->packages()->where('release_status', 'released')->get();
 
-            // Process each package individually
-            $releasedCount = 0;
-            $heldCount = 0;
+            if ($releasedFromBondPackages->isEmpty()) {
+                throw new \Exception('No packages have been released from the Bonded Area. Please release packages from the Package Queue first.');
+            }
 
-            // Get all packages for this HBL
-            $allPackages = $hbl->packages;
+            // Validate that selected packages are actually released from bond
+            $selectedPackageIds = array_keys(array_filter($data['released_packages'] ?? []));
+            
+            if (empty($selectedPackageIds)) {
+                throw new \Exception('Please select at least one package to release.');
+            }
 
-            foreach ($allPackages as $package) {
-                // Check if this package was in the released_packages array
-                $isReleased = isset($data['released_packages'][$package->id]) && $data['released_packages'][$package->id] === true;
-                
-                // Determine action: 'released' or 'held'
-                $packageAction = $isReleased ? 'released' : 'held';
-                
-                // Update package status
-                $package->update([
-                    'release_status' => $packageAction,
-                    'released_at' => $packageAction === 'released' ? now() : null,
-                    'released_by' => $packageAction === 'released' ? auth()->id() : null,
-                    'release_note' => $data['note'] ?? null,
-                ]);
-
-                // Create package examination record
+            // Process only the selected packages
+            foreach ($selectedPackageIds as $packageId) {
+                // Create package examination record for selected packages
                 PackageExamination::create([
-                    'hbl_package_id' => $package->id,
+                    'hbl_package_id' => $packageId,
                     'examination_id' => $examination->id,
                     'customer_queue_id' => $customerQueue->id,
                     'token_id' => $customerQueue->token_id,
-                    'action' => $packageAction,
+                    'action' => 'released',
                     'note' => $data['note'] ?? null,
                     'processed_by' => auth()->id(),
                     'processed_at' => now(),
                 ]);
-
-                if ($packageAction === 'released') {
-                    $releasedCount++;
-                } else {
-                    $heldCount++;
-                }
             }
+
+            // Now check if there are any packages from bonded area that haven't been examined yet
+            // Get all packages released from bonded area
+            $allReleasedFromBond = $hbl->packages()
+                ->where('release_status', 'released')
+                ->with(['packageExaminations' => function ($query) {
+                    $query->latest();
+                }])
+                ->get();
+
+            // Count packages that still need examination
+            $packagesNeedingExamination = $allReleasedFromBond->filter(function ($package) {
+                $latestExamination = $package->packageExaminations->first();
+                // Package needs examination if it has no examination record or latest action is not 'released'
+                return !$latestExamination || $latestExamination->action !== 'released';
+            })->count();
+
+            $allPackagesExamined = $packagesNeedingExamination === 0;
 
             // Update package queue status
             $packageQueue = PackageQueue::where('token_id', $customerQueue->token_id)->first();
             if ($packageQueue) {
-                $totalPackages = $hbl->packages->count();
                 $packageQueue->update([
-                    'released_package_count' => $releasedCount,
-                    'held_package_count' => $heldCount,
-                    'status' => $releasedCount === $totalPackages ? 'completed' : 'partial',
-                    'is_released' => $releasedCount > 0,
+                    'status' => $allPackagesExamined ? 'completed' : 'partial',
+                    'completed_at' => $allPackagesExamined ? now() : null,
                 ]);
             }
 
-            // Update customer queue
+            // Update customer queue - only set left_at if ALL packages are examined and released
             if ($customerQueue) {
-                $customerQueue->update([
-                    'left_at' => now(),
-                ]);
+                // Only mark as left if all packages from bonded area have been released from examination
+                if ($allPackagesExamined) {
+                    $customerQueue->update([
+                        'left_at' => now(),
+                    ]);
 
-                // Set queue status log
-                $customerQueue->addQueueStatus(
-                    CustomerQueue::EXAMINATION_QUEUE,
-                    $customerQueue->token->customer_id,
-                    $customerQueue->token_id,
-                    null,
-                    now(),
-                );
+                    // Set queue status log
+                    $customerQueue->addQueueStatus(
+                        CustomerQueue::EXAMINATION_QUEUE,
+                        $customerQueue->token->customer_id,
+                        $customerQueue->token_id,
+                        null,
+                        now(),
+                    );
+                }
+                // If some packages still need examination, don't update left_at
+                // The token should remain in the examination queue
             }
 
-            // Mark HBL as released only if ALL packages are released
-            $countHBLPackages = $hbl->packages->count();
-            if ($countHBLPackages === $releasedCount) {
+            // Mark HBL as released only if ALL packages from bonded area are released from examination
+            if ($allPackagesExamined) {
                 $hbl->is_released = true;
                 $hbl->save();
             }
 
             // Send feedback mail
             $emailData = [
-                'customerId' => $data['customer_queue']['token']['customer_id'],
+                'customerId' => $customerQueue->token->customer_id,
                 'hblId' => $hbl->id,
-                'tokenId' => $data['customer_queue']['token_id'],
+                'tokenId' => $customerQueue->token_id,
             ];
             SendFeedbackMail::run($emailData);
 

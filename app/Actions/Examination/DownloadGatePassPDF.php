@@ -20,11 +20,23 @@ class DownloadGatePassPDF
 
         $token = $customerQueue->token;
 
-        $examination = Examination::where('token_id', $token->id)->first();
+        $examination = Examination::where('token_id', $token->id)->latest()->first();
 
-        // Filter only released packages
-        $releasedPackages = $hbl->packages->filter(function ($package) {
-            return $package->release_status === 'released';
+        if (!$examination) {
+            abort(404, 'No examination record found.');
+        }
+
+        // Get only packages that were released in THIS examination
+        // Check the released_packages from the examination record
+        $releasedPackageIds = array_keys(array_filter($examination->released_packages ?? []));
+
+        if (empty($releasedPackageIds)) {
+            abort(404, 'No packages were released in this examination.');
+        }
+
+        // Filter packages to only those released in this examination
+        $releasedPackages = $hbl->packages->filter(function ($package) use ($releasedPackageIds) {
+            return in_array($package->id, $releasedPackageIds);
         });
 
         // If no released packages, return error
@@ -42,7 +54,7 @@ class DownloadGatePassPDF
             'hbl' => $hbl,
             'releasedPackages' => $releasedPackages,
             'userId' => GetUserById::run($token->customer_id)->name,
-            'by' => GetUserById::run(auth()->id())->name,
+            'by' => GetUserById::run($examination->released_by)->name,
             'serial' => $customerQueue->id,
         ];
 
