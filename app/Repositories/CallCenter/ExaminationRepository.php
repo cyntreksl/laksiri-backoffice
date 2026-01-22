@@ -20,12 +20,39 @@ class ExaminationRepository implements ExaminationRepositoryInterface
         try {
             DB::beginTransaction();
 
-            $hbl = HBL::withoutGlobalScopes()->where('reference', $data['customer_queue']['token']['reference'])->first();
+            // Get customer queue ID
+            $customerQueueId = $data['customer_queue_id'] ?? null;
+
+            if (!$customerQueueId) {
+                throw new \Exception('Customer queue ID is missing.');
+            }
+
+            $customerQueue = CustomerQueue::with('token')->find($customerQueueId);
+            
+            if (!$customerQueue) {
+                throw new \Exception('Customer queue not found.');
+            }
+
+            $reference = $customerQueue->token->reference;
+
+            $hbl = HBL::withoutGlobalScopes()->where('reference', $reference)->first();
+
+            if (!$hbl) {
+                throw new \Exception('HBL not found.');
+            }
+
+            // Prepare data for CreateExamination action (it expects customer_queue structure)
+            $examinationData = [
+                'customer_queue' => [
+                    'id' => $customerQueue->id,
+                    'token_id' => $customerQueue->token_id,
+                ],
+                'released_packages' => $data['released_packages'] ?? [],
+                'note' => $data['note'] ?? null,
+            ];
 
             // Create examination record
-            $examination = CreateExamination::run($data, $hbl->id);
-
-            $customerQueue = CustomerQueue::find($data['customer_queue']['id']);
+            $examination = CreateExamination::run($examinationData, $hbl->id);
 
             // Get only packages that were released from bonded area (release_status = 'released')
             $releasedFromBondPackages = $hbl->packages()->where('release_status', 'released')->get();
@@ -108,9 +135,9 @@ class ExaminationRepository implements ExaminationRepositoryInterface
 
             // Send feedback mail
             $emailData = [
-                'customerId' => $data['customer_queue']['token']['customer_id'],
+                'customerId' => $customerQueue->token->customer_id,
                 'hblId' => $hbl->id,
-                'tokenId' => $data['customer_queue']['token_id'],
+                'tokenId' => $customerQueue->token_id,
             ];
             SendFeedbackMail::run($emailData);
 

@@ -128,7 +128,7 @@ const updateChecked = (packageId, isChecked) => {
 };
 
 const form = useForm({
-    customer_queue: props.customerQueue,
+    customer_queue_id: props.customerQueue.id,
     note: '',
     released_packages: {},
 });
@@ -144,14 +144,18 @@ const handleUpdateReleaseHBLPackages = () => {
 
     form.post(route("call-center.examination.store"), {
         onSuccess: () => {
+            push.success(`${selectedPackages.length} package(s) released successfully!`);
+            
+            // Open gate pass in new tab
+            const gatePassUrl = route("hbls.download.gate-pass", {
+                hbl: props.hblId,
+                customer_queue: props.customerQueue.id
+            });
+            window.open(gatePassUrl, '_blank');
+            
+            // Navigate to queue list
             router.visit(route("call-center.examination.queue.list"));
             form.reset();
-            push.success(`${selectedPackages.length} package(s) released successfully!`);
-            // Trigger the download of the PDF
-            window.location.href = route("hbls.download.gate-pass", {
-                hbl: props.hblId,
-                customer_queue: props.customerQueue
-            });
         },
         onError: (errors) => {
             const errorMessage = Object.values(errors).join(', ');

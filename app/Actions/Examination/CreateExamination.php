@@ -13,8 +13,11 @@ class CreateExamination
     public function handle(array $data, $hbl_id)
     {
         $package_queue = PackageQueue::where('token_id', $data['customer_queue']['token_id'])
-            ->where('is_released', true)
             ->first();
+
+        if (!$package_queue) {
+            throw new \Exception('Package queue not found for this token.');
+        }
 
         return Examination::create([
             'released_by' => auth()->id(),
