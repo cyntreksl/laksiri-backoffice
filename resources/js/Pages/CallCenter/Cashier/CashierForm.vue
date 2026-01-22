@@ -277,6 +277,12 @@ const streamReceipt = () => {
     }
 };
 
+const printInvoice = () => {
+    if (props.hblId) {
+        window.open(route("hbls.streamCashierReceipt", {hbl: props.hblId}), '_blank');
+    }
+};
+
 const handleUpdatePayment = () => {
     // If it's a verification (zero payment), skip validations
     const isVerification = computedOutstanding.value <= 0;
