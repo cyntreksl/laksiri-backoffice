@@ -68,7 +68,7 @@ const computedOutstanding = computed(() => {
 const maxDiscountAmount = computed(() => {
     const demurrageCharge = parseFloat(hblCharges.value?.destination_demurrage_charge || 0);
     const maxDiscountPercentage = parseFloat(props.branch?.maximum_demurrage_discount || 0);
-    
+
     if (demurrageCharge > 0 && maxDiscountPercentage > 0) {
         return (demurrageCharge * maxDiscountPercentage) / 100;
     }
@@ -182,7 +182,7 @@ getHBLPayments();
 
 const getVerificationInfo = async () => {
     if (!props.hblId) return;
-    
+
     try {
         const response = await fetch(`/call-center/cashier/verification-info/${props.hblId}`, {
             method: "GET",
@@ -232,7 +232,7 @@ watch(cashTendered, (val) => {
 const handleVerify = () => {
     // For zero payment/verification, we set paid_amount to 0
     form.paid_amount = 0;
-    
+
     // Submit verification and redirect to queue list
     form.post(route("call-center.cashier.store"), {
         onSuccess: () => {
@@ -277,10 +277,16 @@ const streamReceipt = () => {
     }
 };
 
+const printInvoice = () => {
+    if (props.hblId) {
+        window.open(route("hbls.streamCashierReceipt", {hbl: props.hblId}), '_blank');
+    }
+};
+
 const handleUpdatePayment = () => {
     // If it's a verification (zero payment), skip validations
     const isVerification = computedOutstanding.value <= 0;
-    
+
     if (!isVerification) {
         const outstandingAmount = parseFloat(computedOutstanding.value);
         const paidAmount = parseFloat(form.paid_amount);
@@ -299,10 +305,10 @@ const handleUpdatePayment = () => {
         onSuccess: () => {
             // Close the payment modal
             showPaymentDialog.value = false;
-            
+
             // Refresh the current page to show updated payment details
             router.reload({ preserveScroll: true });
-            
+
             form.reset();
             push.success('Payment Update Successfully!');
         },
@@ -386,7 +392,7 @@ watch(computedOutstanding, (val) => {
                             </TabList>
                             <TabPanels>
                                 <TabPanel value="0">
-                                    <TabHBLDetails :hbl="hbl" :is-loading="isLoading"/>
+                                    <TabHBLDetails :compact="true" :hbl="hbl" :is-loading="isLoading" />
                                 </TabPanel>
                                 <TabPanel value="1">
                                     <TabHBLCharge :hbl="hbl"></TabHBLCharge>
@@ -423,7 +429,7 @@ watch(computedOutstanding, (val) => {
                         </div>
                     </template>
                 </Card>
-                
+
                 <div class="flex flex-col gap-3 mb-4">
                     <!-- Verify Button for Zero Outstanding, disabled if already verified -->
                     <Button v-if="computedOutstanding <= 0 && !verificationInfo"
@@ -488,15 +494,15 @@ watch(computedOutstanding, (val) => {
                 <!-- Cash Given Input -->
                 <div v-if="computedOutstanding > 0">
                     <IftaLabel>
-                        <InputNumber 
-                            v-model="cashTendered" 
-                            :minFractionDigits="2" 
-                            :maxFractionDigits="2" 
-                            class="w-full" 
+                        <InputNumber
+                            v-model="cashTendered"
+                            :maxFractionDigits="2"
+                            :minFractionDigits="2"
+                            class="w-full"
                             inputId="cash-tendered"
-                            min="0" 
+                            min="0"
                             step="any"
-                            variant="filled" 
+                            variant="filled"
                         />
                         <label for="cash-tendered">Cash Given</label>
                     </IftaLabel>

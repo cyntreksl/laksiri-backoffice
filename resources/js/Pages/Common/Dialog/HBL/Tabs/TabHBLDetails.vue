@@ -30,6 +30,10 @@ const props = defineProps({
         type: Boolean,
         required: true,
     },
+    compact: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 const isRemarkVisible = ref(false);
@@ -307,7 +311,7 @@ const closeIssueDetailModal = () => {
                         </div>
 
                         <!-- Finance Approval Badge - Small and Compact -->
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 ml-1">
                             <span v-if="hbl?.finance_status === 'Approved'"
                                 class="px-2 py-1 bg-green-100 text-green-700 border border-green-300 rounded text-xs font-semibold flex items-center gap-1.5">
                                 <i class="pi pi-check-circle text-sm"></i>
@@ -489,8 +493,8 @@ const closeIssueDetailModal = () => {
                         <Avatar
                             :label="hbl?.hbl_name?.charAt(0)"
                             class="!bg-emerald-200 flex-shrink-0"
-                            size="xlarge"
-                            style="width: 64px; height: 64px"
+                            :size="compact ? 'normal' : 'xlarge'"
+                            :style="compact ? 'width: 32px; height: 32px' : 'width: 64px; height: 64px'"
                         />
 
                         <div class="flex flex-col min-w-0 flex-grow">
@@ -530,8 +534,8 @@ const closeIssueDetailModal = () => {
                         <Avatar
                             :label="hbl?.consignee_name.charAt(0)"
                             class="!bg-emerald-200 flex-shrink-0"
-                            size="xlarge"
-                            style="width: 64px; height: 64px"
+                            :size="compact ? 'normal' : 'xlarge'"
+                            :style="compact ? 'width: 32px; height: 32px' : 'width: 64px; height: 64px'"
                         />
 
                         <div class="flex flex-col min-w-0 flex-grow">
@@ -557,11 +561,9 @@ const closeIssueDetailModal = () => {
         </div>
     </div>
 
-    <div v-else class="grid grid-cols-12 gap-5">
+    <div v-else-if="!isLoading && pickup && Object.keys(pickup).length > 0" class="grid grid-cols-12 gap-5">
         <div class="col-span-12 lg:col-span-4 md:col-span-6 sm:col-span-12 space-y-5">
-            <PostSkeleton v-if="isLoading"/>
-
-            <Card v-else>
+            <Card>
                 <template #title>
                     <div class="flex items-center space-x-2">
                         <i class="ti ti-user-pentagon"></i>
@@ -615,9 +617,7 @@ const closeIssueDetailModal = () => {
         </div>
 
         <div class="col-span-12 lg:col-span-8 md:col-span-6 sm:col-span-12 space-y-4">
-            <PostSkeleton v-if="isLoading"/>
-
-            <Card v-else class="!bg-amber-50 !border !border-amber-200 !shadow-none">
+            <Card class="!bg-amber-50 !border !border-amber-200 !shadow-none">
                 <template #content>
                     <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-10">
                         <InfoDisplay :value="pickup?.reference" label="Job Ref"/>
@@ -646,6 +646,35 @@ const closeIssueDetailModal = () => {
                     </div>
                 </template>
             </Card>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div v-else-if="isLoading" class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5">
+        <div class="lg:col-span-6 space-y-4">
+            <PostSkeleton />
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                <PostSkeleton />
+                <PostSkeleton />
+                <PostSkeleton />
+            </div>
+            <PostSkeleton />
+            <PostSkeleton />
+        </div>
+        <div class="col-span-12 lg:col-span-3 md:col-span-6 sm:col-span-12 space-y-5">
+            <PostSkeleton />
+        </div>
+        <div class="col-span-12 lg:col-span-3 md:col-span-6 sm:col-span-12 space-y-5">
+            <PostSkeleton />
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else class="flex items-center justify-center min-h-[400px]">
+        <div class="text-center text-gray-400">
+            <i class="ti ti-package-off text-6xl mb-4"></i>
+            <p class="text-xl font-medium">No data available</p>
+            <p class="text-sm mt-2">HBL or Pickup information not found</p>
         </div>
     </div>
 
