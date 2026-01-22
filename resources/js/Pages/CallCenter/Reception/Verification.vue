@@ -225,7 +225,7 @@ getHBLPayments();
                             </TabList>
                             <TabPanels>
                                 <TabPanel value="0">
-                                    <TabHBLDetails :hbl="hbl" :is-loading="isLoading"/>
+                                    <TabHBLDetails :compact="true" :hbl="hbl" :is-loading="isLoading" />
                                 </TabPanel>
                                 <TabPanel value="1">
                                     <TabHBLCharge :hbl="hbl"></TabHBLCharge>
