@@ -24,7 +24,13 @@ class BonedAreaController extends Controller
 
     public function store(Request $request)
     {
-        $this->bonedAreaRepository->releasePackage($request->all());
+        try {
+            $this->bonedAreaRepository->releasePackage($request->all());
+            
+            return back()->with('success', 'Package(s) released successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 
     public function showReleasedList()
