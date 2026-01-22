@@ -100,7 +100,8 @@ if (props.hblId !== null) {
 const getHBLPackagesByReference = async () => {
     isLoading.value = true;
     try {
-        const response = await fetch(`/get-hbl-packages-by-reference/${props.reference}`, {
+        // Use the new examination-specific endpoint
+        const response = await fetch(`/call-center/examination/packages/${props.reference}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -116,6 +117,7 @@ const getHBLPackagesByReference = async () => {
 
     } catch (error) {
         console.log(error);
+        push.error('Failed to load packages. Please try again.');
     } finally {
         isLoading.value = false;
     }

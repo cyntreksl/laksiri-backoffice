@@ -8,6 +8,9 @@ Route::get('/examination/queue/list', [ExaminationController::class, 'getExamina
 Route::get('/examination/{customer_queue}', [ExaminationController::class, 'create'])
     ->name('examination.create');
 
+Route::get('/examination/packages/{reference}', [ExaminationController::class, 'getPackagesForExamination'])
+    ->name('examination.packages');
+
 Route::post('/examination', [ExaminationController::class, 'store'])
     ->name('examination.store');
 

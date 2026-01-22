@@ -49,6 +49,11 @@ class ExaminationController extends Controller
         ]);
     }
 
+    public function getPackagesForExamination(string $reference)
+    {
+        return $this->examinationRepository->getPackagesForExamination($reference);
+    }
+
     public function store(Request $request)
     {
         try {
