@@ -27,28 +27,35 @@ class ExaminationRepository implements ExaminationRepositoryInterface
 
             $customerQueue = CustomerQueue::find($data['customer_queue']['id']);
 
-            // Process each package individually
+            // Get only packages that were released from bonded area (release_status = 'released')
+            $releasedFromBondPackages = $hbl->packages()->where('release_status', 'released')->get();
+
+            if ($releasedFromBondPackages->isEmpty()) {
+                throw new \Exception('No packages have been released from the Bonded Area. Please release packages from the Package Queue first.');
+            }
+
+            // Validate that selected packages are actually released from bond
+            $selectedPackageIds = array_keys(array_filter($data['released_packages'] ?? []));
+            
+            if (empty($selectedPackageIds)) {
+                throw new \Exception('Please select at least one package to release.');
+            }
+
+            // Process only the selected packages that were released from bonded area
             $releasedCount = 0;
             $heldCount = 0;
 
-            // Get all packages for this HBL
-            $allPackages = $hbl->packages;
-
-            foreach ($allPackages as $package) {
-                // Check if this package was in the released_packages array
-                $isReleased = isset($data['released_packages'][$package->id]) && $data['released_packages'][$package->id] === true;
+            foreach ($releasedFromBondPackages as $package) {
+                // Check if this package was selected in the form
+                $isSelected = in_array($package->id, $selectedPackageIds);
                 
-                // Determine action: 'released' or 'held'
-                $packageAction = $isReleased ? 'released' : 'held';
+                // Determine action: 'released' (from examination) or 'held' (in examination)
+                $packageAction = $isSelected ? 'released' : 'held';
                 
                 // Update package status
-                $package->update([
-                    'release_status' => $packageAction,
-                    'released_at' => $packageAction === 'released' ? now() : null,
-                    'released_by' => $packageAction === 'released' ? auth()->id() : null,
-                    'release_note' => $data['note'] ?? null,
-                ]);
-
+                // Note: We don't change release_status here as it's already 'released' from bond
+                // We track examination release separately
+                
                 // Create package examination record
                 PackageExamination::create([
                     'hbl_package_id' => $package->id,
@@ -71,12 +78,9 @@ class ExaminationRepository implements ExaminationRepositoryInterface
             // Update package queue status
             $packageQueue = PackageQueue::where('token_id', $customerQueue->token_id)->first();
             if ($packageQueue) {
-                $totalPackages = $hbl->packages->count();
                 $packageQueue->update([
-                    'released_package_count' => $releasedCount,
-                    'held_package_count' => $heldCount,
-                    'status' => $releasedCount === $totalPackages ? 'completed' : 'partial',
-                    'is_released' => $releasedCount > 0,
+                    'status' => $heldCount === 0 ? 'completed' : 'partial',
+                    'completed_at' => $heldCount === 0 ? now() : null,
                 ]);
             }
 
@@ -96,9 +100,8 @@ class ExaminationRepository implements ExaminationRepositoryInterface
                 );
             }
 
-            // Mark HBL as released only if ALL packages are released
-            $countHBLPackages = $hbl->packages->count();
-            if ($countHBLPackages === $releasedCount) {
+            // Mark HBL as released only if ALL packages from bonded area are released from examination
+            if ($heldCount === 0 && $releasedCount > 0) {
                 $hbl->is_released = true;
                 $hbl->save();
             }

@@ -51,7 +51,13 @@ class ExaminationController extends Controller
 
     public function store(Request $request)
     {
-        $this->examinationRepository->releaseHBL($request->all());
+        try {
+            $this->examinationRepository->releaseHBL($request->all());
+            
+            return back()->with('success', 'Package(s) released successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 
     public function showGatePassList()

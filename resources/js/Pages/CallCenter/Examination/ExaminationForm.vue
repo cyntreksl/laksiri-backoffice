@@ -134,19 +134,28 @@ const form = useForm({
 });
 
 const handleUpdateReleaseHBLPackages = () => {
+    // Validate that at least one package is selected
+    const selectedPackages = Object.values(form.released_packages).filter(Boolean);
+    
+    if (selectedPackages.length === 0) {
+        push.error('Please select at least one package to release.');
+        return;
+    }
+
     form.post(route("call-center.examination.store"), {
         onSuccess: () => {
             router.visit(route("call-center.examination.queue.list"));
             form.reset();
-            push.success('HBL Packages Released Successfully!');
+            push.success(`${selectedPackages.length} package(s) released successfully!`);
             // Trigger the download of the PDF
             window.location.href = route("hbls.download.gate-pass", {
                 hbl: props.hblId,
                 customer_queue: props.customerQueue
             });
         },
-        onError: () => {
-            push.error('Something went to wrong!');
+        onError: (errors) => {
+            const errorMessage = Object.values(errors).join(', ');
+            push.error(errorMessage || 'Something went wrong!');
         },
         preserveScroll: true,
         preserveState: true,
@@ -236,13 +245,45 @@ const handleUpdateReleaseHBLPackages = () => {
                         Release HBL Packages
                     </template>
                     <template #content>
+                        <!-- Package Status Summary -->
+                        <div v-if="hblPackages.length > 0" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                            <div class="text-sm">
+                                <div class="font-semibold text-blue-800 mb-1">Released from Bonded Area</div>
+                                <div class="text-blue-700">{{ hblPackages.length }} package(s) available for examination</div>
+                            </div>
+                        </div>
+
+                        <!-- No packages warning -->
+                        <div v-if="hblPackages.length === 0" class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-4">
+                            <div class="flex items-start gap-3">
+                                <i class="pi pi-exclamation-triangle text-yellow-600 text-xl"></i>
+                                <div>
+                                    <p class="font-semibold text-yellow-800">No Packages Available</p>
+                                    <p class="text-sm text-yellow-700">No packages have been released from the Bonded Area yet. Please release packages from the Package Queue first.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-1 gap-5 mt-3">
-                            <div class="space-y-4">
-                                <div v-for="(p, index) in hblPackages" :key="p.id" class="flex items-center gap-2">
-                                    <Checkbox :checked="form.released_packages[p.id] || false" :input-id="`package-${p.id}`"
-                                              :value="p.id"  @change="(event) => updateChecked(p.id, event.target.checked)" />
-                                    <label :for="`package-${p.id}`" class="cursor-pointer">
-                                        {{ p.package_type }} (ID: {{ p.id }})
+                            <div class="space-y-3">
+                                <div 
+                                    v-for="(p, index) in hblPackages" 
+                                    :key="p.id" 
+                                    class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
+                                >
+                                    <Checkbox 
+                                        :checked="form.released_packages[p.id] || false" 
+                                        :input-id="`package-${p.id}`"
+                                        :value="p.id"  
+                                        @change="(event) => updateChecked(p.id, event.target.checked)" 
+                                    />
+                                    <label :for="`package-${p.id}`" class="cursor-pointer flex-1">
+                                        <div class="font-medium text-gray-900">{{ p.package_type }}</div>
+                                        <div class="text-xs text-gray-600 mt-1 space-y-0.5">
+                                            <div>Qty: {{ p.quantity }} | Size: {{ p.length }}×{{ p.width }}×{{ p.height }}</div>
+                                            <div v-if="p.weight">Weight: {{ p.weight }}</div>
+                                            <div v-if="p.bond_storage_number" class="text-blue-600">Bond: {{ p.bond_storage_number }}</div>
+                                        </div>
                                     </label>
                                 </div>
                             </div>
@@ -259,9 +300,15 @@ const handleUpdateReleaseHBLPackages = () => {
                         </div>
 
                         <div class="text-right mt-3">
-                            <Button :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing" icon="pi pi-arrow-right" icon-pos="right"
-                                    label="Release & Create Gate Pass" size="small" @click="handleUpdateReleaseHBLPackages"/>
+                            <Button 
+                                :class="{ 'opacity-25': form.processing || hblPackages.length === 0 }"
+                                :disabled="form.processing || hblPackages.length === 0" 
+                                icon="pi pi-arrow-right" 
+                                icon-pos="right"
+                                label="Release & Create Gate Pass" 
+                                size="small" 
+                                @click="handleUpdateReleaseHBLPackages"
+                            />
                         </div>
                     </template>
                 </Card>
