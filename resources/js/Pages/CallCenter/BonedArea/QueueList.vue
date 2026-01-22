@@ -39,9 +39,18 @@ const selectedToken = ref([]);
 
 const filteredPackageQueue = computed(() => {
     return props.packageQueue.filter(q => {
-        return !q.left_at && q.is_released == false
+        // Show tokens that haven't left AND have packages that are not fully released
+        // A token should appear if: not left AND (not released OR has held packages)
+        return !q.left_at && (!q.is_released || (q.held_package_count && q.held_package_count > 0));
     });
 })
+
+// Helper function to determine package tag color based on release status
+const getPackageTagSeverity = (queueData, packageId) => {
+    const releasedPackages = queueData.released_packages || {};
+    const isReleased = releasedPackages[packageId];
+    return isReleased ? 'success' : 'warning';
+};
 
 const handlePackageRelease = (token) => {
     selectedToken.value = token;
@@ -357,15 +366,23 @@ const addPackageRemark = async (packageId) => {
                     <Column field="reference" header="Reference"></Column>
                     <Column field="package_count" header="Packages">
                         <template #body="slotProps">
-                            <div class="flex items-center">
+                            <div class="flex items-center gap-2 mb-1">
                                 <i class="ti ti-package mr-1 text-blue-500" style="font-size: 1rem"></i>
-                                {{ slotProps.data.package_count }}
+                                <span class="font-medium">{{ slotProps.data.package_count }} Total</span>
                             </div>
-                            <div class="flex flex-wrap space-x-1 mt-1">
+
+                            <!-- Package Status Summary -->
+                            <div v-if="slotProps.data.released_package_count || slotProps.data.held_package_count" class="flex gap-2 text-xs mb-2">
+                                <Tag v-if="slotProps.data.released_package_count" :value="`${slotProps.data.released_package_count} Released`" severity="info" />
+                                <Tag v-if="slotProps.data.held_package_count" :value="`${slotProps.data.held_package_count} On Hold`" severity="warn" />
+                            </div>
+
+                            <!-- Individual Package Tags -->
+                            <div class="flex flex-wrap gap-1">
                                 <div v-for="(hbl_package, index) in slotProps.data?.hbl_packages" :key="index">
                                     <Tag
                                         :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
-                                        severity="info"
+                                        :severity="getPackageTagSeverity(slotProps.data, hbl_package.id)"
                                     />
                                 </div>
                             </div>
@@ -413,11 +430,17 @@ const addPackageRemark = async (packageId) => {
                           class="!border !border-info rounded-2xl bg-white cursor-pointer hover:bg-info/10"
                           @click.prevent="handlePackageRelease(queue)">
                         <template #content>
-                            <div class="flex justify-between items-center mb-6">
+                            <div class="flex justify-between items-center mb-4">
                                 <div class="flex items-center gap-2 text-info">
                                     <i class="ti ti-packages text-2xl"></i>
                                     <span class="text-2xl font-semibold">{{ queue.package_count }}</span>
                                 </div>
+                            </div>
+
+                            <!-- Package Status Summary -->
+                            <div v-if="queue.released_package_count || queue.held_package_count" class="flex justify-center gap-2 mb-4">
+                                <Tag v-if="queue.released_package_count" :value="`${queue.released_package_count} Released`" class="text-xs" severity="success" />
+                                <Tag v-if="queue.held_package_count" :value="`${queue.held_package_count} On Hold`" class="text-xs" severity="warning" />
                             </div>
 
                             <div class="text-center mb-6">
@@ -431,7 +454,7 @@ const addPackageRemark = async (packageId) => {
                                     <Tag
                                         :value="`${hbl_package.quantity} ${hbl_package.package_type}`"
                                         class="rounded-full px-4 py-2 text-base"
-                                        severity="info"
+                                        :severity="getPackageTagSeverity(queue, hbl_package.id)"
                                     />
                                 </template>
                             </div>

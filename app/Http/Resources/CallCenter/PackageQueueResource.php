@@ -27,6 +27,9 @@ class PackageQueueResource extends JsonResource
             'reference' => $this->reference,
             'package_count' => $this->package_count,
             'is_released' => $this->is_released,
+            'released_packages' => $this->released_packages,
+            'released_package_count' => $this->released_package_count ?? 0,
+            'held_package_count' => $this->held_package_count ?? $this->package_count,
             'customer' => $this->token->customer->name,
 
             'created_at' => $this->token->created_at->format('Y-m-d H:i:s'),
