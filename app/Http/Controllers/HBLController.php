@@ -16,6 +16,7 @@ use App\Http\Requests\StoreCallFlagRequest;
 use App\Http\Requests\StoreHBLRequest;
 use App\Http\Requests\StoreRemarksRequest;
 use App\Http\Requests\UpdateHBLRequest;
+use App\Http\Resources\RemarksResource;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\HBLRepositoryInterface;
 use App\Interfaces\PackageTypeRepositoryInterface;
@@ -891,6 +892,14 @@ class HBLController extends Controller
         $remark->body = $request->body;
         $remark->user_id = Auth::id();
         $hbl_package->remarks()->save($remark);
+
+        $remark->load('user:id,name');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Remark added successfully',
+            'data' => new RemarksResource($remark),
+        ], 201);
     }
 
     public function updateHBLStatus(Request $request, HBL $hbl)
