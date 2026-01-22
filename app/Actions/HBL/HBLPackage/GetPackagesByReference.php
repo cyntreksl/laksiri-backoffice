@@ -12,11 +12,24 @@ class GetPackagesByReference
 
     public function handle(string $reference)
     {
+        // Get status filter from request (default to 'released' for examination)
+        $statusFilter = request()->query('status', 'released');
+        
         $hbl = HBL::withoutGlobalScopes()->with([
-            'packages' => function ($query) {
-                $query->withoutGlobalScope(BranchScope::class)
-                    // Only get packages that have been released from bonded area
-                    ->where('release_status', 'released');
+            'packages' => function ($query) use ($statusFilter) {
+                $query->withoutGlobalScope(BranchScope::class);
+                
+                // Apply status filter
+                if ($statusFilter === 'held') {
+                    // For bonded area - show packages that are not yet released (pending or held)
+                    $query->whereIn('release_status', ['pending', 'held']);
+                } elseif ($statusFilter === 'released') {
+                    // For examination - show released packages
+                    $query->where('release_status', 'released');
+                } elseif ($statusFilter === 'all') {
+                    // Show all packages
+                    // No filter
+                }
             },
         ])
             ->where('reference', $reference)->firstOrFail();

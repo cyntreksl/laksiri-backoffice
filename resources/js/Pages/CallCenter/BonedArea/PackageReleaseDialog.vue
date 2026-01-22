@@ -29,7 +29,8 @@ const isLoading = ref(false);
 const getHBLPackagesByReference = async () => {
     isLoading.value = true;
     try {
-        const response = await fetch(`/get-hbl-packages-by-reference/${props.packageQueue.reference}`, {
+        // Request packages with 'held' status for bonded area
+        const response = await fetch(`/get-hbl-packages-by-reference/${props.packageQueue.reference}?status=held`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -49,6 +50,7 @@ const getHBLPackagesByReference = async () => {
 
     } catch (error) {
         console.log(error);
+        push.error('Failed to load packages. Please try again.');
     } finally {
         isLoading.value = false;
     }
@@ -166,6 +168,15 @@ const handleUpdateReleasePackages = () => {
             </div>
         </div>
         <div v-else>
+            <!-- No packages warning -->
+            <div v-if="hblPackages.length === 0" class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-4 flex items-start gap-3">
+                <i class="pi pi-exclamation-triangle text-yellow-600 text-xl"></i>
+                <div>
+                    <p class="font-semibold text-yellow-800">No Packages Available</p>
+                    <p class="text-sm text-yellow-700">No packages are currently on hold in the bonded area for this token. All packages may have already been released.</p>
+                </div>
+            </div>
+
             <!-- Package Status Summary -->
             <div v-if="hblPackages.length > 0" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                 <div class="grid grid-cols-3 gap-2 text-sm">
@@ -193,7 +204,7 @@ const handleUpdateReleasePackages = () => {
                 </div>
             </div>
 
-            <div class="space-y-3">
+            <div v-if="hblPackages.length > 0" class="space-y-3">
                 <div
                     v-for="(p, index) in hblPackages"
                     :key="p.id"
