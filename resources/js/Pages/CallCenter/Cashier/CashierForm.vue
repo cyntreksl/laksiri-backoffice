@@ -393,22 +393,27 @@ const handleUpdatePayment = () => {
 
     form.post(route("call-center.cashier.store"), {
         onSuccess: () => {
-            // Close the payment modal
-            showPaymentDialog.value = false;
-
             // Open receipt in new tab after successful payment
             if (props.hblId && form.paid_amount > 0) {
                 window.open(route("hbls.streamPOSReceipt", {hbl: props.hblId}), '_blank');
             }
 
-            // Refresh payment status
-            getPaymentStatus();
-
-            // Refresh the current page to show updated payment details
-            router.reload({ preserveScroll: true });
-
-            form.reset();
+            // Show success message
             push.success('Payment Update Successfully!');
+
+            // Reset form
+            form.reset();
+
+            // Close the payment modal
+            showPaymentDialog.value = false;
+
+            // Force a full page reload to refresh all data and prevent duplicate payments
+            // Use router.visit to do a fresh Inertia visit
+            router.visit(route("call-center.cashier.create", {customer_queue: props.customerQueue.id}), {
+                preserveState: false,
+                preserveScroll: false,
+                replace: true,
+            });
         },
         onError: (errors) => {
             // Inertia passes validation errors as an object

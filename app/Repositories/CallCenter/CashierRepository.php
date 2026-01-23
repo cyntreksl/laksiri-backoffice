@@ -98,8 +98,9 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         // Create a payment record
         $this->createPaymentRecord($hbl, $paymentData, $currencyRate);
 
-        // Update cashier payments
-        UpdateCashierHBLPayments::run($data, $hbl, $paymentData['new_paid_amount']);
+        // Update cashier payments - pass the LKR amount (what user actually paid)
+        $paidAmountLKR = (float) ($data['paid_amount'] ?? 0);
+        UpdateCashierHBLPayments::run($data, $hbl, $paidAmountLKR);
     }
 
     private function processAdditionalCharges(HBL $hbl, array $data, float $currencyRate): void

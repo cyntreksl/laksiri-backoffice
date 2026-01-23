@@ -69,44 +69,107 @@
             <span>Amount</span>
         </div>
 
+        @if($data['charges']['agent_outstanding'] > 0)
+        <div class="flex justify-between mb-1">
+            <span>Agent Outstanding</span>
+            <span>{{ number_format($data['charges']['agent_outstanding'], 2) }}</span>
+        </div>
+        @endif
+
+        @if($data['charges']['port_charge']['amount'] > 0)
         <div class="flex justify-between mb-1">
             <span>Port Charges</span>
             <span>{{ number_format($data['charges']['port_charge']['amount'], 2) }}</span>
         </div>
+        @endif
+
+        @if($data['charges']['handling_charge']['amount'] > 0)
         <div class="flex justify-between mb-1">
             <span>Handling Charges</span>
             <span>{{ number_format($data['charges']['handling_charge']['amount'], 2) }}</span>
         </div>
+        @endif
+
+        @if($data['charges']['storage_charge']['amount'] > 0)
         <div class="flex justify-between mb-1">
             <span>Storage Charges</span>
             <span>{{ number_format($data['charges']['storage_charge']['amount'], 2) }}</span>
         </div>
+        @endif
+
+        @if($data['charges']['dmg_charge']['amount'] > 0)
         <div class="flex justify-between mb-1">
             <span>Demurrage Charges</span>
             <span>{{ number_format($data['charges']['dmg_charge']['amount'], 2) }}</span>
         </div>
+        @endif
+
+        @if($data['charges']['do_charge'] > 0)
         <div class="flex justify-between mb-1">
             <span>D/O Charges</span>
             <span>{{ number_format($data['charges']['do_charge'], 2) }}</span>
         </div>
+        @endif
+
+        @if($data['charges']['other_charge'] > 0)
+        <div class="flex justify-between mb-1">
+            <span>Other Charges</span>
+            <span>{{ number_format($data['charges']['other_charge'], 2) }}</span>
+        </div>
+        @endif
+
+        @if($data['charges']['tax'] > 0)
         <div class="flex justify-between mb-1">
             <span>Tax</span>
-            <span>{{ number_format($data['charges']['tax'] ?? 0, 2) }}</span>
+            <span>{{ number_format($data['charges']['tax'], 2) }}</span>
         </div>
+        @endif
+
+        @if($data['charges']['stamp_charge'] > 0)
         <div class="flex justify-between mb-1">
             <span>Stamp Duty</span>
             <span>{{ number_format($data['charges']['stamp_charge'], 2) }}</span>
         </div>
+        @endif
 
         <div class="border-t border-black border-dashed my-1"></div>
 
-        <div class="flex justify-between font-bold text-sm">
-            <span>TOTAL</span>
-            <span>{{ number_format($data['charges']['total'] + $data['charges']['stamp_charge'], 2) }}</span>
+{{--        <div class="flex justify-between font-bold text-sm mb-1">--}}
+{{--            <span>OUTSTANDING</span>--}}
+{{--            <span>{{ number_format($data['charges']['outstanding'], 2) }}</span>--}}
+{{--        </div>--}}
+
+        <div class="flex justify-between font-bold text-sm bg-gray-100 p-1">
+            <span>PAID AMOUNT</span>
+            <span>{{ number_format($data['charges']['paid_amount'], 2) }}</span>
         </div>
     </div>
 
     <div class="border-b border-black border-dashed my-2"></div>
+
+    @if(isset($data['payment']) && $data['payment'])
+    <div class="text-xs mb-2">
+        <div class="font-bold mb-1">Payment Details</div>
+        @if($data['payment']->invoice_number)
+        <div class="flex justify-between">
+            <span>Invoice No:</span>
+            <span>{{ $data['payment']->invoice_number }}</span>
+        </div>
+        @endif
+        @if($data['payment']->receipt_number)
+        <div class="flex justify-between">
+            <span>Receipt No:</span>
+            <span>{{ $data['payment']->receipt_number }}</span>
+        </div>
+        @endif
+        @if($data['payment']->note)
+        <div class="mt-1">
+            <span class="font-bold">Note:</span>
+            <p class="text-xxs">{{ $data['payment']->note }}</p>
+        </div>
+        @endif
+    </div>
+    @endif
 
     <div class="text-center text-xxs mt-2">
         <p>Thank you for your business!</p>
