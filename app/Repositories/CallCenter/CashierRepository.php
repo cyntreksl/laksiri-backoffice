@@ -63,15 +63,25 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             return;
         }
         
-        // Check if there's a recent payment for this HBL (within last 5 minutes)
+        // Check if there's a recent payment for this HBL (within last 2 minutes)
         // This prevents accidental double-clicks or rapid resubmissions
+        // Reduced from 5 minutes to 2 minutes to allow legitimate follow-up payments for remaining cents
         $recentPayment = \App\Models\CashierHBLPayment::where('hbl_id', $hbl->id)
             ->where('paid_amount', '>', 0)
-            ->where('created_at', '>=', now()->subMinutes(5))
+            ->where('created_at', '>=', now()->subMinutes(2))
             ->first();
         
         if ($recentPayment) {
-            throw new \Exception('A payment was recently processed for this HBL. Please refresh the page to see the updated status.');
+            // Check if the recent payment was for the same amount (likely a duplicate)
+            // Allow if the amounts are different (e.g., paying remaining cents)
+            $recentAmountRounded = round($recentPayment->paid_amount, 2);
+            $currentAmountRounded = round($formPaidAmountLKR, 2);
+            
+            if (abs($recentAmountRounded - $currentAmountRounded) < 0.01) {
+                // Same amount within 2 minutes - likely a duplicate
+                throw new \Exception('A payment was recently processed for this HBL. Please refresh the page to see the updated status.');
+            }
+            // Different amounts - allow it (e.g., paying remaining balance)
         }
         
         // Note: We don't check if HBL is fully paid here because the frontend

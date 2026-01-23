@@ -385,7 +385,11 @@ const handleUpdatePayment = () => {
         const roundedOutstanding = Math.round(outstandingAmount * 100) / 100;
         const roundedPaid = Math.round(paidAmount * 100) / 100;
 
-        if (roundedPaid < roundedOutstanding) {
+        // Allow a small tolerance of 0.05 for rounding differences
+        // This prevents issues with cent values like 0.01, 0.02, etc.
+        const tolerance = 0.05;
+        
+        if (roundedPaid < (roundedOutstanding - tolerance)) {
             push.error('Please pay full amount');
             return;
         }
