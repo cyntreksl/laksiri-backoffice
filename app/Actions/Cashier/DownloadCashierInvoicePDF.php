@@ -25,13 +25,34 @@ class DownloadCashierInvoicePDF
         if (! $sl_Invoice) {
             $sl_Invoice = CreateSLInvoice::run($hbl);
         }
-        $container = $sl_Invoice && ! is_null($sl_Invoice['container_id'])
-            ? GetContainerWithoutGlobalScopesById::run($sl_Invoice['container_id'])
+        $container = $sl_Invoice && ! is_null($sl_Invoice->container_id)
+            ? GetContainerWithoutGlobalScopesById::run($sl_Invoice->container_id)
             : $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
         
-        // Use stored demurrage charge from HBLDestinationCharge if available, otherwise use SLInvoice
-        $demurrageCharge = $hbl->destinationCharge?->destination_demurrage_charge ?? $sl_Invoice['dmg_charge_amount'] ?? 0;
-        $doCharge = $hbl->destinationCharge?->destination_do_charge ?? $sl_Invoice['do_charge'] ?? 0;
+        // Prioritize HBLDestinationCharge data if available, otherwise use SLInvoice
+        $hasDestinationCharge = $hbl->destinationCharge !== null;
+        
+        // Get Destination I charges (handling, SLPA, bond)
+        $handlingChargeAmount = $hasDestinationCharge 
+            ? ($hbl->destinationCharge->destination_handling_charge ?? 0)
+            : ($sl_Invoice->handling_charge_amount ?? 0);
+            
+        $portChargeAmount = $hasDestinationCharge 
+            ? ($hbl->destinationCharge->destination_slpa_charge ?? 0)
+            : ($sl_Invoice->port_charge_amount ?? 0);
+            
+        $storageChargeAmount = $hasDestinationCharge 
+            ? ($hbl->destinationCharge->destination_bond_charge ?? 0)
+            : ($sl_Invoice->storage_charge_amount ?? 0);
+        
+        // Get Destination II charges (demurrage, DO)
+        $demurrageCharge = $hasDestinationCharge
+            ? ($hbl->destinationCharge->destination_demurrage_charge ?? 0)
+            : ($sl_Invoice->dmg_charge_amount ?? 0);
+            
+        $doCharge = $hasDestinationCharge
+            ? ($hbl->destinationCharge->destination_do_charge ?? 0)
+            : ($sl_Invoice->do_charge ?? 0);
         
         // Calculate tax on Destination II charges (demurrage + DO)
         $destination2Total = $demurrageCharge + $doCharge;
@@ -39,10 +60,7 @@ class DownloadCashierInvoicePDF
         $taxAmount = $taxCalculation['total_tax'];
         $destination2TotalWithTax = $taxCalculation['amount_with_tax'];
         
-        // Recalculate total with correct demurrage charge
-        $portChargeAmount = $sl_Invoice['port_charge_amount'] ?? 0;
-        $handlingChargeAmount = $sl_Invoice['handling_charge_amount'] ?? 0;
-        $storageChargeAmount = $sl_Invoice['storage_charge_amount'] ?? 0;
+        // Calculate total
         $totalAmount = $portChargeAmount + $handlingChargeAmount + $storageChargeAmount + $destination2TotalWithTax;
         $stampCharge = $destination2TotalWithTax > 25000 ? 25.00 : 0.00;
 
@@ -54,28 +72,37 @@ class DownloadCashierInvoicePDF
                 ! empty($package['arrived_at']) ||
                 ! empty($package['unloaded_at']);
         })->count();
+        
+        // Calculate unit rates for display
+        $grandVolume = $sl_Invoice->grand_volume ?? 0;
+        $packageCount = $hbl->packages->count();
+        
+        $portChargeRate = $grandVolume > 0 ? ($portChargeAmount / $grandVolume) : 0;
+        $handlingChargeRate = $packageCount > 0 ? ($handlingChargeAmount / $packageCount) : 0;
+        $storageChargeRate = $grandVolume > 0 ? ($storageChargeAmount / $grandVolume) : 0;
+        $dmgChargeRate = $grandVolume > 0 ? ($demurrageCharge / ($grandVolume * 35)) : 0;
 
         $data = [
-            'clearing_time' => $sl_Invoice['clearing_time'],
-            'date' => $sl_Invoice['date'],
+            'clearing_time' => $sl_Invoice->clearing_time,
+            'date' => $sl_Invoice->date,
             'vessel' => $container,
             'hbl' => $hbl,
-            'grand_volume' => $sl_Invoice['grand_volume'],
+            'grand_volume' => $grandVolume,
             'charges' => [
                 'port_charge' => [
-                    'rate' => $sl_Invoice['port_charge_rate'],
+                    'rate' => $portChargeRate,
                     'amount' => $portChargeAmount,
                 ],
                 'handling_charge' => [
-                    'rate' => $sl_Invoice['handling_charge_rate'],
+                    'rate' => $handlingChargeRate,
                     'amount' => $handlingChargeAmount,
                 ],
                 'storage_charge' => [
-                    'rate' => $sl_Invoice['storage_charge_rate'],
+                    'rate' => $storageChargeRate,
                     'amount' => $storageChargeAmount,
                 ],
                 'dmg_charge' => [
-                    'rate' => $sl_Invoice['dmg_charge_rate'] ?? 0,
+                    'rate' => $dmgChargeRate,
                     'amount' => $demurrageCharge,
                 ],
                 'do_charge' => $doCharge,
@@ -85,7 +112,7 @@ class DownloadCashierInvoicePDF
             ],
             'bond_storage_numbers' => $hbl->packages->pluck('bond_storage_number')->filter()->values()->all(),
             'total_in_word' => $total_in_word,
-            'by' => GetUserById::run($sl_Invoice['created_by'])->name,
+            'by' => GetUserById::run($sl_Invoice->created_by)->name,
             'taxes' => GetTaxesByWarehouse::run($hbl->warehouse_id)
                 ->map(function ($tax) {
                     return [
