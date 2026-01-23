@@ -85,10 +85,57 @@ const loadPackageDetails = async () => {
         returnForm.package_details = response.data;
         returnForm.selected_packages = []; // Reset selections
     } catch (error) {
-        if (error.response?.status === 404) {
-            push.error('No packages found for this token!');
-        } else {
-            push.error(`Error loading package details: ${error.message || error.response?.status || 'Unknown error'}`);
+        // Handle validation errors (422)
+        if (error.response?.status === 422) {
+            const errorData = error.response.data;
+
+            // Check if it's a Laravel validation error with errors object
+            if (errorData.errors) {
+                // Get all error messages from the errors object
+                const errorMessages = Object.values(errorData.errors).flat();
+
+                // Display each error message
+                errorMessages.forEach(message => {
+                    push.error({
+                        title: 'Validation Error',
+                        message: message,
+                        duration: 6000
+                    });
+                });
+            }
+            // Check if it's our custom error format
+            else if (errorData.error || errorData.details) {
+                push.error({
+                    title: errorData.error || 'Validation Error',
+                    message: errorData.details || 'Invalid token or queue status',
+                    duration: 6000
+                });
+            }
+            // Fallback for other 422 errors
+            else {
+                push.error({
+                    title: 'Validation Error',
+                    message: errorData.message || 'Invalid token or queue status',
+                    duration: 6000
+                });
+            }
+        }
+        // Handle not found errors (404)
+        else if (error.response?.status === 404) {
+            const errorData = error.response.data;
+            push.error({
+                title: errorData.error || 'Not Found',
+                message: errorData.details || 'No packages found for this token',
+                duration: 5000
+            });
+        }
+        // Handle other errors
+        else {
+            push.error({
+                title: 'Error Loading Packages',
+                message: error.response?.data?.error || error.message || 'An unexpected error occurred',
+                duration: 5000
+            });
         }
         returnForm.package_details = null;
     }
@@ -479,13 +526,13 @@ const addPackageRemark = async (packageId) => {
         <div class="space-y-6">
             <!-- Token Number Input -->
             <div class="field">
-                <label for="token_number" class="block mb-2 font-semibold">Token Number</label>
+                <label class="block mb-2 font-semibold" for="token_number">Token Number or HBL Reference</label>
                 <div class="flex gap-2">
                     <InputText
                         id="token_number"
                         v-model="returnForm.token_number"
                         class="flex-1"
-                        placeholder="Enter token number (e.g., 1, 2, 3...)"
+                        placeholder="Enter token number (e.g., 1, 2, 3...) or HBL reference"
                         @keyup.enter="loadPackageDetails"
                     />
                     <Button
@@ -495,6 +542,7 @@ const addPackageRemark = async (packageId) => {
                         :disabled="!returnForm.token_number"
                     />
                 </div>
+                <small class="text-gray-500">You can search by token number or HBL reference</small>
                 <div v-if="returnForm.errors.token_number" class="text-red-500 text-sm mt-1">
                     {{ returnForm.errors.token_number }}
                 </div>
@@ -521,6 +569,13 @@ const addPackageRemark = async (packageId) => {
                         <div>
                             <strong>Available for Return:</strong>
                             <Tag :value="returnForm.package_details.summary?.available_for_return || allPackages.length" severity="warning" />
+                        </div>
+                    </div>
+                    <!-- Validation Status Badge -->
+                    <div class="mt-3 pt-3 border-t border-blue-200">
+                        <div class="flex items-center gap-2 text-xs">
+                            <i class="pi pi-check-circle text-green-600"></i>
+                            <span class="text-green-700 font-medium">✓ Token validated: Created today and in Examination Queue</span>
                         </div>
                     </div>
                 </div>

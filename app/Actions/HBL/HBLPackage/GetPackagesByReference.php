@@ -21,8 +21,8 @@ class GetPackagesByReference
                 
                 // Apply status filter
                 if ($statusFilter === 'held') {
-                    // For bonded area - show packages that are not yet released (pending or held)
-                    $query->whereIn('release_status', ['pending', 'held']);
+                    // For bonded area - show packages that are not yet released (pending, held, or returned_to_bond)
+                    $query->whereIn('release_status', ['pending', 'held', 'returned_to_bond']);
                 } elseif ($statusFilter === 'released') {
                     // For examination - show released packages
                     $query->where('release_status', 'released');

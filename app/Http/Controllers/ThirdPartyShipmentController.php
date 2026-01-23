@@ -230,25 +230,24 @@ class ThirdPartyShipmentController extends Controller
         SaveThirdPartyShipmentV2::run($request->all());
     }
 
-    public function createContainer(StoreContainerRequest $request): JsonResponse
+    public function createContainer(StoreContainerRequest $request)
     {
         try {
             $container = CreateContainer::run($request->all());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Container created successfully',
-                'container' => [
-                    'id' => $container->id,
-                    'reference' => $container->reference,
-                    'cargo_type' => $container->cargo_type,
+            return back()->with([
+                'flash' => [
+                    'success' => true,
+                    'message' => 'Container created successfully',
+                    'container_id' => $container->id,
+                    'container_reference' => $container->reference,
+                    'container_cargo_type' => $container->cargo_type,
                 ],
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create container: '.$e->getMessage(),
-            ], 500);
+            return back()->withErrors([
+                'container' => 'Failed to create container: '.$e->getMessage(),
+            ]);
         }
     }
 

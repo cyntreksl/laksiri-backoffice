@@ -438,7 +438,10 @@ const handleDetainPackage = () => {
             severity: 'warn'
         },
         accept: () => {
-            router.post(route("hbl-packages.set.detain", packageId), { detain_type: detainType }, {
+            router.post(route("hbl-packages.set.detain", packageId), { 
+                detain_type: detainType,
+                detain_reason: detainType
+            }, {
                 preserveScroll: true,
                 onSuccess: () => {
                     push.success(`Package detained by ${detainType}`);
