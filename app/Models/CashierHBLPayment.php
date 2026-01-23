@@ -16,6 +16,12 @@ class CashierHBLPayment extends Model
         'verified_by', 'customer_queue_id', 'token_id', 'hbl_id', 'paid_amount', 'note', 'invoice_number', 'receipt_number', 'verified_at',
     ];
 
+    protected $casts = [
+        'verified_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function ($payment) {
