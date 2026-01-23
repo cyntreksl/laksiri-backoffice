@@ -279,7 +279,7 @@ const streamReceipt = () => {
 
 const printInvoice = () => {
     if (props.hblId) {
-        window.open(route("hbls.streamCashierReceipt", {hbl: props.hblId}), '_blank');
+        window.open(route("hbls.getCashierReceipt", {hbl: props.hblId}), '_blank');
     }
 };
 

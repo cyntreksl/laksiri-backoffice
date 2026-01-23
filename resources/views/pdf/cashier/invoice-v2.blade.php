@@ -28,12 +28,12 @@
                 </div>
             </div>
 
-            <div class="mb-2 flex justify-between text-xs">
+            <div class="-mt-16 flex justify-between text-xs">
                 <div><span class="invisible">Clearing Time : </span><span class="text-gray-800">{{ $data['clearing_time'] }}</span></div>
                 <div><span class="invisible">Vehicle No :</span></div>
             </div>
 
-            <div class="mb-2 flex justify-between text-xs">
+            <div class="flex justify-between text-xs">
                 <div><span class="invisible">Date : </span><span class="text-gray-800">{{ $data['date'] }}</span></div>
                 <div><span class="invisible">Serial No. : </span><span class="text-gray-800">IN00708920</span></div>
             </div>
@@ -44,7 +44,7 @@
             </div>
 
             <!-- Customer Details -->
-            <div class="mb-2 space-y-1 text-xs">
+            <div class="mb-2 !space-y-3 !ml-7 text-xs">
                 <div class="flex">
                     <span class="invisible w-40">Name of Consignee</span>
                     <span class="text-gray-800">{{$data['hbl']['consignee_name']}}</span>
@@ -80,7 +80,7 @@
             </div>
 
             <!-- Charges Table -->
-            <div class="mb-2">
+            <div class="mb-2 !mt-28">
                 <table class="w-full border-collapse text-xs">
                     <thead>
                     <tr class="bg-gray-200">
@@ -202,7 +202,7 @@
                 <p class="text-center text-xs font-bold">V.A.T. Reg. No. : 114162671-7000</p>
             </div>
 
-            <div class="mb-2 flex justify-between text-xs">
+            <div class="mb-2 flex justify-between text-xs !ml-10">
                 <div><span class="invisible">Gate Pass : </span><span class="text-gray-800">0.00</span></div>
             </div>
 
@@ -212,7 +212,7 @@
             </div>
 
             <!-- Gate Pass Details -->
-            <div class="mb-2 space-y-1 text-xs">
+            <div class="mb-2 space-y-1 text-xs !mt-28 !ml-10">
                 <div class="flex">
                     <span class="invisible w-40">No.</span>
                     <span class="text-gray-800">IN00708920</span>
@@ -259,7 +259,7 @@
                 The above goods may be permitted to be removed
             </div>
 
-            <div class="mb-2 space-y-1 text-xs">
+            <div class="mb-2 space-y-1 text-xs !ml-10">
                 <div class="flex">
                     <span class="invisible w-20">BY</span>
                     <span class="text-gray-800">{{$data['hbl']['consignee_name']}}</span>
