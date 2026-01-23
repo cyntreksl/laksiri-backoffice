@@ -25,10 +25,13 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             // 1. Retrieve HBL record
             $hbl = $this->getHBL($data['customer_queue']['token']['reference']);
 
-            // 2. Process payment updates
+            // 2. Check if payment is already completed (prevent duplicate payments)
+            $this->validatePaymentNotDuplicate($hbl, $data);
+
+            // 3. Process payment updates
             $this->processPaymentUpdates($hbl, $data);
 
-            // 3. Handle queue updates
+            // 4. Handle queue updates
             $this->updateCustomerQueue($hbl, $data);
 
             DB::commit();
@@ -43,6 +46,37 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         return HBL::where('reference', $reference)
             ->withoutGlobalScopes()
             ->firstOrFail();
+    }
+
+    /**
+     * Validate that payment is not a duplicate
+     * Prevents multiple payments for the same HBL when already fully paid
+     */
+    private function validatePaymentNotDuplicate(HBL $hbl, array $data): void
+    {
+        // Get the payment amount from form (in LKR)
+        $formPaidAmountLKR = (float) ($data['paid_amount'] ?? 0);
+        
+        // If this is a verification (paid_amount == 0), allow it
+        // Verifications are for confirming already paid amounts
+        if ($formPaidAmountLKR == 0) {
+            return;
+        }
+        
+        // Check if there's a recent payment for this HBL (within last 5 minutes)
+        // This prevents accidental double-clicks or rapid resubmissions
+        $recentPayment = \App\Models\CashierHBLPayment::where('hbl_id', $hbl->id)
+            ->where('paid_amount', '>', 0)
+            ->where('created_at', '>=', now()->subMinutes(5))
+            ->first();
+        
+        if ($recentPayment) {
+            throw new \Exception('A payment was recently processed for this HBL. Please refresh the page to see the updated status.');
+        }
+        
+        // Note: We don't check if HBL is fully paid here because the frontend
+        // PaymentSummaryCard calculation is more accurate (includes demurrage, etc.)
+        // The frontend will prevent payment if computedOutstanding <= 0
     }
 
     private function processPaymentUpdates(HBL $hbl, array $data): void

@@ -16,6 +16,8 @@ Route::get('/cashier/search-users', [CashierController::class, 'searchUsers']);
 
 Route::get('/cashier/verification-info/{hblId}', [CashierController::class, 'getVerificationInfo']);
 
+Route::get('/cashier/payment-status/{hblId}', [CashierController::class, 'getPaymentStatus']);
+
 Route::get('/cashier/{customer_queue}', [CashierController::class, 'create'])
     ->name('cashier.create');
 
