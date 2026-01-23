@@ -35,7 +35,7 @@
 
             <div class="flex justify-between text-xs">
                 <div><span class="invisible">Date : </span><span class="text-gray-800">{{ $data['date'] }}</span></div>
-                <div><span class="invisible">Serial No. : </span><span class="text-gray-800">IN00708920</span></div>
+                <div><span class="invisible">Serial No. : </span><span class="text-gray-800">{{ $data['hbl']['hbl_number'] ?? '' }}</span></div>
             </div>
 
             <!-- Title -->
@@ -215,11 +215,11 @@
             <div class="mb-2 space-y-1 text-xs !mt-28 !ml-10">
                 <div class="flex">
                     <span class="invisible w-40">No.</span>
-                    <span class="text-gray-800">IN00708920</span>
+                    <span class="text-gray-800">{{ $data['hbl']['hbl_number'] ?? '' }}</span>
                 </div>
                 <div class="flex">
-                    <span class="w-40">Dostuf Date .</span>
-                    <span class="text-gray-800">{{ $data['date'] }}</span>
+                    <span class="w-40">Destuff Date.</span>
+                    <span class="text-gray-800">{{ $data['vessel']['unloading_ended_at'] ? \Carbon\Carbon::parse($data['vessel']['unloading_ended_at'])->format('Y-m-d') : '' }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">B/L No.</span>
@@ -227,11 +227,11 @@
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Description of goods</span>
-                    <span class="text-gray-800">BUNDLES FRIDGE SOFA SET</span>
+                    <span class="text-gray-800">{{ collect($data['hbl']['packages'])->pluck('package_type')->filter()->implode(', ') }}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40"></span>
-                    <span class="text-gray-800">J-VEARITON</span>
+                    <span class="text-gray-800"></span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">No. of Packages</span>
@@ -239,7 +239,7 @@
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Passport / I.D. Card No.</span>
-                    <span class="text-gray-800"></span>
+                    <span class="text-gray-800">{{$data['hbl']['nic']}}</span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-40">Bond Storage No.</span>
@@ -285,15 +285,15 @@
             <div class="mt-8 space-y-1 text-xs">
                 <div class="flex">
                     <span class="invisible w-32">Reference No. :</span>
-                    <span class="text-gray-800">MF00020377</span>
+                    <span class="text-gray-800"></span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-32">Serial No.</span>
-                    <span class="text-gray-800">23</span>
+                    <span class="text-gray-800"></span>
                 </div>
                 <div class="flex">
                     <span class="invisible w-32">User ID</span>
-                    <span class="text-gray-800">KALIMAN</span>
+                    <span class="text-gray-800">{{ strtoupper($data['by']) }}</span>
                 </div>
             </div>
         </div>
