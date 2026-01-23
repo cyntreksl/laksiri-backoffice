@@ -51,10 +51,13 @@ const hblCharges = ref({});
 const isLoadingHbl = ref(false);
 const paymentRecord = ref([]);
 const isLoading = ref(false);
+const isPaymentSummaryLoading = ref(false);
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
 const showPaymentDialog = ref(false);
 const summaryTotalDue = ref(0);
 const verificationInfo = ref(null);
+const paymentStatus = ref(null);
+const isCheckingPaymentStatus = ref(false);
 
 const computedOutstanding = computed(() => {
     return (
@@ -209,6 +212,63 @@ const getVerificationInfo = async () => {
 
 getVerificationInfo();
 
+const getPaymentStatus = async () => {
+    if (!props.hblId) return;
+
+    isCheckingPaymentStatus.value = true;
+    try {
+        const response = await fetch(`/call-center/cashier/payment-status/${props.hblId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+        });
+
+        if (response.ok) {
+            paymentStatus.value = await response.json();
+        }
+    } catch (error) {
+        console.error("Error fetching payment status:", error);
+        paymentStatus.value = null;
+    } finally {
+        isCheckingPaymentStatus.value = false;
+    }
+};
+
+getPaymentStatus();
+
+// Computed to check if payment should be disabled
+// Use the frontend's computedOutstanding (which includes all charges from PaymentSummaryCard)
+// rather than backend's simple HBL calculation
+const isPaymentDisabled = computed(() => {
+    // Don't determine payment status until PaymentSummaryCard data is loaded
+    // This prevents the card from showing/hiding during initial load
+    if (isPaymentSummaryLoading.value) {
+        return false; // Show loading state, not "Already Paid"
+    }
+
+    // If computedOutstanding is 0 or less, payment is complete
+    // We don't rely solely on backend paymentStatus because it uses simple HBL calculation
+    // which doesn't include demurrage and other destination charges
+    return computedOutstanding.value <= 0;
+});
+
+// Computed to check if data is still loading
+// Only check PaymentSummaryCard loading since that's what determines the payment status
+const isDataLoading = computed(() => {
+    return isPaymentSummaryLoading.value;
+});
+
+// Computed to check if any action should be disabled
+const isAnyActionDisabled = computed(() => {
+    return isLoading.value ||
+           isLoadingHbl.value ||
+           isPaymentSummaryLoading.value ||
+           isCheckingPaymentStatus.value ||
+           isPaymentDisabled.value;
+});
+
 const form = useForm({
     paid_amount: 0,
     customer_queue: props.customerQueue,
@@ -230,6 +290,12 @@ watch(cashTendered, (val) => {
 });
 
 const handleVerify = () => {
+    // Check if payment is already completed
+    if (isPaymentDisabled.value) {
+        push.error('This HBL has already been fully paid and verified.');
+        return;
+    }
+
     // For zero payment/verification, we set paid_amount to 0
     form.paid_amount = 0;
 
@@ -240,8 +306,26 @@ const handleVerify = () => {
             form.reset();
             push.success('Verified Successfully!');
         },
-        onError: () => {
-            push.error('Something went wrong!');
+        onError: (errors) => {
+            // Inertia passes validation errors as an object
+            console.error('Verification error:', errors);
+
+            // Check if there's a message in the errors
+            if (errors.message) {
+                push.error(errors.message);
+            } else if (typeof errors === 'string') {
+                push.error(errors);
+            } else if (errors && typeof errors === 'object') {
+                // Get the first error message
+                const firstError = Object.values(errors)[0];
+                if (firstError) {
+                    push.error(Array.isArray(firstError) ? firstError[0] : firstError);
+                } else {
+                    push.error('Something went wrong!');
+                }
+            } else {
+                push.error('Something went wrong!');
+            }
         },
         preserveScroll: true,
         preserveState: true,
@@ -279,11 +363,17 @@ const streamReceipt = () => {
 
 const printInvoice = () => {
     if (props.hblId) {
-        window.open(route("hbls.streamCashierReceipt", {hbl: props.hblId}), '_blank');
+        window.open(route("hbls.getCashierReceipt", {hbl: props.hblId}), '_blank');
     }
 };
 
 const handleUpdatePayment = () => {
+    // Check if payment is already completed
+    if (isPaymentDisabled.value) {
+        push.error('This HBL has already been fully paid.');
+        return;
+    }
+
     // If it's a verification (zero payment), skip validations
     const isVerification = computedOutstanding.value <= 0;
 
@@ -295,7 +385,11 @@ const handleUpdatePayment = () => {
         const roundedOutstanding = Math.round(outstandingAmount * 100) / 100;
         const roundedPaid = Math.round(paidAmount * 100) / 100;
 
-        if (roundedPaid < roundedOutstanding) {
+        // Allow a small tolerance of 0.05 for rounding differences
+        // This prevents issues with cent values like 0.01, 0.02, etc.
+        const tolerance = 0.05;
+        
+        if (roundedPaid < (roundedOutstanding - tolerance)) {
             push.error('Please pay full amount');
             return;
         }
@@ -303,17 +397,49 @@ const handleUpdatePayment = () => {
 
     form.post(route("call-center.cashier.store"), {
         onSuccess: () => {
+            // Open receipt in new tab after successful payment
+            if (props.hblId && form.paid_amount > 0) {
+                window.open(route("hbls.streamPOSReceipt", {hbl: props.hblId}), '_blank');
+            }
+
+            // Show success message
+            push.success('Payment Update Successfully!');
+
+            // Reset form
+            form.reset();
+
             // Close the payment modal
             showPaymentDialog.value = false;
 
-            // Refresh the current page to show updated payment details
-            router.reload({ preserveScroll: true });
-
-            form.reset();
-            push.success('Payment Update Successfully!');
+            // Force a full page reload to refresh all data and prevent duplicate payments
+            // Use router.visit to do a fresh Inertia visit
+            router.visit(route("call-center.cashier.create", {customer_queue: props.customerQueue.id}), {
+                preserveState: false,
+                preserveScroll: false,
+                replace: true,
+            });
         },
-        onError: () => {
-            push.error('Something went wrong!');
+        onError: (errors) => {
+            // Inertia passes validation errors as an object
+            // For exceptions, the message might be in different formats
+            console.error('Payment error:', errors);
+
+            // Check if there's a message in the errors
+            if (errors.message) {
+                push.error(errors.message);
+            } else if (typeof errors === 'string') {
+                push.error(errors);
+            } else if (errors && typeof errors === 'object') {
+                // Get the first error message
+                const firstError = Object.values(errors)[0];
+                if (firstError) {
+                    push.error(Array.isArray(firstError) ? firstError[0] : firstError);
+                } else {
+                    push.error('Something went wrong!');
+                }
+            } else {
+                push.error('Something went wrong!');
+            }
         },
         preserveScroll: true,
         preserveState: true,
@@ -328,6 +454,13 @@ const handleUpdatePayment = () => {
 // Watch for the dialog open to set the default amount
 watch(showPaymentDialog, (val) => {
     if (val) {
+        // Check if payment is already completed before opening dialog
+        if (isPaymentDisabled.value) {
+            showPaymentDialog.value = false;
+            push.error('This HBL has already been fully paid.');
+            return;
+        }
+
         form.paid_amount = parseFloat(computedOutstanding.value.toFixed(2));
         cashTendered.value = null; // Reset cash tendered
     }
@@ -430,9 +563,48 @@ watch(computedOutstanding, (val) => {
                     </template>
                 </Card>
 
+                <!-- Payment Completed Status Card - Only show after data is fully loaded -->
+                <Card v-if="!isDataLoading && isPaymentDisabled" class="mb-4 bg-blue-50 border-blue-200">
+                    <template #content>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <i class="pi pi-check-circle text-blue-600 text-3xl"></i>
+                                <div>
+                                    <h3 class="text-lg font-bold text-blue-800">Payment Completed</h3>
+                                    <p class="text-sm text-blue-700">This HBL has been fully paid</p>
+                                </div>
+                            </div>
+                            <div v-if="paymentStatus?.latest_payment" class="border-t border-blue-200 pt-3 space-y-1">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Invoice:</span>
+                                    <span class="font-semibold text-gray-800">{{ paymentStatus.latest_payment.invoice_number }}</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Receipt:</span>
+                                    <span class="font-semibold text-gray-800">{{ paymentStatus.latest_payment.receipt_number }}</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Paid By:</span>
+                                    <span class="font-semibold text-gray-800">{{ paymentStatus.latest_payment.verified_by }}</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">Date:</span>
+                                    <span class="font-semibold text-gray-800">{{ paymentStatus.latest_payment.created_at }}</span>
+                                </div>
+                            </div>
+                            <div v-else class="border-t border-blue-200 pt-3">
+                                <p class="text-sm text-gray-600 italic">Payment was completed outside the cashier system</p>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+
                 <div class="flex flex-col gap-3 mb-4">
-                    <!-- Verify Button for Zero Outstanding, disabled if already verified -->
-                    <Button v-if="computedOutstanding <= 0 && !verificationInfo"
+                    <!-- Loading Skeleton for buttons while data loads -->
+                    <Skeleton v-if="isDataLoading" height="60px" width="100%"></Skeleton>
+
+                    <!-- Verify Button for Zero Outstanding, disabled if already verified or paid -->
+                    <Button v-else-if="computedOutstanding <= 0 && !verificationInfo && !isPaymentDisabled"
                             class="p-button-lg p-button-success w-full"
                             icon="pi pi-check-circle"
                             label="Verify & Next"
@@ -440,36 +612,59 @@ watch(computedOutstanding, (val) => {
                             size="large"
                             style="min-width: 180px; font-size: 1.25rem;"
                             :loading="form.processing"
+                            :disabled="isAnyActionDisabled || form.processing"
                             @click="handleVerify"/>
 
-                    <!-- Pay Now Button for Outstanding > 0 -->
-                    <Button v-else
+                    <!-- Pay Now Button for Outstanding > 0, disabled if already paid -->
+                    <Button v-else-if="computedOutstanding > 0 && !isPaymentDisabled"
                             class="p-button-lg p-button-primary w-full"
                             icon="pi pi-credit-card"
                             label="Pay Now"
                             raised
                             size="large"
                             style="min-width: 180px; font-size: 1.25rem;"
+                            :disabled="isAnyActionDisabled"
                             @click="showPaymentDialog = true"/>
 
+                    <!-- Already Paid Message -->
+                    <Button v-else-if="isPaymentDisabled"
+                            class="p-button-lg p-button-success w-full"
+                            disabled
+                            icon="pi pi-check-circle"
+                            label="Already Paid"
+                            raised
+                            size="large"
+                            style="min-width: 180px; font-size: 1.25rem;"/>
+
                     <!-- Print Invoice Button (Always visible if there's any payment history or simply always for re-printing) -->
-                    <Button
+                    <Button v-if="!isDataLoading"
                             class="p-button-lg p-button-secondary p-button-outlined w-full"
                             icon="pi pi-print"
                             label="Print Invoice"
                             size="large"
                             style="min-width: 180px;"
+                            :disabled="isLoading || isLoadingHbl || isPaymentSummaryLoading"
                             @click="printInvoice"/>
                 </div>
 
-                <Skeleton v-if="isLoading" height="350px" width="100%"></Skeleton>
-
-                <PaymentSummaryCard v-if="props.hblId" :hbl-id="props.hblId" @update:total-due="summaryTotalDue = $event" />
+                <!-- PaymentSummaryCard - always render if hblId exists, it handles its own loading state -->
+                <PaymentSummaryCard v-if="props.hblId" :hbl-id="props.hblId" @update:total-due="summaryTotalDue = $event" @update:loading="isPaymentSummaryLoading = $event" />
             </div>
         </div>
 
         <Dialog v-model:visible="showPaymentDialog" :style="{ width: '500px' }" header="Pay Now" modal>
-            <div class="grid grid-cols-1 gap-5 mt-3">
+            <!-- Payment Already Completed Warning -->
+            <div v-if="isPaymentDisabled" class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200">
+                <div class="flex items-center gap-2">
+                    <i class="pi pi-exclamation-triangle text-red-600 text-xl"></i>
+                    <div>
+                        <p class="font-semibold text-red-800">Payment Already Completed</p>
+                        <p class="text-sm text-red-600">This HBL has already been fully paid. No additional payment is required.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else class="grid grid-cols-1 gap-5 mt-3">
                 <!-- Outstanding Amount Widget (now inside dialog) -->
                 <div v-if="computedOutstanding" class="mb-2 p-4 rounded-xl shadow bg-gradient-to-r from-red-100 to-orange-100 border border-red-200 flex flex-col items-center">
                     <div class="flex items-center gap-2 mb-2">
@@ -477,7 +672,7 @@ watch(computedOutstanding, (val) => {
                         <span class="font-semibold text-lg text-red-800">Outstanding</span>
                     </div>
                     <div class="text-3xl font-bold text-red-700">
-                        {{ currencyCode }} {{ parseFloat(computedOutstanding).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                        LKR {{ parseFloat(computedOutstanding).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                     </div>
                 </div>
                 <div v-show="computedOutstanding > 0">
@@ -486,7 +681,7 @@ watch(computedOutstanding, (val) => {
                                      :maxFractionDigits="2" :minFractionDigits="2" class="w-full" inputId="paid-amount"
                                      min="0" step="any"
                                      variant="filled"/>
-                        <label for="paid-amount">Amount to Pay ({{ currencyCode }})</label>
+                        <label for="paid-amount">Amount to Pay (LKR)</label>
                     </IftaLabel>
                     <InputError :message="form.errors.paid_amount"/>
                 </div>
@@ -527,7 +722,7 @@ watch(computedOutstanding, (val) => {
                                      variant="filled"/>
                         <label for="discount">
                             <span v-if="isDiscountDisabled">Discount (Not Available)</span>
-                            <span v-else>Discount (Max: {{ currencyCode }} {{ maxDiscountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})</span>
+                            <span v-else>Discount (Max: LKR {{ maxDiscountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})</span>
                         </label>
                     </IftaLabel>
                     <InputError :message="form.errors.discount"/>
@@ -536,7 +731,7 @@ watch(computedOutstanding, (val) => {
                         Discount not available - No demurrage charges found
                     </small>
                     <small v-else-if="maxDiscountAmount > 0" class="text-gray-500 mt-1 block">
-                        Based on {{ (props.branch?.maximum_demurrage_discount || 0) }}% of demurrage charge ({{ currencyCode }} {{ parseFloat(hblCharges?.destination_demurrage_charge || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})
+                        Based on {{ (props.branch?.maximum_demurrage_discount || 0) }}% of demurrage charge (LKR {{ parseFloat(hblCharges?.destination_demurrage_charge || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})
                     </small>
                 </div>
 
@@ -553,17 +748,18 @@ watch(computedOutstanding, (val) => {
             <template #footer>
                 <div class="flex justify-between items-center w-full">
                     <!-- Balance/Change Display -->
-                    <div v-if="cashTendered && cashTendered > 0" class="flex items-center gap-2">
+                    <div v-if="cashTendered && cashTendered > 0 && !isPaymentDisabled" class="flex items-center gap-2">
                         <span class="text-sm text-gray-600">Balance:</span>
                         <span class="text-lg font-bold" :class="balanceAmount < 0 ? 'text-red-600' : 'text-green-600'">
-                            {{ currencyCode }} {{ balanceAmount.toFixed(2) }}
+                            LKR {{ balanceAmount.toFixed(2) }}
                         </span>
                     </div>
                     <div class="flex gap-2 ml-auto">
                         <Button class="p-button-text" icon="pi pi-times" label="Cancel" @click="showPaymentDialog = false" />
                         <Button
+                          v-if="!isPaymentDisabled"
                           :class="{ 'opacity-25': form.processing }"
-                          :disabled="form.processing"
+                          :disabled="form.processing || isPaymentDisabled"
                           icon="pi pi-wallet"
                           icon-class="animate-pulse"
                           label="Pay Now"

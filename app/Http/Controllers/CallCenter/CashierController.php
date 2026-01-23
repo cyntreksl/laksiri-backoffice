@@ -62,7 +62,13 @@ class CashierController extends Controller
 
     public function store(Request $request)
     {
-        $this->cashierRepository->updatePayment($request->all());
+        try {
+            $this->cashierRepository->updatePayment($request->all());
+            // Success - Inertia will call onSuccess callback
+        } catch (\Exception $e) {
+            // Return back with error message that Inertia can handle
+            return back()->withErrors(['payment' => $e->getMessage()]);
+        }
     }
 
     public function showPaidList()
@@ -141,6 +147,42 @@ class CashierController extends Controller
             'verified' => true,
             'verified_by_name' => $verification->verifiedBy->name ?? 'Unknown',
             'verified_at' => $verification->verified_at->format('M d, Y h:i A'),
+        ]);
+    }
+
+    public function getPaymentStatus($hblId)
+    {
+        $hbl = HBL::withoutGlobalScopes()->find($hblId);
+        
+        if (!$hbl) {
+            return response()->json(['error' => 'HBL not found'], 404);
+        }
+
+        $grandTotal = (float) ($hbl->grand_total ?? 0);
+        $paidAmount = (float) ($hbl->paid_amount ?? 0);
+        $outstandingAmount = $grandTotal - $paidAmount;
+        
+        // Get latest payment record
+        $latestPayment = \App\Models\CashierHBLPayment::where('hbl_id', $hblId)
+            ->with('verifiedBy:id,name')
+            ->latest('created_at')
+            ->first();
+
+        return response()->json([
+            'is_fully_paid' => $outstandingAmount <= 0,
+            'outstanding_amount' => max(0, $outstandingAmount),
+            'paid_amount' => $paidAmount,
+            'grand_total' => $grandTotal,
+            'latest_payment' => $latestPayment ? [
+                'amount' => $latestPayment->paid_amount,
+                'verified_by' => $latestPayment->verifiedBy->name ?? 'Unknown',
+                'verified_at' => $latestPayment->verified_at ? 
+                    (is_string($latestPayment->verified_at) ? $latestPayment->verified_at : $latestPayment->verified_at->format('M d, Y h:i A')) : null,
+                'created_at' => is_string($latestPayment->created_at) ? 
+                    $latestPayment->created_at : $latestPayment->created_at->format('M d, Y h:i A'),
+                'invoice_number' => $latestPayment->invoice_number,
+                'receipt_number' => $latestPayment->receipt_number,
+            ] : null,
         ]);
     }
 }

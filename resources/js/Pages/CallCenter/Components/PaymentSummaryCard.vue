@@ -16,7 +16,7 @@ const isPrepaid = computed(() => hblCharges.value?.is_branch_prepaid ?? false);
 const baseCurrency = computed(() => hblCharges.value?.base_currency_code || 'LKR');
 const baseRate = computed(() => hblCharges.value?.base_currency_rate_in_lkr || 1);
 
-const emit = defineEmits(['update:total-due']);
+const emit = defineEmits(['update:total-due', 'update:loading']);
 
 function formatCurrency(amount, symbol = 'LKR') {
     if (amount === null || amount === undefined || isNaN(amount)) return `${symbol} 0.00`;
@@ -36,6 +36,7 @@ function convertCurrency(amount, isBaseCurrency = false) {
 
 const fetchHBL = async () => {
     isLoading.value = true;
+    emit('update:loading', true);
     try {
         const response = await fetch(`/hbls/${props.hblId}`, {
             method: 'GET',
@@ -52,11 +53,14 @@ const fetchHBL = async () => {
         hbl.value = {};
     } finally {
         isLoading.value = false;
+        // Emit loading state: true if either is still loading
+        emit('update:loading', isLoading.value || isChargesLoading.value);
     }
 };
 
 const fetchHBLCharges = async () => {
     isChargesLoading.value = true;
+    emit('update:loading', true);
     try {
         const response = await fetch(`/hbl-charge/${props.hblId}`, {
             method: 'GET',
@@ -73,6 +77,8 @@ const fetchHBLCharges = async () => {
         hblCharges.value = {};
     } finally {
         isChargesLoading.value = false;
+        // Emit loading state: true if either is still loading
+        emit('update:loading', isLoading.value || isChargesLoading.value);
     }
 };
 
