@@ -176,8 +176,10 @@ class CashierController extends Controller
             'latest_payment' => $latestPayment ? [
                 'amount' => $latestPayment->paid_amount,
                 'verified_by' => $latestPayment->verifiedBy->name ?? 'Unknown',
-                'verified_at' => $latestPayment->verified_at?->format('M d, Y h:i A'),
-                'created_at' => $latestPayment->created_at->format('M d, Y h:i A'),
+                'verified_at' => $latestPayment->verified_at ? 
+                    (is_string($latestPayment->verified_at) ? $latestPayment->verified_at : $latestPayment->verified_at->format('M d, Y h:i A')) : null,
+                'created_at' => is_string($latestPayment->created_at) ? 
+                    $latestPayment->created_at : $latestPayment->created_at->format('M d, Y h:i A'),
                 'invoice_number' => $latestPayment->invoice_number,
                 'receipt_number' => $latestPayment->receipt_number,
             ] : null,
