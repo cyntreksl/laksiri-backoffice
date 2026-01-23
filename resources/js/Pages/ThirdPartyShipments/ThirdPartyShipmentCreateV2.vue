@@ -242,7 +242,7 @@ const generateContainerReference = async () => {
     }
 };
 
-const handleCreateContainer = async () => {
+const handleCreateContainer = () => {
     // Format dates
     if (
         containerForm.estimated_time_of_departure &&
@@ -274,41 +274,32 @@ const handleCreateContainer = async () => {
         containerForm.air_line_id = selectedAirline.id;
     }
 
-    try {
-        const response = await fetch(
-            route("third-party-shipments.create-container"),
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": usePage().props.csrf,
-                },
-                body: JSON.stringify(containerForm.data()),
+    // Use Inertia form submission to properly handle validation errors
+    containerForm.post(route("third-party-shipments.create-container"), {
+        preserveScroll: true,
+        onSuccess: (page) => {
+            // Get container info from flash data
+            const flash = page.props.flash;
+            if (flash?.container_id) {
+                form.shipment = flash.container_id;
+                commonFields.shipment = flash.container_id;
             }
-        );
-
-        const result = await response.json();
-
-        if (response.ok && result.success) {
-            // Refresh the page to get updated shipments list
-            router.reload({
-                only: ["shipments"],
-                onSuccess: () => {
-                    // Auto-select the newly created container
-                    if (result.container) {
-                        form.shipment = result.container.id;
-                    }
-                    push.success("Container created successfully!");
-                    closeCreateContainerDialog();
-                },
-            });
-        } else {
-            push.error(result.message || "Failed to create container");
-        }
-    } catch (error) {
-        console.log("Container creation error:", error);
-        push.error("Failed to create container. Please try again.");
-    }
+            push.success(flash?.message || "Container created successfully!");
+            closeCreateContainerDialog();
+            
+            // Reload to get updated shipments list
+            router.reload({ only: ["shipments"] });
+        },
+        onError: (errors) => {
+            // Validation errors will automatically populate containerForm.errors
+            // Show a general error message
+            if (errors.container) {
+                push.error(errors.container);
+            } else {
+                push.error("Please fix the validation errors and try again.");
+            }
+        },
+    });
 };
 
 //branch set
