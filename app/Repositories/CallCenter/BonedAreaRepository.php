@@ -45,9 +45,9 @@ class BonedAreaRepository implements BonedAreaRepositoryInterface, GridJsInterfa
                 throw new \Exception("The following package(s) have already been released and cannot be released again: {$packageList}. Please refresh the page to see the current status.");
             }
 
-            // Get packages that can be released (not already released)
+            // Get packages that can be released (pending, held, or returned_to_bond)
             $packagesToRelease = \App\Models\HBLPackage::whereIn('id', $selectedPackageIds)
-                ->where('release_status', '!=', 'released')
+                ->whereIn('release_status', ['pending', 'held', 'returned_to_bond'])
                 ->get();
 
             if ($packagesToRelease->isEmpty()) {
