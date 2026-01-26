@@ -76,7 +76,7 @@ class HBLController extends Controller
             return response()->json(['message' => 'HBL not found'], 404);
         }
 
-        // Find a related container via HBL packages pivot
+        // First try to find container from active packages
         $container = Container::withoutGlobalScope(BranchScope::class)
             ->whereHas('hbl_packages', function ($q) use ($hbl) {
                 $q->withoutGlobalScope(BranchScope::class)
@@ -84,6 +84,17 @@ class HBLController extends Controller
             })
             ->orderByDesc('estimated_time_of_departure')
             ->first();
+
+        // If not found in active packages, check duplicate_container_hbl_package (historical)
+        if (! $container) {
+            $package = $hbl->packages()
+                ->withoutGlobalScope(BranchScope::class)
+                ->whereHas('duplicate_containers')
+                ->with('duplicate_containers')
+                ->first();
+
+            $container = $package ? $package->duplicate_containers->sortByDesc('estimated_time_of_departure')->first() : null;
+        }
 
         if (! $container) {
             return response()->json(null);
@@ -368,7 +379,10 @@ class HBLController extends Controller
                 'shipper',
                 'consignee',
                 'packages' => function ($query) {
-                    $query->withoutGlobalScope(BranchScope::class);
+                    $query->withoutGlobalScope(BranchScope::class)
+                        ->with(['duplicate_containers' => function ($q) {
+                            $q->withoutGlobalScope(BranchScope::class);
+                        }]);
                 },
             ])
             ->where('reference', $reference)
@@ -380,14 +394,42 @@ class HBLController extends Controller
         }
 
         $pickup = $hbl->pickup;
+        
+        // Get container details from packages
+        $container = null;
+        if ($hbl->packages && $hbl->packages->count() > 0) {
+            $firstPackage = $hbl->packages->first();
+            // Try active container first
+            $container = $firstPackage->containers()->withoutGlobalScopes()->first();
+            // Fallback to duplicate (historical) container
+            if (!$container) {
+                $container = $firstPackage->duplicate_containers()->withoutGlobalScopes()->first();
+            }
+        }
 
         $payload = [
+            'hbl_type' => $hbl->hbl_type,
             'booking_received_date' => $pickup?->created_at ?? $hbl->created_at,
             'booking_assign_to_driver_date' => $pickup?->driver_assigned_at,
             'cargo_received_date' => $hbl->created_at,
             'shipper_name' => $hbl->hbl_name,
             'consignee_name' => $hbl->consignee_name,
             'packages_count' => $hbl->packages?->count() ?? 0,
+            
+            // Container/Shipment dates
+            'loading_started_at' => $container?->loading_started_at,
+            'loading_ended_at' => $container?->loading_ended_at,
+            'estimated_time_of_departure' => $container?->estimated_time_of_departure,
+            'estimated_time_of_arrival' => $container?->estimated_time_of_arrival,
+            'reached_date' => $container?->reached_date,
+            'arrived_at_primary_warehouse' => $container?->arrived_at_primary_warehouse,
+            'unloading_started_at' => $container?->unloading_started_at,
+            'unloading_ended_at' => $container?->unloading_ended_at,
+            
+            // HBL specific dates
+            'is_arrived_to_primary_warehouse' => $hbl->is_arrived_to_primary_warehouse,
+            'system_status' => $hbl->system_status,
+            'is_released' => $hbl->is_released,
         ];
 
         return response()->json($payload);
