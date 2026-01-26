@@ -489,23 +489,97 @@ const getEstimatedTime = (status, index, total) => {
                                                 <div class="flex items-center justify-between bg-white rounded-lg p-3 border border-green-100">
                                                     <div class="flex items-center">
                                                         <i class="pi pi-calendar text-blue-500 mr-2" />
-                                                        <span class="text-sm font-medium text-gray-600">Booking Received</span>
+                                                        <span class="text-sm font-medium text-gray-600">Pickup Request Appointment</span>
                                                     </div>
-                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_received_date ? moment(hblDetails.booking_received_date).format('MMM DD, YYYY') : '-' }}</span>
+                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_received_date ? moment(hblDetails.booking_received_date).format('MMM DD, YYYY • hh:mm A') : '-' }}</span>
                                                 </div>
                                                 <div v-if="hblDetails.booking_assign_to_driver_date" class="flex items-center justify-between bg-white rounded-lg p-3 border border-green-100">
                                                     <div class="flex items-center">
                                                         <i class="pi pi-user text-blue-500 mr-2" />
-                                                        <span class="text-sm font-medium text-gray-600">Assigned to Driver</span>
+                                                        <span class="text-sm font-medium text-gray-600">Assigned to Driver for Pickup</span>
                                                     </div>
-                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_assign_to_driver_date ? moment(hblDetails.booking_assign_to_driver_date).format('MMM DD, YYYY') : '-' }}</span>
+                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails.booking_assign_to_driver_date ? moment(hblDetails.booking_assign_to_driver_date).format('MMM DD, YYYY • hh:mm A') : '-' }}</span>
                                                 </div>
                                                 <div class="flex items-center justify-between bg-white rounded-lg p-3 border border-green-100">
                                                     <div class="flex items-center">
                                                         <i class="pi pi-check text-blue-500 mr-2" />
-                                                        <span class="text-sm font-medium text-gray-600">Cargo Received</span>
+                                                        <span class="text-sm font-medium text-gray-600">Shipment Collected</span>
                                                     </div>
-                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails.cargo_received_date ? moment(hblDetails.cargo_received_date).format('MMM DD, YYYY') : '-' }}</span>
+                                                    <span class="text-sm font-bold text-gray-800">{{ hblDetails.cargo_received_date ? moment(hblDetails.cargo_received_date).format('MMM DD, YYYY • hh:mm A') : '-' }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Shipment Loading details -->
+                                            <div v-if="getUserFriendlyStatus(log.status) === 'Shipment Export process' && hblDetails"
+                                                 class="grid grid-cols-1 gap-3 mt-3">
+                                                <div v-if="hblDetails.loading_ended_at" class="flex items-center justify-between bg-white rounded-lg p-3 border border-amber-100">
+                                                    <div class="flex items-center">
+                                                        <i class="pi pi-box text-amber-600 mr-2" />
+                                                        <span class="text-sm font-medium text-gray-600">Loaded to Shipment</span>
+                                                    </div>
+                                                    <span class="text-sm font-bold text-gray-800">
+                                                        {{ moment(hblDetails.loading_ended_at).format('MMM DD, YYYY • hh:mm A') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Shipment Arrival details -->
+                                            <div v-if="getUserFriendlyStatus(log.status) === 'Shipment Arrival process' && hblDetails"
+                                                 class="grid grid-cols-1 gap-3 mt-3">
+                                                <div v-if="hblDetails.reached_date" class="flex items-center justify-between bg-white rounded-lg p-3 border border-emerald-100">
+                                                    <div class="flex items-center">
+                                                        <i class="pi pi-flag-fill text-emerald-600 mr-2" />
+                                                        <span class="text-sm font-medium text-gray-600">Reached Destination Port</span>
+                                                    </div>
+                                                    <span class="text-sm font-bold text-gray-800">
+                                                        {{ moment(hblDetails.reached_date).format('MMM DD, YYYY • hh:mm A') }}
+                                                    </span>
+                                                </div>
+                                                <div v-if="hblDetails.arrived_at_primary_warehouse" class="flex items-center justify-between bg-white rounded-lg p-3 border border-emerald-100">
+                                                    <div class="flex items-center">
+                                                        <i class="pi pi-home text-emerald-600 mr-2" />
+                                                        <span class="text-sm font-medium text-gray-600">Reached Destination Warehouse</span>
+                                                    </div>
+                                                    <span class="text-sm font-bold text-gray-800">
+                                                        {{ moment(hblDetails.arrived_at_primary_warehouse).format('MMM DD, YYYY • hh:mm A') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Shipment Unloaded details -->
+                                            <div v-if="getUserFriendlyStatus(log.status) === 'Shipment' && hblDetails"
+                                                 class="grid grid-cols-1 gap-3">
+                                                <div v-if="hblDetails.unloading_ended_at" class="flex items-center justify-between bg-white rounded-lg p-3 border border-blue-100">
+                                                    <div class="flex items-center">
+                                                        <i class="pi pi-download text-blue-600 mr-2" />
+                                                        <span class="text-sm font-medium text-gray-600">Shipment Unloaded</span>
+                                                    </div>
+                                                    <span class="text-sm font-bold text-gray-800">
+                                                        {{ moment(hblDetails.unloading_ended_at).format('MMM DD, YYYY • hh:mm A') }}
+                                                    </span>
+                                                </div>
+                                                <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                                                    <div class="flex items-start">
+                                                        <i class="pi pi-info-circle text-blue-600 mr-2 mt-0.5"></i>
+                                                        <div>
+                                                            <p class="text-sm font-semibold text-blue-900 mb-1">Ready for Collection</p>
+                                                            <p class="text-xs text-blue-700">Please book an appointment for cargo collection at your convenience.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Door to Door specific milestones -->
+                                            <div v-if="hblDetails?.hbl_type === 'door-to-door' && getUserFriendlyStatus(log.status) === 'Delivered'"
+                                                 class="grid grid-cols-1 gap-3">
+                                                <div v-if="hblDetails.is_released" class="flex items-center justify-between bg-white rounded-lg p-3 border border-green-100">
+                                                    <div class="flex items-center">
+                                                        <i class="pi pi-file-check text-green-600 mr-2" />
+                                                        <span class="text-sm font-medium text-gray-600">Cleared from Customs</span>
+                                                    </div>
+                                                    <span class="text-sm font-bold text-gray-800">
+                                                        <i class="pi pi-check-circle text-green-600"></i> Cleared
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
