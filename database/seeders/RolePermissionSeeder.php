@@ -746,6 +746,18 @@ class RolePermissionSeeder extends Seeder
             ],
 
             [
+                'group_name' => 'Dashboard',
+                'permissions' => [
+                    'dashboard.view hbl static card',
+                    'dashboard.view hbl chart',
+                    'dashboard.view loaded shipment static card',
+                    'dashboard.view containers static card',
+                    'dashboard.view pickups static card',
+                    'dashboard.view pickups chart',
+                ],
+            ],
+
+            [
                 'group_name' => 'Reports',
                 'permissions' => [
                     'reports.detain',
