@@ -76,7 +76,7 @@ class HBLController extends Controller
             return response()->json(['message' => 'HBL not found'], 404);
         }
 
-        // Find a related container via HBL packages pivot
+        // First try to find container from active packages
         $container = Container::withoutGlobalScope(BranchScope::class)
             ->whereHas('hbl_packages', function ($q) use ($hbl) {
                 $q->withoutGlobalScope(BranchScope::class)
@@ -84,6 +84,17 @@ class HBLController extends Controller
             })
             ->orderByDesc('estimated_time_of_departure')
             ->first();
+
+        // If not found in active packages, check duplicate_container_hbl_package (historical)
+        if (! $container) {
+            $package = $hbl->packages()
+                ->withoutGlobalScope(BranchScope::class)
+                ->whereHas('duplicate_containers')
+                ->with('duplicate_containers')
+                ->first();
+
+            $container = $package ? $package->duplicate_containers->sortByDesc('estimated_time_of_departure')->first() : null;
+        }
 
         if (! $container) {
             return response()->json(null);
