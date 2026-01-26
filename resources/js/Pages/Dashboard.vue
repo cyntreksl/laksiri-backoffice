@@ -4,6 +4,15 @@ import DashboardCard from "@/Components/Widgets/DashboardCard.vue";
 import {computed} from "vue";
 import {usePage} from "@inertiajs/vue3";
 
+// Permission checking
+const page = usePage();
+const can = (perm) => {
+    const isSuperAdmin = page.props.auth?.user?.roles?.some(role =>
+        (typeof role === 'string' ? role : role?.name)?.toLowerCase() === 'super-admin'
+    );
+    return isSuperAdmin || page.props.user?.permissions?.includes(perm);
+};
+
 const props = defineProps({
     assignedJobs: {
         type: Number,
@@ -214,15 +223,15 @@ const hblChartOptions = computed(() => {
         <template #header>Dashboard</template>
 
         <div v-if="!usePage().props.user?.roles?.includes('customer')" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-4 lg:gap-5">
-            <DashboardCard :count="totalHBLs" icon="box" icon-color="info" title="Total HBL"/>
-            <DashboardCard :count="loadedShipments" icon="truck-ramp-box" icon-color="error" title="Loaded Shipment"/>
-            <DashboardCard :count="totalContainers" icon="truck-moving" icon-color="primary" title="Total Containers"/>
-            <DashboardCard :count="totalPickups" icon="person-biking" icon-color="primary" title="Total Pickups"/>
+            <DashboardCard v-if="can('dashboard.view hbl static card')" :count="totalHBLs" icon="box" icon-color="info" title="Total HBL"/>
+            <DashboardCard v-if="can('dashboard.view loaded shipment static card')" :count="loadedShipments" icon="truck-ramp-box" icon-color="error" title="Loaded Shipment"/>
+            <DashboardCard v-if="can('dashboard.view containers static card')" :count="totalContainers" icon="truck-moving" icon-color="primary" title="Total Containers"/>
+            <DashboardCard v-if="can('dashboard.view pickups static card')" :count="totalPickups" icon="person-biking" icon-color="primary" title="Total Pickups"/>
         </div>
 
 
         <div v-if="!usePage().props.user?.roles?.includes('customer')" class="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5 lg:grid-cols-2 lg:gap-6 mt-10">
-            <div class="card">
+            <div v-if="can('dashboard.view pickups chart')" class="card">
                 <div class="my-3 flex items-center justify-between px-4">
                     <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100">
                         Pickups
@@ -235,7 +244,7 @@ const hblChartOptions = computed(() => {
                     <apexchart :options="driverChartOptions" :series="driverChartOptions.series"></apexchart>
                 </div>
             </div>
-            <div class="card">
+            <div v-if="can('dashboard.view hbl chart')" class="card">
                 <div class="my-3 flex items-center justify-between px-4">
                     <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100">
                         HBL
