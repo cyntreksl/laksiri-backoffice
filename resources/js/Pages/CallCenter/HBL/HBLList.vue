@@ -100,7 +100,11 @@ const menuModel = ref([
         label: "Issue Token",
         icon: "pi pi-fw pi-tag",
         command: () => confirmIssueToken(selectedHBL),
-        visible: () => !selectedHBL.value?.tokens && selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token"),
+        visible: () => {
+            // Check if there's no token OR if the existing token is cancelled
+            const hasNoActiveToken = !selectedHBL.value?.tokens || selectedHBL.value?.tokens?.is_cancelled;
+            return hasNoActiveToken && selectedHBL.value?.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token");
+        },
     },
     {
         label: "Call Flag",

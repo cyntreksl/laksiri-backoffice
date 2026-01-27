@@ -94,7 +94,15 @@ const menuModel = ref([
         label: "Issue Token",
         icon: "pi pi-fw pi-tag",
         command: () => confirmIssueToken(selectedHBL),
-        visible: () =>  selectedHBL.value?.hbl,
+        visible: () => {
+            // Check if HBL exists and has no active token (no token OR token is cancelled)
+            if (!selectedHBL.value?.hbl) return false;
+            
+            const tokens = selectedHBL.value.hbl.tokens;
+            const hasNoActiveToken = !tokens || tokens.length === 0 || (tokens[0] && tokens[0].is_cancelled);
+            
+            return hasNoActiveToken && selectedHBL.value.hbl.system_status > 4.2 && usePage().props.user.permissions.includes("hbls.issue token");
+        },
     },
     {
         label: "Call Flag",
