@@ -16,15 +16,15 @@ class GetUnloadedMHBLWithHBLsByRef
             ->where('hbl_number', $reference)
             ->whereHas('hbls', function ($query) {
                 $query->where('is_hold', false)
-                    ->whereIn('system_status', [HBL::SYSTEM_STATUS_CASH_RECEIVED, 4.1]);
+                    ->whereIn('system_status', [HBL::SYSTEM_STATUS_CASH_RECEIVED, HBL::SYSTEM_STATUS_PARTIAL_LOADED]);
             })
             ->whereDoesntHave('hbls', function ($query) {
                 $query->where('is_hold', true)
-                    ->orWhereNotIn('system_status', [HBL::SYSTEM_STATUS_CASH_RECEIVED, 4.1]);
+                    ->orWhereNotIn('system_status', [HBL::SYSTEM_STATUS_CASH_RECEIVED, HBL::SYSTEM_STATUS_PARTIAL_LOADED]);
             })
             ->with(['hbls' => function ($query) {
                 $query->where('is_hold', false)
-                    ->whereIn('system_status', [HBL::SYSTEM_STATUS_CASH_RECEIVED, 4.1]);
+                    ->whereIn('system_status', [HBL::SYSTEM_STATUS_CASH_RECEIVED, HBL::SYSTEM_STATUS_PARTIAL_LOADED]);
             }, 'hbls.packages'])
             ->first();
 
