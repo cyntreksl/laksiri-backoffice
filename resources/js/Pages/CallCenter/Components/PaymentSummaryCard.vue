@@ -26,11 +26,13 @@ function formatCurrency(amount, symbol = 'LKR') {
 function convertCurrency(amount, isBaseCurrency = false) {
     if (amount === null || amount === undefined || isNaN(amount)) return 0;
     if (isBaseCurrency) {
-        return amount;
-    } else {
+        // isBaseCurrency means the amount is already in the base currency (e.g., QAR)
+        // and we need to convert it to LKR
         const rateRaw = baseRate.value || 1;
-        const rate = isPrepaid.value ? (1 / rateRaw) : rateRaw;
-        return amount * rate;
+        return amount * rateRaw; // QAR * 82.35 = LKR
+    } else {
+        // Amount is in LKR, no conversion needed
+        return amount;
     }
 }
 
@@ -128,10 +130,14 @@ const agentTotal = computed(() => {
     const disc = Number(hblCharges.value.discount) || 0;
 
     if (isPrepaid.value) {
+        // For prepaid: base charges are in base currency (QAR), need to convert to LKR
+        // dest1 charges are already in LKR
         const dest1 = (Number(hblCharges.value.destination_1_total) || 0) +
             (Number(hblCharges.value.destination_1_tax) || 0);
-        return base + add - disc + convertCurrency(dest1, false);
+        const baseInLKR = convertCurrency(base + add - disc, true);
+        return baseInLKR + dest1;
     } else {
+        // For non-prepaid: charges are in base currency, but stored as LKR equivalent
         return convertCurrency(base + add - disc, false);
     }
 });
@@ -142,7 +148,8 @@ const agentPaidAmount = computed(() => {
 });
 
 const agentDue = computed(() => agentTotal.value - agentPaidAmount.value);
-const agentDueLKR = computed(() => isPrepaid.value ? agentDue.value * baseRate.value : agentDue.value);
+// agentDueLKR is already in LKR since both agentTotal and agentPaidAmount are in LKR
+const agentDueLKR = computed(() => agentDue.value);
 
 const destinationIICharges = computed(() => {
     if (!hblCharges.value) return 0;

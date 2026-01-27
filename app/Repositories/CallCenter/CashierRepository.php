@@ -116,7 +116,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
     private function processAdditionalCharges(HBL $hbl, array $data, float $currencyRate): void
     {
         if (! empty($data['additional_charges'])) {
-            $additionalChargesInCurrency = round((float) $data['additional_charges'] / $currencyRate, 2);
+            // Use higher precision (4 decimal places) to minimize rounding errors
+            $additionalChargesInCurrency = round((float) $data['additional_charges'] / $currencyRate, 4);
 
             if ($destinationCharges = $hbl->destinationCharge) {
                 $destinationCharges->destination_other_charge += $additionalChargesInCurrency;
@@ -128,7 +129,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
     private function processDiscount(HBL $hbl, array $data, float $currencyRate): void
     {
         if (! empty($data['discount'])) {
-            $discountInCurrency = round((float) $data['discount'] / $currencyRate, 2);
+            // Use higher precision (4 decimal places) to minimize rounding errors
+            $discountInCurrency = round((float) $data['discount'] / $currencyRate, 4);
 
             // Apply discount to HBL or appropriate model
             $hbl->discount += $discountInCurrency;
@@ -141,7 +143,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         $discountInCurrency = 0;
 
         if (! empty($paymentData['discount'])) {
-            $discountInCurrency = round((float) $paymentData['discount'] / $currencyRate, 2);
+            // Use higher precision (4 decimal places) to minimize rounding errors
+            $discountInCurrency = round((float) $paymentData['discount'] / $currencyRate, 4);
         }
 
         CreateHBLPayment::run([
@@ -159,7 +162,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
     private function calculatePaymentAmounts(HBL $hbl, array $data, float $currencyRate): array
     {
         $newPaidAmountLKR = (float) ($data['paid_amount'] ?? 0);
-        $newPaidAmount = round($newPaidAmountLKR / $currencyRate, 2);
+        // Use higher precision (4 decimal places) to minimize rounding errors
+        $newPaidAmount = round($newPaidAmountLKR / $currencyRate, 4);
         $previousPaidAmount = (float) ($hbl->paid_amount ?? 0);
         $grandTotal = (float) ($hbl->grand_total ?? 0);
 
@@ -215,7 +219,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         
         // Form paid_amount is in LKR, convert to base currency for comparison
         $formPaidAmountLKR = (float) ($data['paid_amount'] ?? 0);
-        $formPaidAmountBase = round($formPaidAmountLKR / $currencyRate, 2);
+        // Use higher precision (4 decimal places) to minimize rounding errors
+        $formPaidAmountBase = round($formPaidAmountLKR / $currencyRate, 4);
 
         // Check if this is a verification (paid_amount == 0 means already paid, just verifying)
         $isVerification = $formPaidAmountLKR == 0;
@@ -224,7 +229,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         // If it's a payment, check if the payment amount covers the outstanding
         if ($isVerification) {
             // Verification: Check if HBL is already fully paid
-            if ($outstandingAmount <= 0) {
+            // Use a small tolerance (0.01) to account for rounding differences
+            if ($outstandingAmount <= 0.01) {
                 // Fully paid, move to package delivery
                 $this->sendToPackageDelivery($customerQueue, $hbl, $data);
             } else {
@@ -237,7 +243,8 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             $newPaidAmount = $currentPaidAmount + $formPaidAmountBase;
             $newOutstanding = $grandTotal - $newPaidAmount;
             
-            if ($newOutstanding <= 0) {
+            // Use a small tolerance (0.01) to account for rounding differences
+            if ($newOutstanding <= 0.01) {
                 // Payment covers all outstanding, move to package delivery
                 $this->sendToPackageDelivery($customerQueue, $hbl, $data);
             } else {
