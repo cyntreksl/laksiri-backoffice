@@ -32,18 +32,19 @@ class DownloadCashierInvoicePDF
         // Prioritize HBLDestinationCharge data if available, otherwise use SLInvoice
         $hasDestinationCharge = $hbl->destinationCharge !== null;
         
-        // Get Destination I charges (handling, SLPA, bond)
-        $handlingChargeAmount = $hasDestinationCharge 
+        // Apply conditional logic based on payment status
+        // 1. If Destination I Charges is paid, set handling, storage, and port charges to 0
+        $handlingChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge 
             ? ($hbl->destinationCharge->destination_handling_charge ?? 0)
-            : ($sl_Invoice->handling_charge_amount ?? 0);
+            : ($sl_Invoice->handling_charge_amount ?? 0));
             
-        $portChargeAmount = $hasDestinationCharge 
+        $portChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge 
             ? ($hbl->destinationCharge->destination_slpa_charge ?? 0)
-            : ($sl_Invoice->port_charge_amount ?? 0);
+            : ($sl_Invoice->port_charge_amount ?? 0));
             
-        $storageChargeAmount = $hasDestinationCharge 
+        $storageChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge 
             ? ($hbl->destinationCharge->destination_bond_charge ?? 0)
-            : ($sl_Invoice->storage_charge_amount ?? 0);
+            : ($sl_Invoice->storage_charge_amount ?? 0));
         
         // Get Destination II charges (demurrage, DO)
         $demurrageCharge = $hasDestinationCharge
@@ -53,6 +54,9 @@ class DownloadCashierInvoicePDF
         $doCharge = $hasDestinationCharge
             ? ($hbl->destinationCharge->destination_do_charge ?? 0)
             : ($sl_Invoice->do_charge ?? 0);
+        
+        // 2. If Demurrage Charge is 0, ensure it shows as 0 in invoice
+        $demurrageCharge = ($demurrageCharge == 0) ? 0 : $demurrageCharge;
         
         // Calculate tax on Destination II charges (demurrage + DO)
         $destination2Total = $demurrageCharge + $doCharge;
