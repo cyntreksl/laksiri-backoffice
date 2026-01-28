@@ -35,6 +35,15 @@ class StreamCashierInvoicePDF
         $demurrageCharge = $hbl->destinationCharge?->destination_demurrage_charge ?? $sl_Invoice['dmg_charge_amount'] ?? 0;
         $doCharge = $hbl->destinationCharge?->destination_do_charge ?? $sl_Invoice['do_charge'] ?? 0;
         
+        // Apply conditional logic based on payment status
+        // 1. If Destination I Charges is paid, set handling, storage, and port charges to 0
+        $portChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($sl_Invoice['port_charge_amount'] ?? 0);
+        $handlingChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($sl_Invoice['handling_charge_amount'] ?? 0);
+        $storageChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($sl_Invoice['storage_charge_amount'] ?? 0);
+        
+        // 2. If Demurrage Charge is 0, ensure it shows as 0 in invoice
+        $demurrageCharge = ($demurrageCharge == 0) ? 0 : $demurrageCharge;
+        
         // Calculate tax on Destination II charges (demurrage + DO)
         $destination2Total = $demurrageCharge + $doCharge;
         $taxCalculation = CalculateTax::run($destination2Total);
@@ -42,9 +51,6 @@ class StreamCashierInvoicePDF
         $destination2TotalWithTax = $taxCalculation['amount_with_tax'];
         
         // Recalculate total with correct demurrage charge
-        $portChargeAmount = $sl_Invoice['port_charge_amount'] ?? 0;
-        $handlingChargeAmount = $sl_Invoice['handling_charge_amount'] ?? 0;
-        $storageChargeAmount = $sl_Invoice['storage_charge_amount'] ?? 0;
         $totalAmount = $portChargeAmount + $handlingChargeAmount + $storageChargeAmount + $destination2TotalWithTax;
         $stampCharge = $destination2TotalWithTax > 25000 ? 25.00 : 0.00;
 
