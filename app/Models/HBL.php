@@ -207,7 +207,6 @@ class HBL extends Model
     {
         $query->whereIn('system_status', [
             self::SYSTEM_STATUS_CASH_RECEIVED,
-            4.1,
         ]);
     }
 

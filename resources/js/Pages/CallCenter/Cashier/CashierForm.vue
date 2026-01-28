@@ -248,10 +248,18 @@ const isPaymentDisabled = computed(() => {
         return false; // Show loading state, not "Already Paid"
     }
 
-    // If computedOutstanding is 0 or less, payment is complete
-    // We don't rely solely on backend paymentStatus because it uses simple HBL calculation
-    // which doesn't include demurrage and other destination charges
-    return computedOutstanding.value <= 0;
+    // Check if there's a verified payment record from backend
+    // This indicates payment was already completed and verified
+    if (paymentStatus.value?.is_paid) {
+        return true;
+    }
+
+    // If there's verification info, payment is complete
+    if (verificationInfo.value) {
+        return true;
+    }
+
+    return false;
 });
 
 // Computed to check if data is still loading
