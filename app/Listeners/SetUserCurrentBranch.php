@@ -23,6 +23,8 @@ class SetUserCurrentBranch
     {
         $user = $event->user;
         $branch = GetBranchById::run($user->last_logged_branch_id ?? $user->primary_branch_id);
-        SwitchUserBranch::run($branch);
+        
+        // Skip validation during login - user is being set to their default branch
+        SwitchUserBranch::run($branch, skipValidation: true);
     }
 }
