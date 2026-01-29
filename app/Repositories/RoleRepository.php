@@ -97,6 +97,11 @@ class RoleRepository implements RoleRepositoryInterface
 
     public function updateRole(array $data, Role $role)
     {
+        // Prevent renaming of super-admin role - critical security check
+        if ($role->name === 'super-admin' && isset($data['name']) && $data['name'] !== 'super-admin') {
+            abort(403, 'The Super Admin role cannot be renamed. This is a critical security protection.');
+        }
+
         // Prevent modification of super-admin role unless actor is super-admin
         if ($role->name === 'super-admin' && ! Auth::user()->hasRole('super-admin')) {
             abort(403, 'Only Super Admin can modify the Super Admin role.');
