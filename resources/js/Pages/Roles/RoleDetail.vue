@@ -31,6 +31,8 @@ const filters = ref({
     global: {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
 
+const permissionSearch = ref('');
+
 const formatDate = (date) => {
     if (!date) return 'N/A';
     return dayjs(date).format('MMM DD, YYYY h:mm A');
@@ -73,6 +75,34 @@ const groupedPermissions = computed(() => {
     });
     
     return groups;
+});
+
+// Filtered permissions based on search
+const filteredGroupedPermissions = computed(() => {
+    if (!permissionSearch.value) {
+        return groupedPermissions.value;
+    }
+    
+    const searchLower = permissionSearch.value.toLowerCase();
+    const filtered = {};
+    
+    Object.entries(groupedPermissions.value).forEach(([groupName, permissions]) => {
+        // Check if group name matches
+        const groupMatches = groupName.toLowerCase().includes(searchLower);
+        
+        // Filter permissions that match
+        const matchingPermissions = permissions.filter(permission => {
+            const permissionName = formatPermissionName(permission.name).toLowerCase();
+            return permissionName.includes(searchLower) || permission.name.toLowerCase().includes(searchLower);
+        });
+        
+        // Include group if group name matches or has matching permissions
+        if (groupMatches || matchingPermissions.length > 0) {
+            filtered[groupName] = groupMatches ? permissions : matchingPermissions;
+        }
+    });
+    
+    return filtered;
 });
 
 const resolveRoleIcon = (role) => {
@@ -201,23 +231,50 @@ const resolveStatus = (status) =>
                     </div>
                 </template>
                 <template #content>
-                    <div v-if="role.permissions && role.permissions.length > 0" class="space-y-4">
-                        <div
-                            v-for="(permissions, groupName) in groupedPermissions"
-                            :key="groupName"
-                            class="bg-slate-100 px-5 py-3 rounded-lg"
-                        >
-                            <div class="font-semibold text-gray-700 mb-3">
-                                {{ groupName }}
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                <Chip
-                                    v-for="permission in permissions"
-                                    :key="permission.id"
-                                    :label="formatPermissionName(permission.name)"
-                                    class="border border-sky-500 !bg-sky-100 text-xs"
+                    <div v-if="role.permissions && role.permissions.length > 0">
+                        <!-- Search Input -->
+                        <div class="mb-4">
+                            <IconField class="w-full sm:w-96">
+                                <InputIcon>
+                                    <i class="pi pi-search"/>
+                                </InputIcon>
+                                <InputText
+                                    v-model="permissionSearch"
+                                    class="w-full"
+                                    placeholder="Search permissions or groups..."
+                                    size="small"
                                 />
+                            </IconField>
+                        </div>
+
+                        <!-- Grouped Permissions -->
+                        <div v-if="Object.keys(filteredGroupedPermissions).length > 0" class="space-y-4">
+                            <div
+                                v-for="(permissions, groupName) in filteredGroupedPermissions"
+                                :key="groupName"
+                                class="bg-slate-100 px-5 py-3 rounded-lg"
+                            >
+                                <div class="font-semibold text-gray-700 mb-3">
+                                    {{ groupName }}
+                                    <span class="text-sm font-normal text-gray-500 ml-2">
+                                        ({{ permissions.length }})
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                    <Chip
+                                        v-for="permission in permissions"
+                                        :key="permission.id"
+                                        :label="formatPermissionName(permission.name)"
+                                        class="border border-sky-500 !bg-sky-100 text-xs"
+                                    />
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- No Results -->
+                        <div v-else class="text-gray-500 text-center py-8">
+                            <i class="pi pi-search text-4xl mb-2 text-gray-400"></i>
+                            <p>No permissions found matching "{{ permissionSearch }}"</p>
                         </div>
                     </div>
                     <div v-else class="text-gray-500 text-center py-4">
