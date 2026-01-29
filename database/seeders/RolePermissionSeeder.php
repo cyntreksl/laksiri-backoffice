@@ -438,6 +438,7 @@ class RolePermissionSeeder extends Seeder
                     'users.list',
                     'users.edit',
                     'users.delete',
+                    'users.switch-branch',
                 ],
             ],
 

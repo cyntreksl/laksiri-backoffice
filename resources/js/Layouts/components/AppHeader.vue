@@ -1,8 +1,9 @@
 <script setup>
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import {router, usePage} from "@inertiajs/vue3";
 import {useMonochromeSelector} from "@/composable/monochromeMode.js";
 import {useDarkModeSelector} from "@/composable/darkMode.js";
+import {push} from "notivue";
 import Select from 'primevue/select';
 import Popover from 'primevue/popover';
 import Avatar from 'primevue/avatar';
@@ -17,6 +18,12 @@ const op = ref();
 
 const userBranches = page.props.userBranch;
 const isDarkMode = darkModeSelector.isDarkMode;
+
+// Check if user has permission to switch branches
+const canSwitchBranch = computed(() => {
+    const permissions = page.props.user?.permissions || [];
+    return permissions.includes('users.switch-branch');
+});
 
 const logout = () => {
     router.post(route("logout"));
@@ -35,6 +42,10 @@ const toggle = (event) => {
 }
 
 const setBranch = (branch) => {
+    if (!canSwitchBranch.value) {
+        push.error('You do not have permission to switch branches');
+        return;
+    }
 
     fetch("/switch-branch", {
         method: "POST",
@@ -46,11 +57,15 @@ const setBranch = (branch) => {
     })
         .then((response) => {
             if (!response.ok) {
-                throw new Error("Failed to switch branch");
+                return response.json().then(data => {
+                    throw new Error(data.error || data.message || "Failed to switch branch");
+                });
             }
             return response.json();
         })
         .then((data) => {
+            push.success(`Switched to ${data.branchName}`);
+            
             if (route().current("branches.edit")) {
                 router.visit(route("branches.edit", data.branchId), {
                     replace: true,
@@ -61,6 +76,7 @@ const setBranch = (branch) => {
         })
         .catch((error) => {
             console.error("Error:", error);
+            push.error(error.message || "Failed to switch branch. Please try again.");
         });
 };
 </script>
@@ -98,11 +114,25 @@ const setBranch = (branch) => {
                     </button>
 
                     <!-- Branch-->
-                    <Select v-if="userBranches.length > 0" :options="userBranches" size="small" @change="setBranch($event.value)">
+                    <Select 
+                        v-if="userBranches.length > 0 && canSwitchBranch" 
+                        :options="userBranches" 
+                        size="small" 
+                        @change="setBranch($event.value)"
+                    >
                         <template #value>
                             {{ $page.props.auth.user.active_branch_name }}
                         </template>
                     </Select>
+                    
+                    <!-- Branch Display Only (No Permission) -->
+                    <div 
+                        v-else-if="userBranches.length > 0 && !canSwitchBranch"
+                        class="px-3 py-2 text-sm font-medium text-slate-700 dark:text-navy-100 bg-slate-100 dark:bg-navy-800 rounded-md"
+                        title="You do not have permission to switch branches"
+                    >
+                        {{ $page.props.auth.user.active_branch_name }}
+                    </div>
 
                     <!-- Profile -->
                     <div class="flex">
@@ -132,7 +162,7 @@ const setBranch = (branch) => {
                             <div class="flex flex-col pt-2">
                                 <template v-if="!usePage().props.user?.roles?.includes('customer')">
                                     <a
-                                        v-if="! $page.props.user.roles.includes('viewer')"
+                                        v-if="! $page.props.user.roles.includes('viewer') && canSwitchBranch"
                                         :href="
                         route(
                           'branches.edit',

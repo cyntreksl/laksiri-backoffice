@@ -194,15 +194,24 @@ class UserController extends Controller
 
     public function switchBranch(Request $request): JsonResponse
     {
+        // Authorization check
+        $this->authorize('users.switch-branch');
+
         $branchName = $request->input('branch_name');
         try {
             $response = $this->userRepository->switchBranch($branchName);
 
             return response()->json($response);
         } catch (Exception $exception) {
-            Log::error('User branch switch failed: '.$exception->getMessage());
+            Log::error('User branch switch failed: '.$exception->getMessage(), [
+                'user_id' => Auth::id(),
+                'branch_name' => $branchName,
+            ]);
 
-            return response()->json([]);
+            return response()->json([
+                'error' => $exception->getMessage(),
+                'message' => 'Failed to switch branch',
+            ], 403);
         }
     }
 
