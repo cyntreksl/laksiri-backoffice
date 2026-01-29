@@ -11,6 +11,10 @@ import Tag from "primevue/tag";
 import {ref} from "vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import InputText from "primevue/inputtext";
+import IconField from "primevue/iconfield";
+import InputIcon from "primevue/inputicon";
+import {FilterMatchMode} from "@primevue/core/api";
 
 dayjs.extend(relativeTime);
 
@@ -22,6 +26,10 @@ const props = defineProps({
 });
 
 const perPage = ref(10);
+
+const filters = ref({
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS},
+});
 
 const formatDate = (date) => {
     if (!date) return 'N/A';
@@ -199,16 +207,38 @@ const resolveStatus = (status) =>
                 </template>
                 <template #content>
                     <DataTable
+                        v-model:filters="filters"
+                        :globalFilterFields="['username', 'email', 'status']"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50]"
                         :totalRecords="role.users ? role.users.length : 0"
                         :value="role.users"
                         data-key="id"
+                        filter-display="menu"
                         paginator
                         removable-sort
                         row-hover
                         tableStyle="min-width: 50rem"
                     >
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div class="text-sm text-gray-600">
+                                    Showing {{ role.users ? role.users.length : 0 }} user(s)
+                                </div>
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search"/>
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.global.value"
+                                        class="w-full"
+                                        placeholder="Search users..."
+                                        size="small"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
+
                         <template #empty>No users assigned to this role.</template>
 
                         <Column field="username" header="Username" sortable>
