@@ -231,7 +231,8 @@ const resolveStatus = (status) =>
                                     <Chip
                                         v-for="branch in slotProps.data.branches"
                                         :key="branch.id"
-                                        :label="branch.name"
+                                        :class="branch.id === slotProps.data.primary_branch_id ? 'border border-blue-600 !bg-blue-100 !text-blue-800 font-semibold' : 'border border-gray-300 !bg-gray-100'"
+                                        :label="branch.id === slotProps.data.primary_branch_id ? `${branch.name} (Primary)` : branch.name"
                                         class="text-xs"
                                     />
                                 </div>

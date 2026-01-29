@@ -64,8 +64,21 @@ class RoleController extends Controller
         // Get users with this role
         $users = User::role($role->name)
             ->select('id', 'username', 'email', 'status', 'created_at', 'primary_branch_id')
-            ->with('branches:id,name')
-            ->get();
+            ->with(['branches:id,name', 'primaryBranch:id,name'])
+            ->get()
+            ->map(function ($user) {
+                // Merge primary branch into branches array if not already present
+                $branches = $user->branches->toArray();
+                
+                if ($user->primaryBranch && !collect($branches)->contains('id', $user->primaryBranch->id)) {
+                    array_unshift($branches, $user->primaryBranch->toArray());
+                }
+                
+                $userData = $user->toArray();
+                $userData['branches'] = $branches;
+                
+                return $userData;
+            });
 
         return Inertia::render('Roles/RoleDetail', [
             'role' => array_merge($role->toArray(), [
