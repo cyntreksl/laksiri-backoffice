@@ -8,7 +8,7 @@ import Column from "primevue/column";
 import DataTable from "primevue/datatable";
 import Chip from "primevue/chip";
 import Tag from "primevue/tag";
-import {ref} from "vue";
+import {ref, computed} from "vue";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import InputText from "primevue/inputtext";
@@ -56,6 +56,24 @@ const formatPermissionName = (name) => {
     }
     return name.charAt(0).toUpperCase() + name.slice(1);
 };
+
+// Group permissions by group_name
+const groupedPermissions = computed(() => {
+    if (!props.role.permissions || props.role.permissions.length === 0) {
+        return {};
+    }
+    
+    const groups = {};
+    props.role.permissions.forEach(permission => {
+        const groupName = permission.group_name || 'Other';
+        if (!groups[groupName]) {
+            groups[groupName] = [];
+        }
+        groups[groupName].push(permission);
+    });
+    
+    return groups;
+});
 
 const resolveRoleIcon = (role) => {
     switch (role.toLowerCase()) {
@@ -183,13 +201,24 @@ const resolveStatus = (status) =>
                     </div>
                 </template>
                 <template #content>
-                    <div v-if="role.permissions && role.permissions.length > 0" class="flex flex-wrap gap-2">
-                        <Chip
-                            v-for="permission in role.permissions"
-                            :key="permission.id"
-                            :label="formatPermissionName(permission.name)"
-                            class="border border-sky-500 !bg-sky-100"
-                        />
+                    <div v-if="role.permissions && role.permissions.length > 0" class="space-y-4">
+                        <div
+                            v-for="(permissions, groupName) in groupedPermissions"
+                            :key="groupName"
+                            class="bg-slate-100 px-5 py-3 rounded-lg"
+                        >
+                            <div class="font-semibold text-gray-700 mb-3">
+                                {{ groupName }}
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                <Chip
+                                    v-for="permission in permissions"
+                                    :key="permission.id"
+                                    :label="formatPermissionName(permission.name)"
+                                    class="border border-sky-500 !bg-sky-100 text-xs"
+                                />
+                            </div>
+                        </div>
                     </div>
                     <div v-else class="text-gray-500 text-center py-4">
                         No permissions assigned to this role.
