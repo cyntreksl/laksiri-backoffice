@@ -59,6 +59,11 @@ class RoleRepository implements RoleRepositoryInterface
         $actorRole = Auth::user()?->roles()->first();
         $targetHierarchy = isset($data['hierarchy']) ? (float) $data['hierarchy'] : 100.00;
 
+        // Prevent creation of super-admin role (hierarchy 0.00) unless actor is already super-admin
+        if ($targetHierarchy === 0.00 && ! Auth::user()->hasRole('super-admin')) {
+            abort(403, 'Only Super Admin can create roles with super-admin privileges.');
+        }
+
         if ($actorRole && ! RoleHierarchy::canActOn($actorRole, $targetHierarchy)) {
             abort(403, 'You are not allowed to create a role with higher privilege.');
         }
@@ -76,6 +81,11 @@ class RoleRepository implements RoleRepositoryInterface
 
     public function deleteRole(Role $role)
     {
+        // Prevent deletion of super-admin role
+        if ($role->name === 'super-admin') {
+            abort(403, 'The Super Admin role cannot be deleted.');
+        }
+
         $actorRole = Auth::user()?->roles()->first();
 
         if ($actorRole && ! RoleHierarchy::canActOn($actorRole, $role)) {
@@ -87,8 +97,18 @@ class RoleRepository implements RoleRepositoryInterface
 
     public function updateRole(array $data, Role $role)
     {
+        // Prevent modification of super-admin role unless actor is super-admin
+        if ($role->name === 'super-admin' && ! Auth::user()->hasRole('super-admin')) {
+            abort(403, 'Only Super Admin can modify the Super Admin role.');
+        }
+
         $actorRole = Auth::user()?->roles()->first();
         $targetHierarchy = isset($data['hierarchy']) ? (float) $data['hierarchy'] : (float) ($role->hierarchy ?? 100.00);
+
+        // Prevent escalation to super-admin privileges unless actor is super-admin
+        if ($targetHierarchy === 0.00 && ! Auth::user()->hasRole('super-admin')) {
+            abort(403, 'Only Super Admin can assign super-admin privileges.');
+        }
 
         if ($actorRole && ! RoleHierarchy::canActOn($actorRole, $targetHierarchy)) {
             abort(403, 'You are not allowed to update this role to a higher privilege.');

@@ -19,6 +19,12 @@ class UpdateUser
         ]);
 
         if (isset($data['role_id'])) {
+            // Prevent assigning super-admin role unless actor is super-admin
+            $targetRole = \Spatie\Permission\Models\Role::find($data['role_id']);
+            if ($targetRole && $targetRole->name === 'super-admin' && ! auth()->user()->hasRole('super-admin')) {
+                abort(403, 'Only Super Admin can assign the Super Admin role to users.');
+            }
+
             // remove all existing roles
             $user->roles()->detach();
 

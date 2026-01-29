@@ -58,8 +58,24 @@ class AppServiceProvider extends ServiceProvider
 
         // Implicitly grant "Super Admin" role all permissions
         // This works in the app by using gate-related functions like auth()->user->can() and @can()
+        // Super Admin bypasses all permission checks for platform-level control
         Gate::before(function ($user, $ability) {
-            return $user->hasRole('admin') ? true : null;
+            // Check for super-admin role (hierarchy 0.00) - highest privilege
+            if ($user->hasRole('super-admin')) {
+                // Log Super Admin activity for audit trail
+                activity()
+                    ->causedBy($user)
+                    ->withProperties([
+                        'ability' => $ability,
+                        'role' => 'super-admin',
+                        'ip' => request()->ip(),
+                    ])
+                    ->log('Super Admin accessed: ' . $ability);
+                
+                return true;
+            }
+
+            return null; // Continue to normal permission checks
         });
 
         Event::listen(PickupCreated::class, SendPickupCreatedNotification::class);
