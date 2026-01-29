@@ -20,6 +20,7 @@ class UserCollection extends JsonResource
             'id' => $this->id,
             'username' => $this->username,
             'role' => Str::ucfirst($this->getRoleName()),
+            'role_id' => $this->getRoleId(),
             'primary_branch_name' => $this->primaryBranch?->name,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
             'status' => $this->status,
@@ -35,5 +36,13 @@ class UserCollection extends JsonResource
     protected function getRoleName(): string
     {
         return $this->roles->pluck('name')->first() ?? '';
+    }
+
+    /**
+     * Get the user's role ID.
+     */
+    protected function getRoleId(): ?int
+    {
+        return $this->roles->pluck('id')->first();
     }
 }

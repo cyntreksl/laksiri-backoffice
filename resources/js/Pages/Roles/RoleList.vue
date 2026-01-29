@@ -182,10 +182,12 @@ const confirmRoleDelete = (id) => {
 
                         <Column field="name" header="Role" sortable>
                             <template #body="slotProps">
-                                <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-2 cursor-pointer hover:opacity-80"
+                                     @click="() => router.visit(route('users.roles.show', slotProps.data.id))">
                                     <i :class="[resolveRoleIcon(slotProps.data.name).icon, resolveRoleIcon(slotProps.data.name).color]"
                                        class="text-lg"></i>
-                                    <div :class="resolveRoleIcon(slotProps.data.name).color">{{ slotProps.data.name.toUpperCase() }}
+                                    <div :class="resolveRoleIcon(slotProps.data.name).color" class="font-medium">
+                                        {{ slotProps.data.name.toUpperCase() }}
                                     </div>
                                 </div>
                             </template>

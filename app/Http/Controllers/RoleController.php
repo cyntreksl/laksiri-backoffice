@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Interfaces\RoleRepositoryInterface;
+use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
@@ -53,9 +54,24 @@ class RoleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Role $role)
     {
-        //
+        $this->authorize('roles.list');
+
+        // Load role with permissions and users
+        $role->load('permissions');
+        
+        // Get users with this role
+        $users = User::role($role->name)
+            ->select('id', 'username', 'email', 'status', 'created_at', 'primary_branch_id')
+            ->with('branches:id,name')
+            ->get();
+
+        return Inertia::render('Roles/RoleDetail', [
+            'role' => array_merge($role->toArray(), [
+                'users' => $users
+            ]),
+        ]);
     }
 
     /**
