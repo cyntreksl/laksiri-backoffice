@@ -33,7 +33,8 @@ class UpdateBranch
         ]);
 
         if (session('current_branch_id') === $branch->id) {
-            SwitchUserBranch::run($branch);
+            // Skip validation - just refreshing session data for current branch
+            SwitchUserBranch::run($branch, skipValidation: true);
         }
 
         return $updated;

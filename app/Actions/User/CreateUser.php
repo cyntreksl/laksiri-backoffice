@@ -27,6 +27,11 @@ class CreateUser
 
         // assign role
         if (isset($data['role'])) {
+            // Prevent assigning super-admin role unless actor is super-admin
+            if ($data['role'] === 'super-admin' && ! auth()->user()->hasRole('super-admin')) {
+                abort(403, 'Only Super Admin can assign the Super Admin role to users.');
+            }
+            
             $user->assignRole($data['role']);
         }
 

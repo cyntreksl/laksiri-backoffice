@@ -331,10 +331,12 @@ const confirmUserDelete = (user) => {
 
                         <Column field="role" header="Role" sortable>
                             <template #body="slotProps">
-                                <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-2 cursor-pointer hover:opacity-80"
+                                     @click="() => router.visit(route('users.roles.show', slotProps.data.role_id))">
                                     <i :class="[resolveRoleIcon(slotProps.data.role).icon, resolveRoleIcon(slotProps.data.role).color]"
                                        class="text-lg"></i>
-                                    <div :class="resolveRoleIcon(slotProps.data.role).color">{{ slotProps.data.role }}
+                                    <div :class="resolveRoleIcon(slotProps.data.role).color" class="font-medium">
+                                        {{ slotProps.data.role }}
                                     </div>
                                 </div>
                             </template>
