@@ -344,6 +344,11 @@ Breadcrumbs::for('users.roles.create', function (BreadcrumbTrail $trail) {
     $trail->push('Create Role', route('users.roles.create'));
 });
 
+Breadcrumbs::for('users.roles.show', function (BreadcrumbTrail $trail, Role $role) {
+    $trail->parent('users.roles.index');
+    $trail->push('Role Details: ' . $role->name, route('users.roles.show', $role->id));
+});
+
 Breadcrumbs::for('users.roles.edit', function (BreadcrumbTrail $trail, Role $role) {
     $trail->parent('users.roles.index');
     $trail->push('Edit Role', route('users.roles.edit', $role->id));
