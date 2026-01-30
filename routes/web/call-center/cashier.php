@@ -31,8 +31,6 @@ Route::get('/cashier/reports/export-pdf', [CashierReportController::class, 'expo
 
 Route::get('/cashier/reports/export-excel', [CashierReportController::class, 'exportExcel']);
 
-Route::get('/cashier/reports/cashiers', [CashierReportController::class, 'getCashiers']);
-
 Route::get('/cashier/{customer_queue}', [CashierController::class, 'create'])
     ->name('cashier.create');
 

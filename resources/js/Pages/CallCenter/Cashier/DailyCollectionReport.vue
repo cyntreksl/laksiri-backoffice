@@ -9,7 +9,6 @@ import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import InputText from 'primevue/inputtext';
-import Select from 'primevue/select';
 import IftaLabel from 'primevue/iftalabel';
 import { push } from 'notivue';
 
@@ -31,27 +30,11 @@ const dateFrom = ref(new Date(new Date().setDate(new Date().getDate() - 30)));
 const dateTo = ref(new Date());
 const hblReference = ref('');
 const customerName = ref('');
-const selectedCashier = ref(null);
-const cashiers = ref([]);
 
 // Pagination
 const first = ref(0);
 const rows = ref(15);
 const currentPage = ref(1);
-
-const fetchCashiers = async () => {
-    try {
-        const response = await fetch('/call-center/cashier/reports/cashiers', {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': usePage().props.csrf
-            }
-        });
-        cashiers.value = await response.json();
-    } catch (error) {
-        console.error('Error fetching cashiers:', error);
-    }
-};
 
 const fetchData = async () => {
     loading.value = true;
@@ -64,7 +47,6 @@ const fetchData = async () => {
             date_to: dateTo.value ? formatDate(dateTo.value) : '',
             hbl_reference: hblReference.value || '',
             customer_name: customerName.value || '',
-            cashier_id: selectedCashier.value || '',
         });
 
         console.log('Fetching data with params:', params.toString());
@@ -144,7 +126,6 @@ const resetFilters = () => {
     dateTo.value = new Date();
     hblReference.value = '';
     customerName.value = '';
-    selectedCashier.value = null;
     applyFilters();
 };
 
@@ -154,7 +135,6 @@ const exportPDF = () => {
         date_to: dateTo.value ? formatDate(dateTo.value) : '',
         hbl_reference: hblReference.value || '',
         customer_name: customerName.value || '',
-        cashier_id: selectedCashier.value || '',
     });
 
     window.location.href = `/call-center/cashier/reports/export-pdf?${params}`;
@@ -166,14 +146,12 @@ const exportExcel = () => {
         date_to: dateTo.value ? formatDate(dateTo.value) : '',
         hbl_reference: hblReference.value || '',
         customer_name: customerName.value || '',
-        cashier_id: selectedCashier.value || '',
     });
 
     window.location.href = `/call-center/cashier/reports/export-excel?${params}`;
 };
 
 onMounted(() => {
-    fetchCashiers();
     fetchData();
 });
 </script>
@@ -256,21 +234,7 @@ onMounted(() => {
                             <label for="customer">Customer Name</label>
                         </IftaLabel>
 
-                        <IftaLabel>
-                            <Select
-                                v-model="selectedCashier"
-                                :options="cashiers"
-                                class="w-full"
-                                inputId="cashier"
-                                optionLabel="name"
-                                optionValue="id"
-                                placeholder="All Cashiers"
-                                showClear
-                            />
-                            <label for="cashier">Cashier</label>
-                        </IftaLabel>
-
-                        <div class="flex items-end gap-2">
+                        <div class="flex items-end gap-2 md:col-span-2">
                             <Button class="flex-1" icon="pi pi-check" label="Apply" @click="applyFilters" />
                             <Button class="flex-1" icon="pi pi-refresh" label="Reset" severity="secondary" @click="resetFilters" />
                         </div>
@@ -315,6 +279,17 @@ onMounted(() => {
                         stripedRows
                         @page="onPage"
                     >
+                        <template #empty>
+                            <div class="flex flex-col items-center justify-center py-12">
+                                <i class="pi pi-inbox text-6xl text-gray-300 mb-4"></i>
+                                <h3 class="text-xl font-semibold text-gray-700 mb-2">No Collection Records Found</h3>
+                                <p class="text-gray-500 text-center max-w-md">
+                                    There are no payment collections for the selected date range and filters.
+                                    <br />
+                                    Try adjusting your filters or date range to see more results.
+                                </p>
+                            </div>
+                        </template>
                         <Column field="created_at" header="Date" style="min-width: 150px">
                             <template #body="{ data }">
                                 {{ formatDateTime(data.created_at) }}

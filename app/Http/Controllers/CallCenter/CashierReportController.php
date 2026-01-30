@@ -77,6 +77,9 @@ class CashierReportController extends Controller
         // Apply branch filter based on user permissions
         $user = auth()->user();
 
+        // Filter by logged-in user - only show their own collections
+        $query->where('verified_by', $user->id);
+
         // Super admins and call center users can see all branches
         if (!$user->hasRole(['super admin', 'call center'])) {
             $branchIds = $user->branches->pluck('id')->toArray();
@@ -117,11 +120,6 @@ class CashierReportController extends Controller
             });
         }
 
-        // Cashier filter
-        if ($request->filled('cashier_id')) {
-            $query->where('verified_by', $request->input('cashier_id'));
-        }
-
         // Sorting
         $sortField = $request->input('sort_field', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
@@ -133,6 +131,9 @@ class CashierReportController extends Controller
 
         // Calculate summary - use a fresh query without pagination
         $summaryQuery = CashierHBLPayment::query();
+
+        // Filter by logged-in user
+        $summaryQuery->where('verified_by', $user->id);
 
         // Apply same filters to summary
         if (!$user->hasRole(['super admin', 'call center'])) {
@@ -164,10 +165,6 @@ class CashierReportController extends Controller
             $summaryQuery->whereHas('token.customer', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->input('customer_name') . '%');
             });
-        }
-
-        if ($request->filled('cashier_id')) {
-            $summaryQuery->where('verified_by', $request->input('cashier_id'));
         }
 
         $summary = [
@@ -214,6 +211,10 @@ class CashierReportController extends Controller
 
         // Apply same filters as getData
         $user = auth()->user();
+        
+        // Filter by logged-in user
+        $query->where('verified_by', $user->id);
+        
         if (!$user->hasRole(['super admin', 'call center'])) {
             $branchIds = $user->branches->pluck('id')->toArray();
             if (!empty($branchIds)) {
@@ -248,10 +249,6 @@ class CashierReportController extends Controller
             });
         }
 
-        if ($request->filled('cashier_id')) {
-            $query->where('verified_by', $request->input('cashier_id'));
-        }
-
         $payments = $query->orderBy('created_at', 'desc')->get();
 
         $summary = [
@@ -275,15 +272,5 @@ class CashierReportController extends Controller
         $filename = 'cashier-collection-' . now()->format('Y-m-d') . '.xlsx';
 
         return Excel::download(new CashierDailyCollectionExport($data), $filename);
-    }
-
-    public function getCashiers()
-    {
-        $cashiers = User::role(['call center'])
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get();
-
-        return response()->json($cashiers);
     }
 }
