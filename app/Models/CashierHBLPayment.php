@@ -94,4 +94,14 @@ class CashierHBLPayment extends Model
     {
         return $this->belongsTo(User::class, 'verified_by');
     }
+
+    public function hbl(): BelongsTo
+    {
+        return $this->belongsTo(HBL::class, 'hbl_id')->withoutGlobalScopes();
+    }
+
+    public function customerQueue(): BelongsTo
+    {
+        return $this->belongsTo(CustomerQueue::class, 'customer_queue_id');
+    }
 }
