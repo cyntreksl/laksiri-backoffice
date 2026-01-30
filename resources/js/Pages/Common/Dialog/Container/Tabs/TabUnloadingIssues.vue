@@ -231,12 +231,6 @@ onMounted(() => {
                                 </h4>
                                 <div v-if="slotProps.data.hbl_package">
                                     <div class="detail-item">
-                                        <span class="detail-label">Package Number:</span>
-                                        <span class="detail-value font-mono">
-                                            {{ slotProps.data.hbl_package.package_number || 'N/A' }}
-                                        </span>
-                                    </div>
-                                    <div class="detail-item">
                                         <span class="detail-label">Package Type:</span>
                                         <span class="detail-value">
                                             {{ slotProps.data.hbl_package.package_type || 'N/A' }}
