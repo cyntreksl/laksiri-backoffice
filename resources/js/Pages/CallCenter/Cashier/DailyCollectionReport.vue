@@ -25,8 +25,8 @@ const summary = ref({
     }
 });
 
-// Filters - default to last 30 days to show data
-const dateFrom = ref(new Date(new Date().setDate(new Date().getDate() - 30)));
+// Filters - default to current date
+const dateFrom = ref(new Date());
 const dateTo = ref(new Date());
 const hblReference = ref('');
 const customerName = ref('');
@@ -122,7 +122,7 @@ const applyFilters = () => {
 };
 
 const resetFilters = () => {
-    dateFrom.value = new Date(new Date().setDate(new Date().getDate() - 30));
+    dateFrom.value = new Date();
     dateTo.value = new Date();
     hblReference.value = '';
     customerName.value = '';
