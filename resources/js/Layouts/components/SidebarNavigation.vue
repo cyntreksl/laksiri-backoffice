@@ -562,6 +562,13 @@ const setMenu = (menu) => {
                     }
                 );
             }
+
+            // Daily Collection Report - accessible to all cashier users
+            cashierMenu.push({
+                title: "Daily Collection Report",
+                route: "call-center.cashier.reports.daily-collection",
+            });
+
             childMenuList.splice(
                 0,
                 childMenuList.length,
