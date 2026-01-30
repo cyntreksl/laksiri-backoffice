@@ -317,6 +317,7 @@ const cancel = () => {
                                     :class="{'p-invalid': form.errors.container_id}"
                                     :options="containers"
                                     class="w-full"
+                                    filter
                                     input-id="container"
                                     optionLabel="container_number"
                                     optionValue="id"
