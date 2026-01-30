@@ -551,4 +551,92 @@ class ContainerController extends Controller
         $remark->user_id = Auth::id();
         $container->remarks()->save($remark);
     }
+
+    public function getUnloadingIssues($containerId): \Illuminate\Http\JsonResponse
+    {
+        try {
+            // Get container to verify it exists
+            $container = Container::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+                ->findOrFail($containerId);
+
+            // Get all unloading issues for packages in this container
+            // Need to bypass BranchScope on HBLPackage to get all packages in the container
+            $unloadingIssues = \App\Models\UnloadingIssue::whereHas('hblPackage', function ($query) use ($containerId) {
+                    $query->withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+                          ->whereHas('containers', function ($containerQuery) use ($containerId) {
+                              $containerQuery->where('containers.id', $containerId);
+                          });
+                })
+                ->with([
+                    'hblPackage' => function ($q) {
+                        $q->withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+                          ->with(['hbl' => function ($hblQ) {
+                              $hblQ->withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+                                   ->select('id', 'hbl_number');
+                          }]);
+                    },
+                    'files'
+                ])
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($issue) {
+                    return [
+                        'id' => $issue->id,
+                        'hbl_package_id' => $issue->hbl_package_id,
+                        'issue' => $issue->issue,
+                        'type' => $issue->type,
+                        'is_damaged' => $issue->is_damaged,
+                        'rtf' => $issue->rtf,
+                        'is_fixed' => $issue->is_fixed,
+                        'note' => $issue->note,
+                        'remarks' => $issue->remarks,
+                        'created_at' => $issue->created_at,
+                        'updated_at' => $issue->updated_at,
+                        'hbl_package' => $issue->hblPackage ? [
+                            'id' => $issue->hblPackage->id,
+                            'package_number' => $issue->hblPackage->package_number,
+                            'weight' => $issue->hblPackage->weight,
+                            'volume' => $issue->hblPackage->volume,
+                            'quantity' => $issue->hblPackage->quantity,
+                            'remarks' => $issue->hblPackage->remarks,
+                            'package_type' => $issue->hblPackage->package_type,
+                            'hbl' => $issue->hblPackage->hbl ? [
+                                'id' => $issue->hblPackage->hbl->id,
+                                'hbl_number' => $issue->hblPackage->hbl->hbl_number,
+                            ] : null,
+                        ] : null,
+                        'files' => $issue->files->map(function ($file) {
+                            // Get the first media item from Spatie Media Library
+                            $media = $file->getFirstMedia();
+                            return [
+                                'id' => $file->id,
+                                'file_path' => $media ? $media->getUrl() : null,
+                                'file_name' => $file->name,
+                            ];
+                        })->filter(function ($file) {
+                            // Filter out files without a valid path
+                            return $file['file_path'] !== null;
+                        })->values(),
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $unloadingIssues,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to fetch unloading issues', [
+                'container_id' => $containerId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch unloading issues',
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null,
+            ], 500);
+        }
+    }
 }

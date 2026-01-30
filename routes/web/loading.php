@@ -117,6 +117,9 @@ Route::name('loading.')->group(function () {
     Route::get('containers/{container}/detain-history', [ContainerController::class, 'getDetainHistory'])
         ->name('containers.detain-history');
 
+    Route::get('containers/{container}/unloading-issues', [ContainerController::class, 'getUnloadingIssues'])
+        ->name('containers.unloading-issues');
+
     Route::get('all-shipments', [ContainerController::class, 'allShipments'])
         ->name('all-shipments');
 

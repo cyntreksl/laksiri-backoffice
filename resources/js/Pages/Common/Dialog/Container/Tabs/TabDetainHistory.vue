@@ -5,7 +5,10 @@ import Timeline from 'primevue/timeline';
 import Card from 'primevue/card';
 import Tag from 'primevue/tag';
 import Divider from 'primevue/divider';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
 import { push } from 'notivue';
+import TabUnloadingIssues from './TabUnloadingIssues.vue';
 
 const props = defineProps({
     container: {
@@ -16,6 +19,7 @@ const props = defineProps({
 
 const detainHistory = ref([]);
 const loading = ref(false);
+const showUnloadingIssuesDialog = ref(false);
 
 const fetchDetainHistory = async () => {
     if (!props.container?.id) return;
@@ -113,6 +117,14 @@ const totalRecords = computed(() => detainHistory.value.length);
 const detainCount = computed(() => detainHistory.value.filter(r => r.action === 'detain').length);
 const liftCount = computed(() => detainHistory.value.filter(r => r.action === 'lift').length);
 
+const openUnloadingIssuesDialog = () => {
+    showUnloadingIssuesDialog.value = true;
+};
+
+const closeUnloadingIssuesDialog = () => {
+    showUnloadingIssuesDialog.value = false;
+};
+
 onMounted(() => {
     fetchDetainHistory();
 });
@@ -120,6 +132,18 @@ onMounted(() => {
 
 <template>
     <div class="detain-history-wrapper">
+        <!-- Header with Button - Always visible -->
+        <div class="flex justify-between items-center mb-4 px-4 pt-4">
+            <h3 class="text-lg font-semibold text-gray-800">Detain History</h3>
+            <Button
+                icon="ti ti-alert-triangle"
+                label="View Unloading Issues"
+                severity="warning"
+                size="small"
+                @click="openUnloadingIssuesDialog"
+            />
+        </div>
+
         <!-- Loading State -->
         <div v-if="loading" class="flex flex-col justify-center items-center py-12">
             <i class="pi pi-spin pi-spinner text-5xl text-primary mb-4"></i>
@@ -295,6 +319,31 @@ onMounted(() => {
                 </template>
             </Timeline>
         </div>
+
+        <!-- Unloading Issues Dialog -->
+        <Dialog
+            v-model:visible="showUnloadingIssuesDialog"
+            :draggable="false"
+            :style="{ width: '80rem' }"
+            closable
+            close-on-escape
+            dismissable-mask
+            header="Unloading Issues"
+            maximizable
+            modal
+        >
+            <TabUnloadingIssues :container="container" />
+            
+            <template #footer>
+                <div class="flex justify-end">
+                    <Button
+                        label="Close"
+                        severity="secondary"
+                        @click="closeUnloadingIssuesDialog"
+                    />
+                </div>
+            </template>
+        </Dialog>
     </div>
 </template>
 
