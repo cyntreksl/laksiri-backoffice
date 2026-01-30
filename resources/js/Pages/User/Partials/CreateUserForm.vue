@@ -92,9 +92,8 @@ const filteredRoles = computed(() => {
         }));
 });
 
-// Filter branches based on user's branch type
+// Filter branches based on user's assigned branches
 const filteredBranches = computed(() => {
-    const userBranchType = usePage().props?.auth.user.active_branch_type;
     const userRole = usePage().props?.auth.user.role;
     
     // Only Super admin can see all branches
@@ -102,21 +101,19 @@ const filteredBranches = computed(() => {
         return props.branches;
     }
     
-    if (!userBranchType) {
-        return props.branches;
+    // Get the user's assigned branch IDs from auth.user.branches
+    const userBranches = usePage().props?.auth?.user?.branches || [];
+    
+    // If user has no assigned branches, return empty array
+    if (userBranches.length === 0) {
+        return [];
     }
     
-    return props.branches.filter(branch => {
-        // Departure users can only see departure branches (case-insensitive comparison)
-        if (userBranchType.toLowerCase() === 'departure') {
-            return branch.type.toLowerCase() === 'departure';
-        }
-        // Destination users can only see destination branches (case-insensitive comparison)
-        if (userBranchType.toLowerCase() === 'destination') {
-            return branch.type.toLowerCase() === 'destination';
-        }
-        return false;
-    });
+    // Extract branch IDs from user's branches
+    const userBranchIds = userBranches.map(branch => branch.id);
+    
+    // Filter branches to only show the ones the user is assigned to
+    return props.branches.filter(branch => userBranchIds.includes(branch.id));
 });
 </script>
 
