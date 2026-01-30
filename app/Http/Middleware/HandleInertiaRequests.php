@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
             $currencyRate = GetLatestCurrencyRateByBranchCurrencyCode::run($currentBranch->currency_symbol);
         }
 
+       
         return [
             ...parent::share($request),
             'userBranch' => Auth::check() ? Auth::user()->branches()->pluck('name')->toArray() : [],
@@ -54,7 +55,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'user.roles' => $request->user() ? $request->user()->roles->pluck('name') : [],
             'user.permissions' => $request->user() ? $request->user()->getPermissionsViaRoles()->pluck('name') : [],
-            'auth.user.branches' => $request->user() ? $request->user()->branches : [],
+            // 'auth.user.branches' =>  $request->user() ? $request->user()->branches : [],
             'csrf' => csrf_token(),
             'pusher' => [
                 'key' => env('PUSHER_APP_KEY'),
