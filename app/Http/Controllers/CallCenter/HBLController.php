@@ -469,11 +469,16 @@ class HBLController extends Controller
         $request->validate([
             'is_checked' => 'nullable|array',
             'note' => 'nullable|string|max:1000',
+            'demurrage_consent_given' => 'nullable|boolean',
+            'demurrage_consent_note' => 'nullable|string|max:1000',
         ]);
 
         $hbl = GetHBLByIdWithPackages::run($hbl);
 
-        $result = $this->HBLRepository->createAndIssueTokenWithVerification($hbl, $request->only(['is_checked', 'note']));
+        $result = $this->HBLRepository->createAndIssueTokenWithVerification(
+            $hbl, 
+            $request->only(['is_checked', 'note', 'demurrage_consent_given', 'demurrage_consent_note'])
+        );
 
         // If it's an Inertia request, return the token data without redirect
         if ($request->header('X-Inertia')) {

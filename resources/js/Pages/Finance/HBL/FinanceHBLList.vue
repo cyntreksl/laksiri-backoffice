@@ -24,6 +24,7 @@ import {debounce} from "lodash";
 import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import {push} from "notivue";
 import CallFlagModal from "@/Pages/HBL/Partials/CallFlagModal.vue";
+import DemurrageConsentDialog from "@/Pages/Finance/HBL/Partials/DemurrageConsentDialog.vue";
 
 const props = defineProps({
     users: {
@@ -66,6 +67,8 @@ const cargoTypes = ref(['Sea Cargo', 'Air Cargo']);
 const showConfirmViewCallFlagModal = ref(false);
 const hblName = ref("");
 const selectedHBLs = ref([]);
+const showDemurrageConsentDialog = ref(false);
+const hblsWithMissingDates = ref([]);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -421,28 +424,61 @@ const approveHBLs = () => {
             severity: 'success'
         },
         accept: async () => {
-            try {
-                const response = await fetch("/finance/finance-approval", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": usePage().props.csrf,
-                    },
-                    body: JSON.stringify({ hbl_ids: idList }),
-                });
-
-                if (!response.ok) {
-                    throw new Error("Network response was not ok.");
-                } else {
-                    push.success("HBLs Approved Successfully!");
-                    window.location.reload();
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                push.error("Failed to approve HBLs.");
-            }
+            await submitApproval(idList);
         }
     });
+};
+
+const submitApproval = async (idList, consentData = null) => {
+    try {
+        const payload = { hbl_ids: idList };
+
+        if (consentData) {
+            payload.consent_given = consentData.consentGiven;
+            payload.consent_note = consentData.consentNote;
+        }
+
+        const response = await fetch("/finance/finance-approval", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": usePage().props.csrf,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Network response was not ok.");
+        }
+
+        // Check if consent is required
+        if (data.status === 'warning' && data.requires_consent) {
+            hblsWithMissingDates.value = data.hbls_with_missing_dates;
+            showDemurrageConsentDialog.value = true;
+            return;
+        }
+
+        // Success
+        push.success("HBLs Approved Successfully!");
+        window.location.reload();
+    } catch (error) {
+        console.error("Error:", error);
+        push.error(error.message || "Failed to approve HBLs.");
+    }
+};
+
+const handleConsentConfirm = async (consentData) => {
+    showDemurrageConsentDialog.value = false;
+    const idList = selectedHBLs.value.map((item) => item.id);
+    await submitApproval(idList, consentData);
+};
+
+const handleConsentCancel = () => {
+    showDemurrageConsentDialog.value = false;
+    hblsWithMissingDates.value = [];
+    push.info("Approval cancelled. Please set container reached dates before approving.");
 };
 
 
@@ -677,6 +713,14 @@ const approveHBLs = () => {
         :visible="showConfirmViewCallFlagModal"
         @close="closeCallFlagModal"
         @update:visible="showConfirmViewCallFlagModal = $event"/>
+
+    <DemurrageConsentDialog
+        :hbls-with-missing-dates="hblsWithMissingDates"
+        :visible="showDemurrageConsentDialog"
+        @cancel="handleConsentCancel"
+        @confirm="handleConsentConfirm"
+        @update:visible="showDemurrageConsentDialog = $event"
+    />
 </template>
 
 <style>
