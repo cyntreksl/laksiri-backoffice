@@ -25,13 +25,22 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             // 1. Retrieve HBL record
             $hbl = $this->getHBL($data['customer_queue']['token']['reference']);
 
-            // 2. Check if payment is already completed (prevent duplicate payments)
+            // 2. Handle cashier demurrage consent if provided
+            if (isset($data['demurrage_consent_given']) && $data['demurrage_consent_given'] === true) {
+                $hbl->cashier_demurrage_consent_given = true;
+                $hbl->cashier_demurrage_consent_by = auth()->id();
+                $hbl->cashier_demurrage_consent_at = now();
+                $hbl->cashier_demurrage_consent_note = $data['demurrage_consent_note'] ?? 'Payment processed without container reached date';
+                $hbl->save();
+            }
+
+            // 3. Check if payment is already completed (prevent duplicate payments)
             $this->validatePaymentNotDuplicate($hbl, $data);
 
-            // 3. Process payment updates
+            // 4. Process payment updates
             $this->processPaymentUpdates($hbl, $data);
 
-            // 4. Handle queue updates
+            // 5. Handle queue updates
             $this->updateCustomerQueue($hbl, $data);
 
             DB::commit();

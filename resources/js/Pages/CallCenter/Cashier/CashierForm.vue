@@ -24,6 +24,7 @@ import TabHBLCharge from "@/Pages/Common/Dialog/HBL/Tabs/TabHBLCharge.vue";
 import TabPayments from "@/Pages/Common/Dialog/HBL/Tabs/TabPayments.vue";
 import Dialog from "primevue/dialog";
 import PaymentSummaryCard from "@/Pages/CallCenter/Components/PaymentSummaryCard.vue";
+import DemurrageConsentDialog from "@/Pages/Finance/HBL/Partials/DemurrageConsentDialog.vue";
 
 const props = defineProps({
     customerQueue: {
@@ -58,6 +59,19 @@ const summaryTotalDue = ref(0);
 const verificationInfo = ref(null);
 const paymentStatus = ref(null);
 const isCheckingPaymentStatus = ref(false);
+const showDemurrageConsentDialog = ref(false);
+
+// Check if HBL has container reached date
+const hasContainerReachedDate = computed(() => {
+    if (!hbl.value) return true;
+
+    // Check HBL's containers directly (simpler approach)
+    const containers = hbl.value.containers || [];
+    if (containers.length === 0) return false;
+
+    // Check if any container has a reached date
+    return containers.some(container => container && container.reached_date);
+});
 
 const computedOutstanding = computed(() => {
     return (
@@ -283,6 +297,8 @@ const form = useForm({
     note: '',
     discount: 0,
     additional_charges: 0,
+    demurrage_consent_given: false,
+    demurrage_consent_note: '',
 });
 
 const cashTendered = ref(null);
@@ -298,6 +314,45 @@ watch(cashTendered, (val) => {
 });
 
 const handleVerify = () => {
+    // Check if payment is already completed
+    if (isPaymentDisabled.value) {
+        push.error('This HBL has already been fully paid and verified.');
+        return;
+    }
+
+    // Check if container reached date is missing
+    if (!hasContainerReachedDate.value) {
+        showDemurrageConsentDialog.value = true;
+        return;
+    }
+
+    // Proceed with verification
+    proceedWithVerification();
+};
+
+const handleDemurrageConsent = (consentData) => {
+    // Store consent data in form
+    form.demurrage_consent_given = consentData.consentGiven;
+    form.demurrage_consent_note = consentData.consentNote;
+
+    // Close consent dialog
+    showDemurrageConsentDialog.value = false;
+
+    // Proceed with the action that was interrupted
+    if (showPaymentDialog.value) {
+        proceedWithPayment();
+    } else {
+        proceedWithVerification();
+    }
+};
+
+const handleDemurrageConsentCancel = () => {
+    showDemurrageConsentDialog.value = false;
+    form.demurrage_consent_given = false;
+    form.demurrage_consent_note = '';
+};
+
+const proceedWithVerification = () => {
     // Check if payment is already completed
     if (isPaymentDisabled.value) {
         push.error('This HBL has already been fully paid and verified.');
@@ -382,6 +437,23 @@ const handleUpdatePayment = () => {
         return;
     }
 
+    // Check if container reached date is missing
+    if (!hasContainerReachedDate.value) {
+        showDemurrageConsentDialog.value = true;
+        return;
+    }
+
+    // Proceed with payment
+    proceedWithPayment();
+}
+
+const proceedWithPayment = () => {
+    // Check if payment is already completed
+    if (isPaymentDisabled.value) {
+        push.error('This HBL has already been fully paid.');
+        return;
+    }
+
     // If it's a verification (zero payment), skip validations
     const isVerification = computedOutstanding.value <= 0;
 
@@ -396,7 +468,7 @@ const handleUpdatePayment = () => {
         // Allow a small tolerance of 0.05 for rounding differences
         // This prevents issues with cent values like 0.01, 0.02, etc.
         const tolerance = 0.05;
-        
+
         if (roundedPaid < (roundedOutstanding - tolerance)) {
             push.error('Please pay full amount');
             return;
@@ -777,5 +849,17 @@ watch(computedOutstanding, (val) => {
                 </div>
             </template>
         </Dialog>
+
+        <!-- Demurrage Consent Dialog -->
+        <DemurrageConsentDialog
+            :hbls-with-missing-dates="[{
+                hbl_number: hbl?.hbl_number || hbl?.hbl,
+                hbl_name: hbl?.hbl_name
+            }]"
+            :visible="showDemurrageConsentDialog"
+            @cancel="handleDemurrageConsentCancel"
+            @confirm="handleDemurrageConsent"
+            @update:visible="showDemurrageConsentDialog = $event"
+        />
     </AppLayout>
 </template>

@@ -87,6 +87,42 @@ class HBLResource extends JsonResource
             'is_destination_charges_paid' => $this->is_destination_charges_paid,
             'is_departure_charges_paid' => $this->is_departure_charges_paid,
             'is_third_party' => $this->is_third_party,
+            
+            // Containers with reached_date (for demurrage consent check)
+            'containers' => (function () {
+                $allContainers = collect();
+                
+                // Load packages if not loaded
+                if (!$this->relationLoaded('packages')) {
+                    $this->load(['packages' => function ($query) {
+                        $query->withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+                            ->with(['containers' => function ($cQuery) {
+                                $cQuery->withoutGlobalScope(\App\Models\Scopes\BranchScope::class);
+                            }]);
+                    }]);
+                }
+                
+                foreach ($this->packages as $package) {
+                    // Load containers if not loaded
+                    if (!$package->relationLoaded('containers')) {
+                        $package->load(['containers' => function ($query) {
+                            $query->withoutGlobalScope(\App\Models\Scopes\BranchScope::class);
+                        }]);
+                    }
+                    
+                    foreach ($package->containers as $container) {
+                        // Add container if not already in collection (by id)
+                        if (!$allContainers->contains('id', $container->id)) {
+                            $allContainers->push([
+                                'id' => $container->id,
+                                'container_number' => $container->container_number,
+                                'reached_date' => $container->reached_date,
+                            ]);
+                        }
+                    }
+                }
+                return $allContainers->values()->toArray();
+            })(),
         ];
     }
 }

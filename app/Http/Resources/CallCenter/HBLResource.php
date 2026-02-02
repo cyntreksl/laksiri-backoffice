@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\CallCenter;
 
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -37,6 +38,45 @@ class HBLResource extends JsonResource
             'finance_status' => $this->finance_status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+
+            '_containers_debug' => 'checking_containers',
+
+            // Containers with reached_date (for demurrage consent check)
+            // Get unique containers from all packages
+            'containers' => (function () {
+                $allContainers = collect();
+                
+                // Load packages if not loaded
+                if (!$this->relationLoaded('packages')) {
+                    $this->load(['packages' => function ($query) {
+                        $query->withoutGlobalScope(BranchScope::class)
+                            ->with(['containers' => function ($cQuery) {
+                                $cQuery->withoutGlobalScope(BranchScope::class);
+                            }]);
+                    }]);
+                }
+                
+                foreach ($this->packages as $package) {
+                    // Load containers if not loaded
+                    if (!$package->relationLoaded('containers')) {
+                        $package->load(['containers' => function ($query) {
+                            $query->withoutGlobalScope(BranchScope::class);
+                        }]);
+                    }
+                    
+                    foreach ($package->containers as $container) {
+                        // Add container if not already in collection (by id)
+                        if (!$allContainers->contains('id', $container->id)) {
+                            $allContainers->push([
+                                'id' => $container->id,
+                                'container_number' => $container->container_number,
+                                'reached_date' => $container->reached_date,
+                            ]);
+                        }
+                    }
+                }
+                return $allContainers->values()->toArray();
+            })(),
 
             // Detain related data
             'is_rtf' => $this->latestDetainRecord?->is_rtf ?? false,
