@@ -116,8 +116,10 @@ class HBLController extends Controller
         $this->authorize('hbls.create finance approval');
 
         $hblIds = $request->hbl_ids;
+        $consentGiven = $request->input('consent_given', null);
+        $consentNote = $request->input('consent_note', null);
 
-        return $this->HBLRepository->financeApproved($hblIds);
+        return $this->HBLRepository->financeApproved($hblIds, $consentGiven, $consentNote);
     }
 
     public function removeFinanceApproval(Request $request)

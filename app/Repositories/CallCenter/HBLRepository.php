@@ -124,6 +124,15 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
 
     public function createAndIssueTokenWithVerification(HBL $hbl, array $verificationData)
     {
+        // Handle token issuance demurrage consent if provided
+        if (isset($verificationData['demurrage_consent_given']) && $verificationData['demurrage_consent_given'] === true) {
+            $hbl->token_demurrage_consent_given = true;
+            $hbl->token_demurrage_consent_by = auth()->id();
+            $hbl->token_demurrage_consent_at = now();
+            $hbl->token_demurrage_consent_note = $verificationData['demurrage_consent_note'] ?? 'Token issued without container reached date';
+            $hbl->save();
+        }
+        
         // create token
         if ($hbl->consignee_id) {
             // Get the current date

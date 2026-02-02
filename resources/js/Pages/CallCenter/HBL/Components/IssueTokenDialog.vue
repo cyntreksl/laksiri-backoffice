@@ -15,6 +15,7 @@ import Avatar from "primevue/avatar";
 import Tag from "primevue/tag";
 import TokenSuccessModal from "./TokenSuccessModal.vue";
 import PaymentSummaryCard from "@/Pages/CallCenter/Components/PaymentSummaryCard.vue";
+import DemurrageConsentDialog from "@/Pages/Finance/HBL/Partials/DemurrageConsentDialog.vue";
 
 const props = defineProps({
     visible: {
@@ -34,6 +35,8 @@ const isProcessing = ref(false);
 const showSuccessModal = ref(false);
 const tokenData = ref({});
 const currencyCode = ref(usePage().props.currentBranch.currency_symbol || "SAR");
+const showDemurrageConsentDialog = ref(false);
+const pendingTokenIssuance = ref(null);
 
 const verificationDocuments = computed(() => {
     if (!props.hbl || !props.hbl.hbl_type) return [];
@@ -49,7 +52,9 @@ const verificationDocuments = computed(() => {
 const form = useForm({
     hbl_id: null,
     is_checked: {},
-    note: ''
+    note: '',
+    demurrage_consent_given: false,
+    demurrage_consent_note: ''
 });
 
 const paymentStatus = computed(() => {
@@ -77,7 +82,7 @@ const isAnyDocumentVerified = computed(() => {
 
 const tokenTimeline = computed(() => {
 
-    
+
     return [
         {
             id: 1,
@@ -134,9 +139,54 @@ const updateChecked = (doc, isChecked) => {
     form.is_checked = { ...form.is_checked, [doc]: isChecked };
 };
 
-// Simplified approach - use the HBL data from props and HBL total summary if available
+// Check if HBL has container reached date
+const hasContainerReachedDate = computed(() => {
+    if (!props.hbl) return true;
+
+    // Check if HBL has packages with containers that have reached dates
+    const packages = props.hbl.packages || [];
+    if (packages.length === 0) return true;
+
+    // Check if any package has a container with a reached date
+    const hasReachedDate = packages.some(pkg => {
+        const container = pkg.container;
+        return container && container.reached_date;
+    });
+
+    return hasReachedDate;
+});
 
 const handleIssueToken = () => {
+    // Check if container reached date is missing
+    if (!hasContainerReachedDate.value) {
+        // Show demurrage consent dialog
+        showDemurrageConsentDialog.value = true;
+        return;
+    }
+
+    // Proceed with normal token issuance
+    proceedWithTokenIssuance();
+};
+
+const handleDemurrageConsent = (consentData) => {
+    // Store consent data in form
+    form.demurrage_consent_given = consentData.consentGiven;
+    form.demurrage_consent_note = consentData.consentNote;
+
+    // Close consent dialog
+    showDemurrageConsentDialog.value = false;
+
+    // Proceed with token issuance
+    proceedWithTokenIssuance();
+};
+
+const handleDemurrageConsentCancel = () => {
+    showDemurrageConsentDialog.value = false;
+    form.demurrage_consent_given = false;
+    form.demurrage_consent_note = '';
+};
+
+const proceedWithTokenIssuance = () => {
     const message = areAllDocumentsVerified.value
         ? 'Are you sure you want to issue token for this HBL? All required documents have been verified.'
         : 'Are you sure you want to issue token for this HBL?';
@@ -165,10 +215,12 @@ const handleIssueToken = () => {
                     : 'Token issued - Reception verification pending';
             }
 
-                                    // Ensure is_checked is always an object, even if empty
+            // Ensure is_checked is always an object, even if empty
             const requestData = {
                 is_checked: Object.keys(form.is_checked).length > 0 ? form.is_checked : {},
-                note: form.note || ''
+                note: form.note || '',
+                demurrage_consent_given: form.demurrage_consent_given,
+                demurrage_consent_note: form.demurrage_consent_note
             };
 
             // Use fetch for direct JSON response handling
@@ -190,7 +242,7 @@ const handleIssueToken = () => {
 
                     // Show appropriate success message based on queue placement
                     let queueMessage = '';
-                    
+
                     if (data.token.all_documents_verified) {
                         queueMessage = 'Token issued and placed in Document Verification Queue - All documents verified!';
                     } else {
@@ -232,6 +284,10 @@ const resetForm = () => {
 
     // Clear note
     form.note = '';
+
+    // Clear consent data
+    form.demurrage_consent_given = false;
+    form.demurrage_consent_note = '';
 };
 
 const closeDialog = () => {
@@ -561,5 +617,17 @@ watch(() => props.visible, (newVal) => {
         :token-data="tokenData"
         @update:visible="showSuccessModal = $event"
         @close="handleSuccessModalClose"
+    />
+
+    <!-- Demurrage Consent Dialog -->
+    <DemurrageConsentDialog
+        :hbls-with-missing-dates="[{
+            hbl_number: props.hbl?.hbl_number || props.hbl?.hbl,
+            hbl_name: props.hbl?.hbl_name
+        }]"
+        :visible="showDemurrageConsentDialog"
+        @cancel="handleDemurrageConsentCancel"
+        @confirm="handleDemurrageConsent"
+        @update:visible="showDemurrageConsentDialog = $event"
     />
 </template>
