@@ -63,18 +63,14 @@ const showDemurrageConsentDialog = ref(false);
 
 // Check if HBL has container reached date
 const hasContainerReachedDate = computed(() => {
-    if (!hbl.value || !hbl.value.packages) return true;
+    if (!hbl.value) return true;
 
-    const packages = hbl.value.packages || [];
-    if (packages.length === 0) return true;
+    // Check HBL's containers directly (simpler approach)
+    const containers = hbl.value.containers || [];
+    if (containers.length === 0) return false;
 
-    // Check if any package has a container with a reached date
-    const hasReachedDate = packages.some(pkg => {
-        const container = pkg.container;
-        return container && container.reached_date;
-    });
-
-    return hasReachedDate;
+    // Check if any container has a reached date
+    return containers.some(container => container && container.reached_date);
 });
 
 const computedOutstanding = computed(() => {

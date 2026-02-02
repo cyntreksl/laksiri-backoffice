@@ -38,7 +38,12 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             ->with(['callFlags' => function ($query) {
                 $query->orderBy('date', 'desc');
             }])
-            ->with('containers');
+            ->with(['packages' => function ($query) {
+                $query->withoutGlobalScope(BranchScope::class)
+                    ->with(['containers' => function ($cQuery) {
+                        $cQuery->withoutGlobalScope(BranchScope::class);
+                    }]);
+            }]);
 
         if (! empty($search)) {
             $query->whereAny([

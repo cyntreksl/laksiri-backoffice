@@ -143,15 +143,26 @@ const updateChecked = (doc, isChecked) => {
 const hasContainerReachedDate = computed(() => {
     if (!props.hbl) return true;
 
-    // Check if HBL has packages with containers that have reached dates
-    const packages = props.hbl.packages || [];
-    if (packages.length === 0) return true;
+    // Check HBL's containers directly (simpler approach)
+    const containers = props.hbl.containers || [];
+    
+    // DEBUG: Log the data structure
+    console.log('=== DEBUG: Container Reached Date Check ===');
+    console.log('HBL Number:', props.hbl.hbl_number || props.hbl.hbl);
+    console.log('Containers count:', containers.length);
+    console.log('Containers:', containers);
+    
+    if (containers.length === 0) {
+        console.log('No containers found, returning false (will show consent)');
+        console.log('=== END DEBUG ===');
+        return false;
+    }
 
-    // Check if any package has a container with a reached date
-    const hasReachedDate = packages.some(pkg => {
-        const container = pkg.container;
-        return container && container.reached_date;
-    });
+    // Check if any container has a reached date
+    const hasReachedDate = containers.some(container => container && container.reached_date);
+
+    console.log('Has reached date:', hasReachedDate);
+    console.log('=== END DEBUG ===');
 
     return hasReachedDate;
 });
