@@ -274,7 +274,8 @@ class HBLReportController extends Controller
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->where('reference', 'like', "%{$search}%")
+                $q->where('hbl_number', 'like', "%{$search}%")
+                    ->orWhere('reference', 'like', "%{$search}%")
                     ->orWhere('hbl_name', 'like', "%{$search}%")
                     ->orWhere('contact_number', 'like', "%{$search}%");
             });
@@ -330,6 +331,7 @@ class HBLReportController extends Controller
         return [
             'id' => $hbl->id,
             'reference' => $hbl->reference,
+            'hbl_number' => $hbl->hbl_number,
             'hbl_name' => $hbl->hbl_name,
             'contact_number' => $hbl->contact_number,
             'email' => $hbl->email,

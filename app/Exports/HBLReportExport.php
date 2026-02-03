@@ -201,7 +201,8 @@ class HBLReportExport implements FromCollection, WithHeadings, WithMapping, With
         if ($this->request->filled('search')) {
             $search = $this->request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->where('reference', 'like', "%{$search}%")
+                $q->where('hbl_number', 'like', "%{$search}%")
+                    ->orWhere('reference', 'like', "%{$search}%")
                     ->orWhere('hbl_name', 'like', "%{$search}%")
                     ->orWhere('contact_number', 'like', "%{$search}%");
             });
@@ -215,6 +216,7 @@ class HBLReportExport implements FromCollection, WithHeadings, WithMapping, With
     {
         return [
             'HBL Reference',
+            'HBL Number',
             'Customer Name',
             'Contact Number',
             'Email',
@@ -267,6 +269,7 @@ class HBLReportExport implements FromCollection, WithHeadings, WithMapping, With
 
         return [
             $hbl->reference,
+            $hbl->hbl_number,
             $hbl->hbl_name,
             $hbl->contact_number,
             $hbl->email,

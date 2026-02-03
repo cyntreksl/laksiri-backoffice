@@ -500,7 +500,7 @@ onMounted(() => {
                                 <label class="filter-label">Search</label>
                                 <InputText
                                     v-model="filters.search"
-                                    placeholder="HBL reference, name..."
+                                    placeholder="HBL number, reference, name..."
                                     @keyup.enter="applyFilters"
                                 />
                             </div>
@@ -557,6 +557,12 @@ onMounted(() => {
                         <Column field="reference" frozen header="HBL Reference" sortable style="min-width: 150px">
                             <template #body="{ data }">
                                 <span class="font-mono font-semibold text-primary">{{ data.reference }}</span>
+                            </template>
+                        </Column>
+
+                        <Column field="hbl_number" header="HBL Number" sortable style="min-width: 150px">
+                            <template #body="{ data }">
+                                <span class="font-mono font-semibold">{{ data.hbl_number || 'N/A' }}</span>
                             </template>
                         </Column>
 
