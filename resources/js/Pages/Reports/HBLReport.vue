@@ -703,9 +703,6 @@ onMounted(() => {
                             <template #body="slotProps">
                                 <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
                         </Column>
 
                         <Column field="hbl_name" header="HBL Name">
@@ -728,9 +725,6 @@ onMounted(() => {
                             <template #body="slotProps">
                                 <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse"></Tag>
                             </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
-                            </template>
                         </Column>
 
                         <Column field="consignee_name" header="Consignee">
@@ -741,14 +735,9 @@ onMounted(() => {
                             </template>
                         </Column>
 
-                        <Column field="consignee_address" header="Consignee Address"></Column>
-
                         <Column field="hbl_type" header="HBL Type" sortable>
                             <template #body="slotProps">
                                 <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
-                            </template>
-                            <template #filter="{ filterModel, filterCallback }">
-                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 

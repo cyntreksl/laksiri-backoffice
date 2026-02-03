@@ -57,7 +57,7 @@ class HBLReportController extends Controller
      */
     private function getContainers(): array
     {
-        return Container::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+        return Container::withoutGlobalScope(BranchScope::class)
             ->select('id', 'reference')
             ->orderBy('reference', 'desc')
             ->limit(500) // Limit to recent containers for performance
@@ -74,7 +74,7 @@ class HBLReportController extends Controller
      */
     private function getCustomers(): array
     {
-        return HBL::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+        return HBL::withoutGlobalScope(BranchScope::class)
             ->select('hbl_name', 'contact_number', 'email')
             ->whereNotNull('hbl_name')
             ->where('hbl_name', '!=', '')
@@ -128,7 +128,6 @@ class HBLReportController extends Controller
             'cargo_type' => 'cargo_type',
             'hbl_type' => 'hbl_type',
             'created_at' => 'created_at',
-            'grand_total' => 'grand_total',
         ];
 
         $dbSortField = $sortableFields[$sortField] ?? 'created_at';
@@ -356,33 +355,36 @@ class HBLReportController extends Controller
             'email' => $hbl->email,
             'cargo_type' => $hbl->cargo_type,
             'hbl_type' => $hbl->hbl_type,
+            'warehouse' => $hbl->warehouse,
+            'consignee_name' => $hbl->consignee_name,
+            'consignee_contact' => $hbl->consignee_contact,
             'branch' => $hbl->branch ? [
                 'id' => $hbl->branch->id,
                 'name' => $hbl->branch->name,
             ] : null,
-            'container_reference' => $containerReference,
-            'loaded_date' => $loadedDate ? date('Y-m-d H:i:s', strtotime($loadedDate)) : null,
-            'unloaded_date' => $unloadedDate ? date('Y-m-d H:i:s', strtotime($unloadedDate)) : null,
-            'appointment_date' => $hbl->callFlags()->latest()->first()?->appointment_date,
-            'token_issued_date' => $hbl->tokens->first()?->created_at?->format('Y-m-d H:i:s'),
-            'token_number' => $hbl->tokens->first()?->token,
-            'document_verified_date' => $hbl->tokens->first()?->verification?->created_at?->format('Y-m-d H:i:s'),
-            'cashier_invoice_date' => $hbl->tokens->first()?->cashierPayment?->created_at?->format('Y-m-d H:i:s'),
-            'gate_pass_date' => Examination::where('hbl_id', $hbl->id)
-                ->where('is_issued_gate_pass', true)
-                ->whereNotNull('released_at')
-                ->latest('released_at')
-                ->value('released_at')
-                ? date('Y-m-d H:i:s', strtotime(Examination::where('hbl_id', $hbl->id)
-                    ->where('is_issued_gate_pass', true)
-                    ->whereNotNull('released_at')
-                    ->latest('released_at')
-                    ->value('released_at')))
-                : null,
+//            'container_reference' => $containerReference,
+//            'loaded_date' => $loadedDate ? date('Y-m-d H:i:s', strtotime($loadedDate)) : null,
+//            'unloaded_date' => $unloadedDate ? date('Y-m-d H:i:s', strtotime($unloadedDate)) : null,
+//            'appointment_date' => $hbl->callFlags()->latest()->first()?->appointment_date,
+//            'token_issued_date' => $hbl->tokens->first()?->created_at?->format('Y-m-d H:i:s'),
+//            'token_number' => $hbl->tokens->first()?->token,
+//            'document_verified_date' => $hbl->tokens->first()?->verification?->created_at?->format('Y-m-d H:i:s'),
+//            'cashier_invoice_date' => $hbl->tokens->first()?->cashierPayment?->created_at?->format('Y-m-d H:i:s'),
+//            'gate_pass_date' => Examination::where('hbl_id', $hbl->id)
+//                ->where('is_issued_gate_pass', true)
+//                ->whereNotNull('released_at')
+//                ->latest('released_at')
+//                ->value('released_at')
+//                ? date('Y-m-d H:i:s', strtotime(Examination::where('hbl_id', $hbl->id)
+//                    ->where('is_issued_gate_pass', true)
+//                    ->whereNotNull('released_at')
+//                    ->latest('released_at')
+//                    ->value('released_at')))
+//                : null,
             'total_packages' => $hbl->packages->count(),
-            'grand_total' => number_format($hbl->grand_total, 2),
-            'paid_amount' => number_format($hbl->paid_amount, 2),
-            'balance' => number_format($hbl->grand_total - $hbl->paid_amount, 2),
+//            'grand_total' => number_format($hbl->grand_total, 2),
+//            'paid_amount' => number_format($hbl->paid_amount, 2),
+//            'balance' => number_format($hbl->grand_total - $hbl->paid_amount, 2),
             'created_at' => $hbl->created_at?->format('Y-m-d H:i:s'),
             'created_by' => $hbl->user ? [
                 'id' => $hbl->user->id,
