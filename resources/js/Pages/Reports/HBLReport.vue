@@ -474,8 +474,6 @@ onMounted(() => {
                                 <Select
                                     v-model="filters.cargo_type"
                                     :options="cargoTypes"
-                                    optionLabel="label"
-                                    optionValue="value"
                                     placeholder="Select cargo type"
                                 />
                             </div>
@@ -486,8 +484,6 @@ onMounted(() => {
                                 <Select
                                     v-model="filters.hbl_type"
                                     :options="hblTypes"
-                                    optionLabel="label"
-                                    optionValue="value"
                                     placeholder="Select HBL type"
                                 />
                             </div>

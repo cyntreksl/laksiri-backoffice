@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enum\CargoType;
+use App\Enum\HBLType;
 use App\Models\HBL;
 use App\Models\Branch;
-use App\Models\Container;
 use App\Models\Examination;
 use App\Exports\HBLReportExport;
+use App\Models\Scopes\BranchScope;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -26,34 +28,10 @@ class HBLReportController extends Controller
         $this->authorize('reports.hbl');
 
         return Inertia::render('Reports/HBLReport', [
-            'cargoTypes' => $this->getCargoTypes(),
-            'hblTypes' => $this->getHBLTypes(),
+            'cargoTypes' => CargoType::cases(),
+            'hblTypes' => HBLType::cases(),
             'branches' => $this->getBranches(),
         ]);
-    }
-
-    /**
-     * Get available cargo types
-     */
-    private function getCargoTypes(): array
-    {
-        return [
-            ['value' => 'General', 'label' => 'General'],
-            ['value' => 'Dangerous', 'label' => 'Dangerous'],
-            ['value' => 'Perishable', 'label' => 'Perishable'],
-        ];
-    }
-
-    /**
-     * Get available HBL types
-     */
-    private function getHBLTypes(): array
-    {
-        return [
-            ['value' => 'Normal', 'label' => 'Normal'],
-            ['value' => 'Door to Door', 'label' => 'Door to Door'],
-            ['value' => 'Third Party', 'label' => 'Third Party'],
-        ];
     }
 
     /**
@@ -78,7 +56,7 @@ class HBLReportController extends Controller
     {
         $this->authorize('reports.hbl');
 
-        $query = HBL::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+        $query = HBL::withoutGlobalScope(BranchScope::class)
             ->with([
                 'branch',
                 'user',
@@ -93,14 +71,14 @@ class HBLReportController extends Controller
 
         // Get total count before pagination
         $totalRecords = $query->count();
-        
+
         // Calculate summary statistics
         $stats = $this->calculateStats($query);
 
         // Apply sorting
         $sortField = $request->input('sort_field', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
-        
+
         $sortableFields = [
             'reference' => 'reference',
             'hbl_name' => 'hbl_name',
@@ -109,7 +87,7 @@ class HBLReportController extends Controller
             'created_at' => 'created_at',
             'grand_total' => 'grand_total',
         ];
-        
+
         $dbSortField = $sortableFields[$sortField] ?? 'created_at';
         $query->orderBy($dbSortField, $sortOrder);
 
@@ -290,7 +268,7 @@ class HBLReportController extends Controller
     private function calculateStats($query): array
     {
         $clonedQuery = clone $query;
-        
+
         $totalHBLs = $clonedQuery->count();
         $totalAmount = (clone $query)->sum('grand_total');
         $totalPaid = (clone $query)->sum('paid_amount');
@@ -325,7 +303,7 @@ class HBLReportController extends Controller
         $containerReference = null;
         if ($hbl->packages->isNotEmpty()) {
             $firstPackage = $hbl->packages->first();
-            $container = $firstPackage->containers()->withoutGlobalScopes()->first() 
+            $container = $firstPackage->containers()->withoutGlobalScopes()->first()
                 ?? $firstPackage->duplicate_containers()->withoutGlobalScopes()->first();
             $containerReference = $container?->reference;
         }
@@ -354,12 +332,12 @@ class HBLReportController extends Controller
                 ->where('is_issued_gate_pass', true)
                 ->whereNotNull('released_at')
                 ->latest('released_at')
-                ->value('released_at') 
+                ->value('released_at')
                 ? date('Y-m-d H:i:s', strtotime(Examination::where('hbl_id', $hbl->id)
                     ->where('is_issued_gate_pass', true)
                     ->whereNotNull('released_at')
                     ->latest('released_at')
-                    ->value('released_at'))) 
+                    ->value('released_at')))
                 : null,
             'total_packages' => $hbl->packages->count(),
             'grand_total' => number_format($hbl->grand_total, 2),
