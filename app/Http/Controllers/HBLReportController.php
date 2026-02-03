@@ -33,6 +33,7 @@ class HBLReportController extends Controller
             'hblTypes' => HBLType::cases(),
             'branches' => $this->getBranches(),
             'containers' => $this->getContainers(),
+            'customers' => $this->getCustomers(),
         ]);
     }
 
@@ -69,6 +70,28 @@ class HBLReportController extends Controller
     }
 
     /**
+     * Get customers for filter
+     */
+    private function getCustomers(): array
+    {
+        return HBL::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+            ->select('hbl_name', 'contact_number', 'email')
+            ->whereNotNull('hbl_name')
+            ->where('hbl_name', '!=', '')
+            ->groupBy('hbl_name', 'contact_number', 'email')
+            ->orderBy('hbl_name')
+            ->limit(1000) // Limit for performance
+            ->get()
+            ->map(fn($hbl) => [
+                'label' => $hbl->hbl_name . ($hbl->contact_number ? ' - ' . $hbl->contact_number : ''),
+                'value' => $hbl->hbl_name,
+                'contact' => $hbl->contact_number,
+                'email' => $hbl->email,
+            ])
+            ->toArray();
+    }
+
+    /**
      * Get HBL report data with filters
      */
     public function getData(Request $request): JsonResponse
@@ -82,6 +105,7 @@ class HBLReportController extends Controller
                 'packages.containers',
                 'tokens.verification',
                 'tokens.cashierPayment',
+                'tokens.examination',
                 'callFlags'
             ]);
 
@@ -170,12 +194,7 @@ class HBLReportController extends Controller
         // Customer search (HBL name, contact, email)
         if ($request->filled('customer_search')) {
             $search = $request->input('customer_search');
-            $query->where(function ($q) use ($search) {
-                $q->where('hbl_name', 'like', "%{$search}%")
-                    ->orWhere('contact_number', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('reference', 'like', "%{$search}%");
-            });
+            $query->where('hbl_name', $search);
         }
 
         // Appointment Date Range
@@ -243,13 +262,13 @@ class HBLReportController extends Controller
         // Document Verified Date Range
         if ($request->filled('document_verified_date_from')) {
             $query->whereHas('tokens.verification', function ($q) use ($request) {
-                $q->where('verified_at', '>=', $request->input('document_verified_date_from'));
+                $q->where('created_at', '>=', $request->input('document_verified_date_from'));
             });
         }
 
         if ($request->filled('document_verified_date_to')) {
             $query->whereHas('tokens.verification', function ($q) use ($request) {
-                $q->where('verified_at', '<=', $request->input('document_verified_date_to') . ' 23:59:59');
+                $q->where('created_at', '<=', $request->input('document_verified_date_to') . ' 23:59:59');
             });
         }
 
@@ -347,7 +366,7 @@ class HBLReportController extends Controller
             'appointment_date' => $hbl->callFlags()->latest()->first()?->appointment_date,
             'token_issued_date' => $hbl->tokens->first()?->created_at?->format('Y-m-d H:i:s'),
             'token_number' => $hbl->tokens->first()?->token,
-            'document_verified_date' => $hbl->tokens->first()?->verification?->verified_at?->format('Y-m-d H:i:s'),
+            'document_verified_date' => $hbl->tokens->first()?->verification?->created_at?->format('Y-m-d H:i:s'),
             'cashier_invoice_date' => $hbl->tokens->first()?->cashierPayment?->created_at?->format('Y-m-d H:i:s'),
             'gate_pass_date' => Examination::where('hbl_id', $hbl->id)
                 ->where('is_issued_gate_pass', true)

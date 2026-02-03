@@ -33,6 +33,7 @@ class HBLReportExport implements FromCollection, WithHeadings, WithMapping, With
                 'packages.containers',
                 'tokens.verification',
                 'tokens.cashierPayment',
+                'tokens.examination',
                 'callFlags'
             ]);
 
@@ -94,15 +95,10 @@ class HBLReportExport implements FromCollection, WithHeadings, WithMapping, With
             $query->where('branch_id', $this->request->input('branch_id'));
         }
 
-        // Customer search
+        // Customer search (HBL name, contact, email)
         if ($this->request->filled('customer_search')) {
             $search = $this->request->input('customer_search');
-            $query->where(function ($q) use ($search) {
-                $q->where('hbl_name', 'like', "%{$search}%")
-                    ->orWhere('contact_number', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('reference', 'like', "%{$search}%");
-            });
+            $query->where('hbl_name', $search);
         }
 
         // Appointment Date Range
@@ -170,13 +166,13 @@ class HBLReportExport implements FromCollection, WithHeadings, WithMapping, With
         // Document Verified Date Range
         if ($this->request->filled('document_verified_date_from')) {
             $query->whereHas('tokens.verification', function ($q) {
-                $q->where('verified_at', '>=', $this->request->input('document_verified_date_from'));
+                $q->where('created_at', '>=', $this->request->input('document_verified_date_from'));
             });
         }
 
         if ($this->request->filled('document_verified_date_to')) {
             $query->whereHas('tokens.verification', function ($q) {
-                $q->where('verified_at', '<=', $this->request->input('document_verified_date_to') . ' 23:59:59');
+                $q->where('created_at', '<=', $this->request->input('document_verified_date_to') . ' 23:59:59');
             });
         }
 
@@ -283,7 +279,7 @@ class HBLReportExport implements FromCollection, WithHeadings, WithMapping, With
             $hbl->callFlags()->latest()->first()?->appointment_date,
             $hbl->tokens->first()?->token,
             $hbl->tokens->first()?->created_at?->format('Y-m-d H:i:s'),
-            $hbl->tokens->first()?->verification?->verified_at?->format('Y-m-d H:i:s'),
+            $hbl->tokens->first()?->verification?->created_at?->format('Y-m-d H:i:s'),
             $hbl->tokens->first()?->cashierPayment?->created_at?->format('Y-m-d H:i:s'),
             Examination::where('hbl_id', $hbl->id)
                 ->where('is_issued_gate_pass', true)

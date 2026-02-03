@@ -30,6 +30,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    customers: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const loading = ref(false);
@@ -343,16 +347,22 @@ onMounted(() => {
                                     optionLabel="label"
                                     optionValue="value"
                                     placeholder="Select branch"
+                                    filter
+                                    showClear
                                 />
                             </div>
 
                             <!-- Customer Search -->
                             <div class="filter-item">
                                 <label class="filter-label">Customer</label>
-                                <InputText
+                                <Select
                                     v-model="filters.customer_search"
-                                    placeholder="Name, contact, email..."
-                                    @keyup.enter="applyFilters"
+                                    :options="customers"
+                                    filter
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Select customer"
+                                    showClear
                                 />
                             </div>
 
