@@ -1,7 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import axios from 'axios';
-import { router } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -11,7 +11,15 @@ import Calendar from 'primevue/calendar';
 import Select from 'primevue/select';
 import Tag from 'primevue/tag';
 import Card from 'primevue/card';
+import ContextMenu from 'primevue/contextmenu';
+import Panel from 'primevue/panel';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+import FloatLabel from 'primevue/floatlabel';
+import { useConfirm } from "primevue/useconfirm";
 import { push } from 'notivue';
+import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
+import moment from "moment";
 
 const props = defineProps({
     cargoTypes: {
@@ -75,6 +83,13 @@ const filters = reactive({
     hbl_type: null,
     search: '',
 });
+
+const cm = ref();
+const selectedHBL = ref(null);
+const selectedHBLID = ref(null);
+const showConfirmViewHBLModal = ref(false);
+const confirm = useConfirm();
+const dt = ref();
 
 const fetchData = async () => {
     loading.value = true;
@@ -155,22 +170,45 @@ const exportData = (format = 'xlsx') => {
     push.success(`Export started. ${format.toUpperCase()} download will begin shortly.`);
 };
 
-const getCargoTypeSeverity = (type) => {
-    const severities = {
-        'General': 'info',
-        'Dangerous': 'danger',
-        'Perishable': 'warn',
-    };
-    return severities[type] || 'secondary';
+const resolveHBLType = (hbl) => {
+    switch (hbl.hbl_type) {
+        case 'UPB':
+            return 'secondary';
+        case 'Gift':
+            return 'warn';
+        case 'Door to Door':
+            return 'info';
+        default:
+            return null;
+    }
 };
 
-const getHBLTypeSeverity = (type) => {
-    const severities = {
-        'Normal': 'primary',
-        'Door to Door': 'success',
-        'Third Party': 'secondary',
-    };
-    return severities[type] || 'contrast';
+const resolveCargoType = (hbl) => {
+    switch (hbl.cargo_type) {
+        case 'Sea Cargo':
+            return {
+                icon: "ti ti-sailboat",
+                color: "success",
+            };
+        case 'Air Cargo':
+            return {
+                icon: "ti ti-plane-tilt",
+                color: "info",
+            };
+        default:
+            return null;
+    }
+};
+
+const resolveWarehouse = (hbl) => {
+    switch (hbl.warehouse) {
+        case 'COLOMBO':
+            return 'info';
+        case 'NINTAVUR':
+            return 'danger';
+        default:
+            return null;
+    }
 };
 
 const formatDate = (dateString) => {
@@ -190,6 +228,38 @@ const formatCurrency = (amount) => {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
+};
+
+const menuModel = ref([
+    {
+        label: "View",
+        icon: "pi pi-fw pi-search",
+        command: () => confirmViewHBL(selectedHBL),
+        disabled: !usePage().props.user.permissions.includes("hbls.show"),
+    },
+]);
+
+const onRowContextMenu = (event) => {
+    cm.value.show(event.originalEvent);
+};
+
+const confirmViewHBL = (hbl) => {
+    selectedHBLID.value = hbl.value.id;
+    showConfirmViewHBLModal.value = true;
+};
+
+const closeModal = () => {
+    showConfirmViewHBLModal.value = false;
+    selectedHBLID.value = null;
+};
+
+const exportCSVFilename = computed(() => {
+    const timestamp = moment().format('YYYY_MM_DD_HH_mm_ss');
+    return `hbl-report-${timestamp}`;
+});
+
+const exportCSV = () => {
+    dt.value.exportCSV();
 };
 
 onMounted(() => {
@@ -290,230 +360,248 @@ onMounted(() => {
             </div>
 
             <!-- Filters Section -->
-            <Card class="filters-card">
-                <template #content>
+            <Panel :collapsed="true" class="mt-5" header="Advance Filters" toggleable>
+                <template #default>
                     <div class="filters-section">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Filters</h3>
-
                         <div class="filters-grid">
                             <!-- Loaded Date Range -->
-                            <div class="filter-item">
-                                <label class="filter-label">Loaded Date From</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.loaded_date_from"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="loaded-date-from"
                                 />
-                            </div>
+                                <label for="loaded-date-from">Loaded Date From</label>
+                            </FloatLabel>
 
-                            <div class="filter-item">
-                                <label class="filter-label">Loaded Date To</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.loaded_date_to"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="loaded-date-to"
                                 />
-                            </div>
+                                <label for="loaded-date-to">Loaded Date To</label>
+                            </FloatLabel>
 
                             <!-- Unloaded Date Range -->
-                            <div class="filter-item">
-                                <label class="filter-label">Unloaded Date From</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.unloaded_date_from"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="unloaded-date-from"
                                 />
-                            </div>
+                                <label for="unloaded-date-from">Unloaded Date From</label>
+                            </FloatLabel>
 
-                            <div class="filter-item">
-                                <label class="filter-label">Unloaded Date To</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.unloaded_date_to"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="unloaded-date-to"
                                 />
-                            </div>
+                                <label for="unloaded-date-to">Unloaded Date To</label>
+                            </FloatLabel>
 
                             <!-- Branch -->
-                            <div class="filter-item">
-                                <label class="filter-label">Branch/Agent</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Select
                                     v-model="filters.branch_id"
                                     :options="branches"
                                     optionLabel="label"
                                     optionValue="value"
-                                    placeholder="Select branch"
                                     filter
                                     showClear
+                                    class="w-full"
+                                    input-id="branch"
                                 />
-                            </div>
+                                <label for="branch">Branch/Agent</label>
+                            </FloatLabel>
 
                             <!-- Customer Search -->
-                            <div class="filter-item">
-                                <label class="filter-label">Customer</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Select
                                     v-model="filters.customer_search"
                                     :options="customers"
                                     filter
                                     optionLabel="label"
                                     optionValue="value"
-                                    placeholder="Select customer"
                                     showClear
+                                    class="w-full"
+                                    input-id="customer"
                                 />
-                            </div>
+                                <label for="customer">Customer</label>
+                            </FloatLabel>
 
                             <!-- Appointment Date Range -->
-                            <div class="filter-item">
-                                <label class="filter-label">Appointment Date From</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.appointment_date_from"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="appointment-date-from"
                                 />
-                            </div>
+                                <label for="appointment-date-from">Appointment Date From</label>
+                            </FloatLabel>
 
-                            <div class="filter-item">
-                                <label class="filter-label">Appointment Date To</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.appointment_date_to"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="appointment-date-to"
                                 />
-                            </div>
+                                <label for="appointment-date-to">Appointment Date To</label>
+                            </FloatLabel>
 
                             <!-- Token Issued Date Range -->
-                            <div class="filter-item">
-                                <label class="filter-label">Token Issued From</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.token_issued_date_from"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="token-issued-from"
                                 />
-                            </div>
+                                <label for="token-issued-from">Token Issued From</label>
+                            </FloatLabel>
 
-                            <div class="filter-item">
-                                <label class="filter-label">Token Issued To</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.token_issued_date_to"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="token-issued-to"
                                 />
-                            </div>
+                                <label for="token-issued-to">Token Issued To</label>
+                            </FloatLabel>
 
                             <!-- Document Verified Date Range -->
-                            <div class="filter-item">
-                                <label class="filter-label">Document Verified From</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.document_verified_date_from"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="doc-verified-from"
                                 />
-                            </div>
+                                <label for="doc-verified-from">Document Verified From</label>
+                            </FloatLabel>
 
-                            <div class="filter-item">
-                                <label class="filter-label">Document Verified To</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.document_verified_date_to"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="doc-verified-to"
                                 />
-                            </div>
+                                <label for="doc-verified-to">Document Verified To</label>
+                            </FloatLabel>
 
                             <!-- Cashier Invoice Date Range -->
-                            <div class="filter-item">
-                                <label class="filter-label">Cashier Invoice From</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.cashier_invoice_date_from"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="cashier-invoice-from"
                                 />
-                            </div>
+                                <label for="cashier-invoice-from">Cashier Invoice From</label>
+                            </FloatLabel>
 
-                            <div class="filter-item">
-                                <label class="filter-label">Cashier Invoice To</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.cashier_invoice_date_to"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="cashier-invoice-to"
                                 />
-                            </div>
+                                <label for="cashier-invoice-to">Cashier Invoice To</label>
+                            </FloatLabel>
 
                             <!-- Gate Pass Date Range -->
-                            <div class="filter-item">
-                                <label class="filter-label">Gate Pass Date From</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.gate_pass_date_from"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="gate-pass-from"
                                 />
-                            </div>
+                                <label for="gate-pass-from">Gate Pass Date From</label>
+                            </FloatLabel>
 
-                            <div class="filter-item">
-                                <label class="filter-label">Gate Pass Date To</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Calendar
                                     v-model="filters.gate_pass_date_to"
                                     dateFormat="yy-mm-dd"
-                                    placeholder="Select date"
+                                    class="w-full"
                                     showIcon
+                                    input-id="gate-pass-to"
                                 />
-                            </div>
+                                <label for="gate-pass-to">Gate Pass Date To</label>
+                            </FloatLabel>
 
                             <!-- Shipment/Container -->
-                            <div class="filter-item">
-                                <label class="filter-label">Shipment/Container</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Select
                                     v-model="filters.container_id"
                                     :options="containers"
                                     filter
                                     optionLabel="reference"
                                     optionValue="id"
-                                    placeholder="Select container"
                                     showClear
+                                    class="w-full"
+                                    input-id="container"
                                 />
-                            </div>
+                                <label for="container">Shipment/Container</label>
+                            </FloatLabel>
 
                             <!-- Cargo Type -->
-                            <div class="filter-item">
-                                <label class="filter-label">Cargo Type</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Select
                                     v-model="filters.cargo_type"
                                     :options="cargoTypes"
-                                    placeholder="Select cargo type"
+                                    class="w-full"
+                                    input-id="cargo-type"
                                 />
-                            </div>
+                                <label for="cargo-type">Cargo Type</label>
+                            </FloatLabel>
 
                             <!-- HBL Type -->
-                            <div class="filter-item">
-                                <label class="filter-label">HBL Type</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <Select
                                     v-model="filters.hbl_type"
                                     :options="hblTypes"
-                                    placeholder="Select HBL type"
+                                    class="w-full"
+                                    input-id="hbl-type"
                                 />
-                            </div>
+                                <label for="hbl-type">HBL Type</label>
+                            </FloatLabel>
 
                             <!-- General Search -->
-                            <div class="filter-item">
-                                <label class="filter-label">Search</label>
+                            <FloatLabel class="w-full" variant="in">
                                 <InputText
                                     v-model="filters.search"
-                                    placeholder="HBL number, reference, name..."
+                                    class="w-full"
+                                    input-id="search"
                                     @keyup.enter="applyFilters"
                                 />
-                            </div>
+                                <label for="search">Search</label>
+                            </FloatLabel>
                         </div>
 
                         <!-- Filter Actions -->
@@ -534,12 +622,15 @@ onMounted(() => {
                         </div>
                     </div>
                 </template>
-            </Card>
+            </Panel>
 
             <!-- Data Table -->
-            <Card class="table-card">
+            <Card class="my-5">
                 <template #content>
+                    <ContextMenu ref="cm" :model="menuModel" @hide="selectedHBL = null" />
                     <DataTable
+                        ref="dt"
+                        v-model:contextMenuSelection="selectedHBL"
                         :lazy="true"
                         :loading="loading"
                         :paginator="true"
@@ -549,14 +640,38 @@ onMounted(() => {
                         :sortOrder="lazyParams.sort_order === 'asc' ? 1 : -1"
                         :totalRecords="totalRecords"
                         :value="records"
-                        class="hbl-table"
+                        :export-filename="exportCSVFilename"
+                        context-menu
+                        dataKey="id"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         sortMode="single"
                         stripedRows
+                        removable-sort
+                        row-hover
+                        tableStyle="min-width: 50rem"
                         @page="onPage"
                         @sort="onSort"
+                        @rowContextmenu="onRowContextMenu"
                     >
+                        <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Search Field -->
+                                <IconField class="w-full sm:w-auto">
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText
+                                        v-model="filters.search"
+                                        class="w-full"
+                                        placeholder="Keyword Search"
+                                        size="small"
+                                        @keyup.enter="applyFilters"
+                                    />
+                                </IconField>
+                            </div>
+                        </template>
+
                         <template #empty>
                             <div class="empty-state">
                                 <i class="ti ti-database-off text-6xl text-gray-300"></i>
@@ -564,131 +679,82 @@ onMounted(() => {
                             </div>
                         </template>
 
-                        <Column field="reference" frozen header="HBL Reference" sortable style="min-width: 150px">
-                            <template #body="{ data }">
-                                <span class="font-mono font-semibold text-primary">{{ data.reference }}</span>
+                        <template #loading> Loading HBL report data. Please wait.</template>
+
+                        <Column field="hbl_number" header="HBL" sortable>
+                            <template #body="slotProps">
+                                <div class="flex items-center space-x-2">
+                                    <i v-if="slotProps.data.latest_detain_record?.is_rtf"
+                                       v-tooltip.left="`Detained by ${slotProps.data.latest_detain_record?.detain_type || 'RTF'}`"
+                                       class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <i v-else-if="slotProps.data.is_rtf"
+                                       v-tooltip.left="`RTF`"
+                                       class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+                                    <div>
+                                        <span class="font-medium">{{ slotProps.data.hbl_number ?? slotProps.data.hbl }}</span>
+                                        <br v-if="slotProps.data.is_short_loaded">
+                                        <Tag v-if="slotProps.data.is_short_loaded" :severity="`warn`" :value="`Short Loaded`" icon="pi pi-exclamation-triangle" size="small"></Tag>
+                                    </div>
+                                </div>
                             </template>
                         </Column>
 
-                        <Column field="hbl_number" header="HBL Number" sortable style="min-width: 150px">
-                            <template #body="{ data }">
-                                <span class="font-mono font-semibold">{{ data.hbl_number || 'N/A' }}</span>
+                        <Column field="cargo_type" header="Cargo Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :icon="resolveCargoType(slotProps.data).icon" :severity="resolveCargoType(slotProps.data).color" :value="slotProps.data.cargo_type" class="text-sm"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="cargoTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
-                        <Column field="hbl_name" header="Customer Name" sortable style="min-width: 180px">
-                            <template #body="{ data }">
-                                <span class="font-medium">{{ data.hbl_name }}</span>
+                        <Column field="hbl_name" header="HBL Name">
+                            <template #body="slotProps">
+                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.hbl_name}`"
+                                   class="hover:underline" target="_blank">
+                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
+                                    {{ slotProps.data.hbl_name }}
+                                </a>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.email}}</div>
+                                <a :href="`hbls/get-hbls-by-user/${slotProps.data.contact_number}`"
+                                   class="text-gray-500 hover:underline text-sm" target="_blank">
+                                    <i class="pi pi-external-link mr-1" style="font-size: 0.75rem"></i>
+                                    {{ slotProps.data.contact_number }}
+                                </a>
                             </template>
                         </Column>
 
-                        <Column field="contact_number" header="Contact" style="min-width: 130px">
-                            <template #body="{ data }">
-                                <span class="font-mono text-sm">{{ data.contact_number || 'N/A' }}</span>
+                        <Column field="warehouse" header="Warehouse" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveWarehouse(slotProps.data)" :value="slotProps.data.warehouse"></Tag>
+                            </template>
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="warehouses" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
-                        <Column field="branch.name" header="Branch" style="min-width: 150px">
-                            <template #body="{ data }">
-                                <span class="text-sm">{{ data.branch?.name || 'N/A' }}</span>
+                        <Column field="consignee_name" header="Consignee">
+                            <template #body="slotProps">
+                                <div>{{ slotProps.data.consignee_name }}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_email}}</div>
+                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
                             </template>
                         </Column>
 
-                        <Column field="container_reference" header="Container" style="min-width: 150px">
-                            <template #body="{ data }">
-                                <span class="font-mono text-sm">{{ data.container_reference || 'N/A' }}</span>
-                            </template>
-                        </Column>
+                        <Column field="consignee_address" header="Consignee Address"></Column>
 
-                        <Column field="cargo_type" header="Cargo Type" sortable style="min-width: 130px">
-                            <template #body="{ data }">
-                                <Tag
-                                    :severity="getCargoTypeSeverity(data.cargo_type)"
-                                    :value="data.cargo_type"
-                                    class="text-xs"
-                                />
+                        <Column field="hbl_type" header="HBL Type" sortable>
+                            <template #body="slotProps">
+                                <Tag :severity="resolveHBLType(slotProps.data)" :value="slotProps.data.hbl_type"></Tag>
                             </template>
-                        </Column>
-
-                        <Column field="hbl_type" header="HBL Type" sortable style="min-width: 140px">
-                            <template #body="{ data }">
-                                <Tag
-                                    :severity="getHBLTypeSeverity(data.hbl_type)"
-                                    :value="data.hbl_type"
-                                    class="text-xs"
-                                />
+                            <template #filter="{ filterModel, filterCallback }">
+                                <Select v-model="filterModel.value" :options="hblTypes" :showClear="true" placeholder="Select One" style="min-width: 12rem" />
                             </template>
                         </Column>
 
                         <Column field="total_packages" header="Packages" style="min-width: 100px">
                             <template #body="{ data }">
                                 <span class="font-semibold">{{ data.total_packages }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="loaded_date" header="Loaded Date" style="min-width: 180px">
-                            <template #body="{ data }">
-                                <span class="text-sm">{{ formatDate(data.loaded_date) }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="unloaded_date" header="Unloaded Date" style="min-width: 180px">
-                            <template #body="{ data }">
-                                <span class="text-sm">{{ formatDate(data.unloaded_date) }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="appointment_date" header="Appointment" style="min-width: 150px">
-                            <template #body="{ data }">
-                                <span class="text-sm">{{ data.appointment_date || 'N/A' }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="token_number" header="Token #" style="min-width: 120px">
-                            <template #body="{ data }">
-                                <span class="font-mono text-sm">{{ data.token_number || 'N/A' }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="token_issued_date" header="Token Issued" style="min-width: 180px">
-                            <template #body="{ data }">
-                                <span class="text-sm">{{ formatDate(data.token_issued_date) }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="document_verified_date" header="Doc Verified" style="min-width: 180px">
-                            <template #body="{ data }">
-                                <span class="text-sm">{{ formatDate(data.document_verified_date) }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="cashier_invoice_date" header="Cashier Invoice" style="min-width: 180px">
-                            <template #body="{ data }">
-                                <span class="text-sm">{{ formatDate(data.cashier_invoice_date) }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="gate_pass_date" header="Gate Pass" style="min-width: 180px">
-                            <template #body="{ data }">
-                                <span class="text-sm">{{ formatDate(data.gate_pass_date) }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="grand_total" header="Grand Total" sortable style="min-width: 130px">
-                            <template #body="{ data }">
-                                <span class="font-semibold text-green-600">{{ formatCurrency(data.grand_total) }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="paid_amount" header="Paid" style="min-width: 130px">
-                            <template #body="{ data }">
-                                <span class="font-semibold text-blue-600">{{ formatCurrency(data.paid_amount) }}</span>
-                            </template>
-                        </Column>
-
-                        <Column field="balance" header="Balance" style="min-width: 130px">
-                            <template #body="{ data }">
-                                <span class="font-semibold text-red-600">{{ formatCurrency(data.balance) }}</span>
                             </template>
                         </Column>
 
@@ -707,11 +773,20 @@ onMounted(() => {
                                 <span v-else class="text-gray-400">N/A</span>
                             </template>
                         </Column>
+
+                        <template #footer> In total there are {{ totalRecords }} HBL records. </template>
                     </DataTable>
                 </template>
             </Card>
         </div>
     </AppLayout>
+
+    <HBLDetailModal
+        :hbl-id="selectedHBLID"
+        :show="showConfirmViewHBLModal"
+        @close="closeModal"
+        @update:show="showConfirmViewHBLModal = $event"
+    />
 </template>
 
 <style scoped>
@@ -769,13 +844,8 @@ onMounted(() => {
 }
 
 /* Filters */
-.filters-card {
-    margin-bottom: 2rem;
-    border: 1px solid #e5e7eb;
-}
-
-.filters-section h3 {
-    margin-bottom: 1rem;
+.filters-section {
+    padding: 1rem 0;
 }
 
 .filters-grid {
@@ -785,18 +855,6 @@ onMounted(() => {
     margin-bottom: 1rem;
 }
 
-.filter-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.filter-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
-}
-
 .filter-actions {
     display: flex;
     gap: 0.75rem;
@@ -804,35 +862,7 @@ onMounted(() => {
     border-top: 1px solid #e5e7eb;
 }
 
-/* Table */
-.table-card {
-    border: 1px solid #e5e7eb;
-}
-
-.hbl-table {
-    font-size: 0.875rem;
-}
-
-.hbl-table :deep(.p-datatable-header) {
-    background: #f9fafb;
-    border-bottom: 2px solid #e5e7eb;
-}
-
-.hbl-table :deep(.p-datatable-thead > tr > th) {
-    background: #f9fafb;
-    color: #374151;
-    font-weight: 600;
-    padding: 1rem;
-}
-
-.hbl-table :deep(.p-datatable-tbody > tr > td) {
-    padding: 0.875rem 1rem;
-}
-
-.hbl-table :deep(.p-datatable-tbody > tr:hover) {
-    background: #f9fafb;
-}
-
+/* Empty State */
 .empty-state {
     display: flex;
     flex-direction: column;
