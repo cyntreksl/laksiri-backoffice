@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import axios from 'axios';
 import { usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -20,6 +20,7 @@ import { useConfirm } from "primevue/useconfirm";
 import { push } from 'notivue';
 import HBLDetailModal from "@/Pages/Common/Dialog/HBL/Index.vue";
 import moment from "moment";
+import { debounce } from "lodash";
 
 const props = defineProps({
     cargoTypes: {
@@ -99,6 +100,50 @@ const fetchData = async () => {
             ...filters,
         };
 
+        // Format date filters
+        if (filters.loaded_date_from) {
+            params.loaded_date_from = moment(filters.loaded_date_from).format('YYYY-MM-DD');
+        }
+        if (filters.loaded_date_to) {
+            params.loaded_date_to = moment(filters.loaded_date_to).format('YYYY-MM-DD');
+        }
+        if (filters.unloaded_date_from) {
+            params.unloaded_date_from = moment(filters.unloaded_date_from).format('YYYY-MM-DD');
+        }
+        if (filters.unloaded_date_to) {
+            params.unloaded_date_to = moment(filters.unloaded_date_to).format('YYYY-MM-DD');
+        }
+        if (filters.appointment_date_from) {
+            params.appointment_date_from = moment(filters.appointment_date_from).format('YYYY-MM-DD');
+        }
+        if (filters.appointment_date_to) {
+            params.appointment_date_to = moment(filters.appointment_date_to).format('YYYY-MM-DD');
+        }
+        if (filters.token_issued_date_from) {
+            params.token_issued_date_from = moment(filters.token_issued_date_from).format('YYYY-MM-DD');
+        }
+        if (filters.token_issued_date_to) {
+            params.token_issued_date_to = moment(filters.token_issued_date_to).format('YYYY-MM-DD');
+        }
+        if (filters.gate_pass_date_from) {
+            params.gate_pass_date_from = moment(filters.gate_pass_date_from).format('YYYY-MM-DD');
+        }
+        if (filters.gate_pass_date_to) {
+            params.gate_pass_date_to = moment(filters.gate_pass_date_to).format('YYYY-MM-DD');
+        }
+        if (filters.cashier_invoice_date_from) {
+            params.cashier_invoice_date_from = moment(filters.cashier_invoice_date_from).format('YYYY-MM-DD');
+        }
+        if (filters.cashier_invoice_date_to) {
+            params.cashier_invoice_date_to = moment(filters.cashier_invoice_date_to).format('YYYY-MM-DD');
+        }
+        if (filters.document_verified_date_from) {
+            params.document_verified_date_from = moment(filters.document_verified_date_from).format('YYYY-MM-DD');
+        }
+        if (filters.document_verified_date_to) {
+            params.document_verified_date_to = moment(filters.document_verified_date_to).format('YYYY-MM-DD');
+        }
+
         const response = await axios.get(route('report.hbl-report.data'), { params });
 
         if (response.data.success) {
@@ -113,6 +158,19 @@ const fetchData = async () => {
         loading.value = false;
     }
 };
+
+// Debounced search function
+const debouncedFetchData = debounce(() => {
+    lazyParams.page = 1;
+    fetchData();
+}, 1000);
+
+// Watch for search changes
+watch(() => filters.search, (newValue) => {
+    if (newValue !== null) {
+        debouncedFetchData();
+    }
+});
 
 const onPage = (event) => {
     lazyParams.page = event.page + 1;
@@ -170,47 +228,6 @@ const exportData = (format = 'xlsx') => {
     push.success(`Export started. ${format.toUpperCase()} download will begin shortly.`);
 };
 
-const resolveHBLType = (hbl) => {
-    switch (hbl.hbl_type) {
-        case 'UPB':
-            return 'secondary';
-        case 'Gift':
-            return 'warn';
-        case 'Door to Door':
-            return 'info';
-        default:
-            return null;
-    }
-};
-
-const resolveCargoType = (hbl) => {
-    switch (hbl.cargo_type) {
-        case 'Sea Cargo':
-            return {
-                icon: "ti ti-sailboat",
-                color: "success",
-            };
-        case 'Air Cargo':
-            return {
-                icon: "ti ti-plane-tilt",
-                color: "info",
-            };
-        default:
-            return null;
-    }
-};
-
-const resolveWarehouse = (hbl) => {
-    switch (hbl.warehouse) {
-        case 'COLOMBO':
-            return 'info';
-        case 'NINTAVUR':
-            return 'danger';
-        default:
-            return null;
-    }
-};
-
 const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleString('en-US', {
@@ -228,6 +245,56 @@ const formatCurrency = (amount) => {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
+};
+
+const getCargoTypeSeverity = (type) => {
+    const severities = {
+        'General': 'info',
+        'Dangerous': 'danger',
+        'Perishable': 'warn',
+        'Sea Cargo': 'success',
+        'Air Cargo': 'info',
+    };
+    return severities[type] || 'secondary';
+};
+
+const getHBLTypeSeverity = (type) => {
+    const severities = {
+        'Normal': 'primary',
+        'UPB': 'secondary',
+        'Door to Door': 'info',
+        'Gift': 'warn',
+        'Third Party': 'secondary',
+    };
+    return severities[type] || 'contrast';
+};
+
+const resolveHBLType = (hbl) => {
+    return getHBLTypeSeverity(hbl.hbl_type);
+};
+
+const resolveCargoType = (hbl) => {
+    const icons = {
+        'Sea Cargo': 'ti ti-sailboat',
+        'Air Cargo': 'ti ti-plane-tilt',
+    };
+    return {
+        icon: icons[hbl.cargo_type] || 'ti ti-package',
+        color: getCargoTypeSeverity(hbl.cargo_type),
+    };
+};
+
+const resolveWarehouse = (warehouse) => {
+    if (!warehouse || typeof warehouse !== 'string') return 'secondary';
+    
+    switch (warehouse.toUpperCase()) {
+        case 'COLOMBO':
+            return 'info';
+        case 'NINTAVUR':
+            return 'danger';
+        default:
+            return 'secondary';
+    }
 };
 
 const menuModel = ref([
@@ -655,7 +722,40 @@ onMounted(() => {
                         @rowContextmenu="onRowContextMenu"
                     >
                         <template #header>
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
+                                <div class="text-lg font-medium">
+                                    HBL Report
+                                </div>
+                            </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
+                                <!-- Button Group -->
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <Button
+                                        :disabled="loading || totalRecords === 0"
+                                        icon="pi pi-file-pdf"
+                                        label="PDF"
+                                        severity="danger"
+                                        size="small"
+                                        @click="exportData('pdf')"
+                                    />
+                                    <Button
+                                        :disabled="loading || totalRecords === 0"
+                                        icon="pi pi-file-excel"
+                                        label="Excel"
+                                        severity="success"
+                                        size="small"
+                                        @click="exportData('xlsx')"
+                                    />
+                                    <Button
+                                        :disabled="loading || totalRecords === 0"
+                                        icon="pi pi-external-link"
+                                        label="CSV"
+                                        severity="secondary"
+                                        size="small"
+                                        @click="exportCSV()"
+                                    />
+                                </div>
+
                                 <!-- Search Field -->
                                 <IconField class="w-full sm:w-auto">
                                     <InputIcon>
@@ -666,7 +766,6 @@ onMounted(() => {
                                         class="w-full"
                                         placeholder="Keyword Search"
                                         size="small"
-                                        @keyup.enter="applyFilters"
                                     />
                                 </IconField>
                             </div>
@@ -730,7 +829,6 @@ onMounted(() => {
                         <Column field="consignee_name" header="Consignee">
                             <template #body="slotProps">
                                 <div>{{ slotProps.data.consignee_name }}</div>
-                                <div class="text-gray-500 text-sm">{{slotProps.data.consignee_email}}</div>
                                 <div class="text-gray-500 text-sm">{{slotProps.data.consignee_contact}}</div>
                             </template>
                         </Column>

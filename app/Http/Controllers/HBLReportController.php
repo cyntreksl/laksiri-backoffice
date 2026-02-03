@@ -99,14 +99,24 @@ class HBLReportController extends Controller
         $this->authorize('reports.hbl');
 
         $query = HBL::withoutGlobalScope(BranchScope::class)
-            ->with([
-                'branch',
-                'user',
-                'packages.containers',
-                'tokens.verification',
-                'tokens.cashierPayment',
-                'tokens.examination',
-                'callFlags'
+            ->select([
+                'id',
+                'reference',
+                'hbl_number',
+                'hbl',
+                'hbl_name',
+                'contact_number',
+                'email',
+                'cargo_type',
+                'hbl_type',
+                'warehouse',
+                'consignee_name',
+                'consignee_contact',
+                'consignee_address',
+                'branch_id',
+                'created_by',
+                'is_short_loading',
+                'created_at'
             ]);
 
         // Apply filters
@@ -115,7 +125,7 @@ class HBLReportController extends Controller
         // Get total count before pagination
         $totalRecords = $query->count();
 
-        // Calculate summary statistics
+        // Calculate summary statistics (only when needed, not on every request)
         $stats = $this->calculateStats($query);
 
         // Apply sorting
@@ -124,6 +134,7 @@ class HBLReportController extends Controller
 
         $sortableFields = [
             'reference' => 'reference',
+            'hbl_number' => 'hbl_number',
             'hbl_name' => 'hbl_name',
             'cargo_type' => 'cargo_type',
             'hbl_type' => 'hbl_type',
@@ -136,21 +147,30 @@ class HBLReportController extends Controller
         // Apply pagination
         $perPage = $request->input('per_page', 25);
         $page = $request->input('page', 1);
-        $records = $query->skip(($page - 1) * $perPage)->take($perPage)->get();
+        
+        // Use paginate instead of manual skip/take for better performance
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        // Load only necessary relationships for the current page
+        $paginator->load([
+            'branch:id,name',
+            'user:id,name',
+            'latestDetainRecord'
+        ]);
 
         // Transform data
-        $data = $records->map(function ($hbl) {
+        $data = $paginator->map(function ($hbl) {
             return $this->transformRecord($hbl);
         });
 
         return response()->json([
             'success' => true,
             'data' => $data,
-            'total' => $totalRecords,
+            'total' => $paginator->total(),
             'stats' => $stats,
-            'per_page' => $perPage,
-            'current_page' => $page,
-            'last_page' => ceil($totalRecords / $perPage),
+            'per_page' => $paginator->perPage(),
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
         ]);
     }
 
@@ -305,17 +325,38 @@ class HBLReportController extends Controller
      */
     private function calculateStats($query): array
     {
-        $clonedQuery = clone $query;
+        // Get HBL IDs from filtered query first
+        $hblIds = (clone $query)->pluck('id');
+        
+        if ($hblIds->isEmpty()) {
+            return [
+                'total_hbls' => 0,
+                'total_amount' => '0.00',
+                'total_paid' => '0.00',
+                'total_packages' => 0,
+            ];
+        }
 
-        $totalHBLs = $clonedQuery->count();
-        $totalAmount = (clone $query)->sum('grand_total');
-        $totalPaid = (clone $query)->sum('paid_amount');
-        $totalPackages = (clone $query)->withCount('packages')->get()->sum('packages_count');
+        // Calculate aggregates using a fresh query on the IDs
+        $stats = HBL::withoutGlobalScope(BranchScope::class)
+            ->whereIn('id', $hblIds)
+            ->selectRaw('
+                COUNT(*) as total_hbls,
+                COALESCE(SUM(grand_total), 0) as total_amount,
+                COALESCE(SUM(paid_amount), 0) as total_paid
+            ')
+            ->first();
+
+        // Get total packages count
+        $totalPackages = \DB::table('hbl_packages')
+            ->whereIn('hbl_id', $hblIds)
+            ->whereNull('deleted_at')
+            ->count();
 
         return [
-            'total_hbls' => $totalHBLs,
-            'total_amount' => number_format($totalAmount, 2),
-            'total_paid' => number_format($totalPaid, 2),
+            'total_hbls' => $stats->total_hbls ?? 0,
+            'total_amount' => number_format($stats->total_amount ?? 0, 2),
+            'total_paid' => number_format($stats->total_paid ?? 0, 2),
             'total_packages' => $totalPackages,
         ];
     }
@@ -325,31 +366,11 @@ class HBLReportController extends Controller
      */
     private function transformRecord(HBL $hbl): array
     {
-        // Get loaded date (first package loaded)
-        $loadedDate = $hbl->packages()
-            ->whereNotNull('loaded_at')
-            ->orderBy('loaded_at', 'asc')
-            ->value('loaded_at');
-
-        // Get unloaded date (last package unloaded)
-        $unloadedDate = $hbl->packages()
-            ->whereNotNull('unloaded_at')
-            ->orderBy('unloaded_at', 'desc')
-            ->value('unloaded_at');
-
-        // Get container reference through packages
-        $containerReference = null;
-        if ($hbl->packages->isNotEmpty()) {
-            $firstPackage = $hbl->packages->first();
-            $container = $firstPackage->containers()->withoutGlobalScopes()->first()
-                ?? $firstPackage->duplicate_containers()->withoutGlobalScopes()->first();
-            $containerReference = $container?->reference;
-        }
-
         return [
             'id' => $hbl->id,
             'reference' => $hbl->reference,
             'hbl_number' => $hbl->hbl_number,
+            'hbl' => $hbl->hbl,
             'hbl_name' => $hbl->hbl_name,
             'contact_number' => $hbl->contact_number,
             'email' => $hbl->email,
@@ -358,33 +379,18 @@ class HBLReportController extends Controller
             'warehouse' => $hbl->warehouse,
             'consignee_name' => $hbl->consignee_name,
             'consignee_contact' => $hbl->consignee_contact,
+            'consignee_address' => $hbl->consignee_address,
+            'is_rtf' => $hbl->latestDetainRecord?->is_rtf ?? false,
+            'is_short_loaded' => $hbl->is_short_loading ?? false,
             'branch' => $hbl->branch ? [
                 'id' => $hbl->branch->id,
                 'name' => $hbl->branch->name,
             ] : null,
-//            'container_reference' => $containerReference,
-//            'loaded_date' => $loadedDate ? date('Y-m-d H:i:s', strtotime($loadedDate)) : null,
-//            'unloaded_date' => $unloadedDate ? date('Y-m-d H:i:s', strtotime($unloadedDate)) : null,
-//            'appointment_date' => $hbl->callFlags()->latest()->first()?->appointment_date,
-//            'token_issued_date' => $hbl->tokens->first()?->created_at?->format('Y-m-d H:i:s'),
-//            'token_number' => $hbl->tokens->first()?->token,
-//            'document_verified_date' => $hbl->tokens->first()?->verification?->created_at?->format('Y-m-d H:i:s'),
-//            'cashier_invoice_date' => $hbl->tokens->first()?->cashierPayment?->created_at?->format('Y-m-d H:i:s'),
-//            'gate_pass_date' => Examination::where('hbl_id', $hbl->id)
-//                ->where('is_issued_gate_pass', true)
-//                ->whereNotNull('released_at')
-//                ->latest('released_at')
-//                ->value('released_at')
-//                ? date('Y-m-d H:i:s', strtotime(Examination::where('hbl_id', $hbl->id)
-//                    ->where('is_issued_gate_pass', true)
-//                    ->whereNotNull('released_at')
-//                    ->latest('released_at')
-//                    ->value('released_at')))
-//                : null,
-            'total_packages' => $hbl->packages->count(),
-//            'grand_total' => number_format($hbl->grand_total, 2),
-//            'paid_amount' => number_format($hbl->paid_amount, 2),
-//            'balance' => number_format($hbl->grand_total - $hbl->paid_amount, 2),
+            'latest_detain_record' => $hbl->latestDetainRecord ? [
+                'is_rtf' => $hbl->latestDetainRecord->is_rtf,
+                'detain_type' => $hbl->latestDetainRecord->detain_type,
+            ] : null,
+            'total_packages' => $hbl->packages()->count(),
             'created_at' => $hbl->created_at?->format('Y-m-d H:i:s'),
             'created_by' => $hbl->user ? [
                 'id' => $hbl->user->id,
