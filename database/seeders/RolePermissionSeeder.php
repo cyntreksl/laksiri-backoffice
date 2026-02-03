@@ -762,6 +762,7 @@ class RolePermissionSeeder extends Seeder
                 'group_name' => 'Reports',
                 'permissions' => [
                     'reports.detain',
+                    'reports.hbl',
                 ],
             ],
         ];

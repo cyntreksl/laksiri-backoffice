@@ -96,6 +96,11 @@ class Token extends Model
         return $this->hasOne(CashierHBLPayment::class, 'token_id');
     }
 
+    public function examination(): HasOne
+    {
+        return $this->hasOne(Examination::class, 'token_id');
+    }
+
     public function isPaid(): bool
     {
         return false;

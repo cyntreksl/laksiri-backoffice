@@ -934,6 +934,11 @@ const setMenu = (menu) => {
                     title: "Detain Report",
                     route: "report.detain-report.index",
                     permission: "reports.detain",
+                },
+                {
+                    title: "HBL Report",
+                    route: "report.hbl-report.index",
+                    permission: "reports.hbl",
                 }
             );
             changeSidePanelTitle("Report");
@@ -1297,7 +1302,7 @@ const menuModel = ref([
     {
         label: 'Report',
         icon: 'ti ti-report text-2xl',
-        visible: () => isSuperAdmin.value || can('reports.detain'),
+        visible: () => isSuperAdmin.value || can('reports.detain') || can('reports.hbl'),
         command: () => {
             setMenu('report');
         }
