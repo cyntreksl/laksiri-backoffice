@@ -6,6 +6,7 @@ use App\Enum\CargoType;
 use App\Enum\HBLType;
 use App\Models\HBL;
 use App\Models\Branch;
+use App\Models\Container;
 use App\Models\Examination;
 use App\Exports\HBLReportExport;
 use App\Models\Scopes\BranchScope;
@@ -31,6 +32,7 @@ class HBLReportController extends Controller
             'cargoTypes' => CargoType::cases(),
             'hblTypes' => HBLType::cases(),
             'branches' => $this->getBranches(),
+            'containers' => $this->getContainers(),
         ]);
     }
 
@@ -45,6 +47,23 @@ class HBLReportController extends Controller
             ->map(fn($branch) => [
                 'value' => $branch->id,
                 'label' => $branch->name
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Get containers for filter
+     */
+    private function getContainers(): array
+    {
+        return Container::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+            ->select('id', 'reference')
+            ->orderBy('reference', 'desc')
+            ->limit(500) // Limit to recent containers for performance
+            ->get()
+            ->map(fn($container) => [
+                'id' => $container->id,
+                'reference' => $container->reference
             ])
             ->toArray();
     }
@@ -235,9 +254,9 @@ class HBLReportController extends Controller
         }
 
         // Shipment/Container filter
-        if ($request->filled('container_reference')) {
+        if ($request->filled('container_id')) {
             $query->whereHas('packages.containers', function ($q) use ($request) {
-                $q->where('reference', 'like', '%' . $request->input('container_reference') . '%');
+                $q->where('containers.id', $request->input('container_id'));
             });
         }
 

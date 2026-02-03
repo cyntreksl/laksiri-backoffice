@@ -26,6 +26,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    containers: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const loading = ref(false);
@@ -62,7 +66,7 @@ const filters = reactive({
     cashier_invoice_date_to: null,
     document_verified_date_from: null,
     document_verified_date_to: null,
-    container_reference: '',
+    container_id: null,
     cargo_type: null,
     hbl_type: null,
     search: '',
@@ -113,7 +117,6 @@ const resetFilters = () => {
         filters[key] = null;
     });
     filters.customer_search = '';
-    filters.container_reference = '';
     filters.search = '';
     lazyParams.page = 1;
     fetchData();
@@ -458,13 +461,17 @@ onMounted(() => {
                                 />
                             </div>
 
-                            <!-- Container Reference -->
+                            <!-- Shipment/Container -->
                             <div class="filter-item">
                                 <label class="filter-label">Shipment/Container</label>
-                                <InputText
-                                    v-model="filters.container_reference"
-                                    placeholder="Container reference..."
-                                    @keyup.enter="applyFilters"
+                                <Select
+                                    v-model="filters.container_id"
+                                    :options="containers"
+                                    filter
+                                    optionLabel="reference"
+                                    optionValue="id"
+                                    placeholder="Select container"
+                                    showClear
                                 />
                             </div>
 

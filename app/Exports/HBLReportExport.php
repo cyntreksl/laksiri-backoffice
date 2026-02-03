@@ -181,9 +181,9 @@ class HBLReportExport implements FromCollection, WithHeadings, WithMapping, With
         }
 
         // Shipment/Container filter
-        if ($this->request->filled('container_reference')) {
+        if ($this->request->filled('container_id')) {
             $query->whereHas('packages.containers', function ($q) {
-                $q->where('reference', 'like', '%' . $this->request->input('container_reference') . '%');
+                $q->where('containers.id', $this->request->input('container_id'));
             });
         }
 
