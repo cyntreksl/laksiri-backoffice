@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\DetainReportController;
+use App\Http\Controllers\HBLReportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DetainReportExport;
+use App\Exports\HBLReportExport;
 
 Route::name('report.')->group(function () {
     // Payment Summery
@@ -22,4 +24,17 @@ Route::name('report.')->group(function () {
     Route::get('detain-report/export', function () {
         return Excel::download(new DetainReportExport(request()), 'detain-report-' . date('Y-m-d-His') . '.xlsx');
     })->name('detain-report.export');
+
+    // HBL Report
+    Route::get('hbl-report', [HBLReportController::class, 'index'])
+        ->name('hbl-report.index')
+        ->middleware('can:reports.hbl');
+
+    Route::get('hbl-report/data', [HBLReportController::class, 'getData'])
+        ->name('hbl-report.data')
+        ->middleware('can:reports.hbl');
+
+    Route::get('hbl-report/export', [HBLReportController::class, 'export'])
+        ->name('hbl-report.export')
+        ->middleware('can:reports.hbl');
 });
