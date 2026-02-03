@@ -286,7 +286,7 @@ const resolveCargoType = (hbl) => {
 
 const resolveWarehouse = (warehouse) => {
     if (!warehouse || typeof warehouse !== 'string') return 'secondary';
-    
+
     switch (warehouse.toUpperCase()) {
         case 'COLOMBO':
             return 'info';
@@ -722,40 +722,7 @@ onMounted(() => {
                         @rowContextmenu="onRowContextMenu"
                     >
                         <template #header>
-                            <div class="flex flex-col sm:flex-row justify-between items-center mb-2">
-                                <div class="text-lg font-medium">
-                                    HBL Report
-                                </div>
-                            </div>
                             <div class="flex flex-col sm:flex-row justify-between gap-4">
-                                <!-- Button Group -->
-                                <div class="flex flex-col sm:flex-row gap-2">
-                                    <Button
-                                        :disabled="loading || totalRecords === 0"
-                                        icon="pi pi-file-pdf"
-                                        label="PDF"
-                                        severity="danger"
-                                        size="small"
-                                        @click="exportData('pdf')"
-                                    />
-                                    <Button
-                                        :disabled="loading || totalRecords === 0"
-                                        icon="pi pi-file-excel"
-                                        label="Excel"
-                                        severity="success"
-                                        size="small"
-                                        @click="exportData('xlsx')"
-                                    />
-                                    <Button
-                                        :disabled="loading || totalRecords === 0"
-                                        icon="pi pi-external-link"
-                                        label="CSV"
-                                        severity="secondary"
-                                        size="small"
-                                        @click="exportCSV()"
-                                    />
-                                </div>
-
                                 <!-- Search Field -->
                                 <IconField class="w-full sm:w-auto">
                                     <InputIcon>
