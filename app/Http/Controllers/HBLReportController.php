@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\HBL;
 use App\Models\Branch;
 use App\Models\Container;
+use App\Models\Examination;
 use App\Exports\HBLReportExport;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -80,13 +81,11 @@ class HBLReportController extends Controller
         $query = HBL::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
             ->with([
                 'branch',
-                'container',
-                'createdBy',
-                'packages',
-                'token',
-                'verification',
-                'cashierPayments',
-                'deliver'
+                'user',
+                'packages.containers',
+                'tokens.verification',
+                'tokens.cashierPayment',
+                'callFlags'
             ]);
 
         // Apply filters
@@ -142,26 +141,26 @@ class HBLReportController extends Controller
     {
         // Loaded Date Range
         if ($request->filled('loaded_date_from')) {
-            $query->whereHas('packages.containerPackages', function ($q) use ($request) {
+            $query->whereHas('packages', function ($q) use ($request) {
                 $q->where('loaded_at', '>=', $request->input('loaded_date_from'));
             });
         }
 
         if ($request->filled('loaded_date_to')) {
-            $query->whereHas('packages.containerPackages', function ($q) use ($request) {
+            $query->whereHas('packages', function ($q) use ($request) {
                 $q->where('loaded_at', '<=', $request->input('loaded_date_to') . ' 23:59:59');
             });
         }
 
         // Unloaded/Destuff Date Range
         if ($request->filled('unloaded_date_from')) {
-            $query->whereHas('packages.containerPackages', function ($q) use ($request) {
+            $query->whereHas('packages', function ($q) use ($request) {
                 $q->where('unloaded_at', '>=', $request->input('unloaded_date_from'));
             });
         }
 
         if ($request->filled('unloaded_date_to')) {
-            $query->whereHas('packages.containerPackages', function ($q) use ($request) {
+            $query->whereHas('packages', function ($q) use ($request) {
                 $q->where('unloaded_at', '<=', $request->input('unloaded_date_to') . ' 23:59:59');
             });
         }
@@ -197,59 +196,69 @@ class HBLReportController extends Controller
 
         // Token Issued Date Range
         if ($request->filled('token_issued_date_from')) {
-            $query->whereHas('token', function ($q) use ($request) {
+            $query->whereHas('tokens', function ($q) use ($request) {
                 $q->where('created_at', '>=', $request->input('token_issued_date_from'));
             });
         }
 
         if ($request->filled('token_issued_date_to')) {
-            $query->whereHas('token', function ($q) use ($request) {
+            $query->whereHas('tokens', function ($q) use ($request) {
                 $q->where('created_at', '<=', $request->input('token_issued_date_to') . ' 23:59:59');
             });
         }
 
         // Gate Pass Marked Date Range
         if ($request->filled('gate_pass_date_from')) {
-            $query->whereHas('packages.examination', function ($q) use ($request) {
-                $q->where('gate_pass_marked_at', '>=', $request->input('gate_pass_date_from'));
+            $query->whereHas('tokens', function ($q) use ($request) {
+                $q->whereHas('examination', function ($subQ) use ($request) {
+                    $subQ->where('is_issued_gate_pass', true)
+                        ->where('released_at', '>=', $request->input('gate_pass_date_from'));
+                });
             });
         }
 
         if ($request->filled('gate_pass_date_to')) {
-            $query->whereHas('packages.examination', function ($q) use ($request) {
-                $q->where('gate_pass_marked_at', '<=', $request->input('gate_pass_date_to') . ' 23:59:59');
+            $query->whereHas('tokens', function ($q) use ($request) {
+                $q->whereHas('examination', function ($subQ) use ($request) {
+                    $subQ->where('is_issued_gate_pass', true)
+                        ->where('released_at', '<=', $request->input('gate_pass_date_to') . ' 23:59:59');
+                });
             });
         }
 
         // Cashier Invoice Date Range
         if ($request->filled('cashier_invoice_date_from')) {
-            $query->whereHas('cashierPayments', function ($q) use ($request) {
-                $q->where('created_at', '>=', $request->input('cashier_invoice_date_from'));
+            $query->whereHas('tokens', function ($q) use ($request) {
+                $q->whereHas('cashierPayment', function ($subQ) use ($request) {
+                    $subQ->where('created_at', '>=', $request->input('cashier_invoice_date_from'));
+                });
             });
         }
 
         if ($request->filled('cashier_invoice_date_to')) {
-            $query->whereHas('cashierPayments', function ($q) use ($request) {
-                $q->where('created_at', '<=', $request->input('cashier_invoice_date_to') . ' 23:59:59');
+            $query->whereHas('tokens', function ($q) use ($request) {
+                $q->whereHas('cashierPayment', function ($subQ) use ($request) {
+                    $subQ->where('created_at', '<=', $request->input('cashier_invoice_date_to') . ' 23:59:59');
+                });
             });
         }
 
         // Document Verified Date Range
         if ($request->filled('document_verified_date_from')) {
-            $query->whereHas('verification', function ($q) use ($request) {
+            $query->whereHas('tokens.verification', function ($q) use ($request) {
                 $q->where('verified_at', '>=', $request->input('document_verified_date_from'));
             });
         }
 
         if ($request->filled('document_verified_date_to')) {
-            $query->whereHas('verification', function ($q) use ($request) {
+            $query->whereHas('tokens.verification', function ($q) use ($request) {
                 $q->where('verified_at', '<=', $request->input('document_verified_date_to') . ' 23:59:59');
             });
         }
 
         // Shipment/Container filter
         if ($request->filled('container_reference')) {
-            $query->whereHas('container', function ($q) use ($request) {
+            $query->whereHas('packages.containers', function ($q) use ($request) {
                 $q->where('reference', 'like', '%' . $request->input('container_reference') . '%');
             });
         }
@@ -302,17 +311,24 @@ class HBLReportController extends Controller
     {
         // Get loaded date (first package loaded)
         $loadedDate = $hbl->packages()
-            ->join('container_hbl_package', 'hbl_packages.id', '=', 'container_hbl_package.hbl_package_id')
-            ->whereNotNull('container_hbl_package.loaded_at')
-            ->orderBy('container_hbl_package.loaded_at', 'asc')
-            ->value('container_hbl_package.loaded_at');
+            ->whereNotNull('loaded_at')
+            ->orderBy('loaded_at', 'asc')
+            ->value('loaded_at');
 
         // Get unloaded date (last package unloaded)
         $unloadedDate = $hbl->packages()
-            ->join('container_hbl_package', 'hbl_packages.id', '=', 'container_hbl_package.hbl_package_id')
-            ->whereNotNull('container_hbl_package.unloaded_at')
-            ->orderBy('container_hbl_package.unloaded_at', 'desc')
-            ->value('container_hbl_package.unloaded_at');
+            ->whereNotNull('unloaded_at')
+            ->orderBy('unloaded_at', 'desc')
+            ->value('unloaded_at');
+
+        // Get container reference through packages
+        $containerReference = null;
+        if ($hbl->packages->isNotEmpty()) {
+            $firstPackage = $hbl->packages->first();
+            $container = $firstPackage->containers()->withoutGlobalScopes()->first() 
+                ?? $firstPackage->duplicate_containers()->withoutGlobalScopes()->first();
+            $containerReference = $container?->reference;
+        }
 
         return [
             'id' => $hbl->id,
@@ -326,25 +342,33 @@ class HBLReportController extends Controller
                 'id' => $hbl->branch->id,
                 'name' => $hbl->branch->name,
             ] : null,
-            'container_reference' => $hbl->container?->reference,
+            'container_reference' => $containerReference,
             'loaded_date' => $loadedDate ? date('Y-m-d H:i:s', strtotime($loadedDate)) : null,
             'unloaded_date' => $unloadedDate ? date('Y-m-d H:i:s', strtotime($unloadedDate)) : null,
             'appointment_date' => $hbl->callFlags()->latest()->first()?->appointment_date,
-            'token_issued_date' => $hbl->token?->created_at?->format('Y-m-d H:i:s'),
-            'token_number' => $hbl->token?->token,
-            'document_verified_date' => $hbl->verification?->verified_at?->format('Y-m-d H:i:s'),
-            'cashier_invoice_date' => $hbl->cashierPayments()->latest()->first()?->created_at?->format('Y-m-d H:i:s'),
-            'gate_pass_date' => $hbl->packages()->whereHas('examination', function($q) {
-                $q->whereNotNull('gate_pass_marked_at');
-            })->with('examination')->first()?->examination?->gate_pass_marked_at?->format('Y-m-d H:i:s'),
+            'token_issued_date' => $hbl->tokens->first()?->created_at?->format('Y-m-d H:i:s'),
+            'token_number' => $hbl->tokens->first()?->token,
+            'document_verified_date' => $hbl->tokens->first()?->verification?->verified_at?->format('Y-m-d H:i:s'),
+            'cashier_invoice_date' => $hbl->tokens->first()?->cashierPayment?->created_at?->format('Y-m-d H:i:s'),
+            'gate_pass_date' => Examination::where('hbl_id', $hbl->id)
+                ->where('is_issued_gate_pass', true)
+                ->whereNotNull('released_at')
+                ->latest('released_at')
+                ->value('released_at') 
+                ? date('Y-m-d H:i:s', strtotime(Examination::where('hbl_id', $hbl->id)
+                    ->where('is_issued_gate_pass', true)
+                    ->whereNotNull('released_at')
+                    ->latest('released_at')
+                    ->value('released_at'))) 
+                : null,
             'total_packages' => $hbl->packages->count(),
             'grand_total' => number_format($hbl->grand_total, 2),
             'paid_amount' => number_format($hbl->paid_amount, 2),
             'balance' => number_format($hbl->grand_total - $hbl->paid_amount, 2),
             'created_at' => $hbl->created_at?->format('Y-m-d H:i:s'),
-            'created_by' => $hbl->createdBy ? [
-                'id' => $hbl->createdBy->id,
-                'name' => $hbl->createdBy->name,
+            'created_by' => $hbl->user ? [
+                'id' => $hbl->user->id,
+                'name' => $hbl->user->name,
             ] : null,
         ];
     }
