@@ -10,14 +10,20 @@ class GetUserBranches
 {
     use AsAction;
 
-    public function handle(): Collection|array
+    public function handle(): \Illuminate\Support\Collection
     {
         $user = Auth::user();
         $branches = $user->branches;
         $userPrimaryBranch = $user->primaryBranch;
 
-        if (! $branches->contains($userPrimaryBranch->id)) {
-            $branches = $branches->merge([$userPrimaryBranch]);
+        // If user has no branches in pivot table but has a primary branch, return primary branch
+        if ($branches->isEmpty() && $userPrimaryBranch) {
+            return collect([$userPrimaryBranch]);
+        }
+
+        // If primary branch exists and is not in the branches collection, add it
+        if ($userPrimaryBranch && !$branches->contains('id', $userPrimaryBranch->id)) {
+            $branches = $branches->push($userPrimaryBranch);
         }
 
         return $branches;

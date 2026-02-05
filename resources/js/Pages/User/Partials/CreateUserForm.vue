@@ -93,28 +93,28 @@ const filteredRoles = computed(() => {
 });
 
 // Filter branches based on user's assigned branches
-const filteredBranches = computed(() => {
-    const userRole = usePage().props?.auth.user.role;
-    
-    // Only Super admin can see all branches
-    if (props.isSuperAdmin || userRole === 'super admin') {
-        return props.branches;
-    }
-    
-    // Get the user's assigned branch IDs from auth.user.branches
-    const userBranches = usePage().props?.auth?.user?.branches || [];
-    
-    // If user has no assigned branches, return empty array
-    if (userBranches.length === 0) {
-        return [];
-    }
-    
-    // Extract branch IDs from user's branches
-    const userBranchIds = userBranches.map(branch => branch.id);
-    
-    // Filter branches to only show the ones the user is assigned to
-    return props.branches.filter(branch => userBranchIds.includes(branch.id));
-});
+// const filteredBranches = computed(() => {
+//     const userRole = usePage().props?.auth.user.role;
+//
+//     // Only Super admin can see all branches
+//     if (props.isSuperAdmin || userRole === 'super admin') {
+//         return props.branches;
+//     }
+//
+//     // Get the user's assigned branch IDs from auth.user.branches
+//     const userBranches = usePage().props?.auth?.user?.branches || [];
+//
+//     // If user has no assigned branches, return empty array
+//     if (userBranches.length === 0) {
+//         return [];
+//     }
+//
+//     // Extract branch IDs from user's branches
+//     const userBranchIds = userBranches.map(branch => branch.id);
+//
+//     // Filter branches to only show the ones the user is assigned to
+//     return props.branches.filter(branch => userBranchIds.includes(branch.id));
+// });
 </script>
 
 <template>
@@ -165,15 +165,15 @@ const filteredBranches = computed(() => {
                 <InputError :message="form.errors.password_confirmation"/>
             </div>
 
-            <div v-if="userRole === 'admin'">
+            <div>
                 <InputLabel value="Select Primary Branch"/>
-                <Select v-model="form.primary_branch_id" :options="filteredBranches" class="w-full" option-label="name" option-value="id" placeholder="Select a primary branch" />
+                <Select v-model="form.primary_branch_id" :options="branches" class="w-full" option-label="name" option-value="id" placeholder="Select a primary branch" />
                 <InputError :message="form.errors.primary_branch_id"/>
             </div>
 
             <div v-if="isSuperAdmin">
                 <InputLabel value="Select Secondary Branch"/>
-                <MultiSelect v-model="form.secondary_branches" :maxSelectedLabels="3" :options="filteredBranches" class="w-full" display="chip" filter option-label="name" option-value="id" placeholder="Select secondary branches"/>
+                <MultiSelect v-model="form.secondary_branches" :maxSelectedLabels="3" :options="branches" class="w-full" display="chip" filter option-label="name" option-value="id" placeholder="Select secondary branches"/>
                 <InputError :message="form.errors.secondary_branches"/>
             </div>
 

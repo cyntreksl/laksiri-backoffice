@@ -52,7 +52,7 @@ class Branch extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_branches');
+        return $this->belongsToMany(User::class, 'branch_user');
     }
 
     public function zones(): HasMany
