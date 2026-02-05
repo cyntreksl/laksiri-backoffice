@@ -11,5 +11,5 @@ class BranchUser extends Model
 
     protected $table = 'branch_user';
 
-    protected $fillable = ['brach_id', 'user_id'];
+    protected $fillable = ['branch_id', 'user_id'];
 }

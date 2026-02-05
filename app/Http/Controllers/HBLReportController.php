@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\HBL\DownloadHBLReportPDF;
+use App\Actions\HBL\StreamHBLReportPDF;
 use App\Enum\CargoType;
 use App\Enum\HBLType;
 use App\Models\HBL;
@@ -407,11 +409,83 @@ class HBLReportController extends Controller
         $this->authorize('reports.hbl');
 
         $format = $request->input('format', 'xlsx');
+        
+        // For PDF format, use the Lambda-style action with Blade template
+        if ($format === 'pdf') {
+            return $this->exportPDF($request);
+        }
+
+        // For Excel/CSV formats, use the existing export class
         $filename = 'hbl-report-' . date('Y-m-d-His');
 
         return Excel::download(
             new HBLReportExport($request),
             "{$filename}.{$format}"
         );
+    }
+
+    /**
+     * Export HBL report as PDF using BrowsershotLambda
+     */
+    private function exportPDF(Request $request)
+    {
+        // Build query with same filters as getData method
+        $query = HBL::withoutGlobalScope(BranchScope::class)
+            ->with([
+                'branch:id,name',
+                'user:id,name',
+                'packages:id,hbl_id', // Only load necessary package fields
+                'latestDetainRecord' => function ($query) {
+                    // Specify table name to avoid ambiguous column error
+                    $query->select('detain_records.id', 'detain_records.rtfable_id', 'detain_records.rtfable_type', 'detain_records.is_rtf', 'detain_records.detain_type');
+                }
+            ]);
+
+        // Apply filters
+        $this->applyFilters($query, $request);
+
+        // Apply sorting
+        $sortField = $request->input('sort_field', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+
+        $sortableFields = [
+            'reference' => 'reference',
+            'hbl_number' => 'hbl_number',
+            'hbl_name' => 'hbl_name',
+            'cargo_type' => 'cargo_type',
+            'hbl_type' => 'hbl_type',
+            'created_at' => 'created_at',
+        ];
+
+        $dbSortField = $sortableFields[$sortField] ?? 'created_at';
+        $query->orderBy($dbSortField, $sortOrder);
+
+        // Limit records for PDF performance (reduce from 1000 to 500 for faster generation)
+        $limit = $request->input('limit', 500);
+        $limit = min($limit, 500); // Cap at 500 records
+        
+        $hbls = $query->limit($limit)->get();
+
+        // Check if no records found
+        if ($hbls->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No HBL records found matching the selected criteria.'
+            ], 404);
+        }
+
+        // Check if user wants to stream (inline) or download
+        $stream = $request->input('stream', false);
+
+        // Use detailed template only if explicitly requested and record count is low
+        $detailed = $request->input('detailed', false) && $hbls->count() <= 100;
+
+        if ($stream) {
+            // Use streaming action for inline display
+            return StreamHBLReportPDF::run($hbls, $request, $detailed);
+        }
+
+        // Use download action for file download
+        return DownloadHBLReportPDF::run($hbls, $request, $detailed);
     }
 }
