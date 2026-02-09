@@ -262,21 +262,37 @@ const closeIssueDetailModal = () => {
 
             <Card v-else
                 :class="[
-                    hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland
+                    hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland || (hbl?.is_shortland && !hbl?.is_shortland_fixed)
                         ? '!border-2 !border-dashed !border-orange-400 !bg-orange-50'
+                        : hbl?.is_shortland && hbl?.is_shortland_fixed
+                        ? '!border-2 !border-solid !border-green-400 !bg-green-50'
                         : '!bg-emerald-50 !border !border-emerald-200',
                     '!shadow-md'
                 ]">
                 <template #content>
                     <!-- Status Badges Section - Always visible at top -->
-                    <div v-if="hbl?.is_short_load || hbl?.is_unmanifest || hbl?.is_overland" class="mb-4 pb-4 border-b-2 border-dashed border-orange-300">
+                    <div v-if="hbl?.is_short_load || hbl?.is_shortland || hbl?.is_unmanifest || hbl?.is_overland" class="mb-4 pb-4 border-b-2 border-dashed border-orange-300">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-sm font-semibold text-orange-800 mr-2">HBL Status:</span>
+                            <!-- Shortland Status (New Auto-Handling) -->
+                            <span v-if="hbl?.is_shortland && !hbl?.is_shortland_fixed"
+                                v-tooltip.top="`Marked on ${hbl?.shortland_marked_at ? new Date(hbl.shortland_marked_at).toLocaleString() : 'N/A'}`"
+                                class="px-3 py-1.5 bg-orange-100 text-orange-800 border-2 border-orange-400 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm">
+                                <i class="ti ti-truck-loading text-xs"></i>
+                                <span>SHORTLAND</span>
+                            </span>
 
-                            <span v-if="hbl?.is_short_load"
+                            <span v-if="hbl?.is_shortland && hbl?.is_shortland_fixed"
+                                v-tooltip.top="`Fixed on ${hbl?.shortland_fixed_at ? new Date(hbl.shortland_fixed_at).toLocaleString() : 'N/A'}`"
+                                class="px-3 py-1.5 bg-green-100 text-green-800 border-2 border-green-400 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm">
+                                <i class="ti ti-circle-check text-xs"></i>
+                                <span>SHORTLAND FIXED</span>
+                            </span>
+
+                            <!-- Legacy Short Load Status -->
+                            <span v-if="hbl?.is_short_load && !hbl?.is_shortland"
                                 class="px-3 py-1.5 bg-orange-100 text-orange-800 border-2 border-orange-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
                                 <i class="ti ti-truck-loading text-lg"></i>
-                                <span>SHORTLAND</span>
+                                <span>SHORT LOAD (Legacy)</span>
                             </span>
 
                             <span v-if="hbl?.is_unmanifest"
@@ -297,7 +313,14 @@ const closeIssueDetailModal = () => {
                         <div class="flex items-center space-x-5">
                             <div class="flex space-x-2">
                                 <i v-if="hbl?.latest_detain_record?.is_rtf" v-tooltip.left="`Detained by ${hbl?.latest_detain_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
-                                <i v-if="hbl?.is_short_load" v-tooltip.left="'Short Load'" class="ti ti-truck-loading text-2xl text-orange-500"></i>
+
+                                <!-- New Shortland Status Icons -->
+                                <i v-if="hbl?.is_shortland && !hbl?.is_shortland_fixed" v-tooltip.left="'Shortland - Packages Missing'" class="ti ti-loader-quarter text-2xl text-orange-500"></i>
+                                <i v-if="hbl?.is_shortland && hbl?.is_shortland_fixed" v-tooltip.left="'Shortland Fixed - All Packages Arrived'" class="ti ti-loader text-2xl text-green-500"></i>
+
+                                <!-- Legacy Short Load -->
+                                <i v-if="hbl?.is_short_load && !hbl?.is_shortland" v-tooltip.left="'Short Load (Legacy)'" class="ti ti-truck-loading text-2xl text-orange-500"></i>
+
                                 <i v-if="hbl?.is_unmanifest" v-tooltip.left="'Unmanifest'" class="ti ti-file-x text-2xl text-purple-500"></i>
                                 <i v-if="hbl?.is_overland" v-tooltip.left="'Overland'" class="ti ti-road text-2xl text-blue-500"></i>
                             </div>
@@ -373,18 +396,31 @@ const closeIssueDetailModal = () => {
                     v-for="item in hbl.packages"
                     v-if="hbl && hbl.packages && hbl.packages.length > 0" :key="item.id"
                     :class="[
-                        item.is_hold ? '!bg-orange-100' : '!bg-white',
+                        item.is_hold ? '!bg-orange-100' :
+                        item.is_shortland && !item.is_shortland_fixed ? '!bg-orange-50' :
+                        item.is_shortland && item.is_shortland_fixed ? '!bg-green-50' :
+                        '!bg-white',
                         item.unloading_issue && item.unloading_issue.length > 0 ? '!border-2 !border-dashed !border-yellow-500' : '!border !border-neutral-300',
                         '!shadow-md !rounded-md'
                     ]"
                 >
                     <template #content>
-                        <div v-if="item.is_hold" class="flex items-center text-xs text-orange-800">
+                        <div v-if="item.is_hold" class="flex items-center text-xs text-orange-800 mb-2">
                             <i class="pi pi-exclamation-triangle mr-1"></i>
                             <span>This Package is on hold</span>
                         </div>
 
-                        <div v-if="item.is_rtf || item?.latest_detain_record?.is_rtf" class="flex items-center text-xs text-orange-800">
+                        <div v-if="item.is_shortland && !item.is_shortland_fixed" class="flex items-center text-xs text-orange-800 mb-2">
+                            <i class="ti ti-truck-loading mr-1"></i>
+                            <span>This Package is marked as Shortland</span>
+                        </div>
+
+                        <div v-if="item.is_shortland && item.is_shortland_fixed" class="flex items-center text-xs text-green-800 mb-2">
+                            <i class="ti ti-circle-check mr-1"></i>
+                            <span>Shortland Fixed - Package has arrived</span>
+                        </div>
+
+                        <div v-if="item.is_rtf || item?.latest_detain_record?.is_rtf" class="flex items-center text-xs text-red-800 mb-2">
                             <i class="pi pi-exclamation-triangle mr-1"></i>
                             <span>This Package is detained by {{ item?.latest_detain_record?.detain_type || 'RTF' }}</span>
                         </div>
@@ -393,6 +429,11 @@ const closeIssueDetailModal = () => {
                             <div class="flex items-center space-x-2">
                                 <div class="flex items-center space-x-2">
                                     <i v-if="item?.latest_detain_record?.is_rtf" v-tooltip.left="`Detained by ${item?.latest_detain_record?.detain_type || 'RTF'}`" class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
+
+                                    <!-- Shortland Status Icons -->
+                                    <i v-if="item.is_shortland && !item.is_shortland_fixed" v-tooltip.left="'Shortland Package'" class="ti ti-loader-quarter text-2xl text-orange-500"></i>
+                                    <i v-if="item.is_shortland && item.is_shortland_fixed" v-tooltip.left="'Shortland Fixed'" class="ti ti-loader text-2xl text-green-500"></i>
+
                                     <i class="ti ti-package text-xl"></i>
                                     <p class="text-xl uppercase font-normal">
                                         {{ item.package_type ?? '-' }}
