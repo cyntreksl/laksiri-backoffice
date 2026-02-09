@@ -71,9 +71,10 @@ class ThirdPartyShipmentController extends Controller
         $airContainerOptions = ContainerType::getAirCargoOptions();
         $warehouses = GetDestinationBranches::run()->reject(fn ($warehouse) => $warehouse->name === 'Other');
         $airLinesList = $this->airLineRepository->getAirLines();
+        $packageTypes = $this->packageTypeRepository->getPackageTypes();
 
         return Inertia::render('ThirdPartyShipments/ThirdPartyShipmentCreateV2',
-            compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines', 'countryCodes', 'containerTypes', 'seaContainerOptions', 'airContainerOptions', 'warehouses', 'airLinesList'));
+            compact('agents', 'cargoTypes', 'hblTypes', 'shipments', 'airLines', 'countryCodes', 'containerTypes', 'seaContainerOptions', 'airContainerOptions', 'warehouses', 'airLinesList', 'packageTypes'));
     }
 
     /**
