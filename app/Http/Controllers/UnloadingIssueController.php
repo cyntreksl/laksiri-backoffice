@@ -8,6 +8,7 @@ use App\Models\Container;
 use App\Models\HBL;
 use App\Models\UnloadingIssue;
 use App\Models\UnloadingIssueFile;
+use App\Services\ShortlandHandlingService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,6 +20,7 @@ class UnloadingIssueController extends Controller
     public function __construct(
         private readonly UnloadingIssuesRepositoryInterface $unloadingIssuesRepository,
         private readonly ContainerRepositoryInterface $ContainerRepository,
+        private readonly ShortlandHandlingService $shortlandService,
     ) {}
 
     public function index()
@@ -102,6 +104,14 @@ class UnloadingIssueController extends Controller
                         $unloadingIssueFile->addMedia($photo)->toMediaCollection();
                     }
                 }
+            }
+
+            // Auto-mark Shortland at HBL level if issue type is Shortland
+            if ($validated['issue_type'] === 'Shortland') {
+                $this->shortlandService->markAsShortland(
+                    $validated['selected_packages'],
+                    auth()->id()
+                );
             }
 
             // If create_another is true, return JSON response (no redirect)
