@@ -8,6 +8,7 @@ use App\Actions\HBLPackageRuleData\UpdateHBLPackageRuleData;
 use App\Models\HBLPackage;
 use App\Models\HBLPackageRuleData;
 use App\Models\PackagePrice;
+use App\Services\ShortlandHandlingService;
 
 class HBLPackageObserver
 {
@@ -42,6 +43,12 @@ class HBLPackageObserver
             $rules = PackagePrice::where('id', $hBLPackage['package_rule'])->get();
             $data['rules'] = json_encode($rules);
             $package_rule_data = UpdateHBLPackageRuleData::run($hBLPackage, $data);
+        }
+
+        // Auto-fix Shortland when package is unloaded
+        if ($hBLPackage->wasChanged('is_unloaded') && $hBLPackage->is_unloaded) {
+            $shortlandService = app(ShortlandHandlingService::class);
+            $shortlandService->checkAndAutoFixShortland($hBLPackage);
         }
     }
 

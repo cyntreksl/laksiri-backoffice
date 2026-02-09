@@ -461,6 +461,20 @@ const cancel = () => {
                                 </template>
 
                                 <template #content>
+                                    <!-- Shortland Info Banner -->
+                                    <div v-if="form.issue_type === 'Shortland'" class="mb-4 p-4 bg-orange-50 border-l-4 border-orange-500 rounded">
+                                        <div class="flex items-start">
+                                            <i class="pi pi-info-circle text-orange-500 text-xl mr-3 mt-1"></i>
+                                            <div>
+                                                <h4 class="font-semibold text-orange-800 mb-1">Shortland Auto-Marking</h4>
+                                                <p class="text-sm text-orange-700">
+                                                    When you create a Shortland issue, the entire HBL and all its packages will be automatically marked as Shortland.
+                                                    The system will auto-fix the Shortland status when all packages arrive and are unloaded.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="mb-4 flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                                         <div class="flex items-center gap-3">
                                             <Checkbox
