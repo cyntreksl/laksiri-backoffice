@@ -290,20 +290,20 @@ const closeIssueDetailModal = () => {
 
                             <!-- Legacy Short Load Status -->
                             <span v-if="hbl?.is_short_load && !hbl?.is_shortland"
-                                class="px-3 py-1.5 bg-orange-100 text-orange-800 border-2 border-orange-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
-                                <i class="ti ti-truck-loading text-lg"></i>
+                                class="px-3 py-1.5 bg-orange-100 text-orange-800 border-2 border-orange-400 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm">
+                                <i class="ti ti-truck-loading text-xs"></i>
                                 <span>SHORT LOAD (Legacy)</span>
                             </span>
 
                             <span v-if="hbl?.is_unmanifest"
-                                class="px-3 py-1.5 bg-purple-100 text-purple-800 border-2 border-purple-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
-                                <i class="ti ti-file-x text-lg"></i>
+                                class="px-3 py-1.5 bg-purple-100 text-purple-800 border-2 border-purple-400 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm">
+                                <i class="ti ti-file-x text-xs"></i>
                                 <span>UNMANIFEST</span>
                             </span>
 
                             <span v-if="hbl?.is_overland"
-                                class="px-3 py-1.5 bg-blue-100 text-blue-800 border-2 border-blue-400 rounded-full text-sm font-bold flex items-center gap-2 shadow-sm">
-                                <i class="ti ti-road text-lg"></i>
+                                class="px-3 py-1.5 bg-blue-100 text-blue-800 border-2 border-blue-400 rounded-full text-xs font-bold flex items-center gap-2 shadow-sm">
+                                <i class="ti ti-road text-xs"></i>
                                 <span>OVERLAND</span>
                             </span>
                         </div>
