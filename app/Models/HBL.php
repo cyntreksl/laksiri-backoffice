@@ -147,6 +147,11 @@ class HBL extends Model
         'is_short_load',
         'is_unmanifest',
         'is_overland',
+        'is_shortland',
+        'is_shortland_fixed',
+        'shortland_marked_at',
+        'shortland_fixed_at',
+        'shortland_marked_by',
         'is_third_party',
     ];
 
@@ -352,5 +357,10 @@ class HBL extends Model
     public function remarks(): MorphMany
     {
         return $this->morphMany(Remark::class, 'remarkable');
+    }
+
+    public function shortlandMarkedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'shortland_marked_by');
     }
 }

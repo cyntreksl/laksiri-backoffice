@@ -69,7 +69,23 @@ class UserController extends Controller
         $dir = $request->input('sort_order', 'asc');
         $search = $request->input('search', null);
 
-        $query = User::withoutRole(['customer', 'driver'])
+        $actor = Auth::user();
+        $excludeRoles = ['customer', 'driver'];
+
+        // Role visibility:
+        // - super-admin: see all users
+        // - admin: hide super-admin users
+        // - others: hide admin and super-admin users
+        if (! $actor->hasRole('super-admin')) {
+            if ($actor->hasRole('admin')) {
+                $excludeRoles[] = 'super-admin';
+            } else {
+                $excludeRoles[] = 'admin';
+                $excludeRoles[] = 'super-admin';
+            }
+        }
+
+        $query = User::withoutRole($excludeRoles)
             ->currentBranch()
             ->with('branches');
 
