@@ -10,7 +10,9 @@ use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\HBL;
 use App\Models\HBLPackage;
+use App\Models\MHBL;
 use App\Models\Scopes\BranchScope;
+use App\Services\ShortlandHandlingService;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -66,35 +68,48 @@ class CreateFullyUnload
 
             // Mark remaining HBLs as shortlanded if any
             if (isset($data['remaining_hbl_ids']) && !empty($data['remaining_hbl_ids'])) {
+                $shortlandService = app(ShortlandHandlingService::class);
+                
                 foreach ($data['remaining_hbl_ids'] as $hblId) {
                     $remainingHBL = HBL::withoutGlobalScope(BranchScope::class)->find($hblId);
                     if ($remainingHBL) {
-                        $remainingHBL->update([
-                            'is_short_load' => true,
-                        ]);
-                        $remainingHBL->addStatus('Marked as Shortlanded - Not fully unloaded from container');
+                        // Get all package IDs for this HBL
+                        $packageIds = $remainingHBL->packages()->pluck('id')->toArray();
+                        
+                        if (!empty($packageIds)) {
+                            // Use ShortlandHandlingService to mark as Shortland
+                            $shortlandService->markAsShortland($packageIds, auth()->id());
+                            
+                            $remainingHBL->addStatus('Marked as Shortland - Not fully unloaded from container');
+                        }
                     }
                 }
             }
 
             // Mark remaining MHBLs' HBLs as shortlanded if any
             if (isset($data['remaining_mhbl_references']) && !empty($data['remaining_mhbl_references'])) {
+                $shortlandService = app(ShortlandHandlingService::class);
+                
                 foreach ($data['remaining_mhbl_references'] as $mhblReference) {
                     $remainingMHBL = MHBL::withoutGlobalScope(BranchScope::class)
                         ->where(function($query) use ($mhblReference) {
                             $query->where('reference', $mhblReference)
                                   ->orWhere('hbl_number', $mhblReference);
                         })
-                        ->with('hbls')
+                        ->with('hbls.packages')
                         ->first();
                     
                     if ($remainingMHBL && $remainingMHBL->hbls) {
                         // Mark all HBLs under this MHBL as shortlanded
                         foreach ($remainingMHBL->hbls as $hbl) {
-                            $hbl->update([
-                                'is_short_load' => true,
-                            ]);
-                            $hbl->addStatus('Marked as Shortlanded - MHBL not fully unloaded from container');
+                            $packageIds = $hbl->packages()->pluck('id')->toArray();
+                            
+                            if (!empty($packageIds)) {
+                                // Use ShortlandHandlingService to mark as Shortland
+                                $shortlandService->markAsShortland($packageIds, auth()->id());
+                                
+                                $hbl->addStatus('Marked as Shortland - MHBL not fully unloaded from container');
+                            }
                         }
                     }
                 }
