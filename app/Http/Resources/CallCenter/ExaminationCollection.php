@@ -25,11 +25,11 @@ class ExaminationCollection extends JsonResource
             'customer' => $this->token->customer->name,
             'reception' => $this->token->reception->name,
             'released_by' => $this->examination->releasedBy->name,
-            'released_at' => $this->examination->created_at->format('Y-m-d H:i:s'),
+            'released_at' => $this->examination->created_at->timezone('Asia/Colombo')->format('Y-m-d H:i:s'),
             'hbl' => optional(optional($this->token)->hbl()->withoutGlobalScope(BranchScope::class)->latest()->first())->hbl_number,
-            'departed_at' => $this->token->departed_at ? Carbon::parse($this->token->departed_at)->toDateTimeString() : null,
+            'departed_at' => $this->token->departed_at ? Carbon::parse($this->token->departed_at)->timezone('Asia/Colombo')->format('Y-m-d H:i:s') : null,
             'departed_by' => $this->token->departed_by ? User::find($this->token->departed_by)?->name : null,
-            'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
+            'created_at' => Carbon::parse($this->created_at)->timezone('Asia/Colombo')->format('Y-m-d H:i:s'),
             'total_time' => $this->token->created_at && $this->token->departed_at
                 ? Carbon::parse($this->token->created_at)
                     ->diff(Carbon::parse($this->token->departed_at))
