@@ -410,7 +410,17 @@ const addPackageRemark = async (packageId) => {
                         </template>
                     </Column>
                     <Column field="customer" header="Customer"></Column>
-                    <Column field="reference" header="Reference"></Column>
+                    <Column field="reference" header="HBL">
+                        <template #body="slotProps">
+                            <div v-if="slotProps.data.hbl" class="flex items-center space-x-2">
+                                <div>
+                                    <div class="font-medium">{{ slotProps.data.hbl.hbl_number ?? slotProps.data.hbl.hbl }}</div>
+                                    <div class="text-sm text-gray-500">{{ slotProps.data.hbl.reference }}</div>
+                                </div>
+                            </div>
+                            <span v-else class="text-gray-400">N/A</span>
+                        </template>
+                    </Column>
                     <Column field="package_count" header="Packages">
                         <template #body="slotProps">
                             <div class="flex items-center gap-2 mb-1">
