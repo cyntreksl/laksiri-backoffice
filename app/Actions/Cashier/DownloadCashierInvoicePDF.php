@@ -28,42 +28,42 @@ class DownloadCashierInvoicePDF
         $container = $sl_Invoice && ! is_null($sl_Invoice->container_id)
             ? GetContainerWithoutGlobalScopesById::run($sl_Invoice->container_id)
             : $hbl->packages[0]->containers()->withoutGlobalScopes()->first();
-        
+
         // Prioritize HBLDestinationCharge data if available, otherwise use SLInvoice
         $hasDestinationCharge = $hbl->destinationCharge !== null;
-        
+
         // Apply conditional logic based on payment status
         // 1. If Destination I Charges is paid, set handling, storage, and port charges to 0
-        $handlingChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge 
+        $handlingChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge
             ? ($hbl->destinationCharge->destination_handling_charge ?? 0)
             : ($sl_Invoice->handling_charge_amount ?? 0));
-            
-        $portChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge 
+
+        $portChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge
             ? ($hbl->destinationCharge->destination_slpa_charge ?? 0)
             : ($sl_Invoice->port_charge_amount ?? 0));
-            
-        $storageChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge 
+
+        $storageChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($hasDestinationCharge
             ? ($hbl->destinationCharge->destination_bond_charge ?? 0)
             : ($sl_Invoice->storage_charge_amount ?? 0));
-        
+
         // Get Destination II charges (demurrage, DO)
         $demurrageCharge = $hasDestinationCharge
             ? ($hbl->destinationCharge->destination_demurrage_charge ?? 0)
             : ($sl_Invoice->dmg_charge_amount ?? 0);
-            
+
         $doCharge = $hasDestinationCharge
             ? ($hbl->destinationCharge->destination_do_charge ?? 0)
             : ($sl_Invoice->do_charge ?? 0);
-        
+
         // 2. If Demurrage Charge is 0, ensure it shows as 0 in invoice
         $demurrageCharge = ($demurrageCharge == 0) ? 0 : $demurrageCharge;
-        
+
         // Calculate tax on Destination II charges (demurrage + DO)
         $destination2Total = $demurrageCharge + $doCharge;
         $taxCalculation = CalculateTax::run($destination2Total);
         $taxAmount = $taxCalculation['total_tax'];
         $destination2TotalWithTax = $taxCalculation['amount_with_tax'];
-        
+
         // Calculate total
         $totalAmount = $portChargeAmount + $handlingChargeAmount + $storageChargeAmount + $destination2TotalWithTax;
         $stampCharge = $destination2TotalWithTax > 25000 ? 25.00 : 0.00;
@@ -76,11 +76,11 @@ class DownloadCashierInvoicePDF
                 ! empty($package['arrived_at']) ||
                 ! empty($package['unloaded_at']);
         })->count();
-        
+
         // Calculate unit rates for display
         $grandVolume = $sl_Invoice->grand_volume ?? 0;
         $packageCount = $hbl->packages->count();
-        
+
         $portChargeRate = $grandVolume > 0 ? ($portChargeAmount / $grandVolume) : 0;
         $handlingChargeRate = $packageCount > 0 ? ($handlingChargeAmount / $packageCount) : 0;
         $storageChargeRate = $grandVolume > 0 ? ($storageChargeAmount / $grandVolume) : 0;
@@ -141,7 +141,6 @@ class DownloadCashierInvoicePDF
         $filePath = storage_path("app/public/{$filename}");
 
         BrowsershotLambda::html($template)
-            ->showBackground()
             ->format('A4')
             ->save($filePath);
 
