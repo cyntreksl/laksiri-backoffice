@@ -14,7 +14,7 @@
             <!-- Header -->
             <div class="mb-2 flex items-start gap-3">
                 <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center invisible">
-                    <img src="{{$logoPath}}" alt="Logo" class="h-full w-full object-contain" />
+                    <img src="{{$logoPath}}" alt="Logo" class="h-full w-full object-contain invisible" />
                 </div>
                 <div class="flex-1">
                     <div class="-mt-3 mb-1 text-right text-xs font-bold">CASHIER'S COPY</div>
@@ -137,7 +137,7 @@
             </div>
 
             <!-- Payment Summary -->
-            <div class="mb-2 text-xs mt-4">
+            <div class="mb-2 text-xs mt-8">
                 <div class="mb-1">
                     <span class="font-bold invisible">Rupees :</span>
                     <div class="ml-12">
