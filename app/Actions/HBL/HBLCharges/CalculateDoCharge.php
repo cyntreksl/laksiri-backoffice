@@ -5,6 +5,8 @@ namespace App\Actions\HBL\HBLCharges;
 use App\Actions\AirLine\GetAirLineByName;
 use App\Actions\SpecialDOCharge\GetSpecialDOChargeByAgent;
 use App\Models\HBL;
+use App\Models\Scopes\BranchScope;
+use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CalculateDoCharge
@@ -13,10 +15,16 @@ class CalculateDoCharge
 
     public function handle(HBL $HBL)
     {
-        if ($HBL->cargo_mode === 'Sea Cargo') {
+        // Normalize database values to prevent case sensitivity issues
+        $cargoType = strtolower(trim($HBL->cargo_type ?? ''));
+        $cargoMode = strtolower(trim($HBL->cargo_mode ?? ''));
+
+        if ($cargoType === 'sea cargo' || $cargoMode === 'sea cargo') {
             return $this->seaCargoDOCharge($HBL);
-        } else {
+        } else if ($cargoType === 'air cargo' || $cargoMode === 'air cargo') {
             return $this->airCargoDOCharge($HBL);
+        } else {
+            Log::info('Undefined HBL Cargo Type: ' . $cargoType);
         }
     }
 
@@ -29,6 +37,9 @@ class CalculateDoCharge
         ];
         $groupedRules = collect(GetSpecialDOChargeByAgent::run($doChargeData))->groupBy('package_type');
 
+        // Get packages without BranchScope to avoid filtering issues
+        $packages = $this->getPackages($hbl);
+
         $rate = 0;
         $amount = 0;
         foreach ($groupedRules as $index => $ruleSet) {
@@ -39,7 +50,7 @@ class CalculateDoCharge
                 $rate += $ruleSet[0]->charge;
                 $amount += $ruleSet[0]->charge;
             } else {
-                $package_quantity = $hbl->packages
+                $package_quantity = $packages
                     ->where('package_type', $index)
                     ->sum('quantity');
                 $groupedDORules = $ruleSet->groupBy('condition');
@@ -100,10 +111,23 @@ class CalculateDoCharge
 
     private function getContainer($hbl)
     {
-        if ($hbl->packages->isEmpty()) {
+        $packages = $this->getPackages($hbl);
+
+        if ($packages->isEmpty()) {
             return null;
         }
 
-        return $hbl->packages[0]->containers()->withoutGlobalScopes()->first() ?? $hbl->packages[0]->duplicate_containers()->withoutGlobalScopes()->first();
+        return $packages[0]->containers()->withoutGlobalScopes()->first() ?? $packages[0]->duplicate_containers()->withoutGlobalScopes()->first();
+    }
+
+    /**
+     * Get packages without BranchScope to avoid filtering issues
+     * Always loads packages without scope to ensure they're not filtered
+     */
+    private function getPackages($hbl)
+    {
+        // Always load packages without BranchScope to avoid filtering issues
+        // Don't rely on pre-loaded packages as they might have been loaded with scope
+        return $hbl->packages()->withoutGlobalScope(BranchScope::class)->get();
     }
 }
