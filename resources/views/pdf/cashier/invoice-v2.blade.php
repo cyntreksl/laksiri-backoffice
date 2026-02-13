@@ -17,7 +17,7 @@
                     <img src="{{$logoPath}}" alt="Logo" class="h-full w-full object-contain invisible" />
                 </div>
                 <div class="flex-1">
-                    <div class="-mt-3 mb-1 text-right text-xs font-bold">CASHIER'S COPY</div>
+                    <div class="-mt-6 mb-1 text-right text-xs font-bold">CASHIER'S COPY</div>
                     <h1 class="text-sm font-bold leading-tight invisible">LAKSIRI INTERNATIONAL FREIGHT FORWARDERS (PVT) LTD.</h1>
                     <p class="text-xs font-bold invisible">U.P.B. Warehouse</p>
                     <p class="text-xs invisible">66, NEW NUGE ROAD,</p>
@@ -28,13 +28,13 @@
                 </div>
             </div>
 
-            <div class="-mt-10 flex justify-between text-xs">
-                <div><span class="invisible">Clearing Time : </span><span class="text-gray-800">{{ $data['clearing_time'] }}</span></div>
+            <div class="-mt-8 flex justify-between text-xs">
+                <div><span class="invisible">Clearing Time : </span><span class="text-gray-800 invisible">{{ $data['clearing_time'] }}</span></div>
                 <div><span class="invisible">Vehicle No :</span></div>
             </div>
 
             <div class="flex justify-between text-xs">
-                <div><span class="invisible">Date : </span><span class="text-gray-800 ml-2">{{ $data['date'] }}</span></div>
+                <div><span class="invisible">Date : </span><span class="text-gray-800 ml-2">{{ \Carbon\Carbon::today()->toDateString() . " " . \Carbon\Carbon::now('Asia/Colombo')->toTimeString()}}</span></div>
                 <div><span class="invisible">Serial No. : </span><span class="text-gray-800">{{ $data['hbl']['hbl_number'] ?? '' }}</span></div>
             </div>
 
@@ -44,7 +44,7 @@
             </div>
 
             <!-- Customer Details -->
-            <div class="mb-2 !space-y-3 !ml-7 text-xs mt-5">
+            <div class="mb-2 !space-y-3 !ml-7 text-xs mt-10">
                 <div class="flex">
                     <span class="invisible w-40">Name of Consignee</span>
                     <span class="text-gray-800">{{$data['hbl']['consignee_name']}}</span>
@@ -80,7 +80,7 @@
             </div>
 
             <!-- Charges Table -->
-            <div class="mb-2 !mt-23">
+            <div class="mb-2 !mt-18">
                 <table class="w-full border-collapse text-xs">
                     <thead>
                     <tr class="bg-gray-200">
@@ -140,7 +140,7 @@
             <div class="mb-2 text-xs mt-8">
                 <div class="mb-1">
                     <span class="font-bold invisible">Rupees :</span>
-                    <div class="ml-12">
+                    <div class="ml-13">
                         <div><span class="">D/O Chrgs. </span><span class="float-right text-gray-800">{{ number_format($data['charges']['do_charge'],2) }}</span></div>
                         <div><span class="">Stamp Duty </span><span class="float-right text-gray-800">{{ number_format($data['charges']['stamp_charge'],2) }}</span></div>
                         <div class="font-bold"><span class="">G/Total : </span><span class="float-right text-gray-800">{{ number_format($data['charges']['total']+$data['charges']['do_charge']+$data['charges']['stamp_charge'],2) }}</span></div>
@@ -212,7 +212,7 @@
             </div>
 
             <!-- Gate Pass Details -->
-            <div class="mb-2 space-y-1 text-xs !mt-28 !ml-10">
+            <div class="mb-2 space-y-1 text-xs !mt-36 !ml-11">
                 <div class="flex">
                     <span class="invisible w-40">No.</span>
                     <span class="text-gray-800">{{ $data['hbl']['hbl_number'] ?? '' }}</span>
@@ -221,7 +221,7 @@
                     <span class="w-40 invisible">Destuff Date.</span>
                     <span class="text-gray-800 invisible">{{ $data['vessel']['unloading_ended_at'] ? \Carbon\Carbon::parse($data['vessel']['unloading_ended_at'])->format('Y-m-d') : '' }}</span>
                 </div>
-                <div class="flex">
+                <div class="flex mt-4">
                     <span class="invisible w-40">B/L No.</span>
                     <span class="text-gray-800">{{ $data['vessel']['bl_number'] ?? ''}}</span>
                 </div>
@@ -259,18 +259,18 @@
                 The above goods may be permitted to be removed
             </div>
 
-            <div class="mb-2 space-y-1 text-xs !ml-10">
+            <div class="mb-2 space-y-1 text-xs !ml-10 mt-5">
                 <div class="flex">
                     <span class="invisible w-20">BY</span>
                     <span class="text-gray-800">{{$data['hbl']['consignee_name']}}</span>
                 </div>
-                <div class="flex">
+                <div class="flex mt-5">
                     <span class="invisible w-20">Date</span>
-                    <span class="text-gray-800">{{ $data['date'] }}</span>
+                    <span class="text-gray-800">{{ \Carbon\Carbon::now()->toTimeString()  }}</span>
                 </div>
-                <div class="flex">
+                <div class="flex mt-2">
                     <span class="invisible w-20">Time</span>
-                    <span class="text-gray-800">{{ $data['clearing_time'] }}</span>
+                    <span class="text-gray-800">{{ \Carbon\Carbon::now('Asia/Colombo')->toDateString() }}</span>
                 </div>
             </div>
 
@@ -291,7 +291,7 @@
                     <span class="invisible w-32">Serial No.</span>
                     <span class="text-gray-800"></span>
                 </div>
-                <div class="flex mt-6 ml-10">
+                <div class="flex mt-10 ml-18">
                     <span class="invisible w-32">User ID</span>
                     <span class="text-gray-800">{{ strtoupper($data['by']) }}</span>
                 </div>
