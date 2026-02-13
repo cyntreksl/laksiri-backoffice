@@ -125,6 +125,16 @@ class Container extends Model
         return $this->morphOne(DetainRecord::class, 'rtfable')->latestOfMany();
     }
 
+    public function arrivedPrimaryWarehouseByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'arrived_primary_warehouse_by');
+    }
+
+    public function departedPrimaryWarehouseByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'departed_primary_warehouse_by');
+    }
+
     public function remarks(): MorphMany
     {
         return $this->morphMany(Remark::class, 'remarkable');

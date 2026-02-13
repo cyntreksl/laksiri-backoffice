@@ -410,6 +410,16 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         try {
             $data['is_reached'] = isset($data['is_reached']) ? ($data['is_reached'] ? 1 : 0) : 0;
 
+            // Only allow updating arrived_at_primary_warehouse if user has permission
+            if (isset($data['arrived_at_primary_warehouse'])) {
+                if (!auth()->user()->can('edit_warehouse_arrival')) {
+                    unset($data['arrived_at_primary_warehouse']);
+                } else {
+                    // Update the user who modified it
+                    $data['arrived_primary_warehouse_by'] = auth()->id();
+                }
+            }
+
             UpdateContainer::run($container, $data);
 
             if ($data['is_reached']) {
