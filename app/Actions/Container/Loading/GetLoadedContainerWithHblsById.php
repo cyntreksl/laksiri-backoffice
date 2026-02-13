@@ -19,6 +19,7 @@ class GetLoadedContainerWithHblsById
                 'branch',
                 'warehouse',
                 'latestDetainRecord',
+                'arrivedPrimaryWarehouseByUser:id,name',
                 'hbl_packages' => function ($query) {
                     $query->withoutGlobalScope(BranchScope::class)
                         ->with(['hbl' => function ($hblQuery) {

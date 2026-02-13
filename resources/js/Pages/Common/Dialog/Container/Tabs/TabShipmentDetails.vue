@@ -110,7 +110,9 @@ const form = useForm({
     cargo_class: props.container.cargo_class,
     loading_ended_at: props.container.loading_ended_at,
     loading_started_at: props.container.loading_started_at,
-    shipment_weight: props.container.shipment_weight
+    shipment_weight: props.container.shipment_weight,
+    arrived_at_primary_warehouse: props.container.arrived_at_primary_warehouse,
+    arrived_primary_warehouse_by: props.container.arrived_primary_warehouse_by
 });
 
 // Watch for is_reached checkbox changes and auto-update status
@@ -153,6 +155,12 @@ const handleUpdateContainer = () => {
         form.reached_date = moment(form.reached_date).format("YYYY-MM-DD");
     } else {
         form.reached_date = null;
+    }
+
+    if (moment(form.arrived_at_primary_warehouse).isValid()) {
+        form.arrived_at_primary_warehouse = moment(form.arrived_at_primary_warehouse).format("YYYY-MM-DD HH:mm:ss");
+    } else {
+        form.arrived_at_primary_warehouse = null;
     }
 
     form.put(route("loading.loading-containers.update", props.container.id), {
@@ -462,6 +470,22 @@ watchEffect(() => {
             <InputLabel value="Loading End Time"/>
             <InputText v-model="form.loading_ended_at" class="w-full" disabled/>
             <InputError :message="form.errors.loading_ended_at"/>
+        </div>
+
+        <div>
+            <InputLabel value="Arrived at Primary Warehouse"/>
+            <DatePicker
+                v-model="form.arrived_at_primary_warehouse"
+                :disabled="!$page.props.user.permissions.includes('edit_warehouse_arrival')"
+                class="w-full mt-1"
+                date-format="yy-mm-dd"
+                hour-format="24"
+                icon-display="input"
+                placeholder="Set Warehouse Arrival"
+                show-icon
+                show-time
+            />
+            <InputError :message="form.errors.arrived_at_primary_warehouse"/>
         </div>
 
         <div>
