@@ -55,7 +55,7 @@ const handleCancel = () => {
         :draggable="false"
         :modal="true"
         :visible="visible"
-        header="Container Reached Date Missing - Consent Required"
+        header="Container Arrived at Primary Warehouse Date Missing - Consent Required"
         style="width: 50rem"
         @update:visible="$emit('update:visible', $event)"
     >
@@ -63,10 +63,10 @@ const handleCancel = () => {
             <Message :closable="false" class="mt-1" severity="warn">
                 <div class="font-semibold mb-2">
                     <i class="pi pi-exclamation-triangle mr-2"></i>
-                    Warning: Missing Container Reached Date
+                    Warning: Missing Container Arrived at Primary Warehouse Date
                 </div>
                 <p class="text-sm">
-                    The following HBL(s) do not have a container reached date set. This date is critical for accurate demurrage charge calculation.
+                    The following HBL(s) do not have a container arrived at primary warehouse date set. This date is critical for accurate demurrage charge calculation.
                 </p>
             </Message>
 
@@ -89,7 +89,7 @@ const handleCancel = () => {
                     <ul class="list-disc ml-5 mt-2 space-y-1">
                         <li>Demurrage charges may be calculated incorrectly or set to zero</li>
                         <li>This could result in financial discrepancies</li>
-                        <li>The container reached date should be set before approval</li>
+                        <li>The container arrived at primary warehouse date should be set before approval</li>
                     </ul>
                 </div>
             </Message>
@@ -102,7 +102,7 @@ const handleCancel = () => {
                         input-id="consent-checkbox"
                     />
                     <label class="text-sm cursor-pointer" for="consent-checkbox">
-                        <strong>I acknowledge and consent to proceed</strong> with the approval despite the missing container reached date(s).
+                        <strong>I acknowledge and consent to proceed</strong> with the approval despite the missing container arrived at primary warehouse date(s).
                         I understand that demurrage calculations may be affected and take full responsibility for this decision.
                     </label>
                 </div>
@@ -115,7 +115,7 @@ const handleCancel = () => {
                         id="consent-note"
                         v-model="consentNote"
                         class="w-full"
-                        placeholder="Enter any additional notes or reasons for proceeding without the reached date..."
+                        placeholder="Enter any additional notes or reasons for proceeding without the arrived at primary warehouse date..."
                         rows="3"
                     />
                 </div>

@@ -118,7 +118,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
         // First pass: Check for HBLs with missing reached dates
         foreach ($hblList as $hbl) {
             $hasReachedDate = $this->checkHBLReachedDate($hbl);
-            
+
             if (!$hasReachedDate) {
                 $hblsWithMissingReachedDate[] = [
                     'id' => $hbl->id,
@@ -144,16 +144,16 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $hbl->is_finance_release_approved = true;
             $hbl->finance_release_approved_by = Auth::user()->id;
             $hbl->finance_release_approved_date = now();
-            
+
             // Store consent if reached date is missing
             $hasReachedDate = $this->checkHBLReachedDate($hbl);
             if (!$hasReachedDate && $consentGiven === true) {
                 $hbl->demurrage_consent_given = true;
                 $hbl->demurrage_consent_by = Auth::user()->id;
                 $hbl->demurrage_consent_at = now();
-                $hbl->demurrage_consent_note = $consentNote ?? 'Approved without container reached date';
+                $hbl->demurrage_consent_note = $consentNote ?? 'Approved without container Arrived at Primary Warehouse date';
             }
-            
+
             $hbl->addStatus('Approved by Accountant');
             $hbl->save();
         }
@@ -167,7 +167,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     private function checkHBLReachedDate(HBL $hbl): bool
     {
         $packages = $hbl->packages;
-        
+
         foreach ($packages as $package) {
             // Check regular containers
             $container = $package->containers()->withoutGlobalScopes()->first();
@@ -177,7 +177,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                     return true;
                 }
             }
-            
+
             // Check duplicate containers
             $container = $package->duplicate_containers()->withoutGlobalScopes()->first();
             if ($container) {
@@ -187,7 +187,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
                 }
             }
         }
-        
+
         return false;
     }
 
