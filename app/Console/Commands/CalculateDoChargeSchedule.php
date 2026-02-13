@@ -34,7 +34,9 @@ class CalculateDoChargeSchedule extends Command
         $updated = 0;
         $batchSize = 100;
 
-        HBL::with(['packages', 'branch', 'destinationCharge'])
+        // Fix: Use withoutGlobalScopes() to process all HBLs regardless of branch context
+        HBL::withoutGlobalScopes()
+            ->with(['packages', 'branch', 'destinationCharge'])
             ->chunk($batchSize, function ($hbls) use (&$count, &$skipped, &$updated) {
                 foreach ($hbls as $hbl) {
                     if ($hbl->destinationCharge) {
@@ -44,8 +46,8 @@ class CalculateDoChargeSchedule extends Command
                             $updated++;
                         } catch (\Throwable $e) {
                             Log::error('Failed to update destination charge for HBL ID '.$hbl->id.': '.$e->getMessage());
+                            $skipped++;
                         }
-                        $skipped++;
 
                         continue;
                     }
@@ -54,6 +56,7 @@ class CalculateDoChargeSchedule extends Command
                         $count++;
                     } catch (\Throwable $e) {
                         Log::error('Failed to calculate destination charge for HBL ID '.$hbl->id.': '.$e->getMessage());
+                        $skipped++;
                     }
                 }
             });
