@@ -35,6 +35,7 @@ class UpdateContainerRequest extends FormRequest
             'container_number' => ['required_if:cargo_type,Sea Cargo'],
             'airline_name' => ['required_if:cargo_type,Air Cargo'],
             'shipment_weight' => ['nullable', 'numeric', 'min:0'],
+            'arrived_at_primary_warehouse' => ['nullable', 'date'],
         ];
     }
 }

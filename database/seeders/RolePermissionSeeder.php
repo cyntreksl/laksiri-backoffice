@@ -688,6 +688,7 @@ class RolePermissionSeeder extends Seeder
                     'mark-gate-pass',
                     'gate-control.complete-token',
                     'gate-control.view-completed-tokens',
+                    'edit_warehouse_arrival',
                 ],
             ],
 

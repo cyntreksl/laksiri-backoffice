@@ -134,10 +134,10 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             $hbl->token_demurrage_consent_given = true;
             $hbl->token_demurrage_consent_by = auth()->id();
             $hbl->token_demurrage_consent_at = now();
-            $hbl->token_demurrage_consent_note = $verificationData['demurrage_consent_note'] ?? 'Token issued without container reached date';
+            $hbl->token_demurrage_consent_note = $verificationData['demurrage_consent_note'] ?? 'Token issued without container arrived at primary warehouse date';
             $hbl->save();
         }
-        
+
         // create token
         if ($hbl->consignee_id) {
             // Get the current date
@@ -254,7 +254,7 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
     {
         // Enforce step-by-step flow: Always go to Document Verification Queue first
         // Remove skip conditions for document verification and cashier
-        
+
         return [
             'queue_type' => CustomerQueue::DOCUMENT_VERIFICATION_QUEUE,
             'is_paid' => false, // We force them to go through the flow regardless of payment status

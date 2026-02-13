@@ -70,7 +70,7 @@ const hasContainerReachedDate = computed(() => {
     if (containers.length === 0) return false;
 
     // Check if any container has a reached date
-    return containers.some(container => container && container.reached_date);
+    return containers.some(container => container && container.arrived_at_primary_warehouse);
 });
 
 const computedOutstanding = computed(() => {
