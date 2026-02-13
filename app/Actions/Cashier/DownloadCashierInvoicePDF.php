@@ -141,7 +141,7 @@ class DownloadCashierInvoicePDF
         $filePath = storage_path("app/public/{$filename}");
 
         BrowsershotLambda::html($template)
-            ->format('A4')
+            ->format('letter')
             ->save($filePath);
 
         return response()->download($filePath)->deleteFileAfterSend(true);
