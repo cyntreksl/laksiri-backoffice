@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DetainReportController;
 use App\Http\Controllers\HBLReportController;
+use App\Http\Controllers\HBLPackageReportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
@@ -37,4 +38,21 @@ Route::name('report.')->group(function () {
     Route::get('hbl-report/export', [HBLReportController::class, 'export'])
         ->name('hbl-report.export')
         ->middleware('can:reports.hbl');
+
+    // HBL Package Report
+    Route::get('hbl-package-report', [HBLPackageReportController::class, 'index'])
+        ->name('hbl-package-report.index')
+        ->middleware('can:reports.hbl-package');
+
+    Route::get('hbl-package-report/data', [HBLPackageReportController::class, 'getData'])
+        ->name('hbl-package-report.data')
+        ->middleware('can:reports.hbl-package');
+
+    Route::get('hbl-package-report/export', [HBLPackageReportController::class, 'export'])
+        ->name('hbl-package-report.export')
+        ->middleware('can:reports.hbl-package');
+
+    Route::get('hbl-package-report/{hbl}/details', [HBLPackageReportController::class, 'getHBLDetails'])
+        ->name('hbl-package-report.hbl-details')
+        ->middleware('can:reports.hbl-package');
 });
