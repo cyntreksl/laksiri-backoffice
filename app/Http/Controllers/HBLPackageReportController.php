@@ -594,12 +594,161 @@ class HBLPackageReportController extends Controller
         $this->authorize('reports.hbl-package');
 
         $format = $request->input('format', 'xlsx');
+        
+        // For PDF format, use a simple PDF generation
+        if ($format === 'pdf') {
+            return $this->exportPDF($request);
+        }
+
+        // For Excel/CSV formats
         $filename = 'hbl-package-report-' . date('Y-m-d-His');
 
         return Excel::download(
             new HBLPackageReportExport($request),
             "{$filename}.{$format}"
         );
+    }
+
+    /**
+     * Export as PDF
+     */
+    private function exportPDF(Request $request)
+    {
+        try {
+            // Check if exporting for specific HBL
+            $hblId = $request->input('hbl_id');
+            
+            if ($hblId) {
+                return $this->exportHBLPackagesPDF($request, $hblId);
+            }
+
+            // Export all packages
+            $query = HBLPackage::withoutGlobalScope(BranchScope::class)
+                ->with([
+                    'hbl:id,hbl_number,hbl_name,contact_number,email,cargo_type,branch_id',
+                    'hbl.branch:id,name',
+                    'containers:id,reference',
+                ]);
+
+            $this->applyFilters($query, $request);
+
+            $sortField = $request->input('sort_field', 'created_at');
+            $sortOrder = $request->input('sort_order', 'desc');
+            $query->orderBy($sortField, $sortOrder);
+
+            $limit = $request->input('limit', 500);
+            $limit = min($limit, 500);
+            
+            $packages = $query->limit($limit)->get();
+
+            if ($packages->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No package records found matching the selected criteria.'
+                ], 404);
+            }
+
+            // Generate PDF using DomPDF
+            $pdf = \PDF::loadView('pdf.reports.hbl-package-report', [
+                'packages' => $packages,
+                'filters' => $request->all(),
+                'generated_at' => now()->format('Y-m-d H:i:s'),
+            ]);
+
+            $filename = 'hbl-package-report-' . date('Y-m-d-His') . '.pdf';
+            
+            return $pdf->download($filename);
+
+        } catch (\Exception $e) {
+            \Log::error('Error exporting HBL Package Report PDF: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate PDF',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
+    }
+
+    /**
+     * Export packages for specific HBL as PDF
+     */
+    private function exportHBLPackagesPDF(Request $request, $hblId)
+    {
+        try {
+            $hbl = HBL::withoutGlobalScope(BranchScope::class)
+                ->with(['branch:id,name'])
+                ->findOrFail($hblId);
+
+            $query = HBLPackage::withoutGlobalScope(BranchScope::class)
+                ->where('hbl_id', $hblId)
+                ->with(['containers:id,reference']);
+
+            // Apply date filters only if provided
+            if ($request->filled('loaded_date_from')) {
+                $query->where('loaded_at', '>=', $request->input('loaded_date_from'));
+            }
+            if ($request->filled('loaded_date_to')) {
+                $query->where('loaded_at', '<=', $request->input('loaded_date_to') . ' 23:59:59');
+            }
+            if ($request->filled('unloaded_date_from')) {
+                $query->where('unloaded_at', '>=', $request->input('unloaded_date_from'));
+            }
+            if ($request->filled('unloaded_date_to')) {
+                $query->where('unloaded_at', '<=', $request->input('unloaded_date_to') . ' 23:59:59');
+            }
+
+            // Apply search filter
+            if ($request->filled('search')) {
+                $search = $request->input('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('hbl_packages.id', 'like', "%{$search}%")
+                        ->orWhere('hbl_packages.remarks', 'like', "%{$search}%");
+                });
+            }
+
+            $sortField = $request->input('sort_field', 'id');
+            $sortOrder = $request->input('sort_order', 'asc');
+            $query->orderBy($sortField, $sortOrder);
+
+            $packages = $query->get();
+
+            if ($packages->isEmpty()) {
+                // Log for debugging
+                \Log::warning('No packages found for HBL export', [
+                    'hbl_id' => $hblId,
+                    'filters' => $request->all()
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No packages found for this HBL with the applied filters.'
+                ], 404);
+            }
+
+            $pdf = \PDF::loadView('pdf.reports.hbl-package-detail', [
+                'hbl' => $hbl,
+                'packages' => $packages,
+                'filters' => $request->all(),
+                'generated_at' => now()->format('Y-m-d H:i:s'),
+            ]);
+
+            $filename = 'hbl-' . $hbl->hbl_number . '-packages-' . date('Y-m-d-His') . '.pdf';
+            
+            return $pdf->download($filename);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error exporting HBL packages PDF: ' . $e->getMessage(), [
+                'hbl_id' => $hblId,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate PDF',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
+            ], 500);
+        }
     }
 
     /**

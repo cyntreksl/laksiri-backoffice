@@ -31,6 +31,15 @@ class HBLPackageReportExport implements FromCollection, WithHeadings, WithMappin
      */
     public function collection()
     {
+        // Check if we're exporting for a specific HBL
+        $hblId = $this->request->input('hbl_id');
+        
+        if ($hblId) {
+            // Export packages for specific HBL
+            return $this->getPackagesForHBL($hblId);
+        }
+
+        // Export all packages with filters
         $query = HBLPackage::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
             ->with([
                 'hbl:id,hbl_number,hbl_name,contact_number,email,cargo_type,branch_id',
@@ -60,6 +69,48 @@ class HBLPackageReportExport implements FromCollection, WithHeadings, WithMappin
         $limit = min($limit, 500);
 
         return $query->limit($limit)->get();
+    }
+
+    /**
+     * Get packages for a specific HBL
+     */
+    private function getPackagesForHBL($hblId)
+    {
+        $query = HBLPackage::withoutGlobalScope(\App\Models\Scopes\BranchScope::class)
+            ->where('hbl_id', $hblId)
+            ->with([
+                'hbl:id,hbl_number,hbl_name,contact_number,email,cargo_type,branch_id',
+                'hbl.branch:id,name',
+                'containers:id,reference',
+            ]);
+
+        // Apply date filters if provided
+        if ($this->request->filled('loaded_date_from')) {
+            $query->where('loaded_at', '>=', $this->request->input('loaded_date_from'));
+        }
+        if ($this->request->filled('loaded_date_to')) {
+            $query->where('loaded_at', '<=', $this->request->input('loaded_date_to') . ' 23:59:59');
+        }
+        if ($this->request->filled('unloaded_date_from')) {
+            $query->where('unloaded_at', '>=', $this->request->input('unloaded_date_from'));
+        }
+        if ($this->request->filled('unloaded_date_to')) {
+            $query->where('unloaded_at', '<=', $this->request->input('unloaded_date_to') . ' 23:59:59');
+        }
+
+        if ($this->request->filled('search')) {
+            $search = $this->request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('hbl_packages.id', 'like', "%{$search}%")
+                    ->orWhere('hbl_packages.remarks', 'like', "%{$search}%");
+            });
+        }
+
+        $sortField = $this->request->input('sort_field', 'id');
+        $sortOrder = $this->request->input('sort_order', 'asc');
+        $query->orderBy($sortField, $sortOrder);
+
+        return $query->get();
     }
 
     /**

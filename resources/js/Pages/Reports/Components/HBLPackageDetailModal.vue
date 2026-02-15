@@ -148,16 +148,24 @@ const exportPackages = (format = 'xlsx') => {
     const params = {
         hbl_id: props.hblId,
         format: format,
-        ...filters.value,
     };
 
-    // Format dates
-    Object.keys(filters.value).forEach(key => {
-        const value = filters.value[key];
-        if (value instanceof Date) {
-            params[key] = value.toISOString().split('T')[0];
-        }
-    });
+    // Add filters, formatting dates
+    if (filters.value.loaded_date_from) {
+        params.loaded_date_from = moment(filters.value.loaded_date_from).format('YYYY-MM-DD');
+    }
+    if (filters.value.loaded_date_to) {
+        params.loaded_date_to = moment(filters.value.loaded_date_to).format('YYYY-MM-DD');
+    }
+    if (filters.value.unloaded_date_from) {
+        params.unloaded_date_from = moment(filters.value.unloaded_date_from).format('YYYY-MM-DD');
+    }
+    if (filters.value.unloaded_date_to) {
+        params.unloaded_date_to = moment(filters.value.unloaded_date_to).format('YYYY-MM-DD');
+    }
+    if (filters.value.search) {
+        params.search = filters.value.search;
+    }
 
     const queryString = new URLSearchParams(params).toString();
     window.location.href = route('report.hbl-package-report.export') + '?' + queryString;
