@@ -87,6 +87,7 @@ const maxDiscountAmount = computed(() => {
     const maxDiscountPercentage = parseFloat(props.branch?.maximum_demurrage_discount || 0);
 
     if (demurrageCharge > 0 && maxDiscountPercentage > 0) {
+        // Demurrage charge is already in LKR
         return (demurrageCharge * maxDiscountPercentage) / 100;
     }
     return 0;
@@ -97,6 +98,9 @@ const isDiscountDisabled = computed(() => {
     const demurrageCharge = parseFloat(hblCharges.value?.destination_demurrage_charge || 0);
     return demurrageCharge === 0;
 });
+
+// Discount validation error message
+const discountValidationError = ref('');
 
 const fetchHBL = async () => {
     isLoadingHbl.value = true;
@@ -313,6 +317,50 @@ watch(cashTendered, (val) => {
     // Optional: if want to auto-fill amount? No, better keep manual.
 });
 
+// Watch discount field for validation
+watch(() => form.discount, (newDiscount, oldDiscount) => {
+    discountValidationError.value = '';
+
+    if (!newDiscount || newDiscount === 0) {
+        return;
+    }
+
+    const discount = parseFloat(newDiscount);
+    const maxDiscount = maxDiscountAmount.value;
+
+    // Check if discount is negative
+    if (discount < 0) {
+        discountValidationError.value = 'Discount cannot be negative';
+        form.discount = 0;
+        push.warning('Discount cannot be negative. Reset to 0.');
+        return;
+    }
+
+    // Check if discount exceeds demurrage charge (demurrage is already in LKR)
+    const demurrageCharge = parseFloat(hblCharges.value?.destination_demurrage_charge || 0);
+
+    if (discount > demurrageCharge) {
+        discountValidationError.value = `Discount cannot exceed demurrage charge (LKR ${demurrageCharge.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
+        // Only auto-correct if the value actually changed (prevent infinite loop)
+        if (oldDiscount !== demurrageCharge) {
+            form.discount = demurrageCharge;
+            push.warning(`Discount auto-corrected to demurrage charge: LKR ${demurrageCharge.toFixed(2)}`);
+        }
+        return;
+    }
+
+    // Check if discount exceeds maximum allowed (most restrictive check)
+    if (maxDiscount > 0 && discount > maxDiscount) {
+        discountValidationError.value = `Discount cannot exceed LKR ${maxDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        // Only auto-correct if the value actually changed (prevent infinite loop)
+        if (oldDiscount !== maxDiscount) {
+            form.discount = maxDiscount;
+            push.warning(`Discount auto-corrected to maximum allowed: LKR ${maxDiscount.toFixed(2)}`);
+        }
+        return;
+    }
+});
+
 const handleVerify = () => {
     // Check if payment is already completed
     if (isPaymentDisabled.value) {
@@ -451,6 +499,21 @@ const proceedWithPayment = () => {
     // Check if payment is already completed
     if (isPaymentDisabled.value) {
         push.error('This HBL has already been fully paid.');
+        return;
+    }
+
+    // Validate discount before proceeding
+    if (discountValidationError.value) {
+        push.error(discountValidationError.value);
+        return;
+    }
+
+    // Additional discount validation
+    const discount = parseFloat(form.discount || 0);
+    const maxDiscount = maxDiscountAmount.value;
+
+    if (discount > maxDiscount) {
+        push.error(`Discount cannot exceed LKR ${maxDiscount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
         return;
     }
 
@@ -799,19 +862,21 @@ watch(computedOutstanding, (val) => {
                     <IftaLabel>
                         <InputNumber v-model="form.discount" :disabled="isDiscountDisabled" :max="maxDiscountAmount" :maxFractionDigits="2" :minFractionDigits="2"
                                      class="w-full" inputId="discount" min="0" step="any"
+                                     :class="{ 'p-invalid': discountValidationError || form.errors.discount }"
+                                     :placeholder="`Max: LKR ${maxDiscountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`"
                                      variant="filled"/>
                         <label for="discount">
                             <span v-if="isDiscountDisabled">Discount (Not Available)</span>
-                            <span v-else>Discount (Max: LKR {{ maxDiscountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})</span>
+                            <span v-else>Discount on Demurrage (Max: LKR {{ maxDiscountAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})</span>
                         </label>
                     </IftaLabel>
-                    <InputError :message="form.errors.discount"/>
+                    <InputError :message="discountValidationError || form.errors.discount"/>
                     <small v-if="isDiscountDisabled" class="text-red-500 mt-1 block">
                         <i class="pi pi-exclamation-triangle mr-1"></i>
                         Discount not available - No demurrage charges found
                     </small>
-                    <small v-else-if="maxDiscountAmount > 0" class="text-gray-500 mt-1 block">
-                        Based on {{ (props.branch?.maximum_demurrage_discount || 0) }}% of demurrage charge (LKR {{ parseFloat(hblCharges?.destination_demurrage_charge || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }})
+                    <small v-else-if="maxDiscountAmount > 0 && !discountValidationError" class="text-gray-500 mt-1 block">
+                        Demurrage Charge: LKR {{ parseFloat(hblCharges?.destination_demurrage_charge || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }} × {{ (props.branch?.maximum_demurrage_discount || 0) }}% = Max Discount
                     </small>
                 </div>
 
@@ -838,8 +903,8 @@ watch(computedOutstanding, (val) => {
                         <Button class="p-button-text" icon="pi pi-times" label="Cancel" @click="showPaymentDialog = false" />
                         <Button
                           v-if="!isPaymentDisabled"
-                          :class="{ 'opacity-25': form.processing }"
-                          :disabled="form.processing || isPaymentDisabled"
+                          :class="{ 'opacity-25': form.processing || discountValidationError }"
+                          :disabled="form.processing || isPaymentDisabled || !!discountValidationError"
                           icon="pi pi-wallet"
                           icon-class="animate-pulse"
                           label="Pay Now"

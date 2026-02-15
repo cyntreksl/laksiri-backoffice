@@ -2,11 +2,13 @@
 
 namespace App\Repositories\CallCenter;
 
+use App\Actions\Branch\GetBranchById;
 use App\Actions\Cashier\DownloadCashierInvoicePDF;
 use App\Actions\Cashier\UpdateCashierHBLPayments;
 use App\Actions\HBL\CashSettlement\UpdateHBLPayments;
 use App\Actions\HBL\HBLPayment\GetPaymentByReference;
 use App\Actions\HBL\Payments\CreateHBLPayment;
+use App\Actions\User\GetUserCurrentBranchID;
 use App\Http\Resources\CallCenter\PaidCollection;
 use App\Interfaces\CallCenter\CashierRepositoryInterface;
 use App\Interfaces\GridJsInterface;
@@ -65,13 +67,13 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
     {
         // Get the payment amount from form (in LKR)
         $formPaidAmountLKR = (float) ($data['paid_amount'] ?? 0);
-        
+
         // If this is a verification (paid_amount == 0), allow it
         // Verifications are for confirming already paid amounts
         if ($formPaidAmountLKR == 0) {
             return;
         }
-        
+
         // Check if there's a recent payment for this HBL (within last 2 minutes)
         // This prevents accidental double-clicks or rapid resubmissions
         // Reduced from 5 minutes to 2 minutes to allow legitimate follow-up payments for remaining cents
@@ -79,20 +81,20 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             ->where('paid_amount', '>', 0)
             ->where('created_at', '>=', now()->subMinutes(2))
             ->first();
-        
+
         if ($recentPayment) {
             // Check if the recent payment was for the same amount (likely a duplicate)
             // Allow if the amounts are different (e.g., paying remaining cents)
             $recentAmountRounded = round($recentPayment->paid_amount, 2);
             $currentAmountRounded = round($formPaidAmountLKR, 2);
-            
+
             if (abs($recentAmountRounded - $currentAmountRounded) < 0.01) {
                 // Same amount within 2 minutes - likely a duplicate
                 throw new \Exception('A payment was recently processed for this HBL. Please refresh the page to see the updated status.');
             }
             // Different amounts - allow it (e.g., paying remaining balance)
         }
-        
+
         // Note: We don't check if HBL is fully paid here because the frontend
         // PaymentSummaryCard calculation is more accurate (includes demurrage, etc.)
         // The frontend will prevent payment if computedOutstanding <= 0
@@ -138,12 +140,44 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
     private function processDiscount(HBL $hbl, array $data, float $currencyRate): void
     {
         if (! empty($data['discount'])) {
-            // Use higher precision (4 decimal places) to minimize rounding errors
-            $discountInCurrency = round((float) $data['discount'] / $currencyRate, 4);
+            // Discount comes in LKR from frontend
+            $discountInLKR = (float) $data['discount'];
 
-            // Apply discount to HBL or appropriate model
-            $hbl->discount += $discountInCurrency;
-            $hbl->save();
+            // Validate discount against demurrage charge
+            if ($destinationCharges = $hbl->destinationCharge) {
+                // Demurrage charge is already in LKR
+                $demurrageCharge = $destinationCharges->destination_demurrage_charge ?? 0;
+
+                // Check if discount exceeds demurrage charge (with small tolerance for rounding)
+                if ($discountInLKR > ($demurrageCharge + 0.01)) {
+                    throw new \Exception('Discount cannot exceed demurrage charge');
+                }
+
+                // Get branch maximum discount percentage from USER'S CURRENT BRANCH (not HBL branch)
+                $currentBranchId = GetUserCurrentBranchID::run();
+                $currentBranch = GetBranchById::run($currentBranchId);
+                $maxDiscountPercentage = $currentBranch->maximum_demurrage_discount ?? 0;
+
+                // If branch doesn't allow discount, throw error
+                if ($maxDiscountPercentage == 0) {
+                    throw new \Exception("Discount not allowed for branch '{$currentBranch->name}'. Please contact administrator to enable discount.");
+                }
+
+                // Calculate maximum allowed discount (in LKR)
+                $maxAllowedDiscount = ($demurrageCharge * $maxDiscountPercentage) / 100;
+
+                // Check if discount exceeds maximum allowed (with small tolerance for rounding)
+                if ($discountInLKR > ($maxAllowedDiscount + 0.01)) {
+                    throw new \Exception("Discount cannot exceed {$maxDiscountPercentage}% of demurrage charge (Max: LKR " . number_format($maxAllowedDiscount, 2) . ", Entered: LKR " . number_format($discountInLKR, 2) . ")");
+                }
+
+                // Apply discount specifically to demurrage charge in destination charges
+                // Store discount in LKR (same currency as demurrage charge)
+                $hbl->discount += $discountInLKR;
+                $hbl->save();
+            } else {
+                throw new \Exception('Cannot apply discount: No destination charges found');
+            }
         }
     }
 
@@ -225,7 +259,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
         $grandTotal = (float) ($hbl->grand_total ?? 0); // Already in base currency
         $currentPaidAmount = (float) ($hbl->paid_amount ?? 0); // Already in base currency
         $outstandingAmount = $grandTotal - $currentPaidAmount;
-        
+
         // Form paid_amount is in LKR, convert to base currency for comparison
         $formPaidAmountLKR = (float) ($data['paid_amount'] ?? 0);
         // Use higher precision (4 decimal places) to minimize rounding errors
@@ -251,7 +285,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             // Calculate new paid amount after this payment (both in base currency)
             $newPaidAmount = $currentPaidAmount + $formPaidAmountBase;
             $newOutstanding = $grandTotal - $newPaidAmount;
-            
+
             // Use a small tolerance (0.01) to account for rounding differences
             if ($newOutstanding <= 0.01) {
                 // Payment covers all outstanding, move to package delivery
@@ -302,7 +336,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
 
         // Create package queue (Step 4: Waiting for Package Receive)
         // We DO NOT create Examination Queue here yet. That happens after package release.
-        
+
         PackageQueue::create([
             'token_id' => $customerQueue->token_id,
             'hbl_id' => $hbl->id,
@@ -311,7 +345,7 @@ class CashierRepository implements CashierRepositoryInterface, GridJsInterface
             'package_count' => $data['customer_queue']['token']['package_count'],
         ]);
 
-        // Note: usage of addQueueStatus for ExaminationQueue removed here, 
+        // Note: usage of addQueueStatus for ExaminationQueue removed here,
         // as we are not in Examination Queue yet.
     }
 
