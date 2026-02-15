@@ -14,6 +14,7 @@ import Divider from "primevue/divider";
 import Checkbox from "primevue/checkbox";
 import Message from "primevue/message";
 import axios from "axios";
+import {useConfirm} from "primevue/useconfirm";
 
 const props = defineProps({
     visible: {
@@ -39,6 +40,9 @@ const emit = defineEmits(['close', 'call-flag-created']);
 const needsFollowUp = ref(false);
 const pricingSummary = ref(null);
 const loadingPricing = ref(false);
+const confirm = useConfirm();
+const validationResult = ref(null);
+const showValidationWarning = ref(false);
 
 const form = useForm({
     caller: "",
@@ -48,6 +52,7 @@ const form = useForm({
     call_outcome: "contacted", // contacted, no_answer, busy, appointment_scheduled
     appointment_date: "",
     appointment_notes: "",
+    override_validation: false,
 });
 
 // Computed property to get the receiver name from HBL data
@@ -120,6 +125,9 @@ watch(() => props.visible, (newVal) => {
         form.date = new Date();
         needsFollowUp.value = false;
         pricingSummary.value = null;
+        validationResult.value = null;
+        showValidationWarning.value = false;
+        form.override_validation = false;
 
         // Fetch pricing summary
         fetchPricingSummary();
@@ -143,7 +151,37 @@ watch(() => needsFollowUp.value, (newVal) => {
     }
 });
 
-const handleCreateCallFlag = () => {
+// Function to validate HBL release criteria when appointment is scheduled
+const validateReleaseForAppointment = async () => {
+    if (!props.hblId) return null;
+
+    try {
+        const response = await axios.get(`/hbls/${props.hblId}/validate-release-for-appointment`);
+        return response.data;
+    } catch (error) {
+        console.error('Error validating HBL release criteria:', error);
+        return null;
+    }
+};
+
+const handleCreateCallFlag = async () => {
+    // If appointment is being scheduled, validate release criteria first
+    if (form.call_outcome === 'appointment_scheduled' && form.appointment_date && !form.override_validation) {
+        const validation = await validateReleaseForAppointment();
+
+        if (validation && !validation.is_good_to_release) {
+            // Store validation result and show warning
+            validationResult.value = validation;
+            showValidationWarning.value = true;
+            return;
+        }
+    }
+
+    // Proceed with call flag creation
+    submitCallFlag();
+};
+
+const submitCallFlag = () => {
     // Format dates properly
     form.date = moment(form.date).format("YYYY-MM-DD");
 
@@ -167,9 +205,36 @@ const handleCreateCallFlag = () => {
             push.success('Call Flag Added Successfully!');
             form.reset();
             needsFollowUp.value = false;
+            validationResult.value = null;
+            showValidationWarning.value = false;
         },
         onError: () => {
             push.error('Failed to create call flag. Please try again.');
+        }
+    });
+};
+
+const confirmOverrideAndProceed = () => {
+    confirm.require({
+        message: 'This HBL does not meet all release criteria. Do you want to proceed with appointment creation?',
+        header: 'Release Criteria Not Met',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Continue Anyway',
+        rejectLabel: 'Cancel',
+        acceptProps: {
+            severity: 'warn'
+        },
+        rejectProps: {
+            severity: 'secondary',
+            outlined: true
+        },
+        accept: () => {
+            form.override_validation = true;
+            showValidationWarning.value = false;
+            submitCallFlag();
+        },
+        reject: () => {
+            showValidationWarning.value = false;
         }
     });
 };
@@ -342,6 +407,38 @@ const callOutcomeOptions = [
             <!-- Appointment Section -->
             <div v-if="form.call_outcome === 'appointment_scheduled'" class="space-y-3">
                 <Divider />
+
+                <!-- Validation Warning -->
+                <Message v-if="showValidationWarning && validationResult" :closable="false" class="mb-3" severity="warn">
+                    <div class="space-y-2">
+                        <div class="font-semibold flex items-center gap-2">
+                            <i class="pi pi-exclamation-triangle"></i>
+                            <span>Release Criteria Not Met</span>
+                        </div>
+                        <div class="text-sm">
+                            <p class="mb-2">The following issues were detected:</p>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li v-for="(issue, index) in validationResult.issues" :key="index">{{ issue }}</li>
+                            </ul>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <Button
+                                label="Continue Anyway"
+                                severity="warn"
+                                size="small"
+                                @click="confirmOverrideAndProceed"
+                            />
+                            <Button
+                                label="Cancel"
+                                outlined
+                                severity="secondary"
+                                size="small"
+                                @click="showValidationWarning = false"
+                            />
+                        </div>
+                    </div>
+                </Message>
+
                 <div>
                     <InputLabel value="Appointment Date" for="appointment-date" />
                     <DatePicker

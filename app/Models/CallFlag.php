@@ -25,6 +25,7 @@ class CallFlag extends Model
         'appointment_date',
         'appointment_notes',
         'created_by',
+        'override_validation',
     ];
 
     public function hbl(): BelongsTo
