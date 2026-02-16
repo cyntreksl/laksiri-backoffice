@@ -764,6 +764,7 @@ class RolePermissionSeeder extends Seeder
                 'permissions' => [
                     'reports.detain',
                     'reports.hbl',
+                    'reports.hbl-package',
                 ],
             ],
         ];
