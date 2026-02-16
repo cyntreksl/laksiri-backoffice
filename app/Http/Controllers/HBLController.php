@@ -163,13 +163,13 @@ class HBLController extends Controller
     public function show($hbl_id)
     {
         $hbl = GetHBLByIdWithPackages::run($hbl_id);
-        
+
         if (! $hbl) {
             return response()->json([
                 'message' => 'HBL not found'
             ], 404);
         }
-        
+
         return response()->json([
             'hbl' => array_merge($hbl->toArray(), [
                 'finance_status' => $hbl->is_finance_release_approved ? 'Approved' : 'Not Approved',
@@ -394,7 +394,7 @@ class HBLController extends Controller
         }
 
         $pickup = $hbl->pickup;
-        
+
         // Get container details from packages
         $container = null;
         if ($hbl->packages && $hbl->packages->count() > 0) {
@@ -415,7 +415,7 @@ class HBLController extends Controller
             'shipper_name' => $hbl->hbl_name,
             'consignee_name' => $hbl->consignee_name,
             'packages_count' => $hbl->packages?->count() ?? 0,
-            
+
             // Container/Shipment dates
             'loading_started_at' => $container?->loading_started_at,
             'loading_ended_at' => $container?->loading_ended_at,
@@ -425,7 +425,7 @@ class HBLController extends Controller
             'arrived_at_primary_warehouse' => $container?->arrived_at_primary_warehouse,
             'unloading_started_at' => $container?->unloading_started_at,
             'unloading_ended_at' => $container?->unloading_ended_at,
-            
+
             // HBL specific dates
             'is_arrived_to_primary_warehouse' => $hbl->is_arrived_to_primary_warehouse,
             'system_status' => $hbl->system_status,
