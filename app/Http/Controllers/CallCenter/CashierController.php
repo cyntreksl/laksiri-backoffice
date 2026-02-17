@@ -11,6 +11,7 @@ use App\Models\CustomerQueue;
 use App\Models\HBL;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CashierController extends Controller
@@ -47,7 +48,8 @@ class CashierController extends Controller
         }
         $hbl = HBL::withoutGlobalScopes()->where('reference', $customerQueue->token->reference)->first();
 
-        $branch = GetBranchById::run($hbl->branch_id);
+        $branch = GetBranchById::run(Auth::user()->primary_branch_id);
+
         $currencyRate = Currency::where('currency_symbol', $branch->currency_symbol)->first()?->sl_rate ?? 1;
 
         return Inertia::render('CallCenter/Cashier/CashierForm', [
@@ -97,7 +99,7 @@ class CashierController extends Controller
     public function searchCustomers(Request $request)
     {
         $search = $request->input('search', '');
-        
+
         $customers = User::role('customer')
             ->select('id', 'name')
             ->when($search, function ($query, $search) {
@@ -105,14 +107,14 @@ class CashierController extends Controller
             })
             ->limit(50)
             ->get();
-        
+
         return response()->json($customers);
     }
 
     public function searchUsers(Request $request)
     {
         $search = $request->input('search', '');
-        
+
         $users = User::role('call center')
             ->select('id', 'name')
             ->when($search, function ($query, $search) {
@@ -120,7 +122,7 @@ class CashierController extends Controller
             })
             ->limit(50)
             ->get();
-        
+
         return response()->json($users);
     }
 
@@ -153,7 +155,7 @@ class CashierController extends Controller
     public function getPaymentStatus($hblId)
     {
         $hbl = HBL::withoutGlobalScopes()->find($hblId);
-        
+
         if (!$hbl) {
             return response()->json(['error' => 'HBL not found'], 404);
         }
@@ -161,7 +163,7 @@ class CashierController extends Controller
         $grandTotal = (float) ($hbl->grand_total ?? 0);
         $paidAmount = (float) ($hbl->paid_amount ?? 0);
         $outstandingAmount = $grandTotal - $paidAmount;
-        
+
         // Get latest payment record
         $latestPayment = \App\Models\CashierHBLPayment::where('hbl_id', $hblId)
             ->with('verifiedBy:id,name')
@@ -176,9 +178,9 @@ class CashierController extends Controller
             'latest_payment' => $latestPayment ? [
                 'amount' => $latestPayment->paid_amount,
                 'verified_by' => $latestPayment->verifiedBy->name ?? 'Unknown',
-                'verified_at' => $latestPayment->verified_at ? 
+                'verified_at' => $latestPayment->verified_at ?
                     (is_string($latestPayment->verified_at) ? $latestPayment->verified_at : $latestPayment->verified_at->format('M d, Y h:i A')) : null,
-                'created_at' => is_string($latestPayment->created_at) ? 
+                'created_at' => is_string($latestPayment->created_at) ?
                     $latestPayment->created_at : $latestPayment->created_at->format('M d, Y h:i A'),
                 'invoice_number' => $latestPayment->invoice_number,
                 'receipt_number' => $latestPayment->receipt_number,

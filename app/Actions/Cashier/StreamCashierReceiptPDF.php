@@ -40,41 +40,41 @@ class StreamCashierReceiptPDF
         $demurrageCharge = $hbl->destinationCharge?->destination_demurrage_charge ?? $sl_Invoice['dmg_charge_amount'] ?? 0;
         $doCharge = $hbl->destinationCharge?->destination_do_charge ?? $sl_Invoice['do_charge'] ?? 0;
         $otherCharge = $hbl->destinationCharge?->destination_other_charge ?? 0;
-        
+
         // Calculate tax on Destination II charges (demurrage + DO)
         $destination2Total = $demurrageCharge + $doCharge;
         $taxCalculation = CalculateTax::run($destination2Total);
         $taxAmount = $taxCalculation['total_tax'];
         $destination2TotalWithTax = $taxCalculation['amount_with_tax'];
-        
+
         // Recalculate total with correct demurrage charge
         // Apply conditional logic based on payment status
         // 1. If Destination I Charges is paid, set handling, storage, and port charges to 0
         $portChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($sl_Invoice['port_charge_amount'] ?? 0);
         $handlingChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($sl_Invoice['handling_charge_amount'] ?? 0);
         $storageChargeAmount = $hbl->is_destination_charges_paid ? 0 : ($sl_Invoice['storage_charge_amount'] ?? 0);
-        
+
         // 2. If Demurrage Charge is 0, ensure it shows as 0 in invoice
         $demurrageCharge = ($demurrageCharge == 0) ? 0 : $demurrageCharge;
-        
+
         // Calculate agent charges (departure + destination I if applicable)
         $agentCharges = $hbl->grand_total ?? 0;
         $agentPaid = $hbl->paid_amount ?? 0;
         $agentOutstanding = max(0, $agentCharges - $agentPaid);
-        
+
         // Recalculate Destination II total and tax based on actual demurrage charge
         $destination2Total = $demurrageCharge + $doCharge;
         $taxCalculation = CalculateTax::run($destination2Total);
         $taxAmount = $taxCalculation['total_tax'];
         $destination2TotalWithTax = $taxCalculation['amount_with_tax'];
-        
+
         // Total outstanding = Agent outstanding + SL Portal charges
         $totalAmount = $portChargeAmount + $handlingChargeAmount + $storageChargeAmount + $destination2TotalWithTax + $otherCharge;
         $stampCharge = $destination2TotalWithTax > 25000 ? 25.00 : 0.00;
-        
+
         // Calculate outstanding amount (what needs to be paid)
         $outstandingAmount = $agentOutstanding + $totalAmount + $stampCharge;
-        
+
         // If there's a payment record, use the paid amount from it
         $paidAmount = $latestPayment ? $latestPayment->paid_amount : $outstandingAmount;
 

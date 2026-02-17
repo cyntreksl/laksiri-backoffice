@@ -163,13 +163,13 @@ class HBLController extends Controller
     public function show($hbl_id)
     {
         $hbl = GetHBLByIdWithPackages::run($hbl_id);
-        
+
         if (! $hbl) {
             return response()->json([
                 'message' => 'HBL not found'
             ], 404);
         }
-        
+
         return response()->json([
             'hbl' => array_merge($hbl->toArray(), [
                 'finance_status' => $hbl->is_finance_release_approved ? 'Approved' : 'Not Approved',
@@ -394,7 +394,7 @@ class HBLController extends Controller
         }
 
         $pickup = $hbl->pickup;
-        
+
         // Get container details from packages
         $container = null;
         if ($hbl->packages && $hbl->packages->count() > 0) {
@@ -415,7 +415,7 @@ class HBLController extends Controller
             'shipper_name' => $hbl->hbl_name,
             'consignee_name' => $hbl->consignee_name,
             'packages_count' => $hbl->packages?->count() ?? 0,
-            
+
             // Container/Shipment dates
             'loading_started_at' => $container?->loading_started_at,
             'loading_ended_at' => $container?->loading_ended_at,
@@ -425,7 +425,7 @@ class HBLController extends Controller
             'arrived_at_primary_warehouse' => $container?->arrived_at_primary_warehouse,
             'unloading_started_at' => $container?->unloading_started_at,
             'unloading_ended_at' => $container?->unloading_ended_at,
-            
+
             // HBL specific dates
             'is_arrived_to_primary_warehouse' => $hbl->is_arrived_to_primary_warehouse,
             'system_status' => $hbl->system_status,
@@ -496,8 +496,73 @@ class HBLController extends Controller
         return $this->HBLRepository->getDraftList($limit, $page, $order, $dir, $search, $filters);
     }
 
+    /**
+     * Validate HBL release criteria for appointment creation
+     */
+    public function validateReleaseForAppointment(HBL $hbl): JsonResponse
+    {
+        $issues = [];
+        
+        // 1. Check if HBL is detained
+        $isDetained = $hbl->latestDetainRecord?->is_rtf ?? false;
+        if ($isDetained) {
+            $detainType = $hbl->latestDetainRecord?->detain_type ?? 'Unknown';
+            $issues[] = "HBL is detained by {$detainType}";
+        }
+        
+        // 2. Check for loading or unloading issues
+        $hasUnloadingIssues = $hbl->unloadingIssues()->where('is_fixed', false)->exists();
+        if ($hasUnloadingIssues) {
+            $issueCount = $hbl->unloadingIssues()->where('is_fixed', false)->count();
+            $issues[] = "{$issueCount} unresolved unloading issue(s) found";
+        }
+        
+        // 3. Check finance approval
+        if (!$hbl->is_finance_release_approved) {
+            $issues[] = "Finance approval pending";
+        }
+        
+        // 4. Check if unloaded at warehouse
+        $hasUnloadedPackages = $hbl->packages()->whereNotNull('unloaded_at')->exists();
+        if (!$hasUnloadedPackages) {
+            $issues[] = "HBL not yet unloaded at warehouse";
+        }
+        
+        // 5. Check for operational flags (is_hold, is_rtf)
+        if ($hbl->is_hold) {
+            $issues[] = "HBL is on hold";
+        }
+        
+        // 6. Check for short loading issues
+        if ($hbl->is_short_loading) {
+            $issues[] = "HBL has short loading issues";
+        }
+        
+        $isGoodToRelease = empty($issues);
+        
+        return response()->json([
+            'is_good_to_release' => $isGoodToRelease,
+            'issues' => $issues,
+            'hbl_number' => $hbl->hbl_number ?? $hbl->hbl,
+            'validation_timestamp' => now()->toIso8601String(),
+        ]);
+    }
+
     public function createCallFlag(StoreCallFlagRequest $request, HBL $hbl)
     {
+        // Log if appointment was created with override
+        if ($request->has('appointment_date') && $request->boolean('override_validation', false)) {
+            activity()
+                ->performedOn($hbl)
+                ->causedBy(auth()->user())
+                ->withProperties([
+                    'appointment_date' => $request->appointment_date,
+                    'override_reason' => 'User confirmed appointment creation despite validation warnings',
+                    'ip_address' => $request->ip(),
+                ])
+                ->log('Appointment created with validation override');
+        }
+        
         return $this->HBLRepository->createCallFlag($hbl, $request->all());
     }
 

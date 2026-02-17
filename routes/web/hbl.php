@@ -90,6 +90,9 @@ Route::post('hbls/calculate-payment', [HBLController::class, 'calculatePayment']
 Route::post('hbls/create-call-flag/{hbl}', [HBLController::class, 'createCallFlag'])
     ->name('hbls.create-call-flag');
 
+Route::get('hbls/{hbl}/validate-release-for-appointment', [HBLController::class, 'validateReleaseForAppointment'])
+    ->name('hbls.validate-release-for-appointment');
+
 Route::get('/get-call-flags/{hbl}', [HBLController::class, 'getHBLCallFlags']);
 
 Route::post('/get-hbl-packages', [HBLController::class, 'getHBLPackageRules']);

@@ -30,6 +30,7 @@ class StoreCallFlagRequest extends FormRequest
             'call_outcome' => ['required', 'string', 'in:contacted,no_answer,busy,appointment_scheduled,not_available'],
             'appointment_date' => ['nullable', 'date', 'after:today', 'required_if:call_outcome,appointment_scheduled'],
             'appointment_notes' => ['nullable', 'string', 'max:1000'],
+            'override_validation' => ['nullable', 'boolean'],
         ];
     }
 
