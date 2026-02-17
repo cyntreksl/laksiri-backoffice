@@ -944,6 +944,11 @@ const setMenu = (menu) => {
                     title: "HBL Package Report",
                     route: "report.hbl-package-report.index",
                     permission: "reports.hbl-package",
+                },
+                {
+                    title: "Shipment Report",
+                    route: "report.shipment-report.index",
+                    permission: "reports.shipment",
                 }
             );
             changeSidePanelTitle("Report");
