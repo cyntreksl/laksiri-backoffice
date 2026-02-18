@@ -23,9 +23,8 @@ Route::name('report.')->group(function () {
     Route::get('detain-report/data', [DetainReportController::class, 'getData'])
         ->name('detain-report.data');
 
-    Route::get('detain-report/export', function () {
-        return Excel::download(new DetainReportExport(request()), 'detain-report-' . date('Y-m-d-His') . '.xlsx');
-    })->name('detain-report.export');
+    Route::get('detain-report/export', [DetainReportController::class, 'export'])
+        ->name('detain-report.export');
 
     // HBL Report
     Route::get('hbl-report', [HBLReportController::class, 'index'])
