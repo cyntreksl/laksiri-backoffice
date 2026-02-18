@@ -25,13 +25,13 @@
 <div style="position: absolute; top: 4.5cm; left: 8.5cm;">{{ $data['hbl']['hbl_number'] ?? '' }}</div>
 
 {{-- Name of Consignee --}}
-<div style="position: absolute; top: 7.4cm; left: 6.1cm;">{{$data['hbl']['consignee_name']}}</div>
+<div style="position: absolute; top: 7cm; left: 6.1cm;">{{$data['hbl']['consignee_name']}}</div>
 
 {{-- B/L No --}}
 <div style="position: absolute; top: 8.3cm; left: 6.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
 
 {{-- Vessel --}}
-<div style="position: absolute; top: 9.2cm; left: 6.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
+<div style="position: absolute; top: 9cm; left: 6.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
 
 {{-- Passport / I.D. Card No --}}
 <div style="position: absolute; top: 10cm; left: 6.1cm;">{{$data['hbl']['nic']}}</div>
@@ -40,7 +40,7 @@
 <div style="position: absolute; top: 10.9cm; left: 6.1cm;">{{ count($data['hbl']['packages']) }}</div>
 
 {{-- Bond Storage No. --}}
-<div style="position: absolute; top: 11.8cm; left: 6.1cm;">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</div>
+<div style="position: absolute; top: 11.7cm; left: 6.1cm;">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</div>
 
 {{-- Agent --}}
 <div style="position: absolute; top: 12.5cm; left: 6.1cm;">{{ $data['hbl']['branch']['name'] }}</div>
@@ -93,7 +93,7 @@
 
 <!-- Gate Pass Details -->
 {{--No.--}}
-<div style="position: absolute; top: 7.4cm; left: 17.6cm;">{{ $data['hbl']['hbl_number'] ?? '' }}</div>
+<div style="position: absolute; top: 7.3cm; left: 17.6cm;">{{ $data['hbl']['hbl_number'] ?? '' }}</div>
 
 {{-- Destuff Date --}}
 <div style="position: absolute; top: 8.4cm; left: 15cm;">Destuff Date.</div>
@@ -111,10 +111,10 @@
 <div style="position: absolute; top: 11cm; left: 17.1cm;">{{ count($data['hbl']['packages']) }}</div>
 
 {{--Passport / I.D. Card No.--}}
-<div style="position: absolute; top: 12cm; left: 17.1cm;">{{$data['hbl']['nic']}}</div>
+<div style="position: absolute; top: 11.7cm; left: 17.1cm;">{{$data['hbl']['nic']}}</div>
 
 {{--Bond Storage No.--}}
-<div style="position: absolute; top: 12.8cm; left: 17.1cm;">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</div>
+<div style="position: absolute; top: 12.5cm; left: 17.1cm;">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</div>
 
 {{--Vessel--}}
 <div style="position: absolute; top: 13.6cm; left: 17.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
