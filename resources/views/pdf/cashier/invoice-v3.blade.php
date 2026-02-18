@@ -28,7 +28,7 @@
 <div style="position: absolute; top: 7cm; left: 6.1cm;">{{$data['hbl']['consignee_name']}}</div>
 
 {{-- B/L No --}}
-<div style="position: absolute; top: 8.3cm; left: 6.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
+<div style="position: absolute; top: 8.2cm; left: 6.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
 
 {{-- Vessel --}}
 <div style="position: absolute; top: 9cm; left: 6.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
@@ -43,7 +43,7 @@
 <div style="position: absolute; top: 11.7cm; left: 6.1cm;">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</div>
 
 {{-- Agent --}}
-<div style="position: absolute; top: 12.5cm; left: 6.1cm;">{{ $data['hbl']['branch']['name'] }}</div>
+<div style="position: absolute; top: 12.6cm; left: 6.1cm;">{{ $data['hbl']['branch']['name'] }}</div>
 
 {{-- Volume --}}
 <div style="position: absolute; top: 13.7cm; left: 6.1cm;">{{ $data['grand_volume'] }}</div>
@@ -102,10 +102,10 @@
 </div>
 
 {{--B/L No.--}}
-<div style="position: absolute; top: 9.1cm; left: 17.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
+<div style="position: absolute; top: 9cm; left: 17.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
 
 {{--Description of goods--}}
-<div style="position: absolute; top: 9.8cm; left: 17.1cm;">{{ collect($data['hbl']['packages'])->pluck('package_type')->filter()->implode(', ') }}</div>
+<div style="position: absolute; top: 9.6cm; left: 17.1cm;">{{ collect($data['hbl']['packages'])->pluck('package_type')->filter()->implode(', ') }}</div>
 
 {{--No. of Packages--}}
 <div style="position: absolute; top: 11cm; left: 17.1cm;">{{ count($data['hbl']['packages']) }}</div>
@@ -120,13 +120,13 @@
 <div style="position: absolute; top: 13.6cm; left: 17.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
 
 {{--BY--}}
-<div style="position: absolute; top: 16.1cm; left: 14.1cm;">{{$data['hbl']['consignee_name']}}</div>
+<div style="position: absolute; top: 16.2cm; left: 14.1cm;">{{$data['hbl']['consignee_name']}}</div>
 
 {{--Date--}}
-<div style="position: absolute; top: 17.6cm; left: 14.1cm;">{{ \Carbon\Carbon::today()->toDateString()  }}</div>
+<div style="position: absolute; top: 17.7cm; left: 14.1cm;">{{ \Carbon\Carbon::today()->toDateString()  }}</div>
 
 {{--Time--}}
-<div style="position: absolute; top: 18.5cm; left: 14.1cm;">{{ \Carbon\Carbon::now('Asia/Colombo')->toTimeString() }}</div>
+<div style="position: absolute; top: 18.6cm; left: 14.1cm;">{{ \Carbon\Carbon::now('Asia/Colombo')->toTimeString() }}</div>
 
 {{--User ID--}}
 <div style="position: absolute; top: 26cm; left: 13.2cm;">{{ strtoupper($data['by']) }}</div>
