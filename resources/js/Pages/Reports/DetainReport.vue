@@ -103,7 +103,7 @@ const resetFilters = () => {
     fetchData();
 };
 
-const exportData = () => {
+const exportData = (format = 'xlsx') => {
     // Build params object, excluding null/undefined values and formatting dates
     const params = {};
     
@@ -143,9 +143,11 @@ const exportData = () => {
         params.search = filters.search;
     }
 
+    params.format = format;
+
     const queryString = new URLSearchParams(params).toString();
     window.location.href = route('report.detain-report.export') + '?' + queryString;
-    push.success('Export started. Download will begin shortly.');
+    push.success(`Export started. ${format.toUpperCase()} download will begin shortly.`);
 };
 
 const getStatusSeverity = (status) => {
@@ -216,10 +218,24 @@ onMounted(() => {
                 <div class="header-right">
                     <Button
                         :disabled="loading || totalRecords === 0"
-                        icon="pi pi-download"
-                        label="Export"
+                        icon="pi pi-file-pdf"
+                        label="PDF"
+                        severity="danger"
+                        @click="exportData('pdf')"
+                    />
+                    <Button
+                        :disabled="loading || totalRecords === 0"
+                        icon="pi pi-file-excel"
+                        label="Excel"
                         severity="success"
-                        @click="exportData"
+                        @click="exportData('xlsx')"
+                    />
+                    <Button
+                        :disabled="loading || totalRecords === 0"
+                        icon="pi pi-file"
+                        label="CSV"
+                        severity="secondary"
+                        @click="exportData('csv')"
                     />
                 </div>
             </div>
@@ -407,13 +423,20 @@ onMounted(() => {
                         </template>
                     </Column>
 
-                    <Column field="entity_level" header="Level" sortable style="min-width: 120px">
+                    <Column field="entity_level" header="Level" sortable style="min-width: 180px">
                         <template #body="{ data }">
-                            <Tag
-                                :severity="getEntityLevelColor(data.entity_level)"
-                                :value="data.entity_level"
-                                class="text-xs uppercase"
-                            />
+                            <div class="flex flex-col gap-1">
+                                <Tag
+                                    :severity="getEntityLevelColor(data.entity_level)"
+                                    :value="data.entity_level"
+                                    class="text-xs uppercase"
+                                />
+                                <span class="font-mono text-xs text-gray-600">
+                                    {{ data.entity_level === 'shipment' ? data.shipment_reference : 
+                                       data.entity_level === 'hbl' ? data.hbl_reference : 
+                                       data.entity_level === 'package' ? data.package_number : 'N/A' }}
+                                </span>
+                            </div>
                         </template>
                     </Column>
 
