@@ -34,13 +34,13 @@
 <div style="position: absolute; top: 9.2cm; left: 6.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
 
 {{-- Passport / I.D. Card No --}}
-<div style="position: absolute; top: 10.3cm; left: 6.1cm;">{{$data['hbl']['nic']}}</div>
+<div style="position: absolute; top: 10cm; left: 6.1cm;">{{$data['hbl']['nic']}}</div>
 
 {{-- >No. of Packages --}}
-<div style="position: absolute; top: 11.1cm; left: 6.1cm;">{{ count($data['hbl']['packages']) }}</div>
+<div style="position: absolute; top: 10.9cm; left: 6.1cm;">{{ count($data['hbl']['packages']) }}</div>
 
 {{-- Bond Storage No. --}}
-<div style="position: absolute; top: 12cm; left: 6.1cm;">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</div>
+<div style="position: absolute; top: 11.8cm; left: 6.1cm;">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</div>
 
 {{-- Agent --}}
 <div style="position: absolute; top: 12.5cm; left: 6.1cm;">{{ $data['hbl']['branch']['name'] }}</div>
@@ -71,15 +71,18 @@
 <div style="position: absolute; top: 19.4cm; left: 9.2cm;">{{ number_format($data['charges']['dmg_charge']['amount'],2) }}</div>
 
 {{-- TOTAL --}}
-<div style="position: absolute; top: 20cm; left: 9.2cm;">{{ number_format($data['charges']['total'],2)}}</div>
+<div style="position: absolute; top: 20.6cm; left: 9.2cm;">{{ number_format($data['charges']['total'],2)}}</div>
 
 
 <!-- Payment Summary -->
-<div style="position: absolute; top: 21cm; left: 4.9cm;"><span>D/O Charges. </span><span>{{ number_format($data['charges']['do_charge'],2) }}</span></div>
+<div style="position: absolute; top: 21.5cm; left: 4cm;">D/O Charges.</div>
+<div style="position: absolute; top: 21.5cm; left: 7.5cm; width: 3cm; text-align: right;">{{ number_format($data['charges']['do_charge'],2) }}</div>
 
-<div style="position: absolute; top: 22cm; left: 4.9cm;"><span>Stamp Duty </span><span>{{ number_format($data['charges']['stamp_charge'],2) }}</span></div>
+<div style="position: absolute; top: 22cm; left: 4cm;">Stamp Duty</div>
+<div style="position: absolute; top: 22cm; left: 7.5cm; width: 3cm; text-align: right;">{{ number_format($data['charges']['stamp_charge'],2) }}</div>
 
-<div style="position: absolute; top: 22.8cm; left: 4.9cm;" class="font-bold"><span>G/Total : </span><span>{{ number_format($data['charges']['total']+$data['charges']['do_charge']+$data['charges']['stamp_charge'],2) }}</span></div>
+<div style="position: absolute; top: 22.8cm; left: 4cm;" class="font-bold">G/Total :</div>
+<div style="position: absolute; top: 22.8cm; left: 7.5cm; width: 3cm; text-align: right;">{{ number_format($data['charges']['total']+$data['charges']['do_charge']+$data['charges']['stamp_charge'],2) }}</div>
 
 @if (!empty($data['taxes']))
     <div style="position: absolute; top: 24.5cm; left: 1.8cm;">VAT 18% included in the charges</div><br />
@@ -99,7 +102,7 @@
 </div>
 
 {{--B/L No.--}}
-<div style="position: absolute; top: 9.4cm; left: 17.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
+<div style="position: absolute; top: 9.1cm; left: 17.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
 
 {{--Description of goods--}}
 <div style="position: absolute; top: 9.8cm; left: 17.1cm;">{{ collect($data['hbl']['packages'])->pluck('package_type')->filter()->implode(', ') }}</div>
@@ -114,7 +117,7 @@
 <div style="position: absolute; top: 12.8cm; left: 17.1cm;">@if(!empty($data['bond_storage_numbers'])){{ implode(', ', $data['bond_storage_numbers']) }}@else N/A @endif</div>
 
 {{--Vessel--}}
-<div style="position: absolute; top: 13.6cm; left: 14.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
+<div style="position: absolute; top: 13.6cm; left: 17.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
 
 {{--BY--}}
 <div style="position: absolute; top: 16.1cm; left: 14.1cm;">{{$data['hbl']['consignee_name']}}</div>
