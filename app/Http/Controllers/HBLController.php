@@ -601,6 +601,12 @@ class HBLController extends Controller
         return $this->HBLRepository->streamCashierReceipt($hbl);
     }
 
+    public function autoPrintPOSReceipt($hbl)
+    {
+        return $this->HBLRepository->autoPrintCashierReceipt($hbl);
+    }
+
+
     public function showDoorToDoorList()
     {
         $this->authorize('hbls.show door to door list');

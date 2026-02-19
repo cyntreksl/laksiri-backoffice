@@ -79,6 +79,8 @@ interface HBLRepositoryInterface
 
     public function streamCashierReceipt($hbl);
 
+    public function autoPrintCashierReceipt($hbl);
+
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = []);
 
     public function downloadBaggagePDF(HBL $hbl);
