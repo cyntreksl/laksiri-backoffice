@@ -38,6 +38,9 @@ Route::get('hbls/download/pos-receipt/{hbl}', [HBLController::class, 'downloadPO
 Route::get('hbls/stream/pos-receipt/{hbl}', [HBLController::class, 'streamPOSReceipt'])
     ->name('hbls.streamPOSReceipt');
 
+Route::get('hbls/print/pos-receipt/{hbl}', [HBLController::class, 'autoPrintPOSReceipt'])
+    ->name('hbls.autoPrintPOSReceipt');
+
 Route::get('hbls/show/cancelled-hbls', [HBLController::class, 'cancelledHBLs'])
     ->name('hbls.cancelled-hbls');
 

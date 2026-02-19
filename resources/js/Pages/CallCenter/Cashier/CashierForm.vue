@@ -468,7 +468,20 @@ const downloadReceipt = () => {
 
 const streamReceipt = () => {
     if (props.hblId) {
-        window.open(route("hbls.streamPOSReceipt", {hbl: props.hblId}), '_blank');
+        const printWindow = window.open(route("hbls.streamPOSReceipt", {hbl: props.hblId}), '_blank');
+        
+        // Try to trigger print after PDF loads
+        if (printWindow) {
+            printWindow.onload = function() {
+                setTimeout(function() {
+                    try {
+                        printWindow.print();
+                    } catch (e) {
+                        console.log('Auto-print not supported, user can print manually');
+                    }
+                }, 1500);
+            };
+        }
     }
 };
 
@@ -540,9 +553,22 @@ const proceedWithPayment = () => {
 
     form.post(route("call-center.cashier.store"), {
         onSuccess: () => {
-            // Open receipt in new tab after successful payment
+            // Open receipt PDF directly in new tab - browser will handle print
             if (props.hblId && form.paid_amount > 0) {
-                window.open(route("hbls.streamPOSReceipt", {hbl: props.hblId}), '_blank');
+                const printWindow = window.open(route("hbls.streamPOSReceipt", {hbl: props.hblId}), '_blank');
+                
+                // Try to trigger print after PDF loads
+                if (printWindow) {
+                    printWindow.onload = function() {
+                        setTimeout(function() {
+                            try {
+                                printWindow.print();
+                            } catch (e) {
+                                console.log('Auto-print not supported, user can print manually');
+                            }
+                        }, 1500);
+                    };
+                }
             }
 
             // Show success message

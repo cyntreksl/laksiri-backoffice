@@ -114,6 +114,8 @@ class StreamCashierReceiptPDF
                 'stamp_charge' => $stampCharge,
                 'outstanding' => $outstandingAmount,
                 'paid_amount' => $paidAmount,
+                'additional_charges' => $latestPayment ? ($latestPayment->additional_charges ?? 0) : 0,
+                'discount' => $latestPayment ? ($latestPayment->discount ?? 0) : 0,
             ],
             'total_in_word' => $total_in_word,
             'by' => $latestPayment ? $latestPayment->verifiedBy->name : (GetUserById::run($sl_Invoice['created_by'])->name ?? 'N/A'),
