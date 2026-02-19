@@ -13,7 +13,7 @@ class CashierHBLPayment extends Model
     protected $table = 'cashier_hbl_payments';
 
     protected $fillable = [
-        'verified_by', 'customer_queue_id', 'token_id', 'hbl_id', 'paid_amount', 'note', 'invoice_number', 'receipt_number', 'verified_at',
+        'verified_by', 'customer_queue_id', 'token_id', 'hbl_id', 'paid_amount', 'note', 'invoice_number', 'receipt_number', 'verified_at', 'additional_charges', 'discount',
     ];
 
     protected $casts = [

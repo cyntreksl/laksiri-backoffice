@@ -28,6 +28,8 @@ class UpdateCashierHBLPayments
             'paid_amount' => $paid_amount,
             'note' => $data['note'],
             'verified_at' => $shouldVerify ? now() : null,
+            'additional_charges' => $data['additional_charges'] ?? 0,
+            'discount' => $data['discount'] ?? 0,
         ]);
     }
 }

@@ -139,6 +139,20 @@
 {{--            <span>{{ number_format($data['charges']['outstanding'], 2) }}</span>--}}
 {{--        </div>--}}
 
+        @if($data['charges']['additional_charges'] > 0)
+        <div class="flex justify-between mb-1">
+            <span>Additional Charges</span>
+            <span>{{ number_format($data['charges']['additional_charges'], 2) }}</span>
+        </div>
+        @endif
+
+        @if($data['charges']['discount'] > 0)
+        <div class="flex justify-between mb-1 text-red-600">
+            <span>Discount</span>
+            <span>-{{ number_format($data['charges']['discount'], 2) }}</span>
+        </div>
+        @endif
+
         <div class="flex justify-between font-bold text-sm bg-gray-100 p-1">
             <span>PAID AMOUNT</span>
             <span>{{ number_format($data['charges']['paid_amount'], 2) }}</span>
