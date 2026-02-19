@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Actions\Branch\GetBranchById;
 use App\Actions\BranchPrice\GetPriceRulesByCargoModeAndHBLType;
 use App\Actions\CallFlag\CreateCallFlag;
+use App\Actions\Cashier\AutoPrintCashierReceipt;
 use App\Actions\Cashier\DownloadCashierInvoicePDF;
 use App\Actions\Cashier\DownloadCashierReceiptPDF;
 use App\Actions\Cashier\StreamCashierInvoicePDF;
@@ -541,6 +542,16 @@ class HBLRepository implements GridJsInterface, HBLRepositoryInterface
             throw new \Exception('Failed to stream receipt'.$e->getMessage());
         }
     }
+
+    public function autoPrintCashierReceipt($hbl)
+    {
+        try {
+            return AutoPrintCashierReceipt::run($hbl);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to auto-print receipt: '.$e->getMessage());
+        }
+    }
+
 
     public function getDoorToDoorHBL(int $limit = 10, int $offset = 0, string $order = 'id', string $direction = 'asc', ?string $search = null, array $filters = [])
     {

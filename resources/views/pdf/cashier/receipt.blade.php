@@ -26,6 +26,13 @@
         .text-xxs {
             font-size: 8px;
         }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 5px;
+            }
+        }
     </style>
 </head>
 
