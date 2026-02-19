@@ -8,6 +8,7 @@ use App\Actions\HBL\HBLCharges\CalculateTax;
 use App\Actions\SLInvoice\CreateSLInvoice;
 use App\Actions\Tax\GetTaxesByWarehouse;
 use App\Actions\User\GetUserById;
+use App\Models\CashierHBLPayment;
 use Lorisleiva\Actions\Concerns\AsAction;
 use NumberFormatter;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,6 +58,11 @@ class StreamCashierInvoicePDF
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
         $total_in_word = strtoupper($formatter->format($totalAmount + $stampCharge));
 
+        // Get the latest cashier payment to show invoice number
+        $latestPayment = CashierHBLPayment::where('hbl_id', $hbl->id)
+            ->latest('created_at')
+            ->first();
+
         $data = [
             'clearing_time' => $sl_Invoice['clearing_time'],
             'date' => $sl_Invoice['date'],
@@ -87,6 +93,7 @@ class StreamCashierInvoicePDF
             ],
             'total_in_word' => $total_in_word,
             'by' => GetUserById::run($sl_Invoice['created_by'])->name,
+            'payment' => $latestPayment,
             'taxes' => GetTaxesByWarehouse::run($hbl->warehouse_id)
                 ->map(function ($tax) {
                     return [

@@ -22,13 +22,13 @@
 </div>
 
 {{-- Serial Number --}}
-<div style="position: absolute; top: 4.5cm; left: 8.5cm;">{{ $data['hbl']['hbl_number'] ?? '' }}</div>
+<div style="position: absolute; top: 4.5cm; left: 8.5cm;">@if(isset($data['payment']) && $data['payment']) {{ $data['payment']->invoice_number }} @endif</div>
 
 {{-- Name of Consignee --}}
 <div style="position: absolute; top: 7cm; left: 6.1cm;">{{$data['hbl']['consignee_name']}}</div>
 
 {{-- B/L No --}}
-<div style="position: absolute; top: 8.2cm; left: 6.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
+<div style="position: absolute; top: 8.2cm; left: 6.1cm;">{{ $data['hbl']['hbl_number'] ?? '' }}</div>
 
 {{-- Vessel --}}
 <div style="position: absolute; top: 9cm; left: 6.1cm;">{{ $data['vessel']['vessel_name'] ?? '' }}</div>
@@ -93,7 +93,7 @@
 
 <!-- Gate Pass Details -->
 {{--No.--}}
-<div style="position: absolute; top: 7.3cm; left: 17.6cm;">{{ $data['hbl']['hbl_number'] ?? '' }}</div>
+<div style="position: absolute; top: 7.3cm; left: 17.6cm;">@if(isset($data['payment']) && $data['payment']) {{ $data['payment']->invoice_number }} @endif</div>
 
 {{-- Destuff Date --}}
 <div style="position: absolute; top: 8.4cm; left: 15cm;">Destuff Date.</div>
@@ -102,7 +102,7 @@
 </div>
 
 {{--B/L No.--}}
-<div style="position: absolute; top: 9cm; left: 17.1cm;">{{ $data['vessel']['bl_number'] ?? ''}}</div>
+<div style="position: absolute; top: 9cm; left: 17.1cm;">{{ $data['hbl']['hbl_number'] ?? '' }}</div>
 
 {{--Description of goods--}}
 <div style="position: absolute; top: 9.6cm; left: 17.1cm;">{{ collect($data['hbl']['packages'])->pluck('package_type')->filter()->implode(', ') }}</div>
@@ -129,6 +129,6 @@
 <div style="position: absolute; top: 18.6cm; left: 14.1cm;">{{ \Carbon\Carbon::now('Asia/Colombo')->toTimeString() }}</div>
 
 {{--User ID--}}
-<div style="position: absolute; top: 26cm; left: 13.2cm;">{{ strtoupper($data['by']) }}</div>
+<div style="position: absolute; top: 26cm; left: 13.2cm;">User ID: {{ strtoupper($data['by']) }}</div>
 </body>
 </html>

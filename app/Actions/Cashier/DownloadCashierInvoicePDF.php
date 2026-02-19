@@ -8,6 +8,7 @@ use App\Actions\HBL\HBLCharges\CalculateTax;
 use App\Actions\SLInvoice\CreateSLInvoice;
 use App\Actions\Tax\GetTaxesByWarehouse;
 use App\Actions\User\GetUserById;
+use App\Models\CashierHBLPayment;
 use Lorisleiva\Actions\Concerns\AsAction;
 use NumberFormatter;
 use Wnx\SidecarBrowsershot\BrowsershotLambda;
@@ -77,6 +78,11 @@ class DownloadCashierInvoicePDF
                 ! empty($package['unloaded_at']);
         })->count();
 
+        // Get the latest cashier payment to show invoice number
+        $latestPayment = CashierHBLPayment::where('hbl_id', $hbl->id)
+            ->latest('created_at')
+            ->first();
+
         // Calculate unit rates for display
         $grandVolume = $sl_Invoice->grand_volume ?? 0;
         $packageCount = $hbl->packages->count();
@@ -117,6 +123,7 @@ class DownloadCashierInvoicePDF
             'bond_storage_numbers' => $hbl->packages->pluck('bond_storage_number')->filter()->values()->all(),
             'total_in_word' => $total_in_word,
             'by' => GetUserById::run($sl_Invoice->created_by)->name,
+            'payment' => $latestPayment,
             'taxes' => GetTaxesByWarehouse::run($hbl->warehouse_id)
                 ->map(function ($tax) {
                     return [
