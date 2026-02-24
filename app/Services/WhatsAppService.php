@@ -9,7 +9,7 @@ class WhatsAppService
 {
     protected string $apiUrl;
 
-    protected string $phoneNumberId;
+    protected ?string $phoneNumberId;
 
     protected string $accessToken;
 
@@ -17,9 +17,9 @@ class WhatsAppService
 
     protected string $baseUrl;
 
-    public function __construct()
+    public function __construct(?string $phoneNumberId = null)
     {
-        $this->phoneNumberId = config('services.whatsapp.phone_number_id');
+        $this->phoneNumberId = $phoneNumberId ?? config('services.whatsapp.phone_number_id');
         $this->accessToken = config('services.whatsapp.access_token');
         $this->apiVersion = config('services.whatsapp.api_version', 'v21.0');
         $this->baseUrl = "https://graph.facebook.com/{$this->apiVersion}";

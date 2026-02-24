@@ -8,13 +8,17 @@ use Illuminate\Support\Facades\Log;
 
 class WhatsAppChannel
 {
-    public function __construct(private WhatsAppService $whatAppService) {}
-
     public function send($notifiable, Notification $notification)
     {
         $message = $notification->toWhatsApp($notifiable);
+        
+        // Get branch-specific phone number ID if available
+        $phoneNumberId = $message['phone_number_id'] ?? null;
+        unset($message['phone_number_id']); // Remove from message payload
+        
         try {
-            $this->whatAppService->sendMessageByTemplate($message);
+            $whatsAppService = new WhatsAppService($phoneNumberId);
+            $whatsAppService->sendMessageByTemplate($message);
         } catch (\Exception $e) {
             Log::error('WhatsApp message exception', [
                 'message' => $e->getMessage(),

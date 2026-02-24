@@ -23,8 +23,8 @@ class SendPickupCollectedNotification
     {
         $hbl = $event->HBL;
 
-        // Only send WhatsApp notifications for Qatar branch
-        if ($hbl->isFromQatarBranch()) {
+        // Send WhatsApp notifications if branch has WhatsApp configured
+        if ($hbl->branch && $hbl->branch->whatsapp_phone_number_id && $hbl->whatsapp_number) {
             Notification::send($hbl->whatsapp_number, new CargoCollectedNotification($hbl));
         }
     }

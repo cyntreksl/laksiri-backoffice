@@ -29,6 +29,7 @@ class ConfirmPickupNotification extends Notification
 
     public function toWhatsapp(string $notifiable)
     {
+        $branch = $this->pickUp->branch;
         $template = new PickupConfirmationWhatsAppTemplate($this->pickUp->name, $this->pickUp->reference);
 
         return [
@@ -36,6 +37,7 @@ class ConfirmPickupNotification extends Notification
             'to' => $notifiable,
             'type' => 'template',
             'template' => $template->getTemplate(),
+            'phone_number_id' => $branch->whatsapp_phone_number_id,
         ];
     }
 }

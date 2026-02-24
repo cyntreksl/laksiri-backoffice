@@ -32,6 +32,7 @@ class CargoCollectedNotification extends Notification
 
     public function toWhatsapp(string $notifiable)
     {
+        $branch = $this->HBL->branch;
         $template = new CargoCollectedWhatsAppTemplate($this->HBL->hbl_name, $this->HBL->hbl_number);
 
         return [
@@ -39,6 +40,7 @@ class CargoCollectedNotification extends Notification
             'to' => $notifiable,
             'type' => 'template',
             'template' => $template->getTemplate(),
+            'phone_number_id' => $branch->whatsapp_phone_number_id,
         ];
     }
 }
