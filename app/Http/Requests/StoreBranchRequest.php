@@ -31,6 +31,7 @@ class StoreBranchRequest extends FormRequest
             'cargo_modes' => ['required'],
             'delivery_types' => ['required'],
             'package_types' => ['required'],
+            'whatsapp_phone_number_id' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

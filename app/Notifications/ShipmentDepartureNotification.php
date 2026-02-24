@@ -42,6 +42,7 @@ class ShipmentDepartureNotification extends Notification
             'to' => $notifiable,
             'type' => 'template',
             'template' => $template->getTemplate(),
+            'phone_number_id' => $branch->whatsapp_phone_number_id,
         ];
     }
 }
