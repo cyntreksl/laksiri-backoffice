@@ -75,6 +75,7 @@ const form = useForm({
     country_code: props.branch.country_code || '',
     country: props.branch.country || '',
     email: props.branch.email || '',
+    whatsapp_phone_number_id: props.branch.whatsapp_phone_number_id || '',
     container_delays: props.branch.container_delays,
     maximum_demurrage_discount: props.branch.maximum_demurrage_discount,
     cargo_modes: JSON.parse(props.branch.cargo_modes) || [],
@@ -289,6 +290,14 @@ const updateChecked = (notification, isChecked) => {
                                 <label for="email">Email</label>
                             </IftaLabel>
                             <InputError :message="form.errors.email"/>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-4">
+                            <IftaLabel>
+                                <InputText id="whatsapp-phone-number-id" v-model="form.whatsapp_phone_number_id" class="w-full" placeholder="Enter WhatsApp Phone Number ID" variant="filled" />
+                                <label for="whatsapp-phone-number-id">WhatsApp Phone Number ID</label>
+                            </IftaLabel>
+                            <InputError :message="form.errors.whatsapp_phone_number_id"/>
                         </div>
 
                         <div class="col-span-12 sm:col-span-3">

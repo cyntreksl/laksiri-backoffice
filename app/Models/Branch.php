@@ -33,6 +33,7 @@ class Branch extends Model
         'package_types',
         'do_charge',
         'email',
+        'whatsapp_phone_number_id',
         'container_delays',
         'maximum_demurrage_discount',
         'country',

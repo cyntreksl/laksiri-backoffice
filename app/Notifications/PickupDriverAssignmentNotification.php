@@ -33,6 +33,7 @@ class PickupDriverAssignmentNotification extends Notification
     public function toWhatsapp(string $notifiable)
     {
         $driver = $this->pickUp->driver;
+        $branch = $this->pickUp->branch;
         $template = new DriverAssignmentForCargoCollectWhatsAppTemplate($this->pickUp->name, $driver->name, $driver->contact);
 
         return [
@@ -40,6 +41,7 @@ class PickupDriverAssignmentNotification extends Notification
             'to' => $notifiable,
             'type' => 'template',
             'template' => $template->getTemplate(),
+            'phone_number_id' => $branch->whatsapp_phone_number_id,
         ];
     }
 }
