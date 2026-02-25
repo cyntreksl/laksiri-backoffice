@@ -133,4 +133,11 @@ class LoadedContainerController extends Controller
 
         return $this->loadedContainerRepository->tallySheetDownloadExcel($container);
     }
+
+    public function exportProofOfDelivery($container)
+    {
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+
+        return $this->loadedContainerRepository->downloadProofOfDelivery($container);
+    }
 }

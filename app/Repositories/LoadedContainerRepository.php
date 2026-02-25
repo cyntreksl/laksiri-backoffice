@@ -17,6 +17,7 @@ use App\Exports\LoadedContainerManifestExcelExport;
 use App\Exports\LoadedContainerManifestExport;
 use App\Exports\LoadedContainerTallySheetExcelExport;
 use App\Exports\LoadedContainerTallySheetExport;
+use App\Exports\ProofOfDeliveryExport;
 use App\Factory\Container\FilterFactory;
 use App\Http\Resources\ContainerResource;
 use App\Interfaces\GridJsInterface;
@@ -30,6 +31,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepositoryInterface
 {
@@ -315,5 +317,15 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         $export->setProcessedData($data, $giftCount, $upbCount, $d2dCount, $cargoType);
 
         return $export->download($filename);
+    }
+
+    public function downloadProofOfDelivery($container): BinaryFileResponse
+    {
+        $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container->id);
+        $filename = $container->reference.'_POD_'.date('Y_m_d_h_i_s').'.xlsx';
+
+        $export = new ProofOfDeliveryExport($container);
+
+        return Excel::download($export, $filename);
     }
 }

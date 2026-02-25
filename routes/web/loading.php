@@ -49,7 +49,25 @@ Route::name('loading.')->group(function () {
 
     Route::get('containers/list/export', [ContainerController::class, 'export']);
 
-    // Loaded Container
+    // Loaded Container - Specific routes must come before resource routes
+    Route::get('/loaded-containers/{container}/manifest/export', [LoadedContainerController::class, 'exportManifest'])
+        ->name('loaded-containers.manifest.export');
+
+    Route::get('/loaded-containers/{container}/manifest/excel', [LoadedContainerController::class, 'exportManifestExcel'])
+        ->name('loaded-containers.manifest.excel');
+
+    Route::get('/loaded-containers/{container}/doorToDoor/export', [LoadedContainerController::class, 'doorToDoorManifest'])
+        ->name('loaded-containers.doorToDoor.export');
+
+    Route::get('/loaded-containers/{container}/pod/export', [LoadedContainerController::class, 'exportProofOfDelivery'])
+        ->name('loaded-containers.pod.export');
+
+    Route::get('loaded-containers/download-loading/{container}', [LoadedContainerController::class, 'downloadLoadingPointDoc'])
+        ->name('loaded-containers.download-loading');
+
+    Route::get('loaded-containers/get-container/{id}', [LoadedContainerController::class, 'getLoadedContainer'])
+        ->name('loaded-containers.single-container');
+
     Route::resource('loaded-containers', LoadedContainerController::class)
         ->except(['create']);
 
@@ -60,21 +78,6 @@ Route::name('loading.')->group(function () {
         ->name('loaded-containers.add-mhbl');
 
     Route::get('loaded-container-list', [LoadedContainerController::class, 'list']);
-
-    Route::get('/loaded-containers/{container}/manifest/export', [LoadedContainerController::class, 'exportManifest'])
-        ->name('loaded-containers.manifest.export');
-
-    Route::get('/loaded-containers/{container}/manifest/excel', [LoadedContainerController::class, 'exportManifestExcel'])
-        ->name('loaded-containers.manifest.excel');
-
-    Route::get('/loaded-containers/{container}/doorToDoor/export', [LoadedContainerController::class, 'doorToDoorManifest'])
-        ->name('loaded-containers.doorToDoor.export');
-
-    Route::get('loaded-containers/download-loading/{container}', [LoadedContainerController::class, 'downloadLoadingPointDoc'])
-        ->name('loaded-containers.download-loading');
-
-    Route::get('loaded-containers/get-container/{id}', [LoadedContainerController::class, 'getLoadedContainer'])
-        ->name('loaded-containers.single-container');
 
     Route::put('containers/{container}/unload/hbl', [ContainerController::class, 'unloadHBLFromContainer'])
         ->name('containers.unload.hbl');

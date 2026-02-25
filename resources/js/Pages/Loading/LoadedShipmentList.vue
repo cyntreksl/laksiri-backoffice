@@ -87,20 +87,25 @@ const menuModel = ref([
     {
         label: 'Main Manifest',
         icon: 'pi pi-fw pi-download',
-        url: () => route("loading.loaded-containers.manifest.export", selectedContainer.value.id),
+        command: () => window.location.href = route("loading.loaded-containers.manifest.export", selectedContainer.value.id),
         disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
     },
     {
         label: 'Main Manifest Excel',
         icon: 'pi pi-fw pi-file-excel',
-        url: () => route("loading.loaded-containers.manifest.excel", selectedContainer.value.id),
+        command: () => window.location.href = route("loading.loaded-containers.manifest.excel", selectedContainer.value.id),
         disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
     },
     {
         label: 'Door to Door Manifest',
         icon: 'pi pi-fw pi-download',
-        url: () => route("loading.loaded-containers.doorToDoor.export", selectedContainer.value.id),
+        command: () => window.location.href = route("loading.loaded-containers.doorToDoor.export", selectedContainer.value.id),
         disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
+    },
+    {
+        label: 'Proof of Delivery (POD)',
+        icon: 'pi pi-fw pi-file-excel',
+        command: () => window.location.href = route("loading.loaded-containers.pod.export", selectedContainer.value.id),
     },
 ]);
 
@@ -398,8 +403,8 @@ const exportCSV = () => {
                         <Column field="container_type" header="Container Type" sortable>
                             <template #body="slotProps">
                                 <div class="flex space-x-2">
-                                    <i v-if="slotProps.data.latest_detain_record?.is_rtf" 
-                                       v-tooltip.left="`Detained: ${slotProps.data.latest_detain_record?.detain_type}`" 
+                                    <i v-if="slotProps.data.latest_detain_record?.is_rtf"
+                                       v-tooltip.left="`Detained: ${slotProps.data.latest_detain_record?.detain_type}`"
                                        class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
                                     <Tag :severity="resolveContainerType(slotProps.data)"
                                          :value="slotProps.data.container_type" class="text-sm"></Tag>
@@ -565,8 +570,8 @@ const exportCSV = () => {
                         <Column field="container_type" header="Container Type" sortable>
                             <template #body="slotProps">
                                 <div class="flex space-x-2">
-                                    <i v-if="slotProps.data.latest_detain_record?.is_rtf" 
-                                       v-tooltip.left="`Detained: ${slotProps.data.latest_detain_record?.detain_type}`" 
+                                    <i v-if="slotProps.data.latest_detain_record?.is_rtf"
+                                       v-tooltip.left="`Detained: ${slotProps.data.latest_detain_record?.detain_type}`"
                                        class="ti ti-lock-square-rounded-filled text-2xl text-red-500"></i>
                                     <Tag :severity="resolveContainerType(slotProps.data)"
                                          :value="slotProps.data.container_type" class="text-sm"></Tag>
