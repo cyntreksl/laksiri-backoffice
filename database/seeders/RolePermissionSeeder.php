@@ -572,6 +572,7 @@ class RolePermissionSeeder extends Seeder
                     'shipment.download manifest',
                     'doortodoor.download manifest',
                     'shipment.download tally sheet',
+                    'shipment.download proof of delivery',
                 ],
             ],
 
