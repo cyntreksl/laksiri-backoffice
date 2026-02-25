@@ -10,9 +10,12 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ProofOfDeliveryExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
+class ProofOfDeliveryExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle, WithEvents
 {
     private Container $container;
 
@@ -83,7 +86,7 @@ class ProofOfDeliveryExport implements FromCollection, WithHeadings, WithMapping
             $hbl->consignee_address,
             number_format($totalWeight, 2),
             number_format($totalVolume, 3),
-            $hbl->consignee_nic,
+            "\t" . $hbl->consignee_nic,
         ];
     }
 
@@ -97,5 +100,20 @@ class ProofOfDeliveryExport implements FromCollection, WithHeadings, WithMapping
     public function title(): string
     {
         return 'POD - '.$this->container->reference;
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $highestRow = $sheet->getHighestRow();
+                
+                // Format column I (Consignee PP or NIC) as text
+                $sheet->getStyle('I2:I' . $highestRow)
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_TEXT);
+            },
+        ];
     }
 }
