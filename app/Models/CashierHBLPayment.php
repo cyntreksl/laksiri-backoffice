@@ -13,13 +13,56 @@ class CashierHBLPayment extends Model
     protected $table = 'cashier_hbl_payments';
 
     protected $fillable = [
-        'verified_by', 'customer_queue_id', 'token_id', 'hbl_id', 'paid_amount', 'note', 'invoice_number', 'receipt_number', 'verified_at', 'additional_charges', 'discount',
+        'verified_by',
+        'customer_queue_id',
+        'token_id',
+        'hbl_id',
+        'paid_amount',
+        'note',
+        'invoice_number',
+        'receipt_number',
+        'verified_at',
+        'additional_charges',
+        'discount',
+
+        // Departure charge columns
+        'departure_freight_charge',
+        'departure_bill_charge',
+        'departure_package_charge',
+        'departure_discount',
+        'departure_additional_charges',
+        'departure_grand_total',
+        'departure_base_currency_code',
+        'departure_base_currency_rate_in_lkr',
+        'departure_is_branch_prepaid',
+
+        // Destination charge columns
+        'destination_handling_charge',
+        'destination_slpa_charge',
+        'destination_bond_charge',
+        'destination_1_total',
+        'destination_1_tax',
+        'destination_1_total_with_tax',
+        'destination_do_charge',
+        'destination_demurrage_charge',
+        'destination_stamp_charge',
+        'destination_other_charge',
+        'destination_2_total',
+        'destination_2_tax',
+        'destination_2_total_with_tax',
+        'destination_base_currency_code',
+        'destination_base_currency_rate_in_lkr',
+        'destination_is_branch_prepaid',
+        'destination_applicable_taxes',
+        'destination_stop_demurrage_at',
     ];
 
     protected $casts = [
         'verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'destination_applicable_taxes' => 'array',
+        'destination_stop_demurrage_at' => 'datetime',
     ];
 
     protected static function booted(): void
@@ -29,7 +72,7 @@ class CashierHBLPayment extends Model
             if (empty($payment->invoice_number)) {
                 $payment->invoice_number = self::generateInvoiceNumber();
             }
-            
+
             // Generate receipt number if not set
             if (empty($payment->receipt_number)) {
                 $payment->receipt_number = self::generateReceiptNumber();
@@ -44,12 +87,12 @@ class CashierHBLPayment extends Model
     {
         $year = date('Y');
         $prefix = "INV-{$year}-";
-        
+
         // Get the last invoice number for this year
         $lastInvoice = self::where('invoice_number', 'like', "{$prefix}%")
             ->orderBy('invoice_number', 'desc')
             ->first();
-        
+
         if ($lastInvoice) {
             // Extract sequence number from last invoice
             $lastSequence = (int) substr($lastInvoice->invoice_number, -5);
@@ -57,7 +100,7 @@ class CashierHBLPayment extends Model
         } else {
             $newSequence = 1;
         }
-        
+
         return $prefix . str_pad($newSequence, 5, '0', STR_PAD_LEFT);
     }
 
@@ -68,12 +111,12 @@ class CashierHBLPayment extends Model
     {
         $year = date('Y');
         $prefix = "RCP-{$year}-";
-        
+
         // Get the last receipt number for this year
         $lastReceipt = self::where('receipt_number', 'like', "{$prefix}%")
             ->orderBy('receipt_number', 'desc')
             ->first();
-        
+
         if ($lastReceipt) {
             // Extract sequence number from last receipt
             $lastSequence = (int) substr($lastReceipt->receipt_number, -5);
@@ -81,7 +124,7 @@ class CashierHBLPayment extends Model
         } else {
             $newSequence = 1;
         }
-        
+
         return $prefix . str_pad($newSequence, 5, '0', STR_PAD_LEFT);
     }
 
