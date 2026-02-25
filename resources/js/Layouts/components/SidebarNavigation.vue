@@ -25,9 +25,9 @@ const canSomeStartWith = (prefix) =>
     isSuperAdmin.value || page.props.user.permissions.some((permission) => permission.startsWith(prefix));
 const canSomeEndsWith = (suffix) =>
     isSuperAdmin.value || page.props.user.permissions.some((permission) => permission.endsWith(suffix));
-const isDep = () => isSuperAdmin.value || page.props.auth.user.primary_branch.type === 'Departure';
-const isDest = () => isSuperAdmin.value || page.props.auth.user.primary_branch.type === 'Destination';
 const currentBranchIs = (type) => isSuperAdmin.value || page.props.currentBranch.type === type;
+const isDep = () => currentBranchIs('Departure');
+const isDest = () => currentBranchIs('Destination');
 
 const current = route().current();
 const mainRoute = current.split(".")[0];
@@ -298,6 +298,95 @@ const setMenu = (menu) => {
                 );
             }
             childMenuList.splice(0, childMenuList.length, ...hblMenu);
+            changeSidePanelTitle("HBL");
+            break;
+        case "hbls-dest":
+            let hblDestMenu = [];
+
+            if (can("hbls.index") && notRole('call center') && notRole('finance team') && notRole('clearance team')) {
+                hblDestMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "All HBL",
+                        route: "hbls.index",
+                    }
+                );
+            }
+
+            if (can("hbls.index") && isRole('call center')) {
+                hblDestMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "All HBL",
+                        route: "call-center.hbls.index",
+                    }
+                );
+            } else if (can("hbls.index") && isRole('finance team')) {
+                hblDestMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "All HBL",
+                        route: "finance.hbls.index",
+                    }
+                );
+            } else if (can("hbls.index") && isRole('clearance team')) {
+                hblDestMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "All HBL",
+                        route: "finance.hbls.index",
+                    }
+                );
+            }
+
+            if (can("hbls.hbl finance approval list")) {
+                hblDestMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "Approve HBLs",
+                        route: "finance.hbls.approve-hbl",
+                    }
+                );
+            }
+
+            if (can("hbls.finance approved hbl list")) {
+                hblDestMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "Approved HBLs",
+                        route: "finance.hbls.approved-hbl",
+                    }
+                );
+            }
+
+            if (can("delivers.assign release to driver")) {
+                hblDestMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "Door to Door HBL",
+                        route: "call-center.hbls.door-to-door-list",
+                    }
+                );
+            }
+
+            if (can("delivers.show deliver order")) {
+                hblDestMenu.splice(
+                    2,
+                    0,
+                    {
+                        title: "Deliver Ordering",
+                        route: "delivery.ordering",
+                    }
+                );
+            }
+            childMenuList.splice(0, childMenuList.length, ...hblDestMenu);
             changeSidePanelTitle("HBL");
             break;
         case "back-office":
@@ -1138,10 +1227,23 @@ const menuModel = ref([
             can('delivers.show deliver order') ||
             can('hbls.show draft hbls') ||
             can('hbls.show cancelled hbls') ||
+            can('hbls.index')
+        ) && isDest(),
+        command: () => {
+            setMenu('hbls-dest');
+        }
+    },
+    {
+        label: 'HBL',
+        icon: 'ti ti-app-window text-2xl',
+        visible: () => (
+            can('delivers.show deliver order') ||
+            can('hbls.show draft hbls') ||
+            can('hbls.show cancelled hbls') ||
             can('mhbls.index') ||
             can('hbls.index') ||
             can('hbls.create')
-        ),
+        ) && isDep(),
         command: () => {
             setMenu('hbls');
         }
@@ -1216,7 +1318,7 @@ const menuModel = ref([
         visible: () => (
             canSomeStartWith('container') ||
             canSomeStartWith('shipment')
-        ),
+        ) && isDep(),
         command: () => {
             setMenu('loading');
         }
@@ -1239,6 +1341,22 @@ const menuModel = ref([
         ) && isDest(),
         command: () => {
             setMenu('courier');
+        }
+    },
+    {
+        label: 'Report',
+        icon: 'ti ti-report text-2xl',
+        visible: () => isDest(),
+        command: () => {
+            setMenu('report');
+        }
+    },
+    {
+        label: 'Delivery',
+        icon: 'ti ti-direction-sign text-2xl',
+        visible: () => isDest(),
+        command: () => {
+            setMenu('delivery');
         }
     },
     {
@@ -1269,7 +1387,7 @@ const menuModel = ref([
     {
         label: 'User Management',
         icon: 'ti ti-users text-2xl',
-        visible: () => canSomeStartWith('users') || can('roles.list'),
+        visible: () => (canSomeStartWith('users') || can('roles.list')) && isDep(),
         command: () => {
             setMenu('users');
         }
@@ -1328,7 +1446,7 @@ const menuModel = ref([
     {
         label: 'Settings',
         icon: 'ti ti-settings text-2xl',
-        visible: () => isSuperAdmin.value || (notRole('viewer') && notRole('customer')),
+        visible: () => (isSuperAdmin.value || (notRole('viewer') && notRole('customer'))) && isDep(),
         command: () => {
             setMenu('setting');
         }
