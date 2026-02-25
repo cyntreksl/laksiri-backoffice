@@ -24,6 +24,7 @@ class UpdateBranch
             'country' => $data['country'],
             'timezone' => $data['timezone'],
             'email' => $data['email'],
+            'whatsapp_phone_number_id' => $data['whatsapp_phone_number_id'] ?? null,
             'container_delays' => $data['container_delays'],
             'maximum_demurrage_discount' => $data['maximum_demurrage_discount'],
             'cargo_modes' => json_encode($data['cargo_modes']),
