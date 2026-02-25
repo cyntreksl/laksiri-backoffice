@@ -136,6 +136,8 @@ class LoadedContainerController extends Controller
 
     public function exportProofOfDelivery($container)
     {
+        $this->authorize('shipment.download proof of delivery');
+
         $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
 
         return $this->loadedContainerRepository->downloadProofOfDelivery($container);

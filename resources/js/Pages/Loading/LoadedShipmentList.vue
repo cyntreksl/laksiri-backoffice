@@ -106,6 +106,7 @@ const menuModel = ref([
         label: 'Proof of Delivery (POD)',
         icon: 'pi pi-fw pi-file-excel',
         command: () => window.location.href = route("loading.loaded-containers.pod.export", selectedContainer.value.id),
+        disabled: !usePage().props.user.permissions.includes('shipment.download proof of delivery'),
     },
 ]);
 
