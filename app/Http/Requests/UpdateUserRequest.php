@@ -26,10 +26,10 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => ['required', 'min:5', 'max:20'],
             'username' => ['required', 'min:5', 'max:20',
-                Rule::unique('users', 'username')->ignore($this->user->id),
+                Rule::unique('users', 'username')->ignore($this->user->id)->whereNull('deleted_at'),
             ],
             'email' => ['nullable', 'email', 'max:254',
-                Rule::unique('users', 'email')->ignore($this->user->id),
+                Rule::unique('users', 'email')->ignore($this->user->id)->whereNull('deleted_at'),
             ],
         ];
     }
