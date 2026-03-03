@@ -11,8 +11,8 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => ['required', 'min:5', 'max:20'],
-            'username' => ['required', 'unique:users,username', 'min:5', 'max:20'],
-            'email' => ['nullable', 'email', 'max:254', 'unique:users'],
+            'username' => ['required', 'unique:users,username,NULL,id,deleted_at,NULL', 'min:5', 'max:20'],
+            'email' => ['nullable', 'email', 'max:254', 'unique:users,email,NULL,id,deleted_at,NULL'],
             'password' => ['required', 'string', Password::default(), 'confirmed'],
             'primary_branch_id' => ['required', 'exists:branches,id'],
             'secondary_branches' => ['nullable'],
