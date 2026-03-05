@@ -29,6 +29,7 @@ class StampDutyReportExport implements
     protected $dateRange;
     protected $cargoType;
     protected $rowCount = 0;
+    protected $grandTotal = 0;
 
     public function __construct(array $filters = [])
     {
@@ -88,6 +89,7 @@ class StampDutyReportExport implements
     {
         $stampCharge = (float) ($row->destination_stamp_charge ?? 0);
         $this->rowCount++;
+        $this->grandTotal += $stampCharge;
 
         return [
             date('d/m/Y', strtotime($row->created_at)),
@@ -219,6 +221,32 @@ class StampDutyReportExport implements
                     $sheet->getStyle('C9:C' . $lastRow)->getNumberFormat()
                         ->setFormatCode('#,##0.00');
                     $sheet->getStyle('C9:C' . $lastRow)->getAlignment()
+                        ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+                    // Add grand total row
+                    $totalRow = $lastRow + 1;
+                    $sheet->setCellValue('A' . $totalRow, 'Total:');
+                    $sheet->mergeCells('A' . $totalRow . ':B' . $totalRow);
+                    $sheet->setCellValue('C' . $totalRow, $this->grandTotal);
+
+                    // Style grand total row
+                    $sheet->getStyle('A' . $totalRow . ':C' . $totalRow)->applyFromArray([
+                        'font' => ['bold' => true, 'size' => 12],
+                        'fill' => [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => 'F3F4F6'],
+                        ],
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                            ],
+                        ],
+                    ]);
+
+                    // Format total amount with 2 decimal places
+                    $sheet->getStyle('C' . $totalRow)->getNumberFormat()
+                        ->setFormatCode('#,##0.00');
+                    $sheet->getStyle('C' . $totalRow)->getAlignment()
                         ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                 }
             },
