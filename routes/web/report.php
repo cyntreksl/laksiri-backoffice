@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
+use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DetainReportController;
 use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
@@ -70,7 +71,7 @@ Route::name('report.')->group(function () {
         ->name('shipment-report.export')
         ->middleware('can:reports.shipment');
 
-    // Agent Wise Container Arrival Summary
+    // Container Arrival Summary
     Route::get('agent-wise-container-arrival-summary', [AgentWiseContainerArrivalSummaryController::class, 'index'])
         ->name('agent-wise-container-arrival-summary.index')
         ->middleware('can:reports.agent-wise-container-arrival');
@@ -82,4 +83,17 @@ Route::name('report.')->group(function () {
     Route::get('agent-wise-container-arrival-summary/export', [AgentWiseContainerArrivalSummaryController::class, 'export'])
         ->name('agent-wise-container-arrival-summary.export')
         ->middleware('can:reports.agent-wise-container-arrival');
+
+    // Daily Collection Report
+    Route::get('daily-collection', [DailyCollectionReportController::class, 'index'])
+        ->name('daily-collection.index')
+        ->middleware('can:reports.daily-collection');
+
+    Route::get('daily-collection/data', [DailyCollectionReportController::class, 'getData'])
+        ->name('daily-collection.data')
+        ->middleware('can:reports.daily-collection');
+
+    Route::get('daily-collection/export', [DailyCollectionReportController::class, 'export'])
+        ->name('daily-collection.export')
+        ->middleware('can:reports.daily-collection');
 });
