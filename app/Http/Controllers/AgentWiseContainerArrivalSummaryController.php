@@ -7,15 +7,19 @@ use App\Exports\AgentWiseContainerArrivalSummaryExport;
 use App\Models\Branch;
 use App\Models\Container;
 use App\Models\Scopes\BranchScope;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AgentWiseContainerArrivalSummaryController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
+        $this->authorize('reports.agent-wise-container-arrival');
+
         $branches = Branch::select('id', 'name')
             ->orderBy('name')
             ->get()
@@ -32,6 +36,8 @@ class AgentWiseContainerArrivalSummaryController extends Controller
 
     public function getData(Request $request)
     {
+        $this->authorize('reports.agent-wise-container-arrival');
+
         try {
             $query = Container::withoutGlobalScope(BranchScope::class)
                 ->whereIn('status', [
@@ -224,6 +230,8 @@ class AgentWiseContainerArrivalSummaryController extends Controller
 
     public function export(Request $request)
     {
+        $this->authorize('reports.agent-wise-container-arrival');
+
         $format = $request->get('format', 'xlsx');
         $dateFrom = $request->get('date_from');
         $dateTo = $request->get('date_to');

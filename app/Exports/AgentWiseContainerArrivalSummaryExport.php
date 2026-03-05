@@ -221,7 +221,15 @@ class AgentWiseContainerArrivalSummaryExport implements
         $dateTo = $this->filters['date_to'] ?? null;
 
         if ($dateFrom && $dateTo) {
-            return date('d/m/Y', strtotime($dateFrom)) . ' To ' . date('d/m/Y', strtotime($dateTo));
+            // Use Carbon to properly format the dates
+            try {
+                $from = \Carbon\Carbon::parse($dateFrom)->format('d/m/Y');
+                $to = \Carbon\Carbon::parse($dateTo)->format('d/m/Y');
+                return $from . ' To ' . $to;
+            } catch (\Exception $e) {
+                // Fallback if parsing fails
+                return $dateFrom . ' To ' . $dateTo;
+            }
         }
 
         return 'All Time';

@@ -133,7 +133,8 @@ const exportData = (format = 'xlsx') => {
         const value = filters[key];
         if (value !== null && value !== undefined && value !== '') {
             if (value instanceof Date) {
-                params[key] = value.toISOString().split('T')[0];
+                // Use moment to format date without timezone issues
+                params[key] = moment(value).format('YYYY-MM-DD');
             } else {
                 params[key] = value;
             }
