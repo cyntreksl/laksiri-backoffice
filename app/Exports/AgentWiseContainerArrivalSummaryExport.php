@@ -247,18 +247,22 @@ class AgentWiseContainerArrivalSummaryExport implements
     public function styles(Worksheet $sheet)
     {
         return [
+            // Row 1: Company name - no borders
             1 => [
                 'font' => ['bold' => true, 'size' => 14],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ],
+            // Row 2: Report title with date range - no borders
             2 => [
                 'font' => ['bold' => true, 'size' => 12],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ],
+            // Row 3: Print date/time and page number - no borders
             3 => [
                 'font' => ['size' => 10],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
             ],
+            // Row 5: Column headers - with borders
             5 => [
                 'font' => ['bold' => true],
                 'fill' => [
@@ -291,10 +295,24 @@ class AgentWiseContainerArrivalSummaryExport implements
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Merge title cells
+                // Set page setup for A4 size
+                $sheet->getPageSetup()
+                    ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4)
+                    ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+
+                // Merge title cells (header rows without borders)
                 $sheet->mergeCells('A1:K1');
                 $sheet->mergeCells('A2:K2');
                 $sheet->mergeCells('A3:K3');
+
+                // Remove borders from header rows (1-3)
+                $sheet->getStyle('A1:K3')->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => Border::BORDER_NONE,
+                        ],
+                    ],
+                ]);
 
                 // Set column widths
                 $sheet->getColumnDimension('A')->setWidth(30);
@@ -309,7 +327,7 @@ class AgentWiseContainerArrivalSummaryExport implements
                 $sheet->getColumnDimension('J')->setWidth(8);
                 $sheet->getColumnDimension('K')->setWidth(8);
 
-                // Apply borders to data rows
+                // Apply borders to data rows only (starting from row 5)
                 $lastRow = 5 + $this->rowCount;
                 $sheet->getStyle('A5:K' . $lastRow)->applyFromArray([
                     'borders' => [
