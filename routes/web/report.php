@@ -7,6 +7,7 @@ use App\Http\Controllers\FreightChargesReportController;
 use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
 use App\Http\Controllers\ShipmentReportController;
+use App\Http\Controllers\StampDutyReportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -107,4 +108,17 @@ Route::name('report.')->group(function () {
     Route::get('freight-charges/export', [FreightChargesReportController::class, 'export'])
         ->name('freight-charges.export')
         ->middleware('can:reports.freight-charges');
+
+    // Stamp Duty Report
+    Route::get('stamp-duty', [StampDutyReportController::class, 'index'])
+        ->name('stamp-duty.index')
+        ->middleware('can:reports.stamp-duty');
+
+    Route::get('stamp-duty/data', [StampDutyReportController::class, 'getData'])
+        ->name('stamp-duty.data')
+        ->middleware('can:reports.stamp-duty');
+
+    Route::get('stamp-duty/export', [StampDutyReportController::class, 'export'])
+        ->name('stamp-duty.export')
+        ->middleware('can:reports.stamp-duty');
 });
