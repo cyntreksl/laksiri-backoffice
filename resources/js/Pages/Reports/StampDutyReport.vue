@@ -41,8 +41,8 @@ const filters = reactive({
 
 const cargoTypes = [
     { label: 'All', value: null },
-    { label: 'Sea Cargo', value: 'sea' },
-    { label: 'Air Cargo', value: 'air' },
+    { label: 'Sea Cargo', value: 'Sea Cargo' },
+    { label: 'Air Cargo', value: 'Air Cargo' },
 ];
 
 const dt = ref();
