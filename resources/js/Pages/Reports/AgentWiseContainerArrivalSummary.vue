@@ -182,8 +182,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <AppLayout title="Agent Wise Container Arrival Summary">
-        <template #header>Agent Wise Container Arrival Summary</template>
+    <AppLayout title="Container Arrival Summary">
+        <template #header>Container Arrival Summary</template>
 
         <div class="agent-wise-report-page">
             <!-- Page Header -->
@@ -192,7 +192,7 @@ onMounted(() => {
                     <div class="header-left">
                         <i class="ti ti-building-warehouse text-4xl text-primary"></i>
                         <div>
-                            <h1 class="text-3xl font-bold text-gray-800">Agent Wise Container Arrival Summary</h1>
+                            <h1 class="text-3xl font-bold text-gray-800">Container Arrival Summary</h1>
                             <p class="text-gray-600 mt-1">{{ dateRangeText }}</p>
                         </div>
                     </div>
@@ -402,7 +402,7 @@ onMounted(() => {
                             <Row>
                                 <Column :rowspan="2" header="Agent Name" sortField="agent_name" sortable style="min-width: 200px" />
                                 <Column :rowspan="2" header="CBM" sortField="total_cbm" sortable style="min-width: 120px" />
-                                <Column :colspan="5" header="No. Of Package" headerStyle="text-align: center" />
+                                <Column :colspan="4" header="No. Of Package" headerStyle="text-align: center" />
                                 <Column :rowspan="2" header="No. Of Consig." sortField="total_consignees" sortable style="min-width: 120px" />
                                 <Column :colspan="3" header="Containers" headerStyle="text-align: center" />
                             </Row>
@@ -411,7 +411,6 @@ onMounted(() => {
                                 <Column header="Steel Trunk" sortField="steel_trunk" sortable style="min-width: 120px" />
                                 <Column header="Other" sortField="other_packages" sortable style="min-width: 100px" />
                                 <Column header="Total" sortField="total_packages" sortable style="min-width: 100px" />
-                                <Column header="No. Of Consig." sortField="packages_consignees" sortable style="min-width: 120px" />
                                 <Column header="40ft" sortField="containers_40ft" sortable style="min-width: 80px" />
                                 <Column header="20ft" sortField="containers_20ft" sortable style="min-width: 80px" />
                                 <Column header="45ft" sortField="containers_45ft" sortable style="min-width: 80px" />
@@ -463,12 +462,6 @@ onMounted(() => {
                             </template>
                         </Column>
 
-                        <Column field="packages_consignees" style="min-width: 120px">
-                            <template #body="{ data }">
-                                <span class="font-mono">{{ formatInteger(data.packages_consignees) }}</span>
-                            </template>
-                        </Column>
-
                         <Column field="total_consignees" style="min-width: 120px">
                             <template #body="{ data }">
                                 <span class="font-mono font-semibold text-purple-600">{{ formatInteger(data.total_consignees) }}</span>
@@ -495,12 +488,11 @@ onMounted(() => {
 
                         <ColumnGroup type="footer">
                             <Row>
-                                <Column footer="Grand Total:" footerStyle="text-align: right; font-weight: bold" />
+                                <Column footerStyle="text-align: right; font-weight: bold" />
                                 <Column :footer="formatNumber(stats.grand_total_cbm)" footerStyle="text-align: left; font-weight: bold" />
                                 <Column :footer="formatInteger(stats.total_wooden_boxes)" footerStyle="text-align: left; font-weight: bold" />
                                 <Column :footer="formatInteger(stats.total_steel_trunk)" footerStyle="text-align: left; font-weight: bold" />
                                 <Column :footer="formatInteger(stats.total_other_packages)" footerStyle="text-align: left; font-weight: bold" />
-                                <Column :footer="formatInteger(stats.total_packages)" footerStyle="text-align: left; font-weight: bold; color: #2563eb" />
                                 <Column :footer="formatInteger(stats.total_packages_consignees)" footerStyle="text-align: left; font-weight: bold" />
                                 <Column :footer="formatInteger(stats.total_consignees)" footerStyle="text-align: left; font-weight: bold; color: #9333ea" />
                                 <Column :footer="formatInteger(stats.total_containers_40ft)" footerStyle="text-align: left; font-weight: bold" />

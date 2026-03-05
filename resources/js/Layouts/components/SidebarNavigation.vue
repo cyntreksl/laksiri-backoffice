@@ -951,7 +951,7 @@ const setMenu = (menu) => {
                     permission: "reports.shipment",
                 },
                 {
-                    title: "Agent Wise Container Arrival Summary",
+                    title: "Container Arrival Summary",
                     route: "report.agent-wise-container-arrival-summary.index",
                     permission: "reports.agent-wise-container-arrival",
                 }

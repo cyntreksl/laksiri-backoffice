@@ -35,11 +35,18 @@ class AgentWiseContainerArrivalSummaryController extends Controller
         try {
             $query = Container::withoutGlobalScope(BranchScope::class)
                 ->whereIn('status', [
-                ContainerStatus::IN_TRANSIT->value,
-                ContainerStatus::REACHED_DESTINATION->value,
-                ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
-                    ])
-                ->with(['branch:id,name', 'hbl_packages.hbl'])
+                    ContainerStatus::IN_TRANSIT->value,
+                    ContainerStatus::REACHED_DESTINATION->value,
+                    ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
+                ])
+                ->with([
+                    'branch:id,name',
+                    'hbl_packages' => function ($query) {
+                        $query->with(['hbl' => function ($q) {
+                                $q->select('id', 'hbl_number', 'consignee_name');
+                            }]);
+                    }
+                ])
                 ->whereNotNull('unloading_started_at');
 
             // Apply date filters (based on unloading/arrival date)
@@ -58,6 +65,34 @@ class AgentWiseContainerArrivalSummaryController extends Controller
 
             // Get all containers
             $containers = $query->get();
+
+            // Manually load packages for each container
+            foreach ($containers as $container) {
+                $packageIds = \DB::table('container_hbl_package')
+                    ->where('container_id', $container->id)
+                    ->where('status', 'loaded')
+                    ->pluck('hbl_package_id');
+
+                if ($packageIds->isNotEmpty()) {
+                    $container->loaded_packages = \DB::table('hbl_packages')
+                        ->whereIn('id', $packageIds)
+                        ->get();
+
+                    // Get HBL info for each package
+                    $hblIds = $container->loaded_packages->pluck('hbl_id')->unique();
+                    $hbls = \DB::table('hbl')
+                        ->whereIn('id', $hblIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    // Attach HBL to each package
+                    foreach ($container->loaded_packages as $package) {
+                        $package->hbl = $hbls->get($package->hbl_id);
+                    }
+                } else {
+                    $container->loaded_packages = collect();
+                }
+            }
 
             // Group by agent/branch
             $agentData = [];
@@ -83,17 +118,16 @@ class AgentWiseContainerArrivalSummaryController extends Controller
                 }
 
                 // Count container types
-                if ($container->container_type === '40FT High Cube') {
+                if (str_contains($container->container_type, '40')) {
                     $agentData[$agentName]['containers_40ft']++;
-                } elseif ($container->container_type === '20FT General') {
+                } elseif (str_contains($container->container_type, '20')) {
                     $agentData[$agentName]['containers_20ft']++;
-                } elseif ($container->container_type === '45FT High Cube') {
+                } elseif (str_contains($container->container_type, '45')) {
                     $agentData[$agentName]['containers_45ft']++;
                 }
 
-                // Process HBL packages
-                foreach ($container->hbl_packages as $package) {
-
+                // Process HBL packages - filter by loaded status here
+                foreach ($container->loaded_packages as $package) {
                     $agentData[$agentName]['total_cbm'] += (float) ($package->volume ?? 0);
                     $agentData[$agentName]['total_packages']++;
 

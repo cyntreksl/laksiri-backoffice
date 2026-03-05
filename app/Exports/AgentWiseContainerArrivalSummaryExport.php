@@ -38,7 +38,16 @@ class AgentWiseContainerArrivalSummaryExport implements
     public function collection()
     {
         $query = Container::withoutGlobalScope(BranchScope::class)
-            ->with(['branch', 'hbl_packages.hbl'])
+            ->with([
+                'branch',
+                'hbl_packages' => function ($query) {
+                    // Include soft deleted packages
+                    $query->withTrashed()
+                        ->with(['hbl' => function ($q) {
+                            $q->withTrashed()->select('id', 'hbl_number', 'consignee_name');
+                        }]);
+                }
+            ])
             ->whereNotNull('unloading_started_at');
 
         // Apply date filters
@@ -56,6 +65,34 @@ class AgentWiseContainerArrivalSummaryExport implements
         }
 
         $containers = $query->get();
+
+        // Manually load packages for each container to bypass soft delete issues
+        foreach ($containers as $container) {
+            $packageIds = \DB::table('container_hbl_package')
+                ->where('container_id', $container->id)
+                ->where('status', 'loaded')
+                ->pluck('hbl_package_id');
+            
+            if ($packageIds->isNotEmpty()) {
+                $container->loaded_packages = \DB::table('hbl_packages')
+                    ->whereIn('id', $packageIds)
+                    ->get();
+                
+                // Get HBL info for each package
+                $hblIds = $container->loaded_packages->pluck('hbl_id')->unique();
+                $hbls = \DB::table('hbl')
+                    ->whereIn('id', $hblIds)
+                    ->get()
+                    ->keyBy('id');
+                
+                // Attach HBL to each package
+                foreach ($container->loaded_packages as $package) {
+                    $package->hbl = $hbls->get($package->hbl_id);
+                }
+            } else {
+                $container->loaded_packages = collect();
+            }
+        }
 
         // Group by agent/branch
         $agentData = [];
@@ -81,17 +118,17 @@ class AgentWiseContainerArrivalSummaryExport implements
             }
 
             // Count container types
-            if ($container->container_type === '40ft') {
+            if (str_contains($container->container_type, '40')) {
                 $agentData[$agentName]['containers_40ft']++;
-            } elseif ($container->container_type === '20ft') {
+            } elseif (str_contains($container->container_type, '20')) {
                 $agentData[$agentName]['containers_20ft']++;
-            } elseif ($container->container_type === '45ft') {
+            } elseif (str_contains($container->container_type, '45')) {
                 $agentData[$agentName]['containers_45ft']++;
             }
 
             // Process HBL packages
-            foreach ($container->hbl_packages as $package) {
-                $agentData[$agentName]['total_cbm'] += (float) ($package->cbm ?? 0);
+            foreach ($container->loaded_packages as $package) {
+                $agentData[$agentName]['total_cbm'] += (float) ($package->volume ?? 0);
                 $agentData[$agentName]['total_packages']++;
 
                 $packageType = strtolower($package->package_type ?? '');
