@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
 use App\Http\Controllers\DailyCollectionReportController;
+use App\Http\Controllers\DetailInvoiceAnalysisController;
 use App\Http\Controllers\DetainReportController;
 use App\Http\Controllers\FreightChargesReportController;
 use App\Http\Controllers\HBLReportController;
@@ -121,4 +122,17 @@ Route::name('report.')->group(function () {
     Route::get('stamp-duty/export', [StampDutyReportController::class, 'export'])
         ->name('stamp-duty.export')
         ->middleware('can:reports.stamp-duty');
+
+    // Detail Invoice Analysis Report
+    Route::get('detail-invoice-analysis', [DetailInvoiceAnalysisController::class, 'index'])
+        ->name('detail-invoice-analysis.index')
+        ->middleware('can:reports.detail-invoice-analysis');
+
+    Route::get('detail-invoice-analysis/data', [DetailInvoiceAnalysisController::class, 'getData'])
+        ->name('detail-invoice-analysis.data')
+        ->middleware('can:reports.detail-invoice-analysis');
+
+    Route::get('detail-invoice-analysis/export', [DetailInvoiceAnalysisController::class, 'export'])
+        ->name('detail-invoice-analysis.export')
+        ->middleware('can:reports.detail-invoice-analysis');
 });
