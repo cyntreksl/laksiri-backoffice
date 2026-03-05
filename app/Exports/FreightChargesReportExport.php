@@ -3,7 +3,8 @@
 namespace App\Exports;
 
 use App\Models\HBL;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -11,14 +12,13 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class FreightChargesReportExport implements
-    FromCollection,
+    FromQuery,
     WithHeadings,
     WithMapping,
     WithStyles,
@@ -27,9 +27,10 @@ class FreightChargesReportExport implements
     WithEvents
 {
     protected $filters;
-    protected $stats;
-    protected $rowCount = 0;
     protected $dateRange;
+    protected $invoiceNumbers = [];
+    protected $grandTotal = 0;
+    protected $rowCount = 0;
 
     public function __construct(array $filters = [])
     {
@@ -43,33 +44,50 @@ class FreightChargesReportExport implements
         } else {
             $this->dateRange = "All Records";
         }
+
+        // Pre-load invoice numbers
+        $this->loadInvoiceNumbers();
     }
 
-    public function collection()
+    protected function loadInvoiceNumbers()
+    {
+        $query = DB::table('cashier_hbl_payments')
+            ->select('hbl_id', 'invoice_number')
+            ->whereNotNull('invoice_number');
+
+        $this->invoiceNumbers = $query->pluck('invoice_number', 'hbl_id')->toArray();
+    }
+
+    public function query()
     {
         $query = HBL::query()
-            ->with([
-                'departureCharge',
-                'branch',
-                'consignee',
+            ->withoutGlobalScopes()
+            ->select([
+                'hbl.id',
+                'hbl.hbl_number',
+                'hbl.created_at',
+                'hbl.branch_id',
+                'hbl.consignee_id',
             ])
-            ->whereHas('departureCharge')
-            ->orderBy('created_at', 'asc');
+            ->join('hbl_departure_charges', 'hbl.id', '=', 'hbl_departure_charges.hbl_id')
+            ->addSelect('hbl_departure_charges.freight_charge')
+            ->with(['branch:id,name', 'consignee:id,name'])
+            ->orderBy('hbl.created_at', 'asc');
 
         // Apply date range filters
         if (!empty($this->filters['date_from'])) {
-            $query->whereDate('created_at', '>=', $this->filters['date_from']);
+            $query->whereDate('hbl.created_at', '>=', $this->filters['date_from']);
         }
 
         if (!empty($this->filters['date_to'])) {
-            $query->whereDate('created_at', '<=', $this->filters['date_to']);
+            $query->whereDate('hbl.created_at', '<=', $this->filters['date_to']);
         }
 
         // Apply search filter
         if (!empty($this->filters['search'])) {
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
-                $q->where('hbl_no', 'like', "%{$search}%")
+                $q->where('hbl.hbl_number', 'like', "%{$search}%")
                     ->orWhereHas('consignee', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");
                     })
@@ -79,50 +97,22 @@ class FreightChargesReportExport implements
             });
         }
 
-        $hbls = $query->get();
-
-        // Get invoice numbers for all HBLs
-        $hblIds = $hbls->pluck('id')->toArray();
-        $invoiceNumbers = \DB::table('cashier_hbl_payments')
-            ->whereIn('hbl_id', $hblIds)
-            ->whereNotNull('invoice_number')
-            ->pluck('invoice_number', 'hbl_id')
-            ->toArray();
-
-        // Transform data
-        $records = $hbls->map(function ($hbl) use ($invoiceNumbers) {
-            $departureCharge = $hbl->departureCharge;
-            $freightCharge = $departureCharge ? (float) ($departureCharge->freight_charge ?? 0) : 0;
-
-            return [
-                'date' => $hbl->created_at->format('d/m/Y'),
-                'hbl_no' => $hbl->hbl_number,
-                'agent_name' => $hbl->branch ? $hbl->branch->name : 'N/A',
-                'invoice_no' => $invoiceNumbers[$hbl->id] ?? '',
-                'consignee_name' => $hbl->consignee ? $hbl->consignee->name : 'N/A',
-                'amount' => $freightCharge,
-            ];
-        });
-
-        // Calculate statistics
-        $this->stats = [
-            'grand_total' => $records->sum('amount'),
-        ];
-
-        $this->rowCount = $records->count();
-
-        return $records;
+        return $query;
     }
 
-    public function map($row): array
+    public function map($hbl): array
     {
+        $freightCharge = (float) ($hbl->freight_charge ?? 0);
+        $this->grandTotal += $freightCharge;
+        $this->rowCount++;
+
         return [
-            $row['date'],
-            $row['hbl_no'],
-            $row['agent_name'],
-            $row['invoice_no'],
-            $row['consignee_name'],
-            number_format($row['amount'], 2),
+            $hbl->created_at->format('d/m/Y'),
+            $hbl->hbl_number,
+            $hbl->branch ? $hbl->branch->name : 'N/A',
+            $this->invoiceNumbers[$hbl->id] ?? '',
+            $hbl->consignee ? $hbl->consignee->name : 'N/A',
+            number_format($freightCharge, 2),
         ];
     }
 
@@ -197,8 +187,8 @@ class FreightChargesReportExport implements
 
                 // Set page setup for A4 size with page numbers
                 $sheet->getPageSetup()
-                    ->setPaperSize(PageSetup::PAPERSIZE_A4)
-                    ->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
+                    ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4)
+                    ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
 
                 // Set header and footer for page numbers
                 $sheet->getHeaderFooter()
@@ -245,7 +235,7 @@ class FreightChargesReportExport implements
                 $totalRow = $lastRow + 1;
                 $sheet->setCellValue('A' . $totalRow, 'GRAND TOTAL');
                 $sheet->mergeCells('A' . $totalRow . ':E' . $totalRow);
-                $sheet->setCellValue('F' . $totalRow, number_format($this->stats['grand_total'], 2));
+                $sheet->setCellValue('F' . $totalRow, number_format($this->grandTotal, 2));
 
                 // Style grand total row
                 $sheet->getStyle('A' . $totalRow . ':F' . $totalRow)->applyFromArray([
