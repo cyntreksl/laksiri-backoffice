@@ -959,6 +959,11 @@ const setMenu = (menu) => {
                     title: "Daily Collection Report",
                     route: "report.daily-collection.index",
                     permission: "reports.daily-collection",
+                },
+                {
+                    title: "Freight Charges Report",
+                    route: "report.freight-charges.index",
+                    permission: "reports.freight-charges",
                 }
             );
             changeSidePanelTitle("Report");
