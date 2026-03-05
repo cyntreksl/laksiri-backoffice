@@ -769,6 +769,7 @@ class RolePermissionSeeder extends Seeder
                     'reports.shipment',
                     'reports.agent-wise-container-arrival',
                     'reports.daily-collection',
+                    'reports.freight-charges',
                 ],
             ],
         ];
