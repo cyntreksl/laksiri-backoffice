@@ -964,6 +964,11 @@ const setMenu = (menu) => {
                     title: "Freight Charges Report",
                     route: "report.freight-charges.index",
                     permission: "reports.freight-charges",
+                },
+                {
+                    title: "Stamp Duty Report",
+                    route: "report.stamp-duty.index",
+                    permission: "reports.stamp-duty",
                 }
             );
             changeSidePanelTitle("Report");
