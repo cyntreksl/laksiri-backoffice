@@ -34,10 +34,10 @@ class FreightChargesReportExport implements
     public function __construct(array $filters = [])
     {
         $this->filters = $filters;
-        
+
         $dateFrom = !empty($filters['date_from']) ? date('d/m/Y', strtotime($filters['date_from'])) : '';
         $dateTo = !empty($filters['date_to']) ? date('d/m/Y', strtotime($filters['date_to'])) : '';
-        
+
         if ($dateFrom && $dateTo) {
             $this->dateRange = "From {$dateFrom} TO {$dateTo}";
         } else {
@@ -122,7 +122,7 @@ class FreightChargesReportExport implements
         return [
             ['Laksiri International Freight Forwarders (Pvt) Ltd'],
             ['Freight Charges ' . $this->dateRange],
-            ['Printed: ' . now()->format('d/m/Y h:i:s A')],
+            [now()->format('d/m/Y h:i:s A')],
             [],
             [
                 'Date',
