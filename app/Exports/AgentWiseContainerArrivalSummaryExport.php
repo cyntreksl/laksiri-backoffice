@@ -197,7 +197,7 @@ class AgentWiseContainerArrivalSummaryExport implements
         return [
             ['Laksiri International Freight Forwarders (Pvt) Ltd'],
             ['Agent Wise Container Arrival Summary  ' . $this->getDateRange()],
-            [now()->format('m/d/Y') . '  ' . now()->format('h:i:sA') . '  PAGE - 1'],
+            [now()->format('m/d/Y') . '  ' . now()->format('h:i:sA'), '', '', '', '', '', '', '', '', 'PAGE - 1'],
             [],
             [
                 'Agent Name',
@@ -206,7 +206,6 @@ class AgentWiseContainerArrivalSummaryExport implements
                 'Steel Trunk',
                 'Other',
                 'Total',
-                'No. Of Consig.',
                 'No. Of Consig.',
                 '40ft',
                 '20ft',
@@ -236,7 +235,6 @@ class AgentWiseContainerArrivalSummaryExport implements
             $row['steel_trunk'],
             $row['other_packages'],
             $row['total_packages'],
-            $row['packages_consignees'],
             $row['total_consignees'],
             $row['containers_40ft'],
             $row['containers_20ft'],
@@ -257,10 +255,9 @@ class AgentWiseContainerArrivalSummaryExport implements
                 'font' => ['bold' => true, 'size' => 12],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ],
-            // Row 3: Print date/time and page number - no borders
+            // Row 3: Date/time (left) and page number (right) - no borders
             3 => [
                 'font' => ['size' => 10],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
             ],
             // Row 5: Column headers - with borders
             5 => [
@@ -301,18 +298,27 @@ class AgentWiseContainerArrivalSummaryExport implements
                     ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
 
                 // Merge title cells (header rows without borders)
-                $sheet->mergeCells('A1:K1');
-                $sheet->mergeCells('A2:K2');
-                $sheet->mergeCells('A3:K3');
+                $sheet->mergeCells('A1:J1');
+                $sheet->mergeCells('A2:J2');
+                // Don't merge row 3 - we want separate alignment for date/time and page number
 
-                // Remove borders from header rows (1-3)
-                $sheet->getStyle('A1:K3')->applyFromArray([
-                    'borders' => [
-                        'allBorders' => [
-                            'borderStyle' => Border::BORDER_NONE,
-                        ],
-                    ],
-                ]);
+                // Set alignment for row 3
+                $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $sheet->getStyle('J3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+                // Explicitly remove ALL borders from header rows (1-3) - all cells
+                for ($row = 1; $row <= 3; $row++) {
+                    for ($col = 'A'; $col <= 'J'; $col++) {
+                        $sheet->getStyle($col . $row)->applyFromArray([
+                            'borders' => [
+                                'top' => ['borderStyle' => Border::BORDER_NONE],
+                                'bottom' => ['borderStyle' => Border::BORDER_NONE],
+                                'left' => ['borderStyle' => Border::BORDER_NONE],
+                                'right' => ['borderStyle' => Border::BORDER_NONE],
+                            ],
+                        ]);
+                    }
+                }
 
                 // Set column widths
                 $sheet->getColumnDimension('A')->setWidth(30);
@@ -322,14 +328,13 @@ class AgentWiseContainerArrivalSummaryExport implements
                 $sheet->getColumnDimension('E')->setWidth(10);
                 $sheet->getColumnDimension('F')->setWidth(10);
                 $sheet->getColumnDimension('G')->setWidth(15);
-                $sheet->getColumnDimension('H')->setWidth(15);
+                $sheet->getColumnDimension('H')->setWidth(8);
                 $sheet->getColumnDimension('I')->setWidth(8);
                 $sheet->getColumnDimension('J')->setWidth(8);
-                $sheet->getColumnDimension('K')->setWidth(8);
 
                 // Apply borders to data rows only (starting from row 5)
                 $lastRow = 5 + $this->rowCount;
-                $sheet->getStyle('A5:K' . $lastRow)->applyFromArray([
+                $sheet->getStyle('A5:J' . $lastRow)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
@@ -339,20 +344,19 @@ class AgentWiseContainerArrivalSummaryExport implements
 
                 // Add grand total row
                 $totalRow = $lastRow + 1;
-                $sheet->setCellValue('A' . $totalRow, 'Grand Total:');
+                $sheet->setCellValue('A' . $totalRow, '');
                 $sheet->setCellValue('B' . $totalRow, number_format($this->stats['total_cbm'], 2));
                 $sheet->setCellValue('C' . $totalRow, $this->stats['wooden_boxes']);
                 $sheet->setCellValue('D' . $totalRow, $this->stats['steel_trunk']);
                 $sheet->setCellValue('E' . $totalRow, $this->stats['other_packages']);
                 $sheet->setCellValue('F' . $totalRow, $this->stats['total_packages']);
-                $sheet->setCellValue('G' . $totalRow, $this->stats['packages_consignees']);
-                $sheet->setCellValue('H' . $totalRow, $this->stats['total_consignees']);
-                $sheet->setCellValue('I' . $totalRow, $this->stats['containers_40ft']);
-                $sheet->setCellValue('J' . $totalRow, $this->stats['containers_20ft']);
-                $sheet->setCellValue('K' . $totalRow, $this->stats['containers_45ft']);
+                $sheet->setCellValue('G' . $totalRow, $this->stats['total_consignees']);
+                $sheet->setCellValue('H' . $totalRow, $this->stats['containers_40ft']);
+                $sheet->setCellValue('I' . $totalRow, $this->stats['containers_20ft']);
+                $sheet->setCellValue('J' . $totalRow, $this->stats['containers_45ft']);
 
                 // Style grand total row
-                $sheet->getStyle('A' . $totalRow . ':K' . $totalRow)->applyFromArray([
+                $sheet->getStyle('A' . $totalRow . ':J' . $totalRow)->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => Fill::FILL_SOLID,
@@ -366,7 +370,7 @@ class AgentWiseContainerArrivalSummaryExport implements
                 ]);
 
                 // Center align numeric columns
-                $sheet->getStyle('B6:K' . $totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('B6:J' . $totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             },
         ];
     }
