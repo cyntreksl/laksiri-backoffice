@@ -954,6 +954,11 @@ const setMenu = (menu) => {
                     title: "Container Arrival Summary",
                     route: "report.agent-wise-container-arrival-summary.index",
                     permission: "reports.agent-wise-container-arrival",
+                },
+                {
+                    title: "Daily Collection Report",
+                    route: "report.daily-collection.index",
+                    permission: "reports.daily-collection",
                 }
             );
             changeSidePanelTitle("Report");

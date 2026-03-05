@@ -768,6 +768,7 @@ class RolePermissionSeeder extends Seeder
                     'reports.hbl-package',
                     'reports.shipment',
                     'reports.agent-wise-container-arrival',
+                    'reports.daily-collection',
                 ],
             ],
         ];
