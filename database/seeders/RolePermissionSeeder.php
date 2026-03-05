@@ -771,6 +771,7 @@ class RolePermissionSeeder extends Seeder
                     'reports.daily-collection',
                     'reports.freight-charges',
                     'reports.stamp-duty',
+                    'reports.detail-invoice-analysis',
                 ],
             ],
         ];

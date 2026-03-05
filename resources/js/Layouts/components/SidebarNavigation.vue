@@ -969,6 +969,11 @@ const setMenu = (menu) => {
                     title: "Stamp Duty Report",
                     route: "report.stamp-duty.index",
                     permission: "reports.stamp-duty",
+                },
+                {
+                    title: "Detail Invoice Analysis",
+                    route: "report.detail-invoice-analysis.index",
+                    permission: "reports.detail-invoice-analysis",
                 }
             );
             changeSidePanelTitle("Report");
