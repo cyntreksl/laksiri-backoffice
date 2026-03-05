@@ -34,7 +34,7 @@ const lazyParams = reactive({
 });
 
 const filters = reactive({
-    date: new Date(),
+    date: null,
     date_from: null,
     date_to: null,
     search: '',
@@ -104,7 +104,7 @@ const applyFilters = () => {
 };
 
 const resetFilters = () => {
-    filters.date = new Date();
+    filters.date = null;
     filters.date_from = null;
     filters.date_to = null;
     filters.search = '';
@@ -151,11 +151,18 @@ const reportDate = computed(() => {
     if (filters.date) {
         return moment(filters.date).format('DD/MM/YYYY');
     }
-    return moment().format('DD/MM/YYYY');
+    if (filters.date_from && filters.date_to) {
+        return moment(filters.date_from).format('DD/MM/YYYY') + ' - ' + moment(filters.date_to).format('DD/MM/YYYY');
+    }
+    return 'All Records';
 });
 
 const exportCSVFilename = computed(() => {
     const timestamp = moment().format('YYYY_MM_DD_HH_mm_ss');
+    if (filters.date) {
+        const dateStr = moment(filters.date).format('YYYY_MM_DD');
+        return `daily-collection-report-${dateStr}-${timestamp}`;
+    }
     return `daily-collection-report-${timestamp}`;
 });
 
