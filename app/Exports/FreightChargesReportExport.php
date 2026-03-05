@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\HBL;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -35,43 +34,49 @@ class FreightChargesReportExport implements
     public function __construct(array $filters = [])
     {
         $this->filters = $filters;
-
+        
         $dateFrom = !empty($filters['date_from']) ? date('d/m/Y', strtotime($filters['date_from'])) : '';
         $dateTo = !empty($filters['date_to']) ? date('d/m/Y', strtotime($filters['date_to'])) : '';
-
+        
         if ($dateFrom && $dateTo) {
             $this->dateRange = "From {$dateFrom} TO {$dateTo}";
         } else {
             $this->dateRange = "All Records";
         }
 
-        // Pre-load invoice numbers
+        // Pre-load invoice numbers in chunks to avoid memory issues
         $this->loadInvoiceNumbers();
     }
 
     protected function loadInvoiceNumbers()
     {
-        $query = DB::table('cashier_hbl_payments')
+        // Load invoice numbers in chunks
+        DB::table('cashier_hbl_payments')
             ->select('hbl_id', 'invoice_number')
-            ->whereNotNull('invoice_number');
-
-        $this->invoiceNumbers = $query->pluck('invoice_number', 'hbl_id')->toArray();
+            ->whereNotNull('invoice_number')
+            ->orderBy('hbl_id')
+            ->chunk(1000, function ($payments) {
+                foreach ($payments as $payment) {
+                    $this->invoiceNumbers[$payment->hbl_id] = $payment->invoice_number;
+                }
+            });
     }
 
     public function query()
     {
-        $query = HBL::query()
-            ->withoutGlobalScopes()
+        $query = DB::table('hbl')
             ->select([
                 'hbl.id',
                 'hbl.hbl_number',
                 'hbl.created_at',
-                'hbl.branch_id',
-                'hbl.consignee_id',
+                'hbl_departure_charges.freight_charge',
+                'branches.name as branch_name',
+                'users.name as consignee_name',
             ])
             ->join('hbl_departure_charges', 'hbl.id', '=', 'hbl_departure_charges.hbl_id')
-            ->addSelect('hbl_departure_charges.freight_charge')
-            ->with(['branch:id,name', 'consignee:id,name'])
+            ->leftJoin('branches', 'hbl.branch_id', '=', 'branches.id')
+            ->leftJoin('users', 'hbl.consignee_id', '=', 'users.id')
+            ->whereNull('hbl.deleted_at')
             ->orderBy('hbl.created_at', 'asc');
 
         // Apply date range filters
@@ -88,30 +93,26 @@ class FreightChargesReportExport implements
             $search = $this->filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('hbl.hbl_number', 'like', "%{$search}%")
-                    ->orWhereHas('consignee', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('branch', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    });
+                    ->orWhere('users.name', 'like', "%{$search}%")
+                    ->orWhere('branches.name', 'like', "%{$search}%");
             });
         }
 
         return $query;
     }
 
-    public function map($hbl): array
+    public function map($row): array
     {
-        $freightCharge = (float) ($hbl->freight_charge ?? 0);
+        $freightCharge = (float) ($row->freight_charge ?? 0);
         $this->grandTotal += $freightCharge;
         $this->rowCount++;
 
         return [
-            $hbl->created_at->format('d/m/Y'),
-            $hbl->hbl_number,
-            $hbl->branch ? $hbl->branch->name : 'N/A',
-            $this->invoiceNumbers[$hbl->id] ?? '',
-            $hbl->consignee ? $hbl->consignee->name : 'N/A',
+            date('d/m/Y', strtotime($row->created_at)),
+            $row->hbl_number,
+            $row->branch_name ?? 'N/A',
+            $this->invoiceNumbers[$row->id] ?? '',
+            $row->consignee_name ?? 'N/A',
             number_format($freightCharge, 2),
         ];
     }
@@ -223,36 +224,38 @@ class FreightChargesReportExport implements
 
                 // Apply borders to data rows (starting from row 5)
                 $lastRow = 5 + $this->rowCount;
-                $sheet->getStyle('A5:F' . $lastRow)->applyFromArray([
-                    'borders' => [
-                        'allBorders' => [
-                            'borderStyle' => Border::BORDER_THIN,
+                if ($this->rowCount > 0) {
+                    $sheet->getStyle('A5:F' . $lastRow)->applyFromArray([
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                            ],
                         ],
-                    ],
-                ]);
+                    ]);
 
-                // Add grand total row
-                $totalRow = $lastRow + 1;
-                $sheet->setCellValue('A' . $totalRow, 'GRAND TOTAL');
-                $sheet->mergeCells('A' . $totalRow . ':E' . $totalRow);
-                $sheet->setCellValue('F' . $totalRow, number_format($this->grandTotal, 2));
+                    // Add grand total row
+                    $totalRow = $lastRow + 1;
+                    $sheet->setCellValue('A' . $totalRow, 'GRAND TOTAL');
+                    $sheet->mergeCells('A' . $totalRow . ':E' . $totalRow);
+                    $sheet->setCellValue('F' . $totalRow, number_format($this->grandTotal, 2));
 
-                // Style grand total row
-                $sheet->getStyle('A' . $totalRow . ':F' . $totalRow)->applyFromArray([
-                    'font' => ['bold' => true],
-                    'fill' => [
-                        'fillType' => Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => 'F3F4F6'],
-                    ],
-                    'borders' => [
-                        'allBorders' => [
-                            'borderStyle' => Border::BORDER_THIN,
+                    // Style grand total row
+                    $sheet->getStyle('A' . $totalRow . ':F' . $totalRow)->applyFromArray([
+                        'font' => ['bold' => true],
+                        'fill' => [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['rgb' => 'F3F4F6'],
                         ],
-                    ],
-                ]);
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                            ],
+                        ],
+                    ]);
 
-                // Right align amount column
-                $sheet->getStyle('F6:F' . $totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                    // Right align amount column
+                    $sheet->getStyle('F6:F' . $totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                }
             },
         ];
     }
