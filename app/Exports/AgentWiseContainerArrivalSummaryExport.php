@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Enum\ContainerStatus;
 use App\Models\Container;
 use App\Models\Scopes\BranchScope;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -38,14 +39,17 @@ class AgentWiseContainerArrivalSummaryExport implements
     public function collection()
     {
         $query = Container::withoutGlobalScope(BranchScope::class)
+            ->whereIn('status', [
+                ContainerStatus::IN_TRANSIT->value,
+                ContainerStatus::REACHED_DESTINATION->value,
+                ContainerStatus::ARRIVED_PRIMARY_WAREHOUSE->value,
+            ])
             ->with([
-                'branch',
+                'branch:id,name',
                 'hbl_packages' => function ($query) {
-                    // Include soft deleted packages
-                    $query->withTrashed()
-                        ->with(['hbl' => function ($q) {
-                            $q->withTrashed()->select('id', 'hbl_number', 'consignee_name');
-                        }]);
+                    $query->with(['hbl' => function ($q) {
+                        $q->select('id', 'hbl_number', 'consignee_name');
+                    }]);
                 }
             ])
             ->whereNotNull('unloading_started_at');
@@ -72,19 +76,19 @@ class AgentWiseContainerArrivalSummaryExport implements
                 ->where('container_id', $container->id)
                 ->where('status', 'loaded')
                 ->pluck('hbl_package_id');
-            
+
             if ($packageIds->isNotEmpty()) {
                 $container->loaded_packages = \DB::table('hbl_packages')
                     ->whereIn('id', $packageIds)
                     ->get();
-                
+
                 // Get HBL info for each package
                 $hblIds = $container->loaded_packages->pluck('hbl_id')->unique();
                 $hbls = \DB::table('hbl')
                     ->whereIn('id', $hblIds)
                     ->get()
                     ->keyBy('id');
-                
+
                 // Attach HBL to each package
                 foreach ($container->loaded_packages as $package) {
                     $package->hbl = $hbls->get($package->hbl_id);
