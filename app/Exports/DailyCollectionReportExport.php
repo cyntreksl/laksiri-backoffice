@@ -70,7 +70,7 @@ class DailyCollectionReportExport implements
         $records = $payments->map(function ($payment, $index) {
             // VAT and NBT are stored directly in the payment record
             $vatAmount = (float) ($payment->destination_1_tax ?? 0);
-            $nbtAmount = (float) (0);
+            $nbtAmount = (float) ($payment->destination_2_tax ?? 0);
 
             // Calculate total amount from all charges
             $departureTotal = (float) ($payment->departure_grand_total ?? 0);
@@ -120,6 +120,7 @@ class DailyCollectionReportExport implements
         return [
             ['Laksiri International Freight Forwarders (Pvt) Ltd'],
             ['Daily Collection Record for ' . $this->reportDate],
+            [now()->format('d/m/Y h:i:s A')],
             [],
             [
                 'Serial No',
@@ -144,8 +145,13 @@ class DailyCollectionReportExport implements
                 'font' => ['bold' => true, 'size' => 12],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ],
-            // Row 4: Column headers
-            4 => [
+            // Row 3: Printed date/time
+            3 => [
+                'font' => ['size' => 10],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            ],
+            // Row 5: Column headers
+            5 => [
                 'font' => ['bold' => true],
                 'fill' => [
                     'fillType' => Fill::FILL_SOLID,
@@ -177,17 +183,22 @@ class DailyCollectionReportExport implements
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Set page setup for A4 size
+                // Set page setup for A4 size with page numbers
                 $sheet->getPageSetup()
                     ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4)
                     ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT);
 
+                // Set header and footer for page numbers
+                $sheet->getHeaderFooter()
+                    ->setOddFooter('&R&P'); // Right-aligned page number
+
                 // Merge title cells (header rows without borders)
                 $sheet->mergeCells('A1:E1');
                 $sheet->mergeCells('A2:E2');
+                $sheet->mergeCells('A3:E3');
 
-                // Remove borders from header rows (1-2)
-                for ($row = 1; $row <= 2; $row++) {
+                // Remove borders from header rows (1-3)
+                for ($row = 1; $row <= 3; $row++) {
                     for ($col = 'A'; $col <= 'E'; $col++) {
                         $sheet->getStyle($col . $row)->applyFromArray([
                             'borders' => [
@@ -207,9 +218,9 @@ class DailyCollectionReportExport implements
                 $sheet->getColumnDimension('D')->setWidth(15);
                 $sheet->getColumnDimension('E')->setWidth(18);
 
-                // Apply borders to data rows (starting from row 4)
-                $lastRow = 4 + $this->rowCount;
-                $sheet->getStyle('A4:E' . $lastRow)->applyFromArray([
+                // Apply borders to data rows (starting from row 5)
+                $lastRow = 5 + $this->rowCount;
+                $sheet->getStyle('A5:E' . $lastRow)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
@@ -240,8 +251,8 @@ class DailyCollectionReportExport implements
                 ]);
 
                 // Center align numeric columns
-                $sheet->getStyle('A5:A' . $totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('C5:E' . $totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+                $sheet->getStyle('A6:A' . $totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('C6:E' . $totalRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
             },
         ];
     }
