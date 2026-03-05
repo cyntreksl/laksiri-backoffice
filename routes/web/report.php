@@ -3,14 +3,12 @@
 use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
 use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DetainReportController;
+use App\Http\Controllers\FreightChargesReportController;
 use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
 use App\Http\Controllers\ShipmentReportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\DetainReportExport;
-use App\Exports\HBLReportExport;
 
 Route::name('report.')->group(function () {
     // Payment Summery
@@ -96,4 +94,17 @@ Route::name('report.')->group(function () {
     Route::get('daily-collection/export', [DailyCollectionReportController::class, 'export'])
         ->name('daily-collection.export')
         ->middleware('can:reports.daily-collection');
+
+    // Freight Charges Report
+    Route::get('freight-charges', [FreightChargesReportController::class, 'index'])
+        ->name('freight-charges.index')
+        ->middleware('can:reports.freight-charges');
+
+    Route::get('freight-charges/data', [FreightChargesReportController::class, 'getData'])
+        ->name('freight-charges.data')
+        ->middleware('can:reports.freight-charges');
+
+    Route::get('freight-charges/export', [FreightChargesReportController::class, 'export'])
+        ->name('freight-charges.export')
+        ->middleware('can:reports.freight-charges');
 });
