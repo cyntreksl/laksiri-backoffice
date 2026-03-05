@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
 use App\Http\Controllers\DetainReportController;
 use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
@@ -68,4 +69,17 @@ Route::name('report.')->group(function () {
     Route::get('shipment-report/export', [ShipmentReportController::class, 'export'])
         ->name('shipment-report.export')
         ->middleware('can:reports.shipment');
+
+    // Agent Wise Container Arrival Summary
+    Route::get('agent-wise-container-arrival-summary', [AgentWiseContainerArrivalSummaryController::class, 'index'])
+        ->name('agent-wise-container-arrival-summary.index')
+        ->middleware('can:reports.agent-wise-container-arrival');
+
+    Route::get('agent-wise-container-arrival-summary/data', [AgentWiseContainerArrivalSummaryController::class, 'getData'])
+        ->name('agent-wise-container-arrival-summary.data')
+        ->middleware('can:reports.agent-wise-container-arrival');
+
+    Route::get('agent-wise-container-arrival-summary/export', [AgentWiseContainerArrivalSummaryController::class, 'export'])
+        ->name('agent-wise-container-arrival-summary.export')
+        ->middleware('can:reports.agent-wise-container-arrival');
 });
