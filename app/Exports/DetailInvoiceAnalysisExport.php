@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -43,10 +44,10 @@ class DetailInvoiceAnalysisExport implements
     public function __construct(array $filters = [])
     {
         $this->filters = $filters;
-        
+
         $dateFrom = !empty($filters['date_from']) ? date('d/m/Y', strtotime($filters['date_from'])) : '';
         $dateTo = !empty($filters['date_to']) ? date('d/m/Y', strtotime($filters['date_to'])) : '';
-        
+
         if ($dateFrom && $dateTo) {
             $this->dateRange = "From Date {$dateFrom} To {$dateTo}";
         } else {
@@ -116,7 +117,7 @@ class DetailInvoiceAnalysisExport implements
     public function map($row): array
     {
         $this->rowCount++;
-        
+
         // Accumulate totals
         $packages = (int) $row->no_of_pkgs;
         $cbm = (float) ($row->cbm ?? 0);
@@ -127,7 +128,7 @@ class DetailInvoiceAnalysisExport implements
         $vat = (float) ($row->vat ?? 0);
         $discount = (float) ($row->discount ?? 0);
         $total = (float) ($row->total ?? 0);
-        
+
         $this->totals['packages'] += $packages;
         $this->totals['cbm'] += $cbm;
         $this->totals['slpa'] += $slpa;
@@ -160,7 +161,7 @@ class DetailInvoiceAnalysisExport implements
             ['NO.31,ST. ANTHONY\'S MAWATHA Colombo 03 Sri lanka'],
             ['Detail Invoice Analysis'],
             [$this->dateRange],
-            ['Printed: ' . now()->format('d/m/Y h:i:s A')],
+            [now()->format('d/m/Y h:i:s A')],
             [],
             [
                 'Invoice No.',
@@ -279,7 +280,7 @@ class DetailInvoiceAnalysisExport implements
                 // Apply borders to data rows (starting from row 7)
                 if ($this->rowCount > 0) {
                     $lastRow = 7 + $this->rowCount;
-                    
+
                     // Explicitly set cell values as numeric to ensure 0 displays
                     for ($row = 8; $row <= $lastRow; $row++) {
                         // Get current values
@@ -291,18 +292,18 @@ class DetailInvoiceAnalysisExport implements
                         $vat = $sheet->getCell("I{$row}")->getValue();
                         $discount = $sheet->getCell("J{$row}")->getValue();
                         $total = $sheet->getCell("K{$row}")->getValue();
-                        
+
                         // Set as explicit numeric values
-                        $sheet->setCellValueExplicit("D{$row}", $cbm ?? 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                        $sheet->setCellValueExplicit("E{$row}", $slpa ?? 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                        $sheet->setCellValueExplicit("F{$row}", $handling ?? 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                        $sheet->setCellValueExplicit("G{$row}", $bond ?? 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                        $sheet->setCellValueExplicit("H{$row}", $demu ?? 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                        $sheet->setCellValueExplicit("I{$row}", $vat ?? 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                        $sheet->setCellValueExplicit("J{$row}", $discount ?? 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                        $sheet->setCellValueExplicit("K{$row}", $total ?? 0, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+                        $sheet->setCellValueExplicit("D{$row}", $cbm ?? 0, DataType::TYPE_NUMERIC);
+                        $sheet->setCellValueExplicit("E{$row}", $slpa ?? 0, DataType::TYPE_NUMERIC);
+                        $sheet->setCellValueExplicit("F{$row}", $handling ?? 0, DataType::TYPE_NUMERIC);
+                        $sheet->setCellValueExplicit("G{$row}", $bond ?? 0, DataType::TYPE_NUMERIC);
+                        $sheet->setCellValueExplicit("H{$row}", $demu ?? 0, DataType::TYPE_NUMERIC);
+                        $sheet->setCellValueExplicit("I{$row}", $vat ?? 0, DataType::TYPE_NUMERIC);
+                        $sheet->setCellValueExplicit("J{$row}", $discount ?? 0, DataType::TYPE_NUMERIC);
+                        $sheet->setCellValueExplicit("K{$row}", $total ?? 0, DataType::TYPE_NUMERIC);
                     }
-                    
+
                     $sheet->getStyle('A7:K' . $lastRow)->applyFromArray([
                         'borders' => [
                             'allBorders' => [
@@ -315,24 +316,24 @@ class DetailInvoiceAnalysisExport implements
                     $sheet->getStyle('C8:C' . $lastRow)->getNumberFormat()->setFormatCode('0');
                     $sheet->getStyle('D8:D' . $lastRow)->getNumberFormat()->setFormatCode('0.000');
                     $sheet->getStyle('E8:K' . $lastRow)->getNumberFormat()->setFormatCode('0.00');
-                    
+
                     // Right align numeric columns
                     $sheet->getStyle('C8:K' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-                    
+
                     // Add Grand Total footer row
                     $footerRow = $lastRow + 1;
-                    $sheet->setCellValue("A{$footerRow}", "Grand Total");
+                    $sheet->setCellValue("A{$footerRow}", "Total");
                     $sheet->setCellValue("B{$footerRow}", "");
-                    $sheet->setCellValueExplicit("C{$footerRow}", $this->totals['packages'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    $sheet->setCellValueExplicit("D{$footerRow}", $this->totals['cbm'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    $sheet->setCellValueExplicit("E{$footerRow}", $this->totals['slpa'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    $sheet->setCellValueExplicit("F{$footerRow}", $this->totals['handling'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    $sheet->setCellValueExplicit("G{$footerRow}", $this->totals['bond'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    $sheet->setCellValueExplicit("H{$footerRow}", $this->totals['demurrage'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    $sheet->setCellValueExplicit("I{$footerRow}", $this->totals['vat'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    $sheet->setCellValueExplicit("J{$footerRow}", $this->totals['discount'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    $sheet->setCellValueExplicit("K{$footerRow}", $this->totals['total'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-                    
+                    $sheet->setCellValueExplicit("C{$footerRow}", $this->totals['packages'], DataType::TYPE_NUMERIC);
+                    $sheet->setCellValueExplicit("D{$footerRow}", $this->totals['cbm'], DataType::TYPE_NUMERIC);
+                    $sheet->setCellValueExplicit("E{$footerRow}", $this->totals['slpa'], DataType::TYPE_NUMERIC);
+                    $sheet->setCellValueExplicit("F{$footerRow}", $this->totals['handling'], DataType::TYPE_NUMERIC);
+                    $sheet->setCellValueExplicit("G{$footerRow}", $this->totals['bond'], DataType::TYPE_NUMERIC);
+                    $sheet->setCellValueExplicit("H{$footerRow}", $this->totals['demurrage'], DataType::TYPE_NUMERIC);
+                    $sheet->setCellValueExplicit("I{$footerRow}", $this->totals['vat'], DataType::TYPE_NUMERIC);
+                    $sheet->setCellValueExplicit("J{$footerRow}", $this->totals['discount'], DataType::TYPE_NUMERIC);
+                    $sheet->setCellValueExplicit("K{$footerRow}", $this->totals['total'], DataType::TYPE_NUMERIC);
+
                     // Style footer row
                     $sheet->getStyle("A{$footerRow}:K{$footerRow}")->applyFromArray([
                         'font' => [
@@ -349,12 +350,12 @@ class DetailInvoiceAnalysisExport implements
                             ],
                         ],
                     ]);
-                    
+
                     // Apply number formats to footer
                     $sheet->getStyle("C{$footerRow}")->getNumberFormat()->setFormatCode('0');
                     $sheet->getStyle("D{$footerRow}")->getNumberFormat()->setFormatCode('0.000');
                     $sheet->getStyle("E{$footerRow}:K{$footerRow}")->getNumberFormat()->setFormatCode('0.00');
-                    
+
                     // Right align footer numeric columns
                     $sheet->getStyle("C{$footerRow}:K{$footerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
                 }
