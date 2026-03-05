@@ -32,8 +32,8 @@ const lazyParams = reactive({
 });
 
 const filters = reactive({
-    date_from: null,
-    date_to: null,
+    date_from: new Date(new Date().setDate(new Date().getDate() - 30)),
+    date_to: new Date(),
     search: '',
 });
 
@@ -98,8 +98,8 @@ const applyFilters = () => {
 };
 
 const resetFilters = () => {
-    filters.date_from = null;
-    filters.date_to = null;
+    filters.date_from = new Date(new Date().setDate(new Date().getDate() - 30));
+    filters.date_to = new Date();
     filters.search = '';
     lazyParams.page = 1;
     fetchData();
