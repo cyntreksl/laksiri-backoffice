@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\DailyCollectionReportExport;
-use App\Models\CashierHblPayment;
+use App\Models\CashierHBLPayment;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -25,7 +25,7 @@ class DailyCollectionReportController extends Controller
         $this->authorize('reports.daily-collection');
 
         try {
-            $query = CashierHblPayment::query()
+            $query = CashierHBLPayment::query()
                 ->whereNotNull('invoice_number')
                 ->orderBy('created_at', 'asc');
 
