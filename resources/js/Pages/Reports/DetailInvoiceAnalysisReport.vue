@@ -210,7 +210,7 @@ onMounted(() => {
                 <Card class="summary-card">
                     <template #content>
                         <div class="card-content">
-                            <i class="ti ti-currency-dollar text-3xl text-green-500"></i>
+                            <i class="ti ti-receipt text-3xl text-green-500"></i>
                             <div>
                                 <p class="text-sm text-gray-500 uppercase">Grand Total</p>
                                 <p class="text-3xl font-bold text-green-600">{{ formatNumber(stats.grand_total) }}</p>
