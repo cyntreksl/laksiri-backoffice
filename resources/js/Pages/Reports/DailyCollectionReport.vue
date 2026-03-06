@@ -394,21 +394,30 @@ onMounted(() => {
                             </template>
                         </Column>
 
-                        <Column field="vat" header="Vat" sortable style="min-width: 120px">
+                        <Column field="vat" sortable style="min-width: 120px">
                             <template #body="{ data }">
                                 <span class="font-mono text-right block">{{ formatNumber(data.vat) }}</span>
                             </template>
-                        </Column>
-
-                        <Column field="nbt" header="NBT" sortable style="min-width: 120px">
-                            <template #body="{ data }">
-                                <span class="font-mono text-right block">{{ formatNumber(data.nbt) }}</span>
+                            <template #header>
+                                <div class="text-right w-full font-bold">VAT</div>
                             </template>
                         </Column>
 
-                        <Column field="total_amount" header="Total Amount" sortable style="min-width: 150px">
+                        <Column field="nbt" sortable style="min-width: 120px">
+                            <template #body="{ data }">
+                                <span class="font-mono text-right block">{{ formatNumber(data.nbt) }}</span>
+                            </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">NBT</div>
+                            </template>
+                        </Column>
+
+                        <Column field="total_amount" sortable style="min-width: 150px">
                             <template #body="{ data }">
                                 <span class="font-mono font-semibold text-green-600 text-right block">{{ formatNumber(data.total_amount) }}</span>
+                            </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">Total Amount</div>
                             </template>
                         </Column>
 

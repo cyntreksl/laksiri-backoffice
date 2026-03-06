@@ -366,9 +366,12 @@ onMounted(() => {
                             </template>
                         </Column>
 
-                        <Column field="amount" header="Amount" sortable style="min-width: 150px">
+                        <Column field="amount" sortable style="min-width: 150px">
                             <template #body="{ data }">
                                 <span class="font-mono font-semibold text-green-600 text-right block">{{ formatNumber(data.amount) }}</span>
+                            </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">Amount</div>
                             </template>
                         </Column>
 

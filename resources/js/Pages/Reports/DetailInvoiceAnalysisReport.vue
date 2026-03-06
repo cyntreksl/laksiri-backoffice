@@ -319,57 +319,84 @@ onMounted(() => {
                             </template>
                         </Column>
 
-                        <Column field="no_of_pkgs" header="No.of Pkgs." style="min-width: 100px">
+                        <Column field="no_of_pkgs" style="min-width: 100px">
                             <template #body="{ data }">
                                 <span class="text-right block">{{ data.no_of_pkgs }}</span>
                             </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold text-nowrap">No.of Pkgs.</div>
+                            </template>
                         </Column>
 
-                        <Column field="cbm" header="CBM" style="min-width: 100px">
+                        <Column field="cbm" style="min-width: 100px">
                             <template #body="{ data }">
                                 <span class="font-mono text-right block">{{ data.cbm }}</span>
                             </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">CBM</div>
+                            </template>
                         </Column>
 
-                        <Column field="slpa" header="SLPA" style="min-width: 120px">
+                        <Column field="slpa" style="min-width: 120px">
                             <template #body="{ data }">
                                 <span class="font-mono text-right block">{{ formatNumber(data.slpa) }}</span>
                             </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">SLPA</div>
+                            </template>
                         </Column>
 
-                        <Column field="handling" header="Handling" style="min-width: 120px">
+                        <Column field="handling" style="min-width: 120px">
                             <template #body="{ data }">
                                 <span class="font-mono text-right block">{{ formatNumber(data.handling) }}</span>
                             </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">Handling</div>
+                            </template>
                         </Column>
 
-                        <Column field="bond" header="Bond" style="min-width: 120px">
+                        <Column field="bond" style="min-width: 120px">
                             <template #body="{ data }">
                                 <span class="font-mono text-right block">{{ formatNumber(data.bond) }}</span>
                             </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">Bond</div>
+                            </template>
                         </Column>
 
-                        <Column field="demu" header="Demu." style="min-width: 120px">
+                        <Column field="demu" style="min-width: 120px">
                             <template #body="{ data }">
                                 <span class="font-mono text-right block">{{ formatNumber(data.demu) }}</span>
                             </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">Demu.</div>
+                            </template>
                         </Column>
 
-                        <Column field="vat" header="VAT" style="min-width: 120px">
+                        <Column field="vat" style="min-width: 120px">
                             <template #body="{ data }">
                                 <span class="font-mono text-right block">{{ formatNumber(data.vat) }}</span>
                             </template>
-                        </Column>
-
-                        <Column field="discount" header="Discount" style="min-width: 120px">
-                            <template #body="{ data }">
-                                <span class="font-mono text-right block">{{ formatNumber(data.discount) }}</span>
+                            <template #header>
+                                <div class="text-right w-full font-bold">VAT</div>
                             </template>
                         </Column>
 
-                        <Column field="total" header="Total" style="min-width: 150px">
+                        <Column field="discount" style="min-width: 120px">
+                            <template #body="{ data }">
+                                <span class="font-mono text-right block">{{ formatNumber(data.discount) }}</span>
+                            </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">Discount</div>
+                            </template>
+                        </Column>
+
+                        <Column field="total" style="min-width: 150px">
                             <template #body="{ data }">
                                 <span class="font-mono font-semibold text-green-600 text-right block">{{ formatNumber(data.total) }}</span>
+                            </template>
+                            <template #header>
+                                <div class="text-right w-full font-bold">Total</div>
                             </template>
                         </Column>
 
