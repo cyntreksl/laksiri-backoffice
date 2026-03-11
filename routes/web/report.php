@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
 use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DetailInvoiceAnalysisController;
+use App\Http\Controllers\ContainerWiseIncomeAnalysisController;
 use App\Http\Controllers\DetainReportController;
 use App\Http\Controllers\FreightChargesReportController;
 use App\Http\Controllers\HBLReportController;
@@ -135,4 +136,17 @@ Route::name('report.')->group(function () {
     Route::get('detail-invoice-analysis/export', [DetailInvoiceAnalysisController::class, 'export'])
         ->name('detail-invoice-analysis.export')
         ->middleware('can:reports.detail-invoice-analysis');
+
+    // Container Wise Income Analysis Report
+    Route::get('container-wise-income', [ContainerWiseIncomeAnalysisController::class, 'index'])
+        ->name('container-wise-income.index')
+        ->middleware('can:reports.container-wise-income');
+
+    Route::get('container-wise-income/data', [ContainerWiseIncomeAnalysisController::class, 'getData'])
+        ->name('container-wise-income.data')
+        ->middleware('can:reports.container-wise-income');
+
+    Route::get('container-wise-income/export', [ContainerWiseIncomeAnalysisController::class, 'export'])
+        ->name('container-wise-income.export')
+        ->middleware('can:reports.container-wise-income');
 });
