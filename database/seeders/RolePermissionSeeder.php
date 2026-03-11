@@ -772,6 +772,7 @@ class RolePermissionSeeder extends Seeder
                     'reports.freight-charges',
                     'reports.stamp-duty',
                     'reports.detail-invoice-analysis',
+                    'reports.container-wise-income',
                 ],
             ],
         ];
