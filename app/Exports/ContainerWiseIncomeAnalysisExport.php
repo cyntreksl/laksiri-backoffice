@@ -61,31 +61,35 @@ class ContainerWiseIncomeAnalysisExport implements
     {
         $query = DB::table('containers')
             ->join('branches', 'containers.branch_id', '=', 'branches.id')
-            ->leftJoin('container_hbl_package', 'containers.id', '=', 'container_hbl_package.container_id')
+            ->leftJoin('container_hbl_package', function($join) {
+                $join->on('containers.id', '=', 'container_hbl_package.container_id')
+                     ->where('container_hbl_package.status', '=', 'loaded');
+            })
             ->leftJoin('hbl_packages', 'container_hbl_package.hbl_package_id', '=', 'hbl_packages.id')
-            ->leftJoin('hbl', 'hbl_packages.hbl_id', '=', 'hbl.id')
+            ->leftJoin('hbl', function($join) {
+                $join->on('hbl_packages.hbl_id', '=', 'hbl.id')
+                     ->whereNull('hbl.deleted_at');
+            })
             ->leftJoin('cashier_hbl_payments', 'hbl.id', '=', 'cashier_hbl_payments.hbl_id')
             ->select([
                 'containers.container_number',
                 'containers.unloading_started_at as destuff_date',
                 'branches.name as agent_name',
-                DB::raw('COUNT(DISTINCT hbl.consignee_id) as no_of_cons'),
-                DB::raw('COUNT(DISTINCT hbl_packages.id) as no_of_pkgs'),
-                DB::raw('COALESCE(SUM(hbl_packages.volume), 0) as cbm'),
-                DB::raw('COALESCE(SUM(cashier_hbl_payments.destination_slpa_charge), 0) as slpa'),
-                DB::raw('COALESCE(SUM(cashier_hbl_payments.destination_handling_charge), 0) as handling'),
-                DB::raw('COALESCE(SUM(cashier_hbl_payments.destination_bond_charge), 0) as bond'),
-                DB::raw('COALESCE(SUM(cashier_hbl_payments.destination_demurrage_charge), 0) as demurr'),
-                DB::raw('COALESCE(SUM(cashier_hbl_payments.departure_freight_charge), 0) as frt_chg'),
-                DB::raw('COALESCE(SUM(cashier_hbl_payments.destination_do_charge), 0) as doc_chg'),
-                DB::raw('COALESCE(SUM(cashier_hbl_payments.destination_1_tax), 0) as vat'),
-                DB::raw('COALESCE(SUM(cashier_hbl_payments.destination_2_tax), 0) as nbt_paid'),
-                DB::raw('(COALESCE(SUM(cashier_hbl_payments.destination_1_total_with_tax), 0) + COALESCE(SUM(cashier_hbl_payments.destination_2_total_with_tax), 0) + COALESCE(SUM(cashier_hbl_payments.departure_grand_total), 0)) as total'),
+                DB::raw('COUNT(DISTINCT CASE WHEN hbl.consignee_id IS NOT NULL THEN hbl.consignee_id END) as no_of_cons'),
+                DB::raw('COUNT(DISTINCT CASE WHEN hbl_packages.id IS NOT NULL THEN hbl_packages.id END) as no_of_pkgs'),
+                DB::raw('COALESCE(SUM(CASE WHEN hbl_packages.volume IS NOT NULL THEN hbl_packages.volume ELSE 0 END), 0) as cbm'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.destination_slpa_charge IS NOT NULL THEN cashier_hbl_payments.destination_slpa_charge ELSE 0 END), 0) as slpa'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.destination_handling_charge IS NOT NULL THEN cashier_hbl_payments.destination_handling_charge ELSE 0 END), 0) as handling'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.destination_bond_charge IS NOT NULL THEN cashier_hbl_payments.destination_bond_charge ELSE 0 END), 0) as bond'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.destination_demurrage_charge IS NOT NULL THEN cashier_hbl_payments.destination_demurrage_charge ELSE 0 END), 0) as demurr'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.departure_freight_charge IS NOT NULL THEN cashier_hbl_payments.departure_freight_charge ELSE 0 END), 0) as frt_chg'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.destination_do_charge IS NOT NULL THEN cashier_hbl_payments.destination_do_charge ELSE 0 END), 0) as doc_chg'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.destination_1_tax IS NOT NULL THEN cashier_hbl_payments.destination_1_tax ELSE 0 END), 0) as vat'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.destination_2_tax IS NOT NULL THEN cashier_hbl_payments.destination_2_tax ELSE 0 END), 0) as nbt_paid'),
+                DB::raw('COALESCE(SUM(CASE WHEN cashier_hbl_payments.destination_1_total_with_tax IS NOT NULL THEN cashier_hbl_payments.destination_1_total_with_tax ELSE 0 END) + SUM(CASE WHEN cashier_hbl_payments.destination_2_total_with_tax IS NOT NULL THEN cashier_hbl_payments.destination_2_total_with_tax ELSE 0 END) + SUM(CASE WHEN cashier_hbl_payments.departure_grand_total IS NOT NULL THEN cashier_hbl_payments.departure_grand_total ELSE 0 END), 0) as total'),
             ])
             ->whereNotNull('containers.unloading_started_at')
             ->whereNull('containers.deleted_at')
-            ->whereNull('hbl.deleted_at')
-            ->whereNull('hbl_packages.deleted_at')
             ->groupBy(
                 'containers.id',
                 'containers.container_number',
@@ -272,21 +276,21 @@ class ContainerWiseIncomeAnalysisExport implements
                 }
 
                 // Set column widths
-                $sheet->getColumnDimension('A')->setWidth(15); // Container No
-                $sheet->getColumnDimension('B')->setWidth(12); // Destuff
-                $sheet->getColumnDimension('C')->setWidth(15); // Agent
-                $sheet->getColumnDimension('D')->setWidth(10); // No of Cons
-                $sheet->getColumnDimension('E')->setWidth(10); // No of Pkgs
-                $sheet->getColumnDimension('F')->setWidth(10); // CBM
-                $sheet->getColumnDimension('G')->setWidth(12); // SLPA
-                $sheet->getColumnDimension('H')->setWidth(12); // Handling
-                $sheet->getColumnDimension('I')->setWidth(12); // Bond
-                $sheet->getColumnDimension('J')->setWidth(12); // Demurr
-                $sheet->getColumnDimension('K')->setWidth(12); // Frt Chg
-                $sheet->getColumnDimension('L')->setWidth(12); // DOC Chg
-                $sheet->getColumnDimension('M')->setWidth(12); // VAT
-                $sheet->getColumnDimension('N')->setWidth(12); // NBT Paid
-                $sheet->getColumnDimension('O')->setWidth(15); // Total
+                $sheet->getColumnDimension('A')->setWidth(12); // Container No
+                $sheet->getColumnDimension('B')->setWidth(10); // Destuff
+                $sheet->getColumnDimension('C')->setWidth(10); // Agent
+                $sheet->getColumnDimension('D')->setWidth(8);  // No of Cons
+                $sheet->getColumnDimension('E')->setWidth(8);  // No of Pkgs
+                $sheet->getColumnDimension('F')->setWidth(8);  // CBM
+                $sheet->getColumnDimension('G')->setWidth(9);  // SLPA
+                $sheet->getColumnDimension('H')->setWidth(9);  // Handling
+                $sheet->getColumnDimension('I')->setWidth(8);  // Bond
+                $sheet->getColumnDimension('J')->setWidth(8);  // Demurr
+                $sheet->getColumnDimension('K')->setWidth(9);  // Frt Chg
+                $sheet->getColumnDimension('L')->setWidth(9);  // DOC Chg
+                $sheet->getColumnDimension('M')->setWidth(8);  // VAT
+                $sheet->getColumnDimension('N')->setWidth(9);  // NBT Paid
+                $sheet->getColumnDimension('O')->setWidth(10); // Total
 
                 // Apply borders to data rows (starting from row 6)
                 if ($this->rowCount > 0) {
