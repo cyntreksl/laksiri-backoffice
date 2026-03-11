@@ -974,6 +974,11 @@ const setMenu = (menu) => {
                     title: "Detail Invoice Analysis",
                     route: "report.detail-invoice-analysis.index",
                     permission: "reports.detail-invoice-analysis",
+                },
+                {
+                    title: "Container Wise Income Analysis",
+                    route: "report.container-wise-income.index",
+                    permission: "reports.container-wise-income",
                 }
             );
             changeSidePanelTitle("Report");
