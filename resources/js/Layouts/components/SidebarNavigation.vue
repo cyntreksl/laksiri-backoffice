@@ -979,6 +979,11 @@ const setMenu = (menu) => {
                     title: "Container Wise Income Analysis",
                     route: "report.container-wise-income.index",
                     permission: "reports.container-wise-income",
+                },
+                {
+                    title: "Uncleared RTF Consignee Details",
+                    route: "report.uncleared-rtf-consignee.index",
+                    permission: "reports.uncleared-rtf-consignee",
                 }
             );
             changeSidePanelTitle("Report");

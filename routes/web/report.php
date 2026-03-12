@@ -10,6 +10,7 @@ use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
 use App\Http\Controllers\ShipmentReportController;
 use App\Http\Controllers\StampDutyReportController;
+use App\Http\Controllers\UnclearedRTFConsigneeDetailsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -149,4 +150,17 @@ Route::name('report.')->group(function () {
     Route::get('container-wise-income/export', [ContainerWiseIncomeAnalysisController::class, 'export'])
         ->name('container-wise-income.export')
         ->middleware('can:reports.container-wise-income');
+
+    // Uncleared RTF Consignee Details Report
+    Route::get('uncleared-rtf-consignee', [UnclearedRTFConsigneeDetailsController::class, 'index'])
+        ->name('uncleared-rtf-consignee.index')
+        ->middleware('can:reports.uncleared-rtf-consignee');
+
+    Route::get('uncleared-rtf-consignee/data', [UnclearedRTFConsigneeDetailsController::class, 'getData'])
+        ->name('uncleared-rtf-consignee.data')
+        ->middleware('can:reports.uncleared-rtf-consignee');
+
+    Route::get('uncleared-rtf-consignee/export', [UnclearedRTFConsigneeDetailsController::class, 'export'])
+        ->name('uncleared-rtf-consignee.export')
+        ->middleware('can:reports.uncleared-rtf-consignee');
 });
