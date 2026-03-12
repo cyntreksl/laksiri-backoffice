@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
+use App\Http\Controllers\AgentWiseIncomeAnalysisController;
 use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DetailInvoiceAnalysisController;
 use App\Http\Controllers\ContainerWiseIncomeAnalysisController;
@@ -163,4 +164,17 @@ Route::name('report.')->group(function () {
     Route::get('uncleared-rtf-consignee/export', [UnclearedRTFConsigneeDetailsController::class, 'export'])
         ->name('uncleared-rtf-consignee.export')
         ->middleware('can:reports.uncleared-rtf-consignee');
+
+    // Agent Wise Income Analysis Report
+    Route::get('agent-wise-income', [AgentWiseIncomeAnalysisController::class, 'index'])
+        ->name('agent-wise-income.index')
+        ->middleware('can:reports.agent-wise-income');
+
+    Route::get('agent-wise-income/data', [AgentWiseIncomeAnalysisController::class, 'getData'])
+        ->name('agent-wise-income.data')
+        ->middleware('can:reports.agent-wise-income');
+
+    Route::get('agent-wise-income/export', [AgentWiseIncomeAnalysisController::class, 'export'])
+        ->name('agent-wise-income.export')
+        ->middleware('can:reports.agent-wise-income');
 });
