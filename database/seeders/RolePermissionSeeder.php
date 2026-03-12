@@ -775,6 +775,7 @@ class RolePermissionSeeder extends Seeder
                     'reports.container-wise-income',
                     'reports.uncleared-rtf-consignee',
                     'reports.agent-wise-income',
+                    'reports.agent-wise-consignee-volume',
                 ],
             ],
         ];
