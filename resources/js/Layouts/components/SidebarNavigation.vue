@@ -1004,6 +1004,11 @@ const setMenu = (menu) => {
                     title: "Short Land Report",
                     route: "report.short-land.index",
                     permission: "reports.short-land",
+                },
+                {
+                    title: "Bond Storage Records",
+                    route: "report.bond-storage-records.index",
+                    permission: "reports.bond-storage-records",
                 }
             );
             changeSidePanelTitle("Report");

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
 use App\Http\Controllers\AgentWiseConsigneeVolumeAnalysisController;
 use App\Http\Controllers\AgentWiseIncomeAnalysisController;
+use App\Http\Controllers\BondStorageRecordsController;
 use App\Http\Controllers\ConsigneeClearanceDetailsController;
 use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DetailInvoiceAnalysisController;
@@ -219,4 +220,17 @@ Route::name('report.')->group(function () {
     Route::get('short-land/export', [ShortLandReportController::class, 'export'])
         ->name('short-land.export')
         ->middleware('can:reports.short-land');
+
+    // Bond Storage Records Report
+    Route::get('bond-storage-records', [BondStorageRecordsController::class, 'index'])
+        ->name('bond-storage-records.index')
+        ->middleware('can:reports.bond-storage-records');
+
+    Route::get('bond-storage-records/data', [BondStorageRecordsController::class, 'getData'])
+        ->name('bond-storage-records.data')
+        ->middleware('can:reports.bond-storage-records');
+
+    Route::get('bond-storage-records/export', [BondStorageRecordsController::class, 'export'])
+        ->name('bond-storage-records.export')
+        ->middleware('can:reports.bond-storage-records');
 });
