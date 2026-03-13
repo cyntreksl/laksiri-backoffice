@@ -989,6 +989,16 @@ const setMenu = (menu) => {
                     title: "Agent Wise Income Analysis",
                     route: "report.agent-wise-income.index",
                     permission: "reports.agent-wise-income",
+                },
+                {
+                    title: "Agent Wise Consignee & Volume Analysis",
+                    route: "report.agent-wise-consignee-volume.index",
+                    permission: "reports.agent-wise-consignee-volume",
+                },
+                {
+                    title: "Consignee Clearance Details",
+                    route: "report.consignee-clearance.index",
+                    permission: "reports.consignee-clearance",
                 }
             );
             changeSidePanelTitle("Report");
