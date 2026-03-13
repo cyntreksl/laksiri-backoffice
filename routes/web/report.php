@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
+use App\Http\Controllers\AgentWiseConsigneeVolumeAnalysisController;
+use App\Http\Controllers\AgentWiseIncomeAnalysisController;
+use App\Http\Controllers\ConsigneeClearanceDetailsController;
 use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DetailInvoiceAnalysisController;
 use App\Http\Controllers\ContainerWiseIncomeAnalysisController;
@@ -10,6 +13,7 @@ use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
 use App\Http\Controllers\ShipmentReportController;
 use App\Http\Controllers\StampDutyReportController;
+use App\Http\Controllers\UnclearedRTFConsigneeDetailsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -149,4 +153,56 @@ Route::name('report.')->group(function () {
     Route::get('container-wise-income/export', [ContainerWiseIncomeAnalysisController::class, 'export'])
         ->name('container-wise-income.export')
         ->middleware('can:reports.container-wise-income');
+
+    // Uncleared RTF Consignee Details Report
+    Route::get('uncleared-rtf-consignee', [UnclearedRTFConsigneeDetailsController::class, 'index'])
+        ->name('uncleared-rtf-consignee.index')
+        ->middleware('can:reports.uncleared-rtf-consignee');
+
+    Route::get('uncleared-rtf-consignee/data', [UnclearedRTFConsigneeDetailsController::class, 'getData'])
+        ->name('uncleared-rtf-consignee.data')
+        ->middleware('can:reports.uncleared-rtf-consignee');
+
+    Route::get('uncleared-rtf-consignee/export', [UnclearedRTFConsigneeDetailsController::class, 'export'])
+        ->name('uncleared-rtf-consignee.export')
+        ->middleware('can:reports.uncleared-rtf-consignee');
+
+    // Agent Wise Income Analysis Report
+    Route::get('agent-wise-income', [AgentWiseIncomeAnalysisController::class, 'index'])
+        ->name('agent-wise-income.index')
+        ->middleware('can:reports.agent-wise-income');
+
+    Route::get('agent-wise-income/data', [AgentWiseIncomeAnalysisController::class, 'getData'])
+        ->name('agent-wise-income.data')
+        ->middleware('can:reports.agent-wise-income');
+
+    Route::get('agent-wise-income/export', [AgentWiseIncomeAnalysisController::class, 'export'])
+        ->name('agent-wise-income.export')
+        ->middleware('can:reports.agent-wise-income');
+
+    // Agent Wise Consignee & Volume Analysis Report
+    Route::get('agent-wise-consignee-volume', [AgentWiseConsigneeVolumeAnalysisController::class, 'index'])
+        ->name('agent-wise-consignee-volume.index')
+        ->middleware('can:reports.agent-wise-consignee-volume');
+
+    Route::get('agent-wise-consignee-volume/data', [AgentWiseConsigneeVolumeAnalysisController::class, 'getData'])
+        ->name('agent-wise-consignee-volume.data')
+        ->middleware('can:reports.agent-wise-consignee-volume');
+
+    Route::get('agent-wise-consignee-volume/export', [AgentWiseConsigneeVolumeAnalysisController::class, 'export'])
+        ->name('agent-wise-consignee-volume.export')
+        ->middleware('can:reports.agent-wise-consignee-volume');
+
+    // Consignee Clearance Details Report
+    Route::get('consignee-clearance', [ConsigneeClearanceDetailsController::class, 'index'])
+        ->name('consignee-clearance.index')
+        ->middleware('can:reports.consignee-clearance');
+
+    Route::get('consignee-clearance/data', [ConsigneeClearanceDetailsController::class, 'getData'])
+        ->name('consignee-clearance.data')
+        ->middleware('can:reports.consignee-clearance');
+
+    Route::get('consignee-clearance/export', [ConsigneeClearanceDetailsController::class, 'export'])
+        ->name('consignee-clearance.export')
+        ->middleware('can:reports.consignee-clearance');
 });
