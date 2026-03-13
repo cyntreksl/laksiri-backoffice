@@ -20,12 +20,19 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    containers: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const loading = ref(false);
 const records = ref([]);
 const totalRecords = ref(0);
 const agents = ref(props.branches);
+
+// Use computed for containers to ensure reactivity
+const containers = computed(() => props.containers || []);
 const stats = ref({
     total_packages: 0,
     total_consignees: 0,
@@ -43,6 +50,7 @@ const filters = reactive({
     date_from: new Date(new Date().setDate(new Date().getDate() - 30)),
     date_to: new Date(),
     agent_id: null,
+    container_id: null,
     search: '',
 });
 
@@ -109,6 +117,7 @@ const resetFilters = () => {
     filters.date_from = new Date(new Date().setDate(new Date().getDate() - 30));
     filters.date_to = new Date();
     filters.agent_id = null;
+    filters.container_id = null;
     filters.search = '';
     lazyParams.page = 1;
     fetchData();
@@ -156,6 +165,22 @@ const selectedAgent = computed(() => {
     return 'All Agents';
 });
 
+const selectedContainer = computed(() => {
+    if (filters.container_id) {
+        const container = containers.value.find(c => c.value === filters.container_id);
+        return container ? container.label : 'All Containers';
+    }
+    return 'All Containers';
+});
+
+const reportTitle = computed(() => {
+    let title = selectedAgent.value;
+    if (filters.container_id) {
+        title += ` - ${selectedContainer.value}`;
+    }
+    return title;
+});
+
 onMounted(() => {
     fetchData();
 });
@@ -172,7 +197,7 @@ onMounted(() => {
                         <i class="ti ti-building-warehouse text-4xl text-blue-500"></i>
                         <div>
                             <h1 class="text-3xl font-bold text-gray-800">Bond Storage Records</h1>
-                            <p class="text-gray-600 mt-1">{{ selectedAgent }} for {{ reportDate }}</p>
+                            <p class="text-gray-600 mt-1">{{ reportTitle }} for {{ reportDate }}</p>
                         </div>
                     </div>
                     <div class="header-right">
@@ -274,10 +299,23 @@ onMounted(() => {
                                     input-id="agent"
                                     optionLabel="label"
                                     optionValue="value"
-                                    placeholder="All Agents"
                                     showClear
                                 />
                                 <label for="agent">Agent</label>
+                            </FloatLabel>
+
+                            <FloatLabel class="w-full" variant="in">
+                                <Dropdown
+                                    v-model="filters.container_id"
+                                    :options="containers"
+                                    class="w-full"
+                                    input-id="container"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="All Containers"
+                                    showClear
+                                />
+                                <label for="container">Container</label>
                             </FloatLabel>
 
                             <FloatLabel class="w-full" variant="in">

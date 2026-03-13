@@ -43,8 +43,8 @@ class BondStorageRecordsExport implements
         $query = DB::table('hbl_packages')
             ->join('hbl', 'hbl_packages.hbl_id', '=', 'hbl.id')
             ->join('branches', 'hbl.branch_id', '=', 'branches.id')
-            ->leftJoin('container_hbl_package', 'hbl_packages.id', '=', 'container_hbl_package.hbl_package_id')
-            ->leftJoin('containers', 'container_hbl_package.container_id', '=', 'containers.id')
+            ->leftJoin('duplicate_container_hbl_package', 'hbl_packages.id', '=', 'duplicate_container_hbl_package.hbl_package_id')
+            ->leftJoin('containers', 'duplicate_container_hbl_package.container_id', '=', 'containers.id')
             ->leftJoin('detain_records', function($join) {
                 $join->on('hbl_packages.id', '=', 'detain_records.rtfable_id')
                      ->where('detain_records.rtfable_type', '=', 'App\\Models\\HBLPackage');
@@ -63,9 +63,13 @@ class BondStorageRecordsExport implements
         if (!empty($this->filters['agent_id'])) {
             $query->where('hbl.branch_id', $this->filters['agent_id']);
         }
+        if (!empty($this->filters['container_id'])) {
+            $query->where('containers.id', $this->filters['container_id']);
+        }
 
         $info = $query->select([
             'containers.reference',
+            'containers.container_number',
             'containers.vessel_name',
             'containers.unloading_ended_at',
             'branches.name as agent_name',
@@ -91,7 +95,7 @@ class BondStorageRecordsExport implements
     {
         $referenceNo = $this->containerInfo->reference ?? '';
         $vesselName = $this->containerInfo->vessel_name ?? '';
-        $containerNo = '';
+        $containerNo = $this->containerInfo->container_number ?? '';
         $destuffingDate = $this->containerInfo->unloading_ended_at
             ? date('d/m/Y', strtotime($this->containerInfo->unloading_ended_at))
             : '';
@@ -103,7 +107,7 @@ class BondStorageRecordsExport implements
             ['Laksiri International Freight Forwarders (Pvt) Ltd'],
             ['Bond Storage Records'],
             [],
-            ['REFERENCE NO', $referenceNo, '', 'DESTUFFING DAT', $destuffingDate],
+            ['REFERENCE NO', $referenceNo, '', 'DESTUFFING DATE', $destuffingDate],
             ['VESSEL NAME', $vesselName, '', 'B.B. NO'],
             ['CONTAINER NO', $containerNo, '', 'T.T. NO'],
             ['AGENT NAME', $this->agentName, '', 'E. NO'],
@@ -239,14 +243,14 @@ class BondStorageRecordsExport implements
                     $totalPackages = $this->query()->sum('hbl_packages.quantity');
                     $totalConsignees = $this->query()->distinct('hbl.consignee_id')->count('hbl.consignee_id');
 
-                    $sheet->setCellValue('A' . ($lastRow + 1), 'No of Packages');
+                    $sheet->setCellValue('B' . ($lastRow + 1), 'No of Packages');
                     $sheet->setCellValue('C' . ($lastRow + 1), $totalPackages);
 
-                    $sheet->setCellValue('A' . ($lastRow + 3), 'Total No. of Packages');
-                    $sheet->setCellValue('C' . ($lastRow + 3), ': ' . $totalPackages);
+                    $sheet->setCellValue('B' . ($lastRow + 3), 'Total No. of Packages');
+                    $sheet->setCellValue('C' . ($lastRow + 3), $totalPackages);
 
-                    $sheet->setCellValue('A' . ($lastRow + 4), 'Total No. of Consignees');
-                    $sheet->setCellValue('C' . ($lastRow + 4), ': ' . $totalConsignees);
+                    $sheet->setCellValue('B' . ($lastRow + 4), 'Total No. of Consignees');
+                    $sheet->setCellValue('C' . ($lastRow + 4), $totalConsignees);
 
                     // Style total rows
                     $sheet->getStyle('A' . ($lastRow + 1) . ':E' . ($lastRow + 1))->applyFromArray([
@@ -279,7 +283,8 @@ class BondStorageRecordsExport implements
                 'consignees.name as consignee_name',
                 'hbl_packages.quantity as pkgs',
                 'hbl_packages.bond_storage_number as bs_no',
-                'detain_records.note as remarks'
+                'detain_records.note as remarks',
+                'hbl_packages.created_at'
             ])
             ->whereNotNull('hbl_packages.bond_storage_number')
             ->whereNull('hbl.deleted_at')
@@ -294,6 +299,14 @@ class BondStorageRecordsExport implements
         }
         if (!empty($this->filters['agent_id'])) {
             $query->where('hbl.branch_id', $this->filters['agent_id']);
+        }
+        if (!empty($this->filters['container_id'])) {
+            $query->whereExists(function($subQuery) {
+                $subQuery->select(DB::raw(1))
+                         ->from('duplicate_container_hbl_package as dchp')
+                         ->whereRaw('dchp.hbl_package_id = hbl_packages.id')
+                         ->where('dchp.container_id', $this->filters['container_id']);
+            });
         }
         if (!empty($this->filters['search'])) {
             $search = $this->filters['search'];

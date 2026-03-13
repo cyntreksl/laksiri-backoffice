@@ -17,7 +17,7 @@ class BondStorageRecordsController extends Controller
     public function index()
     {
         $this->authorize('reports.bond-storage-records');
-        
+
         $branches = Branch::select('id', 'name')
             ->orderBy('name')
             ->get()
@@ -26,16 +26,35 @@ class BondStorageRecordsController extends Controller
                 'label' => $branch->name
             ])
             ->toArray();
-        
+
+        // Get containers that have bond storage packages (using duplicate_container_hbl_package table)
+        $containers = DB::table('containers')
+            ->select('containers.id', 'containers.reference', 'containers.container_number')
+            ->join('duplicate_container_hbl_package', 'containers.id', '=', 'duplicate_container_hbl_package.container_id')
+            ->join('hbl_packages', 'duplicate_container_hbl_package.hbl_package_id', '=', 'hbl_packages.id')
+            ->whereNotNull('hbl_packages.bond_storage_number')
+            ->whereNotNull('containers.reference')
+            ->where('containers.reference', '!=', '')
+            ->whereNull('hbl_packages.deleted_at')
+            ->distinct()
+            ->orderBy('containers.reference')
+            ->get()
+            ->map(fn($container) => [
+                'value' => $container->id,
+                'label' => $container->reference . ($container->container_number ? ' (' . $container->container_number . ')' : '')
+            ])
+            ->toArray();
+
         return Inertia::render('Reports/BondStorageRecords', [
             'branches' => $branches,
+            'containers' => $containers,
         ]);
     }
 
     public function getData(Request $request)
     {
         $this->authorize('reports.bond-storage-records');
-        
+
         try {
             $query = DB::table('hbl_packages')
                 ->join('hbl', 'hbl_packages.hbl_id', '=', 'hbl.id')
@@ -78,6 +97,16 @@ class BondStorageRecordsController extends Controller
                 $query->where('hbl.branch_id', $request->agent_id);
             }
 
+            // Apply container filter using duplicate_container_hbl_package table
+            if ($request->filled('container_id')) {
+                $query->whereExists(function($subQuery) use ($request) {
+                    $subQuery->select(DB::raw(1))
+                             ->from('duplicate_container_hbl_package as dchp')
+                             ->whereRaw('dchp.hbl_package_id = hbl_packages.id')
+                             ->where('dchp.container_id', $request->container_id);
+                });
+            }
+
             // Apply search filter
             if ($request->filled('search')) {
                 $search = $request->search;
@@ -116,6 +145,14 @@ class BondStorageRecordsController extends Controller
             if ($request->filled('agent_id')) {
                 $statsBaseQuery->where('hbl.branch_id', $request->agent_id);
             }
+            if ($request->filled('container_id')) {
+                $statsBaseQuery->whereExists(function($query) use ($request) {
+                    $query->select(DB::raw(1))
+                          ->from('duplicate_container_hbl_package as dchp')
+                          ->whereRaw('dchp.hbl_package_id = hbl_packages.id')
+                          ->where('dchp.container_id', $request->container_id);
+                });
+            }
             if ($request->filled('search')) {
                 $search = $request->search;
                 $statsBaseQuery->where(function ($q) use ($search) {
@@ -134,7 +171,7 @@ class BondStorageRecordsController extends Controller
             // Pagination
             $perPage = $request->get('per_page', 25);
             $page = $request->get('page', 1);
-            
+
             $data = $query->skip(($page - 1) * $perPage)->take($perPage)->get();
 
             return response()->json([
@@ -155,8 +192,8 @@ class BondStorageRecordsController extends Controller
     public function export(Request $request)
     {
         $this->authorize('reports.bond-storage-records');
-        
-        $filters = $request->only(['date_from', 'date_to', 'agent_id', 'search']);
+
+        $filters = $request->only(['date_from', 'date_to', 'agent_id', 'container_id', 'search']);
         $format = $request->get('format', 'xlsx');
 
         $export = new BondStorageRecordsExport($filters);
