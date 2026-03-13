@@ -12,6 +12,7 @@ use App\Http\Controllers\FreightChargesReportController;
 use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
 use App\Http\Controllers\ShipmentReportController;
+use App\Http\Controllers\ShortLandReportController;
 use App\Http\Controllers\StampDutyReportController;
 use App\Http\Controllers\UnclearedRTFConsigneeDetailsController;
 use Illuminate\Support\Facades\Route;
@@ -205,4 +206,17 @@ Route::name('report.')->group(function () {
     Route::get('consignee-clearance/export', [ConsigneeClearanceDetailsController::class, 'export'])
         ->name('consignee-clearance.export')
         ->middleware('can:reports.consignee-clearance');
+
+    // Short Land Report
+    Route::get('short-land', [ShortLandReportController::class, 'index'])
+        ->name('short-land.index')
+        ->middleware('can:reports.short-land');
+
+    Route::get('short-land/data', [ShortLandReportController::class, 'getData'])
+        ->name('short-land.data')
+        ->middleware('can:reports.short-land');
+
+    Route::get('short-land/export', [ShortLandReportController::class, 'export'])
+        ->name('short-land.export')
+        ->middleware('can:reports.short-land');
 });
