@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgentWiseContainerArrivalSummaryController;
 use App\Http\Controllers\AgentWiseConsigneeVolumeAnalysisController;
 use App\Http\Controllers\AgentWiseIncomeAnalysisController;
+use App\Http\Controllers\ConsigneeClearanceDetailsController;
 use App\Http\Controllers\DailyCollectionReportController;
 use App\Http\Controllers\DetailInvoiceAnalysisController;
 use App\Http\Controllers\ContainerWiseIncomeAnalysisController;
@@ -191,4 +192,17 @@ Route::name('report.')->group(function () {
     Route::get('agent-wise-consignee-volume/export', [AgentWiseConsigneeVolumeAnalysisController::class, 'export'])
         ->name('agent-wise-consignee-volume.export')
         ->middleware('can:reports.agent-wise-consignee-volume');
+
+    // Consignee Clearance Details Report
+    Route::get('consignee-clearance', [ConsigneeClearanceDetailsController::class, 'index'])
+        ->name('consignee-clearance.index')
+        ->middleware('can:reports.consignee-clearance');
+
+    Route::get('consignee-clearance/data', [ConsigneeClearanceDetailsController::class, 'getData'])
+        ->name('consignee-clearance.data')
+        ->middleware('can:reports.consignee-clearance');
+
+    Route::get('consignee-clearance/export', [ConsigneeClearanceDetailsController::class, 'export'])
+        ->name('consignee-clearance.export')
+        ->middleware('can:reports.consignee-clearance');
 });
