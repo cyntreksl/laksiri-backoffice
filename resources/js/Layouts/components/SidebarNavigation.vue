@@ -999,6 +999,11 @@ const setMenu = (menu) => {
                     title: "Consignee Clearance Details",
                     route: "report.consignee-clearance.index",
                     permission: "reports.consignee-clearance",
+                },
+                {
+                    title: "Short Land Report",
+                    route: "report.short-land.index",
+                    permission: "reports.short-land",
                 }
             );
             changeSidePanelTitle("Report");
