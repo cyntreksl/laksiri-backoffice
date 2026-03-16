@@ -778,6 +778,8 @@ class RolePermissionSeeder extends Seeder
                     'reports.agent-wise-consignee-volume',
                     'reports.consignee-clearance',
                     'reports.short-land',
+                    'reports.over-land',
+                    'reports.age-analysis-consignee',
                     'reports.bond-storage-records',
                 ],
             ],
