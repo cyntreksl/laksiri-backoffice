@@ -232,12 +232,105 @@ class AgeAnalysisConsigneeController extends Controller
             }
 
             // Calculate total count
-            $total = $query->count();
+            if ($request->filled('container_id')) {
+                // For grouped queries, we need to count distinct HBLs
+                $total = DB::table('hbl')
+                    ->join('users as consignees', 'hbl.consignee_id', '=', 'consignees.id')
+                    ->join('branches as agent_from', 'hbl.branch_id', '=', 'agent_from.id')
+                    ->leftJoin('branches as agent_to', 'hbl.warehouse_id', '=', 'agent_to.id')
+                    ->join('hbl_packages', 'hbl.id', '=', 'hbl_packages.hbl_id')
+                    ->join('duplicate_container_hbl_package as dchp', 'hbl_packages.id', '=', 'dchp.hbl_package_id')
+                    ->join('containers', 'dchp.container_id', '=', 'containers.id')
+                    ->whereNull('hbl.deleted_at')
+                    ->where('containers.id', (int)$request->container_id);
+                    
+                // Apply the same filters as the main query
+                if ($request->filled('agent_from')) {
+                    $total->where('hbl.branch_id', (int)$request->agent_from);
+                }
+                if ($request->filled('agent_to')) {
+                    $total->where('hbl.warehouse_id', (int)$request->agent_to);
+                }
+                if ($request->filled('date_from')) {
+                    $total->where(function($q) use ($request) {
+                        $q->whereDate('containers.unloading_ended_at', '>=', $request->date_from)
+                          ->orWhere(function($subQ) use ($request) {
+                              $subQ->whereNull('containers.unloading_ended_at')
+                                   ->whereDate('hbl.created_at', '>=', $request->date_from);
+                          });
+                    });
+                }
+                if ($request->filled('date_to')) {
+                    $total->where(function($q) use ($request) {
+                        $q->whereDate('containers.unloading_ended_at', '<=', $request->date_to)
+                          ->orWhere(function($subQ) use ($request) {
+                              $subQ->whereNull('containers.unloading_ended_at')
+                                   ->whereDate('hbl.created_at', '<=', $request->date_to);
+                          });
+                    });
+                }
+                if ($request->filled('search')) {
+                    $search = $request->search;
+                    $total->where(function ($q) use ($search) {
+                        $q->where('hbl.hbl_number', 'like', "%{$search}%")
+                            ->orWhere('consignees.name', 'like', "%{$search}%")
+                            ->orWhere('containers.reference', 'like', "%{$search}%");
+                    });
+                }
+                
+                $total = $total->distinct('hbl.id')->count('hbl.id');
+            } else {
+                $total = $query->count();
+            }
 
             // Calculate stats
             if ($request->filled('container_id')) {
-                $statsQuery = clone $query;
-                $packageTotal = $statsQuery->sum(DB::raw('hbl_packages.quantity')) ?: 0;
+                // Create a separate query for package count without GROUP BY
+                $packageQuery = DB::table('hbl')
+                    ->join('users as consignees', 'hbl.consignee_id', '=', 'consignees.id')
+                    ->join('branches as agent_from', 'hbl.branch_id', '=', 'agent_from.id')
+                    ->leftJoin('branches as agent_to', 'hbl.warehouse_id', '=', 'agent_to.id')
+                    ->join('hbl_packages', 'hbl.id', '=', 'hbl_packages.hbl_id')
+                    ->join('duplicate_container_hbl_package as dchp', 'hbl_packages.id', '=', 'dchp.hbl_package_id')
+                    ->join('containers', 'dchp.container_id', '=', 'containers.id')
+                    ->whereNull('hbl.deleted_at')
+                    ->where('containers.id', (int)$request->container_id);
+                    
+                // Apply the same filters as the main query
+                if ($request->filled('agent_from')) {
+                    $packageQuery->where('hbl.branch_id', (int)$request->agent_from);
+                }
+                if ($request->filled('agent_to')) {
+                    $packageQuery->where('hbl.warehouse_id', (int)$request->agent_to);
+                }
+                if ($request->filled('date_from')) {
+                    $packageQuery->where(function($q) use ($request) {
+                        $q->whereDate('containers.unloading_ended_at', '>=', $request->date_from)
+                          ->orWhere(function($subQ) use ($request) {
+                              $subQ->whereNull('containers.unloading_ended_at')
+                                   ->whereDate('hbl.created_at', '>=', $request->date_from);
+                          });
+                    });
+                }
+                if ($request->filled('date_to')) {
+                    $packageQuery->where(function($q) use ($request) {
+                        $q->whereDate('containers.unloading_ended_at', '<=', $request->date_to)
+                          ->orWhere(function($subQ) use ($request) {
+                              $subQ->whereNull('containers.unloading_ended_at')
+                                   ->whereDate('hbl.created_at', '<=', $request->date_to);
+                          });
+                    });
+                }
+                if ($request->filled('search')) {
+                    $search = $request->search;
+                    $packageQuery->where(function ($q) use ($search) {
+                        $q->where('hbl.hbl_number', 'like', "%{$search}%")
+                            ->orWhere('consignees.name', 'like', "%{$search}%")
+                            ->orWhere('containers.reference', 'like', "%{$search}%");
+                    });
+                }
+                
+                $packageTotal = $packageQuery->sum('hbl_packages.quantity') ?: 0;
             } else {
                 $packageTotal = 0;
             }

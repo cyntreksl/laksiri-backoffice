@@ -268,7 +268,7 @@ onMounted(() => {
             </div>
 
             <!-- Summary Cards -->
-            <div class="summary-cards">
+            <div v-if="canFetchData" class="summary-cards">
                 <Card class="summary-card">
                     <template #content>
                         <div class="card-content">
@@ -288,6 +288,21 @@ onMounted(() => {
                             <div>
                                 <p class="text-sm text-gray-500 uppercase">Total Packages</p>
                                 <p class="text-3xl font-bold text-green-600">{{ stats.total_packages }}</p>
+                            </div>
+                        </div>
+                    </template>
+                </Card>
+            </div>
+
+            <!-- Message when no agents selected -->
+            <div v-if="!canFetchData" class="summary-cards">
+                <Card class="summary-card">
+                    <template #content>
+                        <div class="card-content">
+                            <i class="ti ti-info-circle text-3xl text-yellow-500"></i>
+                            <div>
+                                <p class="text-sm text-gray-500 uppercase">Status</p>
+                                <p class="text-lg font-semibold text-yellow-600">Select Agent From & Agent To</p>
                             </div>
                         </div>
                     </template>
