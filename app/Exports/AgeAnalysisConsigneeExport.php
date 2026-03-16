@@ -29,6 +29,7 @@ class AgeAnalysisConsigneeExport implements
     protected $dateRange;
     protected $agentFromName;
     protected $agentToName;
+    protected $containerInfo;
 
     public function __construct(array $filters = [])
     {
@@ -57,6 +58,17 @@ class AgeAnalysisConsigneeExport implements
             $this->agentToName = $branch ? $branch->name : 'ALL';
         } else {
             $this->agentToName = 'ALL';
+        }
+
+        // Get container information
+        if (!empty($filters['container_id'])) {
+            $container = DB::table('containers')->where('id', $filters['container_id'])->first();
+            $this->containerInfo = [
+                'number' => $container->container_number ?? '',
+                'reference' => $container->reference ?? '',
+            ];
+        } else {
+            $this->containerInfo = null;
         }
     }
 
@@ -203,13 +215,12 @@ class AgeAnalysisConsigneeExport implements
             ['Laksiri International Freight Forwarders (Pvt) Ltd'],
             ['Age Analysis of Consignees ' . $this->dateRange],
             ['Agent from ' . $this->agentFromName . ' To ' . $this->agentToName],
-            ['', '', '', '', '', '', '', '', ''],
+            ['', '', '', '', ''],
             [],
-            [],
-            ['AGENT', $this->agentFromName],
-            ['CONTAINER NO', ($this->filters['container_no'] ?? '')],
+            ['AGENT' , $this->agentFromName],
+            ['CONTAINER NO' , ($this->containerInfo['number'] ?? '')],
             ['DESTUFFING DATE' , ($this->filters['destuffing_date'] ?? '')],
-            ['NO OF DAYS', ($this->filters['no_of_days'] ?? '')],
+            ['NO OF DAYS' , ($this->filters['no_of_days'] ?? '')],
             [],
             [
                 'HBL No',
@@ -244,7 +255,7 @@ class AgeAnalysisConsigneeExport implements
                 'font' => ['bold' => false, 'size' => 10],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
             ],
-            13 => [
+            12 => [
                 'font' => ['bold' => true, 'size' => 9],
                 'fill' => [
                     'fillType' => Fill::FILL_SOLID,
