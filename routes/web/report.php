@@ -15,6 +15,7 @@ use App\Http\Controllers\HBLPackageReportController;
 use App\Http\Controllers\ShipmentReportController;
 use App\Http\Controllers\ShortLandReportController;
 use App\Http\Controllers\OverLandReportController;
+use App\Http\Controllers\AgeAnalysisConsigneeController;
 use App\Http\Controllers\StampDutyReportController;
 use App\Http\Controllers\UnclearedRTFConsigneeDetailsController;
 use Illuminate\Support\Facades\Route;
@@ -238,6 +239,23 @@ Route::name('report.')->group(function () {
     Route::get('over-land/debug', [OverLandReportController::class, 'debug'])
         ->name('over-land.debug')
         ->middleware('can:reports.over-land');
+
+    // Age Analysis Consignee Report
+    Route::get('age-analysis-consignee', [AgeAnalysisConsigneeController::class, 'index'])
+        ->name('age-analysis-consignee.index')
+        ->middleware('can:reports.age-analysis-consignee');
+
+    Route::get('age-analysis-consignee/data', [AgeAnalysisConsigneeController::class, 'getData'])
+        ->name('age-analysis-consignee.data')
+        ->middleware('can:reports.age-analysis-consignee');
+
+    Route::get('age-analysis-consignee/export', [AgeAnalysisConsigneeController::class, 'export'])
+        ->name('age-analysis-consignee.export')
+        ->middleware('can:reports.age-analysis-consignee');
+
+    Route::get('age-analysis-consignee/containers', [AgeAnalysisConsigneeController::class, 'getContainers'])
+        ->name('age-analysis-consignee.containers')
+        ->middleware('can:reports.age-analysis-consignee');
 
     // Bond Storage Records Report
     Route::get('bond-storage-records', [BondStorageRecordsController::class, 'index'])
