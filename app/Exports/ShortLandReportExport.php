@@ -33,10 +33,10 @@ class ShortLandReportExport implements
     public function __construct(array $filters = [])
     {
         $this->filters = $filters;
-        
+
         $dateFrom = !empty($filters['date_from']) ? date('d/m/Y', strtotime($filters['date_from'])) : '';
         $dateTo = !empty($filters['date_to']) ? date('d/m/Y', strtotime($filters['date_to'])) : '';
-        
+
         if ($dateFrom && $dateTo) {
             $this->dateRange = "FROM {$dateFrom} TO {$dateTo}";
         } else {
@@ -78,7 +78,7 @@ class ShortLandReportExport implements
             ->where('hbl.is_shortland', true)
             ->groupBy([
                 'hbl.id',
-                'hbl.hbl_number', 
+                'hbl.hbl_number',
                 'hbl.reference',
                 'consignees.name',
                 'hbl.consignee_address',
@@ -133,7 +133,7 @@ class ShortLandReportExport implements
         return [
             ['Laksiri International Freight Forwarders (Pvt) Ltd'],
             ['SHORT LAND ' . $this->dateRange],
-            ['AGENT NAME : ' . $this->agentName, '', '', '', '', '', '', '', '', 'PAGE : 1'],
+            ['AGENT NAME : ' . $this->agentName, '', '', '', '', '', '', '', '', ''],
             [],
             [
                 'HBL No.',
@@ -244,7 +244,7 @@ class ShortLandReportExport implements
 
                 // Get the last row with data
                 $lastRow = $sheet->getHighestRow();
-                
+
                 if ($lastRow > 5) {
                     // Apply borders to data rows (starting from row 5)
                     $sheet->getStyle('A5:J' . $lastRow)->applyFromArray([
@@ -259,7 +259,7 @@ class ShortLandReportExport implements
                     // Center align numeric columns
                     $sheet->getStyle('E6:F' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                     $sheet->getStyle('I6:J' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                    
+
                     // Center align dates
                     $sheet->getStyle('G6:H' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 }

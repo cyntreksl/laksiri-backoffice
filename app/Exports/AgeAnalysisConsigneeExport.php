@@ -33,10 +33,10 @@ class AgeAnalysisConsigneeExport implements
     public function __construct(array $filters = [])
     {
         $this->filters = $filters;
-        
+
         $dateFrom = !empty($filters['date_from']) ? date('d/m/Y', strtotime($filters['date_from'])) : '';
         $dateTo = !empty($filters['date_to']) ? date('d/m/Y', strtotime($filters['date_to'])) : '';
-        
+
         if ($dateFrom && $dateTo) {
             $this->dateRange = "from {$dateFrom} To {$dateTo}";
         } else {
@@ -170,7 +170,7 @@ class AgeAnalysisConsigneeExport implements
             $query->where(function ($q) use ($search) {
                 $q->where('hbl.hbl_number', 'like', "%{$search}%")
                     ->orWhere('consignees.name', 'like', "%{$search}%");
-                
+
                 // Add container reference search if container data is available
                 if (!empty($this->filters['container_id'])) {
                     $q->orWhere('containers.reference', 'like', "%{$search}%");
@@ -198,20 +198,18 @@ class AgeAnalysisConsigneeExport implements
 
     public function headings(): array
     {
-        $printedDateTime = date('d/m/Y H:i:s');
-        
         return [
-            [$printedDateTime],
+            [now()->format('d/m/Y'), now()->format('H:i:s')],
             ['Laksiri International Freight Forwarders (Pvt) Ltd'],
             ['Age Analysis of Consignees ' . $this->dateRange],
             ['Agent from ' . $this->agentFromName . ' To ' . $this->agentToName],
-            ['', '', '', '', '', '', '', '', 'PAGE - 1'],
+            ['', '', '', '', '', '', '', '', ''],
             [],
-            ['CARGO MANIFEST NO : ' . ($this->filters['cargo_manifest'] ?? '')],
-            ['AGENT : ' . $this->agentFromName],
-            ['CONTAINER NO : ' . ($this->filters['container_no'] ?? '')],
-            ['DESTUFFING DATE : ' . ($this->filters['destuffing_date'] ?? '')],
-            ['NO OF DAYS : ' . ($this->filters['no_of_days'] ?? '')],
+            [],
+            ['AGENT', $this->agentFromName],
+            ['CONTAINER NO', ($this->filters['container_no'] ?? '')],
+            ['DESTUFFING DATE' , ($this->filters['destuffing_date'] ?? '')],
+            ['NO OF DAYS', ($this->filters['no_of_days'] ?? '')],
             [],
             [
                 'HBL No',
@@ -317,7 +315,7 @@ class AgeAnalysisConsigneeExport implements
 
                 // Get the last row with data
                 $lastRow = $sheet->getHighestRow();
-                
+
                 if ($lastRow > 13) {
                     // Apply borders to data rows
                     $sheet->getStyle('A13:E' . $lastRow)->applyFromArray([
@@ -331,7 +329,7 @@ class AgeAnalysisConsigneeExport implements
 
                     // Center align numeric columns
                     $sheet->getStyle('D14:E' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                    
+
                     // Wrap text for consignee column
                     $sheet->getStyle('B14:B' . $lastRow)->getAlignment()->setWrapText(true);
                 }

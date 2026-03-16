@@ -329,7 +329,6 @@ onMounted(() => {
                                     input-id="agent-from"
                                     optionLabel="label"
                                     optionValue="value"
-                                    placeholder="Select Agent From"
                                     showClear
                                 />
                                 <label for="agent-from">Agent From *</label>
@@ -343,7 +342,6 @@ onMounted(() => {
                                     input-id="agent-to"
                                     optionLabel="label"
                                     optionValue="value"
-                                    placeholder="Select Agent To"
                                     showClear
                                 />
                                 <label for="agent-to">Agent To *</label>
@@ -359,7 +357,6 @@ onMounted(() => {
                                     input-id="container"
                                     optionLabel="label"
                                     optionValue="value"
-                                    placeholder="Select Container (Optional)"
                                     showClear
                                 />
                                 <label for="container">Container</label>
