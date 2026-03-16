@@ -1011,6 +1011,11 @@ const setMenu = (menu) => {
                     permission: "reports.over-land",
                 },
                 {
+                    title: "Age Analysis Consignee",
+                    route: "report.age-analysis-consignee.index",
+                    permission: "reports.age-analysis-consignee",
+                },
+                {
                     title: "Bond Storage Records",
                     route: "report.bond-storage-records.index",
                     permission: "reports.bond-storage-records",
