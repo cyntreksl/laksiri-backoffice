@@ -14,6 +14,7 @@ use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
 use App\Http\Controllers\ShipmentReportController;
 use App\Http\Controllers\ShortLandReportController;
+use App\Http\Controllers\OverLandReportController;
 use App\Http\Controllers\StampDutyReportController;
 use App\Http\Controllers\UnclearedRTFConsigneeDetailsController;
 use Illuminate\Support\Facades\Route;
@@ -220,6 +221,23 @@ Route::name('report.')->group(function () {
     Route::get('short-land/export', [ShortLandReportController::class, 'export'])
         ->name('short-land.export')
         ->middleware('can:reports.short-land');
+
+    // Over Land Report
+    Route::get('over-land', [OverLandReportController::class, 'index'])
+        ->name('over-land.index')
+        ->middleware('can:reports.over-land');
+
+    Route::get('over-land/data', [OverLandReportController::class, 'getData'])
+        ->name('over-land.data')
+        ->middleware('can:reports.over-land');
+
+    Route::get('over-land/export', [OverLandReportController::class, 'export'])
+        ->name('over-land.export')
+        ->middleware('can:reports.over-land');
+
+    Route::get('over-land/debug', [OverLandReportController::class, 'debug'])
+        ->name('over-land.debug')
+        ->middleware('can:reports.over-land');
 
     // Bond Storage Records Report
     Route::get('bond-storage-records', [BondStorageRecordsController::class, 'index'])
