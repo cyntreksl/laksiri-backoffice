@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {onMounted, ref, watch, computed} from "vue";
+import {onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import {router, usePage} from "@inertiajs/vue3";
@@ -73,7 +73,7 @@ const filters = ref({
     status: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
-const menuModel = computed(() => [
+const menuModel = ref([
     {
         label: 'Show',
         icon: 'pi pi-fw pi-search',
@@ -84,24 +84,30 @@ const menuModel = computed(() => [
         label: 'Edit',
         icon: 'pi pi-fw pi-pencil',
         command: () => router.visit(route("loading.loading-containers.edit", selectedContainer.value.id)),
-        disabled: !usePage().props.user.permissions.includes('container.edit') || !!selectedContainer.value?.manifest_number,
+        disabled: !usePage().props.user.permissions.includes('container.edit') || selectedContainer.value?.manifest_number,
+    },
+    {
+        label: 'Generate Manifest',
+        icon: 'pi pi-fw pi-file-plus',
+        command: () => showManifestConfirmation(),
+        disabled: !usePage().props.user.permissions.includes('shipment.download manifest') || selectedContainer.value?.manifest_number,
     },
     {
         label: 'Main Manifest',
         icon: 'pi pi-fw pi-download',
-        command: () => handleManifestDownload('pdf'),
+        command: () => window.location.href = route("loading.loaded-containers.manifest.export", selectedContainer.value.id),
         disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
     },
     {
         label: 'Main Manifest Excel',
         icon: 'pi pi-fw pi-file-excel',
-        command: () => handleManifestDownload('excel'),
+        command: () => window.location.href = route("loading.loaded-containers.manifest.excel", selectedContainer.value.id),
         disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
     },
     {
         label: 'Door to Door Manifest',
         icon: 'pi pi-fw pi-download',
-        command: () => handleManifestDownload('doorToDoor'),
+        command: () => window.location.href = route("loading.loaded-containers.doorToDoor.export", selectedContainer.value.id),
         disabled: !usePage().props.user.permissions.includes('shipment.download manifest'),
     },
     {
@@ -304,45 +310,22 @@ const showManifestConfirmation = () => {
     showManifestConfirmationModal.value = true;
 };
 
-const handleManifestDownload = (type) => {
-    // Always show confirmation dialog regardless of manifest status
-    showManifestConfirmation();
-    // Store the download type for after confirmation
-    pendingDownloadType.value = type;
-};
-
-const proceedWithDownload = (type) => {
-    const containerId = selectedContainer.value.id;
-
-    switch (type) {
-        case 'pdf':
-            window.location.href = route("loading.loaded-containers.manifest.export", containerId);
-            break;
-        case 'excel':
-            window.location.href = route("loading.loaded-containers.manifest.excel", containerId);
-            break;
-        case 'doorToDoor':
-            window.location.href = route("loading.loaded-containers.doorToDoor.export", containerId);
-            break;
-    }
-};
-
-const pendingDownloadType = ref(null);
-
-const handleManifestConfirmed = async () => {
+const handleManifestConfirmed = async (containerId) => {
     try {
-        // Proceed with download - the backend will handle manifest generation
-        if (pendingDownloadType.value) {
-            proceedWithDownload(pendingDownloadType.value);
-            pendingDownloadType.value = null;
-
-            // Refetch data after a short delay to show updated manifest number
-            setTimeout(async () => {
-                await fetchLoadedShipments(currentPage.value, filters.value.global.value);
-            }, 2000); // 2 second delay to allow download to process
+        const response = await axios.post(route('loading.loaded-containers.generate-manifest', containerId));
+        
+        if (response.data.success) {
+            // Refresh the data to show updated manifest status
+            await fetchLoadedShipments(currentPage.value, filters.value.global.value);
+            
+            // Show success message
+            // You can add a toast notification here if available
+            console.log('Manifest generated successfully:', response.data.manifest_number);
+        } else {
+            console.error('Failed to generate manifest:', response.data.message);
         }
     } catch (error) {
-        console.error('Error processing manifest download:', error);
+        console.error('Error generating manifest:', error);
     } finally {
         showManifestConfirmationModal.value = false;
         // Reset loading state in the dialog
@@ -354,7 +337,6 @@ const handleManifestConfirmed = async () => {
 
 const handleManifestCancelled = () => {
     showManifestConfirmationModal.value = false;
-    pendingDownloadType.value = null; // Clear pending download
 };
 
 const manifestConfirmationDialog = ref();
@@ -397,7 +379,7 @@ const manifestConfirmationDialog = ref();
                         ref="dt"
                         v-model:contextMenuSelection="selectedContainer"
                         v-model:filters="filters"
-                        :globalFilterFields="['reference', 'manifest_number', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'vessel_name', 'voyage_number', 'shipping_line']"
+                        :globalFilterFields="['reference', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'vessel_name', 'voyage_number', 'shipping_line']"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
@@ -479,14 +461,6 @@ const manifestConfirmationDialog = ref();
                         </Column>
 
                         <Column field="reference" header="Reference" sortable></Column>
-                        <Column field="manifest_number" header="Manifest #" sortable>
-                            <template #body="slotProps">
-                                <span v-if="slotProps.data.manifest_number" class="font-medium text-green-600">
-                                    {{ slotProps.data.manifest_number }}
-                                </span>
-                                <span v-else class="text-gray-400 italic">Not Generated</span>
-                            </template>
-                        </Column>
 
                         <Column field="bl_number" header="BL Number" sortable></Column>
 
@@ -572,7 +546,7 @@ const manifestConfirmationDialog = ref();
                         ref="dt"
                         v-model:contextMenuSelection="selectedContainer"
                         v-model:filters="filters"
-                        :globalFilterFields="['reference', 'manifest_number', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'vessel_name', 'voyage_number', 'shipping_line']"
+                        :globalFilterFields="['reference', 'bl_number', 'awb_number', 'container_number', 'seal_number', 'vessel_name', 'voyage_number', 'shipping_line']"
                         :loading="loading"
                         :rows="perPage"
                         :rowsPerPageOptions="[5, 10, 20, 50, 100]"
@@ -654,14 +628,6 @@ const manifestConfirmationDialog = ref();
                         </Column>
 
                         <Column field="reference" header="Reference" sortable></Column>
-                        <Column field="manifest_number" header="Manifest #" sortable>
-                            <template #body="slotProps">
-                                <span v-if="slotProps.data.manifest_number" class="font-medium text-green-600">
-                                    {{ slotProps.data.manifest_number }}
-                                </span>
-                                <span v-else class="text-gray-400 italic">Not Generated</span>
-                            </template>
-                        </Column>
 
                         <Column field="bl_number" header="BL Number" sortable></Column>
 
@@ -714,9 +680,9 @@ const manifestConfirmationDialog = ref();
            @close="closeModal"
            @update:show="showConfirmLoadedShipmentModal = $event" />
 
-    <ManifestConfirmationDialog
+    <ManifestConfirmationDialog 
         ref="manifestConfirmationDialog"
-        :show="showManifestConfirmationModal"
+        :show="showManifestConfirmationModal" 
         :container-id="selectedContainer?.id"
         @confirmed="handleManifestConfirmed"
         @cancelled="handleManifestCancelled"
@@ -730,5 +696,3 @@ const manifestConfirmationDialog = ref();
     margin-right: 3px;
 }
 </style>
-
-

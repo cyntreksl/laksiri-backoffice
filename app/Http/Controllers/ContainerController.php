@@ -154,6 +154,7 @@ class ContainerController extends Controller
 
     public function update(Container $container, UpdateContainerRequest $request)
     {
+
         return $this->containerRepository->update($request->all(), $container);
     }
 
@@ -630,7 +631,7 @@ class ContainerController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch unloading issues',
