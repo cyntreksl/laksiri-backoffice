@@ -1024,6 +1024,11 @@ const setMenu = (menu) => {
                     title: "Manifest Listing Report",
                     route: "report.manifest-listing.index",
                     permission: "reports.manifest-listing",
+                },
+                {
+                    title: "Manifest Clearance Status",
+                    route: "report.manifest-clearance-status.index",
+                    permission: "reports.manifest-clearance-status",
                 }
             );
             changeSidePanelTitle("Report");

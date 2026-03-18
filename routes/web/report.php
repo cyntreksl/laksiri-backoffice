@@ -13,6 +13,7 @@ use App\Http\Controllers\FreightChargesReportController;
 use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
 use App\Http\Controllers\ManifestListingReportController;
+use App\Http\Controllers\ManifestClearanceStatusController;
 use App\Http\Controllers\ShipmentReportController;
 use App\Http\Controllers\ShortLandReportController;
 use App\Http\Controllers\OverLandReportController;
@@ -93,6 +94,19 @@ Route::name('report.')->group(function () {
     Route::get('manifest-listing/export', [ManifestListingReportController::class, 'export'])
         ->name('manifest-listing.export')
         ->middleware('can:reports.manifest-listing');
+
+    // Manifest Clearance Status Report
+    Route::get('manifest-clearance-status', [ManifestClearanceStatusController::class, 'index'])
+        ->name('manifest-clearance-status.index')
+        ->middleware('can:reports.manifest-clearance-status');
+
+    Route::get('manifest-clearance-status/data', [ManifestClearanceStatusController::class, 'getData'])
+        ->name('manifest-clearance-status.data')
+        ->middleware('can:reports.manifest-clearance-status');
+
+    Route::get('manifest-clearance-status/export', [ManifestClearanceStatusController::class, 'export'])
+        ->name('manifest-clearance-status.export')
+        ->middleware('can:reports.manifest-clearance-status');
 
     // Container Arrival Summary
     Route::get('agent-wise-container-arrival-summary', [AgentWiseContainerArrivalSummaryController::class, 'index'])
