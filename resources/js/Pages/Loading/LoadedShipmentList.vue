@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import {onMounted, ref, watch} from "vue";
+import {onMounted, ref, watch, computed} from "vue";
 import Breadcrumb from "@/Components/Breadcrumb.vue";
 import moment from "moment";
 import {router, usePage} from "@inertiajs/vue3";
@@ -73,7 +73,7 @@ const filters = ref({
     status: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 
-const menuModel = ref([
+const menuModel = computed(() => [
     {
         label: 'Show',
         icon: 'pi pi-fw pi-search',
@@ -84,7 +84,7 @@ const menuModel = ref([
         label: 'Edit',
         icon: 'pi pi-fw pi-pencil',
         command: () => router.visit(route("loading.loading-containers.edit", selectedContainer.value.id)),
-        disabled: !usePage().props.user.permissions.includes('container.edit') || selectedContainer.value?.manifest_number,
+        disabled: !usePage().props.user.permissions.includes('container.edit') || !!selectedContainer.value?.manifest_number,
     },
     {
         label: 'Main Manifest',
@@ -716,10 +716,10 @@ const manifestConfirmationDialog = ref();
 
     <ManifestConfirmationDialog
         ref="manifestConfirmationDialog"
-        :container-id="selectedContainer?.id"
         :show="showManifestConfirmationModal"
-        @cancelled="handleManifestCancelled"
+        :container-id="selectedContainer?.id"
         @confirmed="handleManifestConfirmed"
+        @cancelled="handleManifestCancelled"
         @update:show="showManifestConfirmationModal = $event"
     />
 </template>
