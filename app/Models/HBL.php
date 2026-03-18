@@ -363,4 +363,9 @@ class HBL extends Model
     {
         return $this->belongsTo(User::class, 'shortland_marked_by');
     }
+
+    public function examinations(): HasMany
+    {
+        return $this->hasMany(Examination::class, 'hbl_id');
+    }
 }

@@ -1019,6 +1019,21 @@ const setMenu = (menu) => {
                     title: "Bond Storage Records",
                     route: "report.bond-storage-records.index",
                     permission: "reports.bond-storage-records",
+                },
+                {
+                    title: "Manifest Listing Report",
+                    route: "report.manifest-listing.index",
+                    permission: "reports.manifest-listing",
+                },
+                {
+                    title: "Manifest Clearance Status",
+                    route: "report.manifest-clearance-status.index",
+                    permission: "reports.manifest-clearance-status",
+                },
+                {
+                    title: "Unmanifested Cargo",
+                    route: "report.unmanifested-cargo.index",
+                    permission: "reports.unmanifested-cargo",
                 }
             );
             changeSidePanelTitle("Report");

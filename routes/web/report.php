@@ -12,6 +12,8 @@ use App\Http\Controllers\DetainReportController;
 use App\Http\Controllers\FreightChargesReportController;
 use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
+use App\Http\Controllers\ManifestListingReportController;
+use App\Http\Controllers\ManifestClearanceStatusController;
 use App\Http\Controllers\ShipmentReportController;
 use App\Http\Controllers\ShortLandReportController;
 use App\Http\Controllers\OverLandReportController;
@@ -79,6 +81,32 @@ Route::name('report.')->group(function () {
     Route::get('shipment-report/export', [ShipmentReportController::class, 'export'])
         ->name('shipment-report.export')
         ->middleware('can:reports.shipment');
+
+    // Manifest Listing Report
+    Route::get('manifest-listing', [ManifestListingReportController::class, 'index'])
+        ->name('manifest-listing.index')
+        ->middleware('can:reports.manifest-listing');
+
+    Route::get('manifest-listing/data', [ManifestListingReportController::class, 'getData'])
+        ->name('manifest-listing.data')
+        ->middleware('can:reports.manifest-listing');
+
+    Route::get('manifest-listing/export', [ManifestListingReportController::class, 'export'])
+        ->name('manifest-listing.export')
+        ->middleware('can:reports.manifest-listing');
+
+    // Manifest Clearance Status Report
+    Route::get('manifest-clearance-status', [ManifestClearanceStatusController::class, 'index'])
+        ->name('manifest-clearance-status.index')
+        ->middleware('can:reports.manifest-clearance-status');
+
+    Route::get('manifest-clearance-status/data', [ManifestClearanceStatusController::class, 'getData'])
+        ->name('manifest-clearance-status.data')
+        ->middleware('can:reports.manifest-clearance-status');
+
+    Route::get('manifest-clearance-status/export', [ManifestClearanceStatusController::class, 'export'])
+        ->name('manifest-clearance-status.export')
+        ->middleware('can:reports.manifest-clearance-status');
 
     // Container Arrival Summary
     Route::get('agent-wise-container-arrival-summary', [AgentWiseContainerArrivalSummaryController::class, 'index'])
@@ -269,4 +297,17 @@ Route::name('report.')->group(function () {
     Route::get('bond-storage-records/export', [BondStorageRecordsController::class, 'export'])
         ->name('bond-storage-records.export')
         ->middleware('can:reports.bond-storage-records');
+
+    // Unmanifested Cargo Report
+    Route::get('unmanifested-cargo', [\App\Http\Controllers\UnmanifestedCargoController::class, 'index'])
+        ->name('unmanifested-cargo.index')
+        ->middleware('can:reports.unmanifested-cargo');
+
+    Route::get('unmanifested-cargo/data', [\App\Http\Controllers\UnmanifestedCargoController::class, 'getData'])
+        ->name('unmanifested-cargo.data')
+        ->middleware('can:reports.unmanifested-cargo');
+
+    Route::get('unmanifested-cargo/export', [\App\Http\Controllers\UnmanifestedCargoController::class, 'export'])
+        ->name('unmanifested-cargo.export')
+        ->middleware('can:reports.unmanifested-cargo');
 });

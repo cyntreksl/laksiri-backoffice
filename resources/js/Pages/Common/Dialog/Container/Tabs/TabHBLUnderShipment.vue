@@ -86,7 +86,7 @@ const hbls = () => {
 
 const updateContainerStatusFlags = () => {
     const allHBLs = containerData.value.hbls ? Object.values(containerData.value.hbls) : [];
-    
+
     containerStatusFlags.value = {
         has_short_load: allHBLs.some(hbl => hbl.is_short_load),
         has_unmanifest: allHBLs.some(hbl => hbl.is_unmanifest),
@@ -107,7 +107,7 @@ const mhbls = () => {
     filteredMHBLsLHBL.value = Object.values(hbls).filter(hbl => hbl.mhbl !== null);
 
     const filteredMHblsHBLIds = filteredMHBLsLHBL.value.map(hbl => hbl.id);
-    
+
     // Use all packages from container (including historical/unloaded ones)
     const allPackages = props.container.hbl_packages || [];
     const filteredMHblsHBLPackages = allPackages.filter(pkg =>
@@ -188,8 +188,12 @@ watch(
         </div>
         <div class="flex items-center space-x-2">
             <template v-if="container.status !== 'IN TRANSIT'">
-                <Button v-if="usePage().props.user?.roles[0] === 'admin'" icon="pi pi-plus"
-                        label="Add HBL To Shipment" size="small" @click.prevent="confirmAddHBLModal"/>
+                <Button v-if="usePage().props.user?.roles[0] === 'admin'"
+                        :disabled="!!container.manifest_number"
+                        icon="pi pi-plus"
+                        label="Add HBL To Shipment"
+                        size="small"
+                        @click.prevent="confirmAddHBLModal"/>
             </template>
 
             <a :href="route('loading.hbls.batch-downloads', container.id)">
