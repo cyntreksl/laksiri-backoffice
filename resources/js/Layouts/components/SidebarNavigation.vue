@@ -1019,6 +1019,11 @@ const setMenu = (menu) => {
                     title: "Bond Storage Records",
                     route: "report.bond-storage-records.index",
                     permission: "reports.bond-storage-records",
+                },
+                {
+                    title: "Manifest Listing Report",
+                    route: "report.manifest-listing.index",
+                    permission: "reports.manifest-listing",
                 }
             );
             changeSidePanelTitle("Report");
