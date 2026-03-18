@@ -198,6 +198,16 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     public function downloadDoorToDoorPdf($container)
     {
+        // Generate manifest number if not exists
+        if (!$container->hasManifest()) {
+            $container->update([
+                'manifest_number' => $container->generateManifestNumber(),
+                'manifest_generated_at' => now(),
+                'manifest_generated_by' => auth()->id(),
+            ]);
+            $container->refresh();
+        }
+
         $filename = $container->reference.'_door_to_door_'.date('Y_m_d_h_i_s').'.pdf';
 
         $export = new DoorToDoorManifestExport($container);
