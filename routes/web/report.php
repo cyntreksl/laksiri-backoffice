@@ -12,6 +12,7 @@ use App\Http\Controllers\DetainReportController;
 use App\Http\Controllers\FreightChargesReportController;
 use App\Http\Controllers\HBLReportController;
 use App\Http\Controllers\HBLPackageReportController;
+use App\Http\Controllers\ManifestListingReportController;
 use App\Http\Controllers\ShipmentReportController;
 use App\Http\Controllers\ShortLandReportController;
 use App\Http\Controllers\OverLandReportController;
@@ -79,6 +80,19 @@ Route::name('report.')->group(function () {
     Route::get('shipment-report/export', [ShipmentReportController::class, 'export'])
         ->name('shipment-report.export')
         ->middleware('can:reports.shipment');
+
+    // Manifest Listing Report
+    Route::get('manifest-listing', [ManifestListingReportController::class, 'index'])
+        ->name('manifest-listing.index')
+        ->middleware('can:reports.manifest-listing');
+
+    Route::get('manifest-listing/data', [ManifestListingReportController::class, 'getData'])
+        ->name('manifest-listing.data')
+        ->middleware('can:reports.manifest-listing');
+
+    Route::get('manifest-listing/export', [ManifestListingReportController::class, 'export'])
+        ->name('manifest-listing.export')
+        ->middleware('can:reports.manifest-listing');
 
     // Container Arrival Summary
     Route::get('agent-wise-container-arrival-summary', [AgentWiseContainerArrivalSummaryController::class, 'index'])

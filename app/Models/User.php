@@ -178,6 +178,14 @@ class User extends Authenticatable
         return $this->hasMany(Pickup::class, 'consignee_id');
     }
 
+    /**
+     * Get containers where this user generated the manifest
+     */
+    public function manifestGeneratedContainers(): HasMany
+    {
+        return $this->hasMany(Container::class, 'manifest_generated_by');
+    }
+
     public function getActiveBranchTypeAttribute()
     {
         $data = GetUserCurrentBranch::run();
