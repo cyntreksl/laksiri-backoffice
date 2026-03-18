@@ -105,14 +105,18 @@ watch(() => containerData.value, () => {
         </div>
         <div class="flex items-center space-x-2">
             <template v-if="container.status !== 'IN TRANSIT'">
-                <Button v-if="usePage().props.user?.roles[0] === 'admin'" icon="pi pi-plus"
-                    label="Add MHBL To Shipment" size="small" @click.prevent="confirmAddMHBLModal" />
+                <Button v-if="usePage().props.user?.roles[0] === 'admin'"
+                    :disabled="!!container.manifest_number"
+                    icon="pi pi-plus"
+                    label="Add MHBL To Shipment"
+                    size="small"
+                    @click.prevent="confirmAddMHBLModal" />
             </template>
 
             <a v-if="filteredHBLSPackagesCount > 0" :href="route('loading.loaded-containers.doorToDoor.export', container.id)">
                 <Button icon="pi pi-print" label="Print Manifest" severity="info" size="small" />
             </a>
-            
+
             <a v-if="container.status === 'LOADED' && mhblsCount > 0" :href="route('loading.mhbls.batch-downloads', container.id)">
                 <Button icon="pi pi-print" label="Print All MHBL" severity="info" size="small" />
             </a>

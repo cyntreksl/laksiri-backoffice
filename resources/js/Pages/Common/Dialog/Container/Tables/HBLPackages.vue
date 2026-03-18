@@ -313,6 +313,7 @@ const mergedHBLData = computed(() => {
                             rounded
                             severity="danger"
                             size="small"
+                            :disabled="!!container.manifest_number"
                             @click.prevent="data.type === 'HBL' ? handleRemoveHBLFromContainer(data.id) : handleRemoveMHBLFromContainer(data.id)"
                         />
                     </div>
