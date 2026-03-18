@@ -105,6 +105,7 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
         if (! empty($search)) {
             $query->where(function ($query) use ($search) {
                 $query->where('reference', 'like', '%'.$search.'%')
+                    ->orWhere('manifest_number', 'like', '%'.$search.'%')
                     ->orWhere('container_number', 'like', '%'.$search.'%')
                     ->orWhere('bl_number', 'like', '%'.$search.'%')
                     ->orWhere('awb_number', 'like', '%'.$search.'%');
@@ -137,6 +138,16 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
 
     public function downloadManifestFile($container)
     {
+        // Generate manifest number if not exists
+        if (!$container->hasManifest()) {
+            $container->update([
+                'manifest_number' => $container->generateManifestNumber(),
+                'manifest_generated_at' => now(),
+                'manifest_generated_by' => auth()->id(),
+            ]);
+            $container->refresh();
+        }
+
         $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.pdf';
 
         $export = new LoadedContainerManifestExport($container);
@@ -294,6 +305,17 @@ class LoadedContainerRepository implements GridJsInterface, LoadedContainerRepos
     public function downloadManifestExcel($container)
     {
         $container = Container::withoutGlobalScope(BranchScope::class)->findOrFail($container);
+
+        // Generate manifest number if not exists
+        if (!$container->hasManifest()) {
+            $container->update([
+                'manifest_number' => $container->generateManifestNumber(),
+                'manifest_generated_at' => now(),
+                'manifest_generated_by' => auth()->id(),
+            ]);
+            $container->refresh();
+        }
+
         $filename = $container->reference.'_manifest_'.date('Y_m_d_h_i_s').'.xlsx';
 
         $export = new LoadedContainerManifestExcelExport($container);

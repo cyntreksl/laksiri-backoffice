@@ -136,6 +136,12 @@ class ContainerController extends Controller
 
     public function edit(Container $container)
     {
+        // Check if container has manifest and prevent editing
+        if ($container->hasManifest()) {
+            return redirect()->route('loading.loading-containers.index')
+                ->with('error', 'Container cannot be edited as manifest has been generated (Manifest #: ' . $container->manifest_number . ')');
+        }
+
         $containerTypes = ContainerType::getDropdownOptions();
         $seaContainerOptions = ContainerType::getSeaCargoOptions();
         $airContainerOptions = ContainerType::getAirCargoOptions();
@@ -154,6 +160,14 @@ class ContainerController extends Controller
 
     public function update(Container $container, UpdateContainerRequest $request)
     {
+        // Check if container has manifest and prevent updating
+        if ($container->hasManifest()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Container cannot be updated as manifest has been generated (Manifest #: ' . $container->manifest_number . ')'
+            ], 422);
+        }
+
         return $this->containerRepository->update($request->all(), $container);
     }
 
