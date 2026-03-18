@@ -1029,6 +1029,11 @@ const setMenu = (menu) => {
                     title: "Manifest Clearance Status",
                     route: "report.manifest-clearance-status.index",
                     permission: "reports.manifest-clearance-status",
+                },
+                {
+                    title: "Unmanifested Cargo",
+                    route: "report.unmanifested-cargo.index",
+                    permission: "reports.unmanifested-cargo",
                 }
             );
             changeSidePanelTitle("Report");

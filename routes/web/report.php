@@ -297,4 +297,17 @@ Route::name('report.')->group(function () {
     Route::get('bond-storage-records/export', [BondStorageRecordsController::class, 'export'])
         ->name('bond-storage-records.export')
         ->middleware('can:reports.bond-storage-records');
+
+    // Unmanifested Cargo Report
+    Route::get('unmanifested-cargo', [\App\Http\Controllers\UnmanifestedCargoController::class, 'index'])
+        ->name('unmanifested-cargo.index')
+        ->middleware('can:reports.unmanifested-cargo');
+
+    Route::get('unmanifested-cargo/data', [\App\Http\Controllers\UnmanifestedCargoController::class, 'getData'])
+        ->name('unmanifested-cargo.data')
+        ->middleware('can:reports.unmanifested-cargo');
+
+    Route::get('unmanifested-cargo/export', [\App\Http\Controllers\UnmanifestedCargoController::class, 'export'])
+        ->name('unmanifested-cargo.export')
+        ->middleware('can:reports.unmanifested-cargo');
 });

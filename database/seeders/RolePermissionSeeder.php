@@ -782,7 +782,8 @@ class RolePermissionSeeder extends Seeder
                     'reports.age-analysis-consignee',
                     'reports.bond-storage-records',
                     'reports.manifest-listing',
-                    'reports.manifest-clearance-status'
+                    'reports.manifest-clearance-status',
+                    'reports.unmanifested-cargo',
                 ],
             ],
         ];
