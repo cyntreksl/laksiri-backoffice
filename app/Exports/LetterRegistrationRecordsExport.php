@@ -33,6 +33,7 @@ class LetterRegistrationRecordsExport implements
     protected $agentName;
     protected $containerNumber;
     protected $destuffingDate;
+    protected $unloadingEndedAt;
     protected $serialCounter = 1;
 
     public function __construct(Request $request)
@@ -50,6 +51,7 @@ class LetterRegistrationRecordsExport implements
         $this->manifestNumber = '';
         $this->agentName = '';
         $this->containerNumber = '';
+        $this->unloadingEndedAt = '';
 
         // Get details from the first matching record
         $query = $this->buildQuery();
@@ -61,6 +63,7 @@ class LetterRegistrationRecordsExport implements
                 $container = $package->containers->first();
                 $this->manifestNumber = $container->manifest_number ?? '';
                 $this->containerNumber = $container->container_number ?? '';
+                $this->unloading_ended_at = $container->unloading_ended_at ?? '';
             }
             $this->agentName = $firstHbl->branch?->name ?? '';
         }
@@ -147,6 +150,7 @@ class LetterRegistrationRecordsExport implements
         // Get container and manifest information
         $manifestNumber = '';
         $containerNumber = '';
+        $unloadingEndedAt = '';
 
         if ($hbl->packages->isNotEmpty()) {
             $package = $hbl->packages->first();
@@ -154,6 +158,7 @@ class LetterRegistrationRecordsExport implements
                 $container = $package->containers->first();
                 $manifestNumber = $container->manifest_number ?? '';
                 $containerNumber = $container->container_number ?? '';
+                $unloadingEndedAt = $container->unloading_ended_at ?? '';
             }
         }
 
@@ -177,12 +182,12 @@ class LetterRegistrationRecordsExport implements
             ['Laksiri International Freight Forwarders (Pvt) Ltd'],
             ['Letter Registration Records'],
             [],
-            ['CARGO MANIFEST NO.', ':', $this->manifestNumber],
-            ['AGENT', ':', $this->agentName],
-            ['CONTAINER NO.', ':', $this->containerNumber],
-            ['DESTUFFING DATE', ':', ''],
+            ['CARGO MANIFEST NO. : ' . $this->manifestNumber],
+            ['AGENT : ' . $this->agentName],
+            ['CONTAINER NO. : ' . $this->containerNumber],
+            ['DESTUFFING DATE : ' . $this->unloadingEndedAt],
             [],
-            [$this->destuffingDate, '', '', '', '', 'PAGE - 1'],
+            [$this->destuffingDate, '', '', '', '', ''],
             [
                 'Serial No',
                 'HBL No',
@@ -268,6 +273,12 @@ class LetterRegistrationRecordsExport implements
                 // Merge title cells
                 $sheet->mergeCells('A1:F1');
                 $sheet->mergeCells('A2:F2');
+
+                // Merge header information cells
+                $sheet->mergeCells('A4:F4'); // CARGO MANIFEST NO.
+                $sheet->mergeCells('A5:F5'); // AGENT
+                $sheet->mergeCells('A6:F6'); // CONTAINER NO.
+                $sheet->mergeCells('A7:F7'); // DESTUFFING DATE
 
                 // Remove borders from header rows (1-9)
                 for ($row = 1; $row <= 9; $row++) {
