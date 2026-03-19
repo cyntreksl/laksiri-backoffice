@@ -1034,6 +1034,16 @@ const setMenu = (menu) => {
                     title: "Unmanifested Cargo",
                     route: "report.unmanifested-cargo.index",
                     permission: "reports.unmanifested-cargo",
+                },
+                {
+                    title: "Letter Registration Records",
+                    route: "report.letter-registration-records.index",
+                    permission: "reports.letter-registration-records",
+                },
+                {
+                    title: "Consignee & Volume Analysis",
+                    route: "report.consignee-volume-analysis.index",
+                    permission: "reports.consignee-volume-analysis",
                 }
             );
             changeSidePanelTitle("Report");
