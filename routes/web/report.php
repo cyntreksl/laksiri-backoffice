@@ -323,4 +323,17 @@ Route::name('report.')->group(function () {
     Route::get('letter-registration-records/export', [\App\Http\Controllers\LetterRegistrationRecordsController::class, 'export'])
         ->name('letter-registration-records.export')
         ->middleware('can:reports.letter-registration-records');
+
+    // Consignee & Volume Analysis Report
+    Route::get('consignee-volume-analysis', [\App\Http\Controllers\ConsigneeVolumeAnalysisController::class, 'index'])
+        ->name('consignee-volume-analysis.index')
+        ->middleware('can:reports.consignee-volume-analysis');
+
+    Route::get('consignee-volume-analysis/data', [\App\Http\Controllers\ConsigneeVolumeAnalysisController::class, 'getData'])
+        ->name('consignee-volume-analysis.data')
+        ->middleware('can:reports.consignee-volume-analysis');
+
+    Route::get('consignee-volume-analysis/export', [\App\Http\Controllers\ConsigneeVolumeAnalysisController::class, 'export'])
+        ->name('consignee-volume-analysis.export')
+        ->middleware('can:reports.consignee-volume-analysis');
 });
