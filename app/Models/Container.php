@@ -213,19 +213,32 @@ class Container extends Model
         return !$this->hasManifest();
     }
 
+    /**
+     * Generate a unique manifest number for this container.
+     * Format: MF-{branch_code}-{sequence} (e.g., MF-RY-00001 for Riyadh, MF-CO-00001 for Colombo)
+     * This ensures manifest numbers are unique across all branches.
+     */
     public function generateManifestNumber(): string
     {
-        $lastContainer = static::whereNotNull('manifest_number')
+        // Get branch code from the relationship
+        $branchCode = $this->branch?->branch_code ?? 'XX';
+        $prefix = 'MF-' . $branchCode . '-';
+        
+        // Find the last manifest number for this specific branch
+        $lastContainer = static::where('branch_id', $this->branch_id)
+            ->whereNotNull('manifest_number')
+            ->where('manifest_number', 'like', $prefix . '%')
             ->orderBy('manifest_number', 'desc')
             ->first();
 
         if (!$lastContainer) {
-            return 'MF00001';
+            return $prefix . '00001';
         }
 
-        $lastNumber = (int) substr($lastContainer->manifest_number, 2);
+        // Extract the numeric part after the branch prefix (e.g., MF-RY-00001 -> 00001)
+        $lastNumber = (int) substr($lastContainer->manifest_number, strlen($prefix));
         $nextNumber = $lastNumber + 1;
 
-        return 'MF' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+        return $prefix . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
     }
 }
