@@ -31,6 +31,7 @@ use App\Actions\UnloadingIssueImages\GetUnloadingIssueImages;
 use App\Actions\User\GetUserCurrentBranchID;
 use App\Actions\VesselSchedule\GetVesselSchedule;
 use App\Enum\ContainerStatus;
+use App\Enum\HBLType;
 use App\Exports\ContainersExport;
 use App\Exports\LoadedShipmentsExport;
 use App\Exports\ShipmentArrivalsExport;
@@ -170,7 +171,7 @@ class ContainerRepositories implements ContainerRepositoryInterface, GridJsInter
         $container = GetLoadedContainerById::run($container);
 
         $filteredHbls = $container->hbls->filter(function ($hbl) {
-            return in_array($hbl->hbl_type, ['UPB', 'Gift']);
+            return in_array($hbl->hbl_type, [HBLType::UPB->value, HBLType::GIFT->value, HBLType::DOOR_TO_DOOR->value]);
         });
 
         // Initialize a new Dompdf instance with custom options
