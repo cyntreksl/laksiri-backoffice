@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -103,7 +103,7 @@
         <thead style="padding: 0; margin: 0">
         @if ($chunkIndex === 0)
             <tr>
-                <th colspan="10" style="text-align: center; height: 3% !important;">UNIVERSAL FREIGHT SERVICES</th>
+                <th colspan="10" style="text-align: center; height: 3% !important;">{{ $settings?->invoice_header_title ?: 'UNIVERSAL FREIGHT SERVICES' }}</th>
             </tr>
             <tr>
                 <th colspan="10" style="background-color: #D8D8D8 ; text-align: center; height: 3% !important;">
@@ -298,9 +298,9 @@
                 <td colspan="2" style="border: none; text-align: center;"></td>
                 <td colspan="8" style="border: none; text-align: left;">
                     <strong>
-                        UNIVERSAL FREIGHT SERVICES
+                        {{ $settings?->invoice_header_title ?? 'UNIVERSAL FREIGHT SERVICES' }}
                         <br>
-                                 DOHA QATAR
+                                 {{ $settings->branch?->name ?? 'DOHA QATAR' }}
                     </strong>
                 </td>
             </tr>
