@@ -103,7 +103,7 @@
         <thead style="padding: 0; margin: 0">
         @if ($chunkIndex === 0)
             <tr>
-                <th colspan="10" style="text-align: center; height: 3% !important;">{{ $settings?->invoice_header_title ?: 'UNIVERSAL FREIGHT SERVICES' }}' }}</th>
+                <th colspan="10" style="text-align: center; height: 3% !important;">{{ $settings?->invoice_header_title ?: 'UNIVERSAL FREIGHT SERVICES' }}</th>
             </tr>
             <tr>
                 <th colspan="10" style="background-color: #D8D8D8 ; text-align: center; height: 3% !important;">
@@ -300,7 +300,7 @@
                     <strong>
                         {{ $settings?->invoice_header_title ?? 'UNIVERSAL FREIGHT SERVICES' }}
                         <br>
-                                 {{ $branch['branchName'] ?? 'DOHA QATAR' }}
+                                 {{ $settings->branch?->name ?? 'DOHA QATAR' }}
                     </strong>
                 </td>
             </tr>
