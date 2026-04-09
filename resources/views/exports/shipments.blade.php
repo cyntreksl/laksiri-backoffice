@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -106,7 +106,7 @@
                 <th colspan="2" style="border-right: none;">
                     <strong>  OBL  {{$container?->bl_number}}</strong>
                 </th>
-                <th colspan="4" style="border-left: none; border-right: none !important; text-align: center">UNIVERSAL FREIGHT SERVICES</th>
+                <th colspan="4" style="border-left: none; border-right: none !important; text-align: center">{{ $settings?->invoice_header_title ?? 'UNIVERSAL FREIGHT SERVICES' }}</th>
                 <th colspan="5" style="border-left: none; text-align: right">SHIPMENT NO {{$container?->reference}}</th>
             </tr>
             <tr>
