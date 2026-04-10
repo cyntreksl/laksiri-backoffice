@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Actions\Branch\GetBranchByName;
 use App\Actions\MHBL\GetMHBLById;
+use App\Actions\Setting\GetSettingsByBranch;
 use App\Enum\WarehouseType;
 use App\Models\Container;
 use App\Models\HBL;
@@ -42,11 +43,12 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
 
     private $branch;
 
-    public function __construct(Container $container, $settings = null, $branch = null)
+    public function __construct(Container $container)
     {
         $this->container = $container;
-        $this->settings = $settings;
-        $this->branch = $branch;
+        // Get settings from the container's branch, not the current user's branch
+        $this->settings = GetSettingsByBranch::run($container->branch_id);
+        $this->branch = $container->branch;
     }
 
     public function setProcessedData(array $data, int $giftCount, int $upbCount, int $d2dCount, string $cargoType): void
@@ -119,7 +121,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->getStyle('C1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         $worksheet->mergeCells('D1:J1');
-        $worksheet->setCellValue('D1', 'UNIVERSAL FREIGHT SERVICES');
+        $worksheet->setCellValue('D1', $this->settings?->invoice_header_title ?? 'UNIVERSAL FREIGHT SERVICES');
         $worksheet->getStyle('H1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $worksheet->setCellValue('K1', 'SHIPMENT  NO' . ($this->container?->reference ?? '2745'));
@@ -159,7 +161,7 @@ class LoadedContainerManifestExcelExport implements FromCollection, ShouldAutoSi
         $worksheet->getStyle('A4:K4')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('EEEEEE');
         $worksheet->setCellValue('A4', 'SHIPPER');
         $worksheet->mergeCells('B4:K4');
-        $worksheet->setCellValue('B4', ': ' . ($settings?->invoice_header_title ?? '') . ', ' . ($settings?->invoice_header_address ?? '') . '. TEL: ' . ($settings?->invoice_header_telephone ?? ''));
+        $worksheet->setCellValue('B4', ': ' . ($this->settings?->invoice_header_title ?? '') . ', ' . ($this->settings?->invoice_header_address ?? '') . '. TEL: ' . ($this->settings?->invoice_header_telephone ?? ''));
         $worksheet->getStyle('A4:K4')->getFont()->setBold(true);
 
         // Row 5 - Consignee
